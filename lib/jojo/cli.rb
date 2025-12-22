@@ -67,7 +67,7 @@ module Jojo
 
     desc "test", "Run tests"
     def test
-      exec "ruby -Ilib:test test/**/*_test.rb"
+      exec 'ruby -Ilib:test -e \'Dir.glob("test/**/*_test.rb").each { |f| require f.sub(/^test\//, "") }\''
     end
 
     private
