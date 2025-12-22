@@ -26,6 +26,21 @@ module Jojo
       report_results(errors)
     end
 
+    desc "generate", "Generate everything: research, resume, cover letter, and website"
+    def generate
+      validate_generate_options!
+
+      config = Jojo::Config.new
+      employer = Jojo::Employer.new(options[:employer])
+
+      say "Generating application materials for #{employer.name}...", :green
+
+      employer.create_directory!
+      say "✓ Created directory: #{employer.base_path}", :green
+
+      say "✓ Setup complete. Additional generation steps coming in future phases.", :yellow
+    end
+
     private
 
     def handle_config_yml(errors)
@@ -103,6 +118,18 @@ module Jojo
       say "2. Edit inputs/generic_resume.md with your actual work history"
       say "3. (Optional) Copy templates/recommendations.md to inputs/recommendations.md"
       say "4. Run 'jojo generate -e \"Company Name\" -j job_description.txt' to generate materials"
+    end
+
+    def validate_generate_options!
+      errors = []
+      errors << "--employer is required" unless options[:employer]
+      errors << "--job is required" unless options[:job]
+
+      if errors.any?
+        say "Error:", :red
+        errors.each { |e| say "  #{e}", :red }
+        exit 1
+      end
     end
   end
 end
