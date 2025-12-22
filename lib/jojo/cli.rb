@@ -58,11 +58,32 @@ module Jojo
     end
 
     def handle_env_file(errors)
-      # TODO: implement
+      if File.exist?('.env')
+        say "✓ .env already exists", :green
+      else
+        create_env_file(errors)
+      end
+    end
+
+    def create_env_file(errors)
+      api_key = ask("Anthropic API key:")
+
+      if api_key.strip.empty?
+        errors << "API key is required for .env"
+        return
+      end
+
+      begin
+        File.write('.env', "ANTHROPIC_API_KEY=#{api_key}\n")
+        say "✓ Created .env", :green
+      rescue => e
+        errors << "Failed to create .env: #{e.message}"
+      end
     end
 
     def ensure_inputs_directory
-      # TODO: implement
+      FileUtils.mkdir_p('inputs') unless Dir.exist?('inputs')
+      say "✓ inputs/ directory ready", :green
     end
 
     def report_results(errors)
