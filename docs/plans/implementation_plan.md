@@ -169,10 +169,16 @@ Each phase will include tests and be potentially shippable.
 
 ### Tasks:
 
-- [ ] Create `lib/jojo/employer.rb` - Employer class
+- [ ] Create `lib/jojo/employer.rb` - Employer class (verify if this is already completed)
   - Generate slug from employer name
   - Create employer directory structure
   - Provide paths to all employer files
+
+- [ ] Create `lib/jojo/ai_client.rb` - Wrapper for ruby-llm
+  - Initialize with config (API key, model selection)
+  - Methods for reasoning vs text generation
+  - Error handling and retries
+  - Token usage logging
 
 - [ ] Create `lib/jojo/job_description_processor.rb`
   - Handle file input: read markdown/text file
@@ -180,7 +186,7 @@ Each phase will include tests and be potentially shippable.
     - use https://github.com/goldziher/html-to-markdown gem to get raw markdown as `employers/#{slug}/job_description_raw.md`
     - use AI to extract just the job description to markdown -- no alterations, we want the employer to recognize it as their own wording
   - Save as `employers/#{slug}/job_description.md`
-  - Extract key details (job title, company name, etc.) for use in other components
+  - Extract key details (job title, company name, etc.) for use in other components using AI; save as `employers/#{slug}/job_details.yml`
 
 - [ ] Add `html-to-markdown` gem to Gemfile (https://github.com/goldziher/html-to-markdown)
 
@@ -199,12 +205,6 @@ Each phase will include tests and be potentially shippable.
 **Goal**: Generate company/role research using AI
 
 ### Tasks:
-
-- [ ] Create `lib/jojo/ai_client.rb` - Wrapper for ruby-llm
-  - Initialize with config (API key, model selection)
-  - Methods for reasoning vs text generation
-  - Error handling and retries
-  - Token usage logging
 
 - [ ] Create `lib/jojo/prompts/research_prompt.rb`
   - Template for research generation prompt
