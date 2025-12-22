@@ -1,0 +1,4 @@
+seeker_name: Test User
+reasoning_ai:
+  service: anthropic
+  # missing model

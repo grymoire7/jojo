@@ -23,4 +23,18 @@ describe Jojo::Config do
     config = Jojo::Config.new('test/fixtures/valid_config.yml')
     _(config.voice_and_tone).must_equal 'professional and friendly'
   end
+
+  it "aborts when config file is missing" do
+    _ {
+      config = Jojo::Config.new('nonexistent.yml')
+      config.seeker_name # trigger lazy load
+    }.must_raise SystemExit
+  end
+
+  it "aborts when AI config is invalid" do
+    _ {
+      config = Jojo::Config.new('test/fixtures/invalid_config.yml')
+      config.reasoning_ai_model # trigger validation
+    }.must_raise SystemExit
+  end
 end
