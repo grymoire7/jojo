@@ -21,4 +21,17 @@ describe Jojo::Employer do
     employer = Jojo::Employer.new('!Company!')
     _(employer.slug).must_equal 'company'
   end
+
+  it "provides correct file paths" do
+    employer = Jojo::Employer.new('Acme Corp')
+
+    _(employer.base_path).must_equal 'employers/acme-corp'
+    _(employer.job_description_path).must_equal 'employers/acme-corp/job_description.md'
+    _(employer.research_path).must_equal 'employers/acme-corp/research.md'
+    _(employer.resume_path).must_equal 'employers/acme-corp/resume.md'
+    _(employer.cover_letter_path).must_equal 'employers/acme-corp/cover_letter.md'
+    _(employer.status_log_path).must_equal 'employers/acme-corp/status_log.md'
+    _(employer.website_path).must_equal 'employers/acme-corp/website'
+    _(employer.index_html_path).must_equal 'employers/acme-corp/website/index.html'
+  end
 end

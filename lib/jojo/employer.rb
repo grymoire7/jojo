@@ -8,6 +8,34 @@ module Jojo
       @base_path = File.join('employers', @slug)
     end
 
+    def job_description_path
+      File.join(base_path, 'job_description.md')
+    end
+
+    def research_path
+      File.join(base_path, 'research.md')
+    end
+
+    def resume_path
+      File.join(base_path, 'resume.md')
+    end
+
+    def cover_letter_path
+      File.join(base_path, 'cover_letter.md')
+    end
+
+    def status_log_path
+      File.join(base_path, 'status_log.md')
+    end
+
+    def website_path
+      File.join(base_path, 'website')
+    end
+
+    def index_html_path
+      File.join(website_path, 'index.html')
+    end
+
     private
 
     def slugify(text)
