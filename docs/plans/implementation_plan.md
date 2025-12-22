@@ -180,6 +180,10 @@ Each phase will include tests and be potentially shippable.
   - Error handling and retries
   - Token usage logging
 
+- [ ] Create `lib/jojo/prompts/job_description_prompts.rb`
+  - Template for description extraction prompt
+  - Template for key details prompt
+
 - [ ] Create `lib/jojo/job_description_processor.rb`
   - Handle file input: read markdown/text file
   - Handle URL input: fetch HTML, convert to markdown
