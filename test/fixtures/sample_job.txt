@@ -1,0 +1,10 @@
+Senior Ruby Developer
+
+Acme Corp is seeking an experienced Ruby developer to join our team.
+
+Requirements:
+- 5+ years of Ruby experience
+- Experience with Rails
+- Strong communication skills
+
+To apply, send resume and cover letter.
