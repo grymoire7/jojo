@@ -176,11 +176,13 @@ Each phase will include tests and be potentially shippable.
 
 - [ ] Create `lib/jojo/job_description_processor.rb`
   - Handle file input: read markdown/text file
-  - Handle URL input: fetch HTML, convert to markdown (use `reverse_markdown` gem or AI)
+  - Handle URL input: fetch HTML, convert to markdown
+    - use https://github.com/goldziher/html-to-markdown gem to get raw markdown as `employers/#{slug}/job_description_raw.md`
+    - use AI to extract just the job description to markdown -- no alterations, we want the employer to recognize it as their own wording
   - Save as `employers/#{slug}/job_description.md`
   - Extract key details (job title, company name, etc.) for use in other components
 
-- [ ] Add `reverse_markdown` gem to Gemfile (or use AI for HTML→markdown)
+- [ ] Add `html-to-markdown` gem to Gemfile (https://github.com/goldziher/html-to-markdown)
 
 - [ ] Create tests for JobDescriptionProcessor
 
