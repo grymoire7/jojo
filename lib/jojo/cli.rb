@@ -41,6 +41,35 @@ module Jojo
       say "✓ Setup complete. Additional generation steps coming in future phases.", :yellow
     end
 
+    desc "research", "Generate company/role research only"
+    def research
+      validate_generate_options!
+      say "Research generation coming in Phase 3", :yellow
+    end
+
+    desc "resume", "Generate tailored resume only"
+    def resume
+      validate_generate_options!
+      say "Resume generation coming in Phase 4", :yellow
+    end
+
+    desc "cover_letter", "Generate cover letter only"
+    def cover_letter
+      validate_generate_options!
+      say "Cover letter generation coming in Phase 5", :yellow
+    end
+
+    desc "website", "Generate website only"
+    def website
+      validate_generate_options!
+      say "Website generation coming in Phase 6", :yellow
+    end
+
+    desc "test", "Run tests"
+    def test
+      exec "ruby -Ilib:test test/**/*_test.rb"
+    end
+
     private
 
     def handle_config_yml(errors)
