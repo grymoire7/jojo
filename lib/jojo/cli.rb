@@ -29,7 +29,32 @@ module Jojo
     private
 
     def handle_config_yml(errors)
-      # TODO: implement
+      if File.exist?('config.yml')
+        if yes?("config.yml already exists. Overwrite?")
+          create_config_yml(errors)
+        else
+          say "⊘ Skipped config.yml", :yellow
+        end
+      else
+        create_config_yml(errors)
+      end
+    end
+
+    def create_config_yml(errors)
+      seeker_name = ask("Your name:")
+
+      if seeker_name.strip.empty?
+        errors << "Name is required for config.yml"
+        return
+      end
+
+      begin
+        template = ERB.new(File.read('templates/config.yml.erb'))
+        File.write('config.yml', template.result(binding))
+        say "✓ Created config.yml", :green
+      rescue => e
+        errors << "Failed to create config.yml: #{e.message}"
+      end
     end
 
     def handle_env_file(errors)
