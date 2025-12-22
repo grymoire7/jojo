@@ -1,0 +1,8 @@
+seeker_name: Test User
+reasoning_ai:
+  service: anthropic
+  model: sonnet
+text_generation_ai:
+  service: anthropic
+  model: haiku
+voice_and_tone: professional and friendly
