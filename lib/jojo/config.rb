@@ -35,6 +35,18 @@ module Jojo
       config['voice_and_tone'] || 'professional and friendly'
     end
 
+    def search_provider_service
+      config.dig('search_provider', 'service')
+    end
+
+    def search_provider_api_key
+      config.dig('search_provider', 'api_key')
+    end
+
+    def search_provider_configured?
+      !search_provider_service.nil? && !search_provider_api_key.nil?
+    end
+
     private
 
     def config

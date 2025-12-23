@@ -24,6 +24,20 @@ describe Jojo::Config do
     _(config.voice_and_tone).must_equal 'professional and friendly'
   end
 
+  it "loads search provider config" do
+    config = Jojo::Config.new('test/fixtures/valid_config.yml')
+    _(config.search_provider_service).must_equal 'serper'
+    _(config.search_provider_api_key).must_equal 'test_api_key'
+    _(config.search_provider_configured?).must_equal true
+  end
+
+  it "handles missing search provider config" do
+    config = Jojo::Config.new('test/fixtures/invalid_config.yml')
+    _(config.search_provider_service).must_be_nil
+    _(config.search_provider_api_key).must_be_nil
+    _(config.search_provider_configured?).must_equal false
+  end
+
   it "aborts when config file is missing" do
     _ {
       config = Jojo::Config.new('nonexistent.yml')
