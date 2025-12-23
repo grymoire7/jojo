@@ -79,6 +79,17 @@ module Jojo
       end
 
       def perform_web_search(company_name)
+        # Web search uses deepsearch-rb gem to query search APIs
+        # Requires search_provider configuration in config.yml:
+        #   search_provider:
+        #     service: serper  # or tavily, searxng, duckduckgo
+        #     api_key: your_api_key
+        #
+        # Supported services: https://github.com/alexshagov/deepsearch-rb
+        #
+        # If search provider is not configured, research generation continues
+        # using only job description analysis (graceful degradation)
+
         unless config.search_provider_configured?
           log "Warning: Search provider not configured, skipping web search"
           return nil
