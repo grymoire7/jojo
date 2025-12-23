@@ -135,7 +135,23 @@ module Jojo
       say "Website generation coming in Phase 6", :yellow
     end
 
-    desc "test", "Run tests"
+    desc "test", "Run tests (default: --unit for fast feedback)"
+    long_desc <<~DESC
+      Run test suite with optional category filtering.
+
+      Categories:
+        --unit         Unit tests (fast, no external dependencies) [default]
+        --integration  Integration tests (mocked external services)
+        --service      Service tests (real API calls, may cost money)
+        --all          All test categories
+
+      Examples:
+        jojo test                        # Run unit tests only (fast)
+        jojo test --all                  # Run all tests
+        jojo test --unit --integration   # Run unit and integration tests
+        jojo test --service              # Run service tests (with confirmation)
+        jojo test -q                     # Quiet mode, check exit code
+    DESC
     method_option :unit, type: :boolean, desc: 'Run unit tests (default)'
     method_option :integration, type: :boolean, desc: 'Run integration tests'
     method_option :service, type: :boolean, desc: 'Run service tests (may use real APIs)'
