@@ -35,6 +35,7 @@ module Jojo
       config = Jojo::Config.new
       employer = Jojo::Employer.new(options[:employer])
       ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
+      status_logger = Jojo::StatusLogger.new(employer)
 
       say "Generating application materials for #{employer.name}...", :green
 
@@ -47,16 +48,33 @@ module Jojo
         result = processor.process(options[:job])
 
         say "✓ Job description processed and saved", :green
-
-        # Log to status log
-        log_to_status(employer, "Job description processed from: #{options[:job]}")
-        log_to_status(employer, "Tokens used: #{ai_client.total_tokens_used}")
-
-        say "\n✓ Phase 2 complete. Research generation coming in Phase 3.", :yellow
+        status_logger.log_step("Job Description Processing",
+          tokens: ai_client.total_tokens_used,
+          status: "complete"
+        )
       rescue => e
         say "✗ Error processing job description: #{e.message}", :red
+        status_logger.log_step("Job Description Processing", status: "failed", error: e.message)
         exit 1
       end
+
+      # Generate research
+      begin
+        generator = Jojo::Generators::ResearchGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+        generator.generate
+
+        say "✓ Research generated and saved", :green
+        status_logger.log_step("Research Generation",
+          tokens: ai_client.total_tokens_used,
+          status: "complete"
+        )
+      rescue => e
+        say "✗ Error generating research: #{e.message}", :red
+        status_logger.log_step("Research Generation", status: "failed", error: e.message)
+        exit 1
+      end
+
+      say "\n✓ Phase 3 complete. Resume generation coming in Phase 4.", :yellow
     end
 
     desc "research", "Generate company/role research only"
@@ -209,16 +227,6 @@ module Jojo
         say "Error:", :red
         errors.each { |e| say "  #{e}", :red }
         exit 1
-      end
-    end
-
-    def log_to_status(employer, message)
-      timestamp = Time.now.strftime("%Y-%m-%d %H:%M:%S")
-      log_entry = "**#{timestamp}**: #{message}\n\n"
-
-      # Create or append to status log
-      File.open(employer.status_log_path, 'a') do |f|
-        f.write(log_entry)
       end
     end
   end
