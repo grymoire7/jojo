@@ -409,6 +409,32 @@ Each phase will include tests and be potentially shippable.
 - **Fixtures**: Create sample job descriptions and generic resumes for testing
 - **Run tests**: `./bin/jojo test` or `ruby -Ilib:test test/**/*_test.rb`
 
+## Test Organization
+
+**Structure**: Tests are organized by category in separate directories:
+
+- `test/unit/` - Fast unit tests with no external dependencies (default)
+- `test/integration/` - Integration tests with mocked external services
+- `test/service/` - Tests that call real external APIs (Serper, OpenAI, etc.)
+
+**Running Tests**:
+
+```bash
+./bin/jojo test                       # Unit tests only (fast, default)
+./bin/jojo test --all                 # All test categories
+./bin/jojo test --unit --integration  # Multiple categories
+./bin/jojo test --service             # Service tests (confirmation required)
+./bin/jojo test -q                    # Quiet mode
+```
+
+**Decision Rule**:
+- Real external service call → `test/service/`
+- Mocked external service → `test/integration/` or `test/unit/`
+- Pure unit logic → `test/unit/`
+
+**Environment Variables**:
+- `SKIP_SERVICE_CONFIRMATION=true` - Skip confirmation prompt for service tests (useful for CI)
+
 ## Future Enhancements (Post-v1)
 
 - [ ] Application tracking: list all employers, status, dates
