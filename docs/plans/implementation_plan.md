@@ -229,7 +229,7 @@ Each phase will include tests and be potentially shippable.
 
 - [ ] Add to `generate` command workflow
 
-- [ ] Create tests for ResearchGenerator
+- [ ] Create tests for ResearchGenerator - do not call third-party APIs in tests; mock AI responses
 
 **Validation**: `./bin/jojo research -e "Acme Corp" -j test_job.txt` generates research.md with relevant company insights
 
