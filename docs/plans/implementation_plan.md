@@ -205,33 +205,69 @@ Each phase will include tests and be potentially shippable.
 
 **Validation**: ✅ Command structure validated. Directory creation and file processing work correctly. Full end-to-end test requires valid Anthropic API key in `.env`
 
-## Phase 3: Research Generation
+## Phase 3: Research Generation ✅
 
 **Goal**: Generate company/role research using AI
 
+**Status**: COMPLETED
+
 ### Tasks:
 
-- [ ] Create `lib/jojo/prompts/research_prompt.rb`
-  - Template for research generation prompt
-  - Include job description
-  - Request company research, role analysis, culture insights
-  - Output format specification (markdown sections)
+- [x] Create `lib/jojo/status_logger.rb`
+  - Log entries with timestamps
+  - Markdown formatting
+  - Append to status_log.md
+  - Metadata support for step logging
 
-- [ ] Create `lib/jojo/generators/research_generator.rb`
+- [x] Create `lib/jojo/prompts/research_prompt.rb`
+  - Template for research generation prompt
+  - Include job description, web search results, generic resume
+  - Request company research, role analysis, strategic positioning, tailoring recommendations
+  - Output format specification (markdown sections)
+  - Graceful degradation when inputs are missing
+
+- [x] Create `lib/jojo/generators/research_generator.rb`
   - Read job description
-  - Build prompt
+  - Read generic resume from inputs/
+  - Extract company name from job details
+  - Perform web search using deepsearch-rb gem
+  - Build comprehensive prompt
   - Call AI (reasoning model)
   - Save to `employers/#{slug}/research.md`
-  - Log to status_log
+  - Graceful error handling
 
-- [ ] Implement `research` command in CLI
+- [x] Implement `research` command in CLI
   - Run research generator only
+  - Use StatusLogger for logging
 
-- [ ] Add to `generate` command workflow
+- [x] Add to `generate` command workflow
+  - Run after job description processing
+  - Before resume generation (Phase 4)
 
-- [ ] Create tests for ResearchGenerator - do not call third-party APIs in tests; mock AI responses
+- [x] Create tests for StatusLogger
+  - Test log creation and appending
+  - Test timestamp formatting
+  - Test metadata logging
 
-**Validation**: `./bin/jojo research -e "Acme Corp" -j test_job.txt` generates research.md with relevant company insights
+- [x] Create tests for ResearchGenerator
+  - Mock AI responses
+  - Mock web search results
+  - Test graceful degradation
+  - Test error handling
+
+- [x] Add deepsearch-rb integration
+  - Add gem to Gemfile
+  - Update Config to support search_provider settings
+  - Configure search provider (serper, tavily, searxng, duckduckgo)
+  - Graceful degradation when search provider not configured
+
+**Validation**: ✅ `./bin/jojo research -e "Acme Corp" -j test_job.txt` generates research.md with relevant company insights, role analysis, strategic positioning, and tailoring recommendations. Status log is updated. Tests pass without calling third-party APIs.
+
+**Notes**:
+- Web search functionality uses deepsearch-rb gem (user-configurable search provider)
+- Requires search provider configuration in config.yml (optional but recommended)
+- In standalone execution without search config, research uses job description only
+- Generic resume (inputs/generic_resume.md) is optional but recommended for personalized research
 
 ## Phase 4: Resume Generation
 
