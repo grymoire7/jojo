@@ -1,5 +1,7 @@
 require 'erb'
 require 'fileutils'
+require_relative 'status_logger'
+require_relative 'generators/research_generator'
 
 module Jojo
   class CLI < Thor
@@ -60,7 +62,40 @@ module Jojo
     desc "research", "Generate company/role research only"
     def research
       validate_generate_options!
-      say "Research generation coming in Phase 3", :yellow
+
+      config = Jojo::Config.new
+      employer = Jojo::Employer.new(options[:employer])
+      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
+      status_logger = Jojo::StatusLogger.new(employer)
+
+      say "Generating research for #{employer.name}...", :green
+
+      # Ensure employer directory exists
+      employer.create_directory! unless Dir.exist?(employer.base_path)
+
+      # Check that job description has been processed
+      unless File.exist?(employer.job_description_path)
+        say "✗ Job description not found. Run 'generate' first or provide job description.", :red
+        exit 1
+      end
+
+      begin
+        generator = Jojo::Generators::ResearchGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+        research = generator.generate
+
+        say "✓ Research generated and saved to #{employer.research_path}", :green
+
+        status_logger.log_step("Research Generation",
+          tokens: ai_client.total_tokens_used,
+          status: "complete"
+        )
+
+        say "\n✓ Research complete!", :green
+      rescue => e
+        say "✗ Error generating research: #{e.message}", :red
+        status_logger.log_step("Research Generation", status: "failed", error: e.message)
+        exit 1
+      end
     end
 
     desc "resume", "Generate tailored resume only"
