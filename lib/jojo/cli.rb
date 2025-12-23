@@ -6,6 +6,7 @@ require_relative 'generators/research_generator'
 module Jojo
   class CLI < Thor
     class_option :verbose, type: :boolean, aliases: '-v', desc: 'Run verbosely'
+    class_option :quiet, type: :boolean, aliases: '-q', desc: 'Suppress output, rely on exit code'
     class_option :employer, type: :string, aliases: '-e', desc: 'Employer name'
     class_option :job, type: :string, aliases: '-j', desc: 'Job description (file path or URL)'
 
@@ -136,7 +137,14 @@ module Jojo
 
     desc "test", "Run tests"
     def test
-      exec 'ruby -Ilib:test -e \'Dir.glob("test/**/*_test.rb").each { |f| require f.sub(/^test\//, "") }\''
+      test_cmd = 'ruby -Ilib:test -e \'Dir.glob("test/**/*_test.rb").each { |f| require f.sub(/^test\//, "") }\''
+
+      if options[:quiet]
+        # Redirect stdout and stderr to /dev/null in quiet mode
+        exec "#{test_cmd} > /dev/null 2>&1"
+      else
+        exec test_cmd
+      end
     end
 
     private
