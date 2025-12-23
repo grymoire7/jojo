@@ -1,4 +1,4 @@
 seeker_name: Test User
 reasoning_ai:
   service: anthropic
-  # missing model
+  # Missing model field intentionally for testing

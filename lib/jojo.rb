@@ -7,4 +7,7 @@ end
 
 require_relative 'jojo/config'
 require_relative 'jojo/employer'
+require_relative 'jojo/ai_client'
+require_relative 'jojo/prompts/job_description_prompts'
+require_relative 'jojo/job_description_processor'
 require_relative 'jojo/cli'

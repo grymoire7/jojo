@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Jojo
   class Employer
     attr_reader :name, :slug, :base_path
@@ -8,8 +10,16 @@ module Jojo
       @base_path = File.join('employers', @slug)
     end
 
+    def job_description_raw_path
+      File.join(base_path, 'job_description_raw.md')
+    end
+
     def job_description_path
       File.join(base_path, 'job_description.md')
+    end
+
+    def job_details_path
+      File.join(base_path, 'job_details.yml')
     end
 
     def research_path

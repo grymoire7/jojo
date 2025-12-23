@@ -32,13 +32,29 @@ module Jojo
 
       config = Jojo::Config.new
       employer = Jojo::Employer.new(options[:employer])
+      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
 
       say "Generating application materials for #{employer.name}...", :green
 
       employer.create_directory!
       say "✓ Created directory: #{employer.base_path}", :green
 
-      say "✓ Setup complete. Additional generation steps coming in future phases.", :yellow
+      # Process job description
+      begin
+        processor = Jojo::JobDescriptionProcessor.new(employer, ai_client, verbose: options[:verbose])
+        result = processor.process(options[:job])
+
+        say "✓ Job description processed and saved", :green
+
+        # Log to status log
+        log_to_status(employer, "Job description processed from: #{options[:job]}")
+        log_to_status(employer, "Tokens used: #{ai_client.total_tokens_used}")
+
+        say "\n✓ Phase 2 complete. Research generation coming in Phase 3.", :yellow
+      rescue => e
+        say "✗ Error processing job description: #{e.message}", :red
+        exit 1
+      end
     end
 
     desc "research", "Generate company/role research only"
@@ -158,6 +174,16 @@ module Jojo
         say "Error:", :red
         errors.each { |e| say "  #{e}", :red }
         exit 1
+      end
+    end
+
+    def log_to_status(employer, message)
+      timestamp = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+      log_entry = "**#{timestamp}**: #{message}\n\n"
+
+      # Create or append to status log
+      File.open(employer.status_log_path, 'a') do |f|
+        f.write(log_entry)
       end
     end
   end

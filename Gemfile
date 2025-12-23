@@ -5,6 +5,7 @@ ruby '3.4.5'
 gem 'thor', '~> 1.3'
 gem 'ruby_llm', '~> 1.9'
 gem 'dotenv', '~> 3.1'
+gem 'html-to-markdown', '~> 2.16'
 
 group :development, :test do
   gem 'minitest', '~> 5.25'

@@ -1,10 +1,42 @@
-Senior Ruby Developer
+# Senior Ruby Developer - Acme Corp
 
-Acme Corp is seeking an experienced Ruby developer to join our team.
+## About Acme Corp
+Acme Corp is a leading technology company specializing in innovative solutions for the modern web. We're building the next generation of tools for developers worldwide.
 
-Requirements:
-- 5+ years of Ruby experience
-- Experience with Rails
-- Strong communication skills
+## Job Description
+We are seeking a Senior Ruby Developer to join our dynamic engineering team. You'll be working on cutting-edge web applications using Ruby on Rails and modern JavaScript frameworks.
 
-To apply, send resume and cover letter.
+## Responsibilities
+- Design and develop scalable Ruby on Rails applications
+- Collaborate with cross-functional teams to define and ship new features
+- Write clean, maintainable, and well-tested code
+- Mentor junior developers and conduct code reviews
+- Participate in architectural decisions
+
+## Requirements
+- 5+ years of experience with Ruby and Ruby on Rails
+- Strong understanding of RESTful API design
+- Experience with PostgreSQL or other relational databases
+- Proficiency in modern JavaScript (React, Vue, or similar)
+- Excellent problem-solving and communication skills
+- Experience with Git and CI/CD workflows
+
+## Nice to Have
+- Experience with containerization (Docker, Kubernetes)
+- Background in test-driven development (TDD)
+- Open source contributions
+
+## What We Offer
+- Competitive salary: $120k - $160k
+- Flexible remote work options
+- Health, dental, and vision insurance
+- Professional development budget
+- Collaborative and inclusive work environment
+
+## Location
+Remote (US) or San Francisco, CA
+
+## How to Apply
+Please send your resume and a brief cover letter explaining your interest in the role to careers@acmecorp.com
+
+Acme Corp is an equal opportunity employer.
