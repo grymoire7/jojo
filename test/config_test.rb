@@ -1,5 +1,6 @@
 require_relative 'test_helper'
 require_relative '../lib/jojo/config'
+require 'stringio'
 
 describe Jojo::Config do
   it "loads seeker name" do
@@ -40,15 +41,29 @@ describe Jojo::Config do
 
   it "aborts when config file is missing" do
     _ {
-      config = Jojo::Config.new('nonexistent.yml')
-      config.seeker_name # trigger lazy load
+      # Capture stderr to suppress error message during test
+      original_stderr = $stderr
+      $stderr = StringIO.new
+      begin
+        config = Jojo::Config.new('nonexistent.yml')
+        config.seeker_name # trigger lazy load
+      ensure
+        $stderr = original_stderr
+      end
     }.must_raise SystemExit
   end
 
   it "aborts when AI config is invalid" do
     _ {
-      config = Jojo::Config.new('test/fixtures/invalid_config.yml')
-      config.reasoning_ai_model # trigger validation
+      # Capture stderr to suppress error message during test
+      original_stderr = $stderr
+      $stderr = StringIO.new
+      begin
+        config = Jojo::Config.new('test/fixtures/invalid_config.yml')
+        config.reasoning_ai_model # trigger validation
+      ensure
+        $stderr = original_stderr
+      end
     }.must_raise SystemExit
   end
 end
