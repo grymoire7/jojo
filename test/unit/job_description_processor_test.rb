@@ -50,11 +50,6 @@ describe Jojo::JobDescriptionProcessor do
     _(error.message).must_include "File not found"
   end
 
-  it "saves raw content when processing URL" do
-    # Skip this test if no network or we want unit tests only
-    skip "URL processing requires network and mocking"
-  end
-
   it "extracts job description using AI" do
     raw_content = "Navigation bar\nJob posting: Ruby Developer\nFooter"
 
