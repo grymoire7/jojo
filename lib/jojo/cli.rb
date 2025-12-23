@@ -136,11 +136,47 @@ module Jojo
     end
 
     desc "test", "Run tests"
+    method_option :unit, type: :boolean, desc: 'Run unit tests (default)'
+    method_option :integration, type: :boolean, desc: 'Run integration tests'
+    method_option :service, type: :boolean, desc: 'Run service tests (may use real APIs)'
+    method_option :all, type: :boolean, desc: 'Run all tests'
     def test
-      test_cmd = 'ruby -Ilib:test -e \'Dir.glob("test/**/*_test.rb").each { |f| require f.sub(/^test\//, "") }\''
+      # Determine which test categories to run
+      categories = []
+
+      if options[:all]
+        categories = ['unit', 'integration', 'service']
+      else
+        # Collect specified categories
+        categories << 'unit' if options[:unit]
+        categories << 'integration' if options[:integration]
+        categories << 'service' if options[:service]
+
+        # Default to unit tests if no flags specified
+        categories = ['unit'] if categories.empty?
+      end
+
+      # Safety confirmation for service tests
+      if categories.include?('service') && !ENV['SKIP_SERVICE_CONFIRMATION']
+        unless yes?("⚠️  Run service tests? These may cost money and require API keys. Continue? (y/n)")
+          # Remove service from categories if user declines
+          categories.delete('service')
+          # Exit if service was the only category requested
+          if categories.empty?
+            say "No tests to run.", :yellow
+            exit 0
+          end
+        end
+      end
+
+      # Build test file patterns
+      patterns = categories.map { |cat| "test/#{cat}/**/*_test.rb" }
+
+      # Build and execute test command
+      pattern_glob = patterns.join(',')
+      test_cmd = "ruby -Ilib:test -e 'Dir.glob(\"{#{pattern_glob}}\").each { |f| require f.sub(/^test\\//, \"\") }'"
 
       if options[:quiet]
-        # Redirect stdout and stderr to /dev/null in quiet mode
         exec "#{test_cmd} > /dev/null 2>&1"
       else
         exec test_cmd
