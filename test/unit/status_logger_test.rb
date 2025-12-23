@@ -1,5 +1,5 @@
-require_relative 'test_helper'
-require_relative '../lib/jojo/status_logger'
+require_relative '../test_helper'
+require_relative '../../lib/jojo/status_logger'
 
 describe Jojo::StatusLogger do
   before do

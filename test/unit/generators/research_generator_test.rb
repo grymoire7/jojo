@@ -1,7 +1,7 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/employer'
-require_relative '../../lib/jojo/generators/research_generator'
-require_relative '../../lib/jojo/prompts/research_prompt'
+require_relative '../../test_helper'
+require_relative '../../../lib/jojo/employer'
+require_relative '../../../lib/jojo/generators/research_generator'
+require_relative '../../../lib/jojo/prompts/research_prompt'
 
 describe Jojo::Generators::ResearchGenerator do
   before do

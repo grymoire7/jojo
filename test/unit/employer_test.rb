@@ -1,5 +1,5 @@
-require_relative 'test_helper'
-require_relative '../lib/jojo/employer'
+require_relative '../test_helper'
+require_relative '../../lib/jojo/employer'
 
 describe Jojo::Employer do
   it "slugifies company name with spaces" do

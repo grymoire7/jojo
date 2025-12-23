@@ -1,5 +1,5 @@
-require_relative 'test_helper'
-require_relative '../lib/jojo/config'
+require_relative '../test_helper'
+require_relative '../../lib/jojo/config'
 require 'stringio'
 
 describe Jojo::Config do

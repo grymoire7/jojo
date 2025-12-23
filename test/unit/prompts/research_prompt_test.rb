@@ -1,5 +1,5 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/prompts/research_prompt'
+require_relative '../../test_helper'
+require_relative '../../../lib/jojo/prompts/research_prompt'
 
 describe Jojo::Prompts::Research do
   it "generates research prompt with all inputs" do

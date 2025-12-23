@@ -1,8 +1,8 @@
-require_relative 'test_helper'
-require_relative '../lib/jojo/employer'
-require_relative '../lib/jojo/ai_client'
-require_relative '../lib/jojo/job_description_processor'
-require_relative '../lib/jojo/prompts/job_description_prompts'
+require_relative '../test_helper'
+require_relative '../../lib/jojo/employer'
+require_relative '../../lib/jojo/ai_client'
+require_relative '../../lib/jojo/job_description_processor'
+require_relative '../../lib/jojo/prompts/job_description_prompts'
 
 describe Jojo::JobDescriptionProcessor do
   before do
