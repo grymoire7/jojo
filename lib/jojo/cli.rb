@@ -98,7 +98,27 @@ module Jojo
         exit 1
       end
 
-      say "\n✓ Generation complete through Phase 4. Cover letter coming in Phase 5.", :yellow
+      # Generate cover letter
+      begin
+        unless File.exist?(employer.resume_path)
+          say "⚠ Warning: Resume not found, skipping cover letter generation", :yellow
+        else
+          generator = Jojo::Generators::CoverLetterGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+          generator.generate
+
+          say "✓ Cover letter generated and saved", :green
+          status_logger.log_step("Cover Letter Generation",
+            tokens: ai_client.total_tokens_used,
+            status: "complete"
+          )
+        end
+      rescue => e
+        say "✗ Error generating cover letter: #{e.message}", :red
+        status_logger.log_step("Cover Letter Generation", status: "failed", error: e.message)
+        exit 1
+      end
+
+      say "\n✓ Generation complete!", :green
     end
 
     desc "research", "Generate company/role research only"
