@@ -221,6 +221,13 @@ module Jojo
         return
       end
 
+      base_url = ask("Your website base URL (e.g., https://yourname.com):")
+
+      if base_url.strip.empty?
+        errors << "Base URL is required for config.yml"
+        return
+      end
+
       begin
         template = ERB.new(File.read('templates/config.yml.erb'))
         File.write('config.yml', template.result(binding))
