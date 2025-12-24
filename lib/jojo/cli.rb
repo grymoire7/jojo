@@ -76,7 +76,28 @@ module Jojo
         exit 1
       end
 
-      say "\n✓ Phase 3 complete. Resume generation coming in Phase 4.", :yellow
+      # Generate resume
+      begin
+        unless File.exist?('inputs/generic_resume.md')
+          say "⚠ Warning: Generic resume not found, skipping resume generation", :yellow
+          say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
+        else
+          generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+          generator.generate
+
+          say "✓ Resume generated and saved", :green
+          status_logger.log_step("Resume Generation",
+            tokens: ai_client.total_tokens_used,
+            status: "complete"
+          )
+        end
+      rescue => e
+        say "✗ Error generating resume: #{e.message}", :red
+        status_logger.log_step("Resume Generation", status: "failed", error: e.message)
+        exit 1
+      end
+
+      say "\n✓ Generation complete through Phase 4. Cover letter coming in Phase 5.", :yellow
     end
 
     desc "research", "Generate company/role research only"
