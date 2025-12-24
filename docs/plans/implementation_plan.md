@@ -303,13 +303,15 @@ Each phase will include tests and be potentially shippable.
 
 **Validation**: ✅ `./bin/jojo resume -e "Acme Corp" -j test_job.txt` generates tailored resume.md with landing page link
 
-## Phase 5: Cover Letter Generation
+## Phase 5: Cover Letter Generation ✅
 
 **Goal**: Generate cover letter based on research and tailored resume
 
+**Status**: COMPLETED
+
 ### Tasks:
 
-- [ ] Create `lib/jojo/generators/cover_letter_generator.rb`
+- [x] Create `lib/jojo/generators/cover_letter_generator.rb`
   - Read job description, research, and tailored resume
   - Build cover letter prompt
   - Call AI (text generation model)
@@ -317,20 +319,20 @@ Each phase will include tests and be potentially shippable.
   - Include link to landing page
   - Log to status_log
 
-- [ ] Create `lib/jojo/prompts/cover_letter_prompt.rb`
+- [x] Create `lib/jojo/prompts/cover_letter_prompt.rb`
   - Instructions for professional cover letter
   - Use research insights
   - Reference specific qualifications from resume
   - Include call to action
   - Voice and tone from config
 
-- [ ] Implement `cover_letter` command in CLI
+- [x] Implement `cover_letter` command in CLI
 
-- [ ] Add to `generate` command workflow (after resume)
+- [x] Add to `generate` command workflow (after resume)
 
-- [ ] Create tests for CoverLetterGenerator
+- [x] Create tests for CoverLetterGenerator
 
-**Validation**: `./bin/jojo cover_letter -e "Acme Corp" -j test_job.txt` generates cover_letter.md
+**Validation**: ✅ `./bin/jojo cover_letter -e "Acme Corp" -j test_job.txt` generates cover_letter.md with landing page link. Tests passing.
 
 ## Phase 6: Website Generation
 
