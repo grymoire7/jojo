@@ -2,6 +2,7 @@ require 'erb'
 require 'fileutils'
 require_relative 'status_logger'
 require_relative 'generators/research_generator'
+require_relative 'generators/resume_generator'
 
 module Jojo
   class CLI < Thor
@@ -120,7 +121,52 @@ module Jojo
     desc "resume", "Generate tailored resume only"
     def resume
       validate_generate_options!
-      say "Resume generation coming in Phase 4", :yellow
+
+      config = Jojo::Config.new
+      employer = Jojo::Employer.new(options[:employer])
+      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
+      status_logger = Jojo::StatusLogger.new(employer)
+
+      say "Generating resume for #{employer.name}...", :green
+
+      # Ensure employer directory exists
+      employer.create_directory! unless Dir.exist?(employer.base_path)
+
+      # Check that job description has been processed
+      unless File.exist?(employer.job_description_path)
+        say "✗ Job description not found. Run 'generate' first or provide job description.", :red
+        exit 1
+      end
+
+      # Check that research has been generated
+      unless File.exist?(employer.research_path)
+        say "⚠ Warning: Research not found. Resume will be less targeted.", :yellow
+      end
+
+      # Check that generic resume exists
+      unless File.exist?('inputs/generic_resume.md')
+        say "✗ Generic resume not found at inputs/generic_resume.md", :red
+        say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
+        exit 1
+      end
+
+      begin
+        generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+        resume = generator.generate
+
+        say "✓ Resume generated and saved to #{employer.resume_path}", :green
+
+        status_logger.log_step("Resume Generation",
+          tokens: ai_client.total_tokens_used,
+          status: "complete"
+        )
+
+        say "\n✓ Resume complete!", :green
+      rescue => e
+        say "✗ Error generating resume: #{e.message}", :red
+        status_logger.log_step("Resume Generation", status: "failed", error: e.message)
+        exit 1
+      end
     end
 
     desc "cover_letter", "Generate cover letter only"
