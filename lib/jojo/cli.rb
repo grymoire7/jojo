@@ -3,6 +3,7 @@ require 'fileutils'
 require_relative 'status_logger'
 require_relative 'generators/research_generator'
 require_relative 'generators/resume_generator'
+require_relative 'generators/cover_letter_generator'
 
 module Jojo
   class CLI < Thor
@@ -193,7 +194,58 @@ module Jojo
     desc "cover_letter", "Generate cover letter only"
     def cover_letter
       validate_generate_options!
-      say "Cover letter generation coming in Phase 5", :yellow
+
+      config = Jojo::Config.new
+      employer = Jojo::Employer.new(options[:employer])
+      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
+      status_logger = Jojo::StatusLogger.new(employer)
+
+      say "Generating cover letter for #{employer.name}...", :green
+
+      # Ensure employer directory exists
+      employer.create_directory! unless Dir.exist?(employer.base_path)
+
+      # Check job description exists
+      unless File.exist?(employer.job_description_path)
+        say "✗ Job description not found. Run 'generate' first.", :red
+        exit 1
+      end
+
+      # Check tailored resume exists (REQUIRED)
+      unless File.exist?(employer.resume_path)
+        say "✗ Tailored resume not found. Run 'jojo resume' or 'jojo generate' first.", :red
+        exit 1
+      end
+
+      # Check generic resume exists (REQUIRED)
+      unless File.exist?('inputs/generic_resume.md')
+        say "✗ Generic resume not found at inputs/generic_resume.md", :red
+        say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
+        exit 1
+      end
+
+      # Warn if research missing (optional)
+      unless File.exist?(employer.research_path)
+        say "⚠ Warning: Research not found. Cover letter will be less targeted.", :yellow
+      end
+
+      begin
+        generator = Jojo::Generators::CoverLetterGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+        cover_letter = generator.generate
+
+        say "✓ Cover letter generated and saved to #{employer.cover_letter_path}", :green
+
+        status_logger.log_step("Cover Letter Generation",
+          tokens: ai_client.total_tokens_used,
+          status: "complete"
+        )
+
+        say "\n✓ Cover letter complete!", :green
+      rescue => e
+        say "✗ Error generating cover letter: #{e.message}", :red
+        status_logger.log_step("Cover Letter Generation", status: "failed", error: e.message)
+        exit 1
+      end
     end
 
     desc "website", "Generate website only"
