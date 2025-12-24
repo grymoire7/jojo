@@ -66,4 +66,32 @@ describe Jojo::Config do
       end
     }.must_raise SystemExit
   end
+
+  it "returns base_url from config" do
+    config = Jojo::Config.new('test/fixtures/valid_config.yml')
+    _(config.base_url).must_equal "https://tracyatteberry.com"
+  end
+
+  it "validates base_url is present" do
+    # Create config without base_url
+    File.write('test/fixtures/no_base_url_config.yml', <<~YAML
+      seeker_name: Test User
+      reasoning_ai:
+        service: anthropic
+        model: sonnet
+    YAML
+    )
+
+    _ {
+      # Capture stderr to suppress error message during test
+      original_stderr = $stderr
+      $stderr = StringIO.new
+      begin
+        config = Jojo::Config.new('test/fixtures/no_base_url_config.yml')
+        config.base_url
+      ensure
+        $stderr = original_stderr
+      end
+    }.must_raise SystemExit
+  end
 end

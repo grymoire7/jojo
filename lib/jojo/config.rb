@@ -35,6 +35,14 @@ module Jojo
       config['voice_and_tone'] || 'professional and friendly'
     end
 
+    def base_url
+      url = config['base_url']
+      if url.nil? || url.strip.empty?
+        abort "Error: base_url is required in config.yml"
+      end
+      url
+    end
+
     def search_provider_service
       config.dig('search_provider', 'service')
     end

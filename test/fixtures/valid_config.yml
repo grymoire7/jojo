@@ -1,4 +1,5 @@
 seeker_name: Test User
+base_url: https://tracyatteberry.com
 reasoning_ai:
   service: anthropic
   model: sonnet
