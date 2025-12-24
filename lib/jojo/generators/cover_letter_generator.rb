@@ -1,4 +1,5 @@
 require 'yaml'
+require_relative '../prompts/cover_letter_prompt'
 
 module Jojo
   module Generators

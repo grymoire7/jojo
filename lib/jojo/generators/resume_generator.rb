@@ -1,4 +1,5 @@
 require 'yaml'
+require_relative '../prompts/resume_prompt'
 
 module Jojo
   module Generators

@@ -1,5 +1,6 @@
 require 'yaml'
 require 'deepsearch'
+require_relative '../prompts/research_prompt'
 
 module Jojo
   module Generators
