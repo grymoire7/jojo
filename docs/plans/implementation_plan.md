@@ -269,13 +269,15 @@ Each phase will include tests and be potentially shippable.
 - In standalone execution without search config, research uses job description only
 - Generic resume (inputs/generic_resume.md) is optional but recommended for personalized research
 
-## Phase 4: Resume Generation
+## Phase 4: Resume Generation ✅
 
 **Goal**: Generate tailored resume from generic resume + job description + research
 
+**Status**: COMPLETED
+
 ### Tasks:
 
-- [ ] Create `lib/jojo/generators/resume_generator.rb`
+- [x] Create `lib/jojo/generators/resume_generator.rb`
   - Read `inputs/generic_resume.md`
   - Read job description and research
   - Build tailoring prompt
@@ -284,20 +286,22 @@ Each phase will include tests and be potentially shippable.
   - Include link to landing page in resume
   - Log to status_log
 
-- [ ] Create `lib/jojo/prompts/resume_prompt.rb`
+- [x] Create `lib/jojo/prompts/resume_prompt.rb`
   - Instructions for tailoring resume
   - Emphasis on relevance to job description
   - Use research insights
   - Maintain voice and tone from config
   - Output markdown format
 
-- [ ] Implement `resume` command in CLI
+- [x] Implement `resume` command in CLI
 
-- [ ] Add to `generate` command workflow (after research)
+- [x] Add to `generate` command workflow (after research)
 
-- [ ] Create tests for ResumeGenerator
+- [x] Create tests for ResumeGenerator
 
-**Validation**: `./bin/jojo resume -e "Acme Corp" -j test_job.txt` generates tailored resume.md
+- [x] Update configuration for base_url field
+
+**Validation**: ✅ `./bin/jojo resume -e "Acme Corp" -j test_job.txt` generates tailored resume.md with landing page link
 
 ## Phase 5: Cover Letter Generation
 
