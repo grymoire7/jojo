@@ -336,38 +336,193 @@ Each phase will include tests and be potentially shippable.
 
 ## Phase 6: Website Generation
 
-**Goal**: Generate landing page and supporting HTML files
+**Goal**: Generate comprehensive landing page for job applications
 
-### Tasks:
+**Status**: IN PROGRESS
+
+**Design Decisions**:
+- **Architecture**: Template-based system with AI-generated content (not AI-generated HTML/CSS)
+- **Template Strategy**: Multiple templates supported via `--template` CLI flag, with `default` as baseline
+- **AI Role**: Generates content only (branding statements, portfolio descriptions, etc.), not styling
+- **Approach**: Phased implementation - build foundation first, then add interactive features incrementally
+- **Landing Page Sections** (full vision):
+  - Masthead with "Am I a good match?" messaging
+  - Annotated job description with hover-over explanations
+  - Recommendation quotes (carousel)
+  - Relevant work project highlights
+  - FAQ accordion (tech stack, remote work, AI philosophy, resume/cover letter links)
+  - Tailored personal branding statement
+  - Clear CTA (Calendly/contact)
+
+### Phase 6a: Foundation & Core Content
+
+**Goal**: Template system, basic landing page, AI-generated branding
+
+**Status**: PLANNED
+
+**Design Document**: `docs/plans/2025-12-26-phase-6a-website-generation-design.md`
+
+#### Tasks:
 
 - [ ] Create `lib/jojo/generators/website_generator.rb`
-  - Read all context (job description, research, resume, cover letter)
-  - Generate index.html (landing page)
-  - Generate other pages as needed
-  - Copy/generate assets (CSS, images if provided)
-  - Save to `employers/#{slug}/website/`
+  - Read context (job description, research, resume)
+  - Generate personalized branding statement via AI
+  - Support multiple templates via `template:` parameter
+  - Render template with ERB
+  - Copy branding image from inputs/ if exists
+  - Save to `employers/#{slug}/website/index.html`
   - Log to status_log
 
 - [ ] Create `lib/jojo/prompts/website_prompt.rb`
-  - Instructions for landing page HTML/CSS
-  - Include elements from design.md:
-    - Personal branding statement
-    - Portfolio highlights
-    - AI usage philosophy (from inputs/ if exists)
-    - CTA (Calendly link, contact info from config)
-    - Optional: custom image if provided
-  - Modern, professional design
-  - Mobile responsive
+  - Branding statement generation prompt
+  - Use text_generation_ai (Haiku)
+  - 2-3 paragraphs, 150-250 words
+  - Focus on "why me for this company"
+  - Graceful degradation without research
 
-- [ ] Create templates/website CSS if not AI-generated
+- [ ] Create `templates/website/default.html.erb`
+  - Complete HTML5 document with inline CSS
+  - Responsive design (mobile-friendly)
+  - Sections: masthead, branding statement, CTA, footer
+  - Template variables: seeker_name, company_name, job_title, branding_statement, cta_text, cta_link, branding_image
+  - No JavaScript (static content only)
+
+- [ ] Add `--template` CLI option
+  - Add class option to CLI: `--template NAME` (alias: `-t`)
+  - Default to 'default' template
+  - Pass to WebsiteGenerator
+
+- [ ] Update `lib/jojo/config.rb`
+  - Add `website_cta_text` method with default
+  - Add `website_cta_link` method with default
+
+- [ ] Update `templates/config.yml.erb`
+  - Add `website:` section with `cta_text` and `cta_link`
 
 - [ ] Implement `website` command in CLI
+  - Generate website only
+  - Support `--template` option
 
-- [ ] Add to `generate` command workflow (after cover_letter)
+- [ ] Add to `generate` command workflow
+  - Run after cover_letter generation
+  - Pass `--template` option through
 
-- [ ] Create tests for WebsiteGenerator
+- [ ] Create `test/unit/website_generator_test.rb`
+  - Test with all inputs, minimal inputs, custom template
+  - Test error cases (missing template, missing required files)
+  - Test branding image handling
+  - Test graceful degradation
 
-**Validation**: `./bin/jojo website -e "Acme Corp" -j test_job.txt` generates website/ with index.html
+- [ ] Create `test/unit/website_prompt_test.rb`
+  - Test prompt includes all required context
+  - Test graceful degradation without optional inputs
+
+- [ ] Create `test/integration/website_workflow_test.rb`
+  - Test end-to-end website generation
+  - Test integration with generate command
+
+- [ ] Create test fixtures
+  - `test/fixtures/templates/test_template.html.erb`
+  - `test/fixtures/branding_image.jpg`
+
+**Validation**: `./bin/jojo website -e "Acme Corp" -j test_job.txt` generates website/index.html with masthead, branding statement, and CTA. Tests pass.
+
+### Phase 6b: Portfolio Highlights
+
+**Goal**: Display relevant projects and achievements
+
+**Status**: PLANNED
+
+#### Tasks:
+
+- [ ] Extend WebsiteGenerator to extract portfolio items
+  - AI analyzes resume for relevant projects
+  - Generates project cards with descriptions
+  - Links to external portfolio if available
+
+- [ ] Update default template with portfolio section
+  - Project cards layout
+  - "Don't tell me, show me!" heading
+
+- [ ] Create tests for portfolio extraction
+
+**Validation**: Landing page includes 3-5 relevant project highlights
+
+### Phase 6c: Interactive Job Description
+
+**Goal**: Annotated job description with hover tooltips
+
+**Status**: PLANNED
+
+#### Tasks:
+
+- [ ] AI annotates job description
+  - Identify key requirements
+  - Match to candidate experience
+  - Generate hover tooltip content
+
+- [ ] Add JavaScript for hover interactions
+  - Tooltip positioning
+  - Highlighting system
+  - Mobile-friendly tap interactions
+
+- [ ] Update template with annotated job description section
+  - "Compare me to the Job Description" heading
+  - Highlighted terms with data attributes
+
+- [ ] Create tests for annotation generation
+
+**Validation**: Job description terms have hover tooltips showing relevant experience
+
+### Phase 6d: Recommendations Carousel
+
+**Goal**: Display recommendation quotes with carousel
+
+**Status**: PLANNED
+
+#### Tasks:
+
+- [ ] Parse `inputs/recommendations.md`
+  - Extract individual recommendations
+  - Parse author/relationship metadata
+
+- [ ] Create carousel JavaScript component
+  - Auto-advance with manual controls
+  - Responsive design
+
+- [ ] Update template with recommendations section
+  - "What do my co-workers say?" heading
+  - Carousel container
+
+- [ ] Create tests for recommendation parsing
+
+**Validation**: Recommendations display in rotating carousel
+
+### Phase 6e: FAQ Accordion
+
+**Goal**: Interactive FAQ with accordion UI
+
+**Status**: PLANNED
+
+#### Tasks:
+
+- [ ] AI generates role-specific FAQs
+  - Standard questions (tech stack, remote work, AI philosophy)
+  - Custom questions based on job description
+  - Answers based on resume, research, inputs
+
+- [ ] Create accordion JavaScript component
+  - Expand/collapse interactions
+  - Keyboard accessible
+
+- [ ] Update template with FAQ section
+  - "Your questions, answered" heading
+  - Accordion container
+  - Links to resume.pdf, cover_letter.pdf in answers
+
+- [ ] Create tests for FAQ generation
+
+**Validation**: FAQ accordion displays with standard + custom questions. Resume/cover letter download links work.
 
 ## Phase 7: PDF Generation and Polish
 
