@@ -1,0 +1,218 @@
+require 'yaml'
+require 'erb'
+require 'fileutils'
+require_relative '../prompts/website_prompt'
+
+module Jojo
+  module Generators
+    class WebsiteGenerator
+      attr_reader :employer, :ai_client, :config, :verbose, :template_name
+
+      def initialize(employer, ai_client, config:, template: 'default', verbose: false)
+        @employer = employer
+        @ai_client = ai_client
+        @config = config
+        @template_name = template
+        @verbose = verbose
+      end
+
+      def generate
+        log "Gathering inputs for website generation..."
+        inputs = gather_inputs
+
+        log "Generating personalized branding statement using AI..."
+        branding_statement = generate_branding_statement(inputs)
+
+        log "Preparing template variables..."
+        template_vars = prepare_template_vars(branding_statement, inputs)
+
+        log "Rendering HTML template (#{template_name})..."
+        html = render_template(template_vars)
+
+        log "Copying branding image if available..."
+        copy_branding_image
+
+        log "Saving website to #{employer.index_html_path}..."
+        save_website(html)
+
+        log "Website generation complete!"
+        html
+      end
+
+      private
+
+      def gather_inputs
+        # Read job description (REQUIRED)
+        unless File.exist?(employer.job_description_path)
+          raise "Job description not found at #{employer.job_description_path}"
+        end
+        job_description = File.read(employer.job_description_path)
+
+        # Read tailored resume (REQUIRED)
+        unless File.exist?(employer.resume_path)
+          raise "Resume not found at #{employer.resume_path}. Run 'jojo resume' first."
+        end
+        resume = File.read(employer.resume_path)
+
+        # Read research (OPTIONAL)
+        research = read_research
+
+        # Read job details (OPTIONAL)
+        job_details = read_job_details
+
+        {
+          job_description: job_description,
+          resume: resume,
+          research: research,
+          job_details: job_details,
+          company_name: employer.name,
+          company_slug: employer.slug
+        }
+      end
+
+      def read_research
+        unless File.exist?(employer.research_path)
+          log "Warning: Research not found at #{employer.research_path}, branding will be less targeted"
+          return nil
+        end
+
+        File.read(employer.research_path)
+      end
+
+      def read_job_details
+        unless File.exist?(employer.job_details_path)
+          return nil
+        end
+
+        YAML.load_file(employer.job_details_path)
+      rescue => e
+        log "Warning: Could not parse job details: #{e.message}"
+        nil
+      end
+
+      def generate_branding_statement(inputs)
+        prompt = Prompts::Website.generate_branding_statement(
+          job_description: inputs[:job_description],
+          resume: inputs[:resume],
+          company_name: inputs[:company_name],
+          seeker_name: config.seeker_name,
+          voice_and_tone: config.voice_and_tone,
+          research: inputs[:research],
+          job_details: inputs[:job_details]
+        )
+
+        ai_client.generate_text(prompt)
+      end
+
+      def prepare_template_vars(branding_statement, inputs)
+        # Extract job title from job_details if available
+        job_title = inputs[:job_details] ? inputs[:job_details]['job_title'] : nil
+
+        # Check for branding image
+        branding_image_info = find_branding_image
+
+        # Check for CTA link
+        cta_link = config.website_cta_link
+        if cta_link.nil? || cta_link.strip.empty?
+          log "Warning: No website CTA link configured in config.yml. CTA button will not be displayed."
+          log "  Add website.cta_link to config.yml (e.g., Calendly URL or mailto link)"
+        end
+
+        {
+          seeker_name: config.seeker_name,
+          company_name: inputs[:company_name],
+          company_slug: inputs[:company_slug],
+          job_title: job_title,
+          branding_statement: branding_statement,
+          cta_text: config.website_cta_text,
+          cta_link: cta_link,
+          has_branding_image: branding_image_info[:exists],
+          branding_image_path: branding_image_info[:relative_path],
+          base_url: config.base_url
+        }
+      end
+
+      def render_template(vars)
+        template_path = File.join('templates', 'website', "#{template_name}.html.erb")
+
+        unless File.exist?(template_path)
+          raise "Template not found: #{template_path}. Available templates: #{available_templates.join(', ')}"
+        end
+
+        template_content = File.read(template_path)
+
+        # Create binding with template variables
+        seeker_name = vars[:seeker_name]
+        company_name = vars[:company_name]
+        company_slug = vars[:company_slug]
+        job_title = vars[:job_title]
+        branding_statement = vars[:branding_statement]
+        cta_text = vars[:cta_text]
+        cta_link = vars[:cta_link]
+        has_branding_image = vars[:has_branding_image]
+        branding_image_path = vars[:branding_image_path]
+        base_url = vars[:base_url]
+
+        ERB.new(template_content).result(binding)
+      end
+
+      def find_branding_image
+        # Check for branding image in inputs/ directory
+        image_extensions = %w[.jpg .jpeg .png .gif]
+        image_extensions.each do |ext|
+          path = "inputs/branding_image#{ext}"
+          if File.exist?(path)
+            return {
+              exists: true,
+              source_path: path,
+              relative_path: "branding_image#{ext}",
+              extension: ext
+            }
+          end
+        end
+
+        { exists: false, source_path: nil, relative_path: nil, extension: nil }
+      end
+
+      def copy_branding_image
+        image_info = find_branding_image
+
+        unless image_info[:exists]
+          log "No branding image found in inputs/"
+          return false
+        end
+
+        # Ensure website directory exists
+        FileUtils.mkdir_p(employer.website_path)
+
+        # Copy image to website directory
+        dest_path = File.join(employer.website_path, image_info[:relative_path])
+        FileUtils.cp(image_info[:source_path], dest_path)
+
+        log "Copied branding image: #{image_info[:source_path]} -> #{dest_path}"
+        true
+      end
+
+      def save_website(html)
+        # Ensure website directory exists
+        FileUtils.mkdir_p(employer.website_path)
+
+        # Write HTML file
+        File.write(employer.index_html_path, html)
+      end
+
+      def available_templates
+        template_dir = 'templates/website'
+        return [] unless Dir.exist?(template_dir)
+
+        Dir.glob(File.join(template_dir, '*.html.erb')).map do |path|
+          File.basename(path, '.html.erb')
+        end
+      end
+
+      def log(message)
+        puts "  [WebsiteGenerator] #{message}" if verbose
+      end
+    end
+  end
+end

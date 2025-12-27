@@ -55,6 +55,14 @@ module Jojo
       !search_provider_service.nil? && !search_provider_api_key.nil?
     end
 
+    def website_cta_text
+      config.dig('website', 'cta_text') || 'Get in Touch'
+    end
+
+    def website_cta_link
+      config.dig('website', 'cta_link')
+    end
+
     private
 
     def config

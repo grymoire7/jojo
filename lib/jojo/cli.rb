@@ -4,6 +4,7 @@ require_relative 'status_logger'
 require_relative 'generators/research_generator'
 require_relative 'generators/resume_generator'
 require_relative 'generators/cover_letter_generator'
+require_relative 'generators/website_generator'
 
 module Jojo
   class CLI < Thor
@@ -11,6 +12,7 @@ module Jojo
     class_option :quiet, type: :boolean, aliases: '-q', desc: 'Suppress output, rely on exit code'
     class_option :employer, type: :string, aliases: '-e', desc: 'Employer name'
     class_option :job, type: :string, aliases: '-j', desc: 'Job description (file path or URL)'
+    class_option :template, type: :string, aliases: '-t', desc: 'Website template name (default: default)', default: 'default'
 
     desc "version", "Show version"
     def version
@@ -115,6 +117,33 @@ module Jojo
       rescue => e
         say "✗ Error generating cover letter: #{e.message}", :red
         status_logger.log_step("Cover Letter Generation", status: "failed", error: e.message)
+        exit 1
+      end
+
+      # Generate website
+      begin
+        unless File.exist?(employer.resume_path)
+          say "⚠ Warning: Resume not found, skipping website generation", :yellow
+        else
+          generator = Jojo::Generators::WebsiteGenerator.new(
+            employer,
+            ai_client,
+            config: config,
+            template: options[:template],
+            verbose: options[:verbose]
+          )
+          generator.generate
+
+          say "✓ Website generated and saved", :green
+          status_logger.log_step("Website Generation",
+            tokens: ai_client.total_tokens_used,
+            status: "complete",
+            metadata: { template: options[:template] }
+          )
+        end
+      rescue => e
+        say "✗ Error generating website: #{e.message}", :red
+        status_logger.log_step("Website Generation", status: "failed", error: e.message)
         exit 1
       end
 
@@ -271,7 +300,58 @@ module Jojo
     desc "website", "Generate website only"
     def website
       validate_generate_options!
-      say "Website generation coming in Phase 6", :yellow
+
+      config = Jojo::Config.new
+      employer = Jojo::Employer.new(options[:employer])
+      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
+      status_logger = Jojo::StatusLogger.new(employer)
+
+      say "Generating website for #{employer.name}...", :green
+
+      # Ensure employer directory exists
+      employer.create_directory! unless Dir.exist?(employer.base_path)
+
+      # Check that job description has been processed
+      unless File.exist?(employer.job_description_path)
+        say "✗ Job description not found. Run 'generate' first.", :red
+        exit 1
+      end
+
+      # Check that resume has been generated (REQUIRED)
+      unless File.exist?(employer.resume_path)
+        say "✗ Resume not found. Run 'jojo resume' or 'jojo generate' first.", :red
+        exit 1
+      end
+
+      # Warn if research missing (optional)
+      unless File.exist?(employer.research_path)
+        say "⚠ Warning: Research not found. Website will be less targeted.", :yellow
+      end
+
+      begin
+        generator = Jojo::Generators::WebsiteGenerator.new(
+          employer,
+          ai_client,
+          config: config,
+          template: options[:template],
+          verbose: options[:verbose]
+        )
+        website = generator.generate
+
+        say "✓ Website generated and saved to #{employer.index_html_path}", :green
+
+        status_logger.log_step("Website Generation",
+          tokens: ai_client.total_tokens_used,
+          status: "complete",
+          metadata: { template: options[:template] }
+        )
+
+        say "\n✓ Website complete!", :green
+      rescue => e
+        say "✗ Error generating website: #{e.message}", :red
+        status_logger.log_step("Website Generation", status: "failed", error: e.message)
+        exit 1
+      end
     end
 
     desc "test", "Run tests (default: --unit for fast feedback)"
