@@ -43,7 +43,7 @@ describe Jojo::ProjectSelector do
     selector = Jojo::ProjectSelector.new(@employer, @projects)
     selected = selector.select_for_landing_page(limit: 3)
 
-    _(selected.size).must_equal 3
+    _(selected.size).must_equal 2  # Only 2 projects match
     _(selected.first[:title]).must_equal 'Project Alpha'
     _(selected.first[:score]).must_be :>, 0
   end
@@ -70,5 +70,21 @@ describe Jojo::ProjectSelector do
 
     _(selected.first[:title]).must_equal 'Recent Project'
     _(selected.first[:score]).must_be :>, selected.last[:score]
+  end
+
+  it "returns empty array when no projects match" do
+    projects = [
+      {
+        title: 'Unrelated Project',
+        description: 'No matching skills',
+        skills: ['Python', 'Java']
+      }
+    ]
+
+    selector = Jojo::ProjectSelector.new(@employer, projects)
+    selected = selector.select_for_landing_page(limit: 3)
+
+    _(selected).must_be_kind_of Array
+    _(selected).must_be_empty
   end
 end

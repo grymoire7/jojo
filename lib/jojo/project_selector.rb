@@ -28,6 +28,9 @@ module Jojo
         project.merge(score: calculate_score(project))
       end
 
+      # Filter out zero-score projects
+      scored = scored.select { |p| p[:score] > 0 }
+
       scored.sort_by { |p| -p[:score] }.take(limit)
     end
 
