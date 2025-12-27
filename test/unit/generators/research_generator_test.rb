@@ -20,12 +20,23 @@ describe Jojo::Generators::ResearchGenerator do
 
     # Create generic resume fixture
     FileUtils.mkdir_p('inputs')
+
+    # Backup user's generic_resume.md if it exists
+    @backup_generic_resume = File.read('inputs/generic_resume.md') if File.exist?('inputs/generic_resume.md')
+
     File.write('inputs/generic_resume.md', "# Jane Doe\n\n## Experience\n\nSoftware Engineer...")
   end
 
   after do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    FileUtils.rm_f('inputs/generic_resume.md')
+
+    # Restore user's generic_resume.md if it existed, otherwise clean up test file
+    if @backup_generic_resume
+      File.write('inputs/generic_resume.md', @backup_generic_resume)
+    else
+      FileUtils.rm_f('inputs/generic_resume.md')
+    end
+
     @config.verify if @config
   end
 
