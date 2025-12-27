@@ -47,4 +47,28 @@ describe Jojo::ProjectSelector do
     _(selected.first[:title]).must_equal 'Project Alpha'
     _(selected.first[:score]).must_be :>, 0
   end
+
+  it "applies recency bonus to recent projects" do
+    current_year = Time.now.year
+    projects = [
+      {
+        title: 'Old Project',
+        description: 'From 5 years ago',
+        skills: ['Ruby on Rails'],
+        year: current_year - 5
+      },
+      {
+        title: 'Recent Project',
+        description: 'From last year',
+        skills: ['Ruby on Rails'],
+        year: current_year - 1
+      }
+    ]
+
+    selector = Jojo::ProjectSelector.new(@employer, projects)
+    selected = selector.select_for_landing_page(limit: 2)
+
+    _(selected.first[:title]).must_equal 'Recent Project'
+    _(selected.first[:score]).must_be :>, selected.last[:score]
+  end
 end

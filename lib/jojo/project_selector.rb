@@ -40,6 +40,12 @@ module Jojo
         score += 5 if desired_skills.include?(skill)
       end
 
+      # Recency bonus
+      if project[:year]
+        current_year = Time.now.year
+        score += 5 if project[:year] >= (current_year - 2)
+      end
+
       score
     end
 
