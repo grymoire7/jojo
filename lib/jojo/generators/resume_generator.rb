@@ -1,5 +1,7 @@
 require 'yaml'
 require_relative '../prompts/resume_prompt'
+require_relative '../project_loader'
+require_relative '../project_selector'
 
 module Jojo
   module Generators
@@ -18,8 +20,11 @@ module Jojo
         log "Gathering inputs for resume generation..."
         inputs = gather_inputs
 
+        log "Loading relevant projects..."
+        projects = load_projects
+
         log "Building resume prompt..."
-        prompt = build_resume_prompt(inputs)
+        prompt = build_resume_prompt(inputs, projects)
 
         log "Generating tailored resume using AI..."
         resume = call_ai(prompt)
@@ -86,13 +91,14 @@ module Jojo
         nil
       end
 
-      def build_resume_prompt(inputs)
+      def build_resume_prompt(inputs, projects = [])
         Prompts::Resume.generate_prompt(
           job_description: inputs[:job_description],
           generic_resume: inputs[:generic_resume],
           research: inputs[:research],
           job_details: inputs[:job_details],
-          voice_and_tone: config.voice_and_tone
+          voice_and_tone: config.voice_and_tone,
+          relevant_projects: projects
         )
       end
 
@@ -111,6 +117,19 @@ module Jojo
 
       def log(message)
         puts "  [ResumeGenerator] #{message}" if verbose
+      end
+
+      def load_projects
+        return [] unless File.exist?('inputs/projects.yml')
+
+        loader = ProjectLoader.new('inputs/projects.yml')
+        all_projects = loader.load
+
+        selector = ProjectSelector.new(employer, all_projects)
+        selector.select_for_resume(limit: 3)
+      rescue ProjectLoader::ValidationError => e
+        log "Warning: Projects validation failed: #{e.message}"
+        []
       end
     end
   end

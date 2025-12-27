@@ -1,7 +1,7 @@
 module Jojo
   module Prompts
     module Resume
-      def self.generate_prompt(job_description:, generic_resume:, research: nil, job_details: nil, voice_and_tone:)
+      def self.generate_prompt(job_description:, generic_resume:, research: nil, job_details: nil, voice_and_tone:, relevant_projects: [])
         <<~PROMPT
           You are an expert resume writer helping tailor a generic resume to a specific job opportunity.
 
@@ -25,6 +25,8 @@ module Jojo
           ## Generic Resume
 
           #{generic_resume}
+
+          #{projects_section(relevant_projects)}
 
           # Tailoring Instructions
 
@@ -81,6 +83,20 @@ module Jojo
 
           #{job_details.map { |k, v| "- #{k}: #{v}" }.join("\n")}
         DETAILS
+      end
+
+      def self.projects_section(projects)
+        return "" if projects.empty?
+
+        <<~SECTION
+          ## Relevant Projects and Achievements
+
+          The following projects and achievements are particularly relevant to this role:
+
+          #{projects.map { |p| "- **#{p[:title]}**: #{p[:description]}" }.join("\n")}
+
+          Consider emphasizing these in the tailored resume where appropriate.
+        SECTION
       end
     end
   end
