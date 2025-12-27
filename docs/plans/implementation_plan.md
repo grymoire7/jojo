@@ -354,17 +354,17 @@ Each phase will include tests and be potentially shippable.
   - Tailored personal branding statement
   - Clear CTA (Calendly/contact)
 
-### Phase 6a: Foundation & Core Content
+### Phase 6a: Foundation & Core Content ✅
 
 **Goal**: Template system, basic landing page, AI-generated branding
 
-**Status**: PLANNED
+**Status**: COMPLETED
 
 **Design Document**: `docs/plans/2025-12-26-phase-6a-website-generation-design.md`
 
 #### Tasks:
 
-- [ ] Create `lib/jojo/generators/website_generator.rb`
+- [x] Create `lib/jojo/generators/website_generator.rb`
   - Read context (job description, research, resume)
   - Generate personalized branding statement via AI
   - Support multiple templates via `template:` parameter
@@ -373,59 +373,63 @@ Each phase will include tests and be potentially shippable.
   - Save to `employers/#{slug}/website/index.html`
   - Log to status_log
 
-- [ ] Create `lib/jojo/prompts/website_prompt.rb`
+- [x] Create `lib/jojo/prompts/website_prompt.rb`
   - Branding statement generation prompt
   - Use text_generation_ai (Haiku)
   - 2-3 paragraphs, 150-250 words
   - Focus on "why me for this company"
   - Graceful degradation without research
 
-- [ ] Create `templates/website/default.html.erb`
+- [x] Create `templates/website/default.html.erb`
   - Complete HTML5 document with inline CSS
   - Responsive design (mobile-friendly)
   - Sections: masthead, branding statement, CTA, footer
   - Template variables: seeker_name, company_name, job_title, branding_statement, cta_text, cta_link, branding_image
   - No JavaScript (static content only)
 
-- [ ] Add `--template` CLI option
+- [x] Add `--template` CLI option
   - Add class option to CLI: `--template NAME` (alias: `-t`)
   - Default to 'default' template
   - Pass to WebsiteGenerator
 
-- [ ] Update `lib/jojo/config.rb`
+- [x] Update `lib/jojo/config.rb`
   - Add `website_cta_text` method with default
-  - Add `website_cta_link` method with default
+  - Add `website_cta_link` method (returns nil if not configured)
 
-- [ ] Update `templates/config.yml.erb`
+- [x] Update `templates/config.yml.erb`
   - Add `website:` section with `cta_text` and `cta_link`
 
-- [ ] Implement `website` command in CLI
+- [x] Implement `website` command in CLI
   - Generate website only
   - Support `--template` option
 
-- [ ] Add to `generate` command workflow
+- [x] Add to `generate` command workflow
   - Run after cover_letter generation
   - Pass `--template` option through
 
-- [ ] Create `test/unit/website_generator_test.rb`
+- [x] Create `test/unit/website_generator_test.rb`
   - Test with all inputs, minimal inputs, custom template
   - Test error cases (missing template, missing required files)
   - Test branding image handling
-  - Test graceful degradation
+  - Test graceful degradation (12 tests)
 
-- [ ] Create `test/unit/website_prompt_test.rb`
+- [x] Create `test/unit/website_prompt_test.rb`
   - Test prompt includes all required context
-  - Test graceful degradation without optional inputs
+  - Test graceful degradation without optional inputs (7 tests)
 
-- [ ] Create `test/integration/website_workflow_test.rb`
+- [x] Create `test/integration/website_workflow_test.rb`
   - Test end-to-end website generation
-  - Test integration with generate command
+  - Test integration with generate command (5 tests)
 
-- [ ] Create test fixtures
-  - `test/fixtures/templates/test_template.html.erb`
-  - `test/fixtures/branding_image.jpg`
+- [x] Test fixtures created in test files
+  - Custom templates created dynamically in tests
+  - Branding images created as needed in tests
 
-**Validation**: `./bin/jojo website -e "Acme Corp" -j test_job.txt` generates website/index.html with masthead, branding statement, and CTA. Tests pass.
+**Validation**: ✅
+- `./bin/jojo generate -e "CyberCoders" -j inputs/cybercoders.md` successfully generates website/index.html
+- Website includes masthead, AI-generated branding statement, CTA, and footer
+- All tests pass: 83 tests, 318 assertions, 0 failures, 0 errors
+- Responsive design works, graceful CTA handling (nil link displays no CTA section)
 
 ### Phase 6b: Portfolio Highlights
 
