@@ -2,6 +2,8 @@ require 'yaml'
 require 'erb'
 require 'fileutils'
 require_relative '../prompts/website_prompt'
+require_relative '../project_loader'
+require_relative '../project_selector'
 
 module Jojo
   module Generators
@@ -213,6 +215,19 @@ module Jojo
 
       def log(message)
         puts "  [WebsiteGenerator] #{message}" if verbose
+      end
+
+      def load_projects
+        return [] unless File.exist?('inputs/projects.yml')
+
+        loader = ProjectLoader.new('inputs/projects.yml')
+        all_projects = loader.load
+
+        selector = ProjectSelector.new(employer, all_projects)
+        selector.select_for_landing_page(limit: 5)
+      rescue ProjectLoader::ValidationError => e
+        log "Warning: Projects validation failed: #{e.message}"
+        []
       end
     end
   end
