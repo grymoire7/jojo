@@ -1,0 +1,4 @@
+- title: "Minimal Project"
+  description: "Only has required fields."
+  skills:
+    - Ruby

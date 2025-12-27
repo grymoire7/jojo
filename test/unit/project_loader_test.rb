@@ -31,4 +31,14 @@ describe Jojo::ProjectLoader do
 
     _(projects).must_equal []
   end
+
+  it "loads minimal projects with only required fields" do
+    loader = Jojo::ProjectLoader.new('test/fixtures/minimal_projects.yml')
+    projects = loader.load
+
+    _(projects.size).must_equal 1
+    _(projects.first[:title]).must_equal 'Minimal Project'
+    _(projects.first[:year]).must_be_nil
+    _(projects.first[:context]).must_be_nil
+  end
 end
