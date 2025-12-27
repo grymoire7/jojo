@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Template - <%= seeker_name %> for <%= company_name %></title>
+</head>
+<body>
+  <h1>Test Template</h1>
+  <div class="company"><%= company_name %></div>
+  <div class="seeker"><%= seeker_name %></div>
+  <div class="branding"><%= branding_statement %></div>
+  <% if cta_link && !cta_link.strip.empty? %>
+  <a href="<%= cta_link %>" class="cta"><%= cta_text %></a>
+  <% end %>
+  <% if has_branding_image %>
+  <img src="<%= branding_image_path %>" alt="Profile">
+  <% end %>
+  <footer>
+    <a href="<%= base_url %>/resume/<%= company_slug %>">Resume</a>
+    <% if job_title %>
+    <span>Position: <%= job_title %></span>
+    <% end %>
+  </footer>
+</body>
+</html>
