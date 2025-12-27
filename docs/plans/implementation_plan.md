@@ -432,26 +432,27 @@ Each phase will include tests and be potentially shippable.
 - Responsive design works, graceful CTA handling (nil link displays no CTA section)
 - Comprehensive test coverage: prompt generation, generator functionality, end-to-end workflows
 
-### Phase 6b: Portfolio Highlights
+### Phase 6b: Portfolio Highlights ✅
 
 **Goal**: Display relevant projects and achievements
 
-**Status**: PLANNED
+**Status**: COMPLETED
+
+**Design Document**: `docs/plans/2025-12-27-projects-yaml-design.md`
 
 #### Tasks:
 
-- [ ] Extend WebsiteGenerator to extract portfolio items
-  - AI analyzes resume for relevant projects
-  - Generates project cards with descriptions
-  - Links to external portfolio if available
+- [x] Create ProjectLoader for YAML loading and validation
+- [x] Create ProjectSelector for skill-based matching
+- [x] Integrate projects into WebsiteGenerator
+- [x] Update default template with projects section
+- [x] Add image handling for project images
+- [x] Integrate projects into ResumeGenerator
+- [x] Integrate projects into CoverLetterGenerator
+- [x] Create comprehensive test coverage
+- [x] Update templates/projects.yml example
 
-- [ ] Update default template with portfolio section
-  - Project cards layout
-  - "Don't tell me, show me!" heading
-
-- [ ] Create tests for portfolio extraction
-
-**Validation**: Landing page includes 3-5 relevant project highlights
+**Validation**: ✅ Landing page includes relevant project highlights selected by skill matching. Resume and cover letter prompts include relevant projects for AI to weave into content. Images are properly handled (copied or linked).
 
 ### Phase 6c: Interactive Job Description
 

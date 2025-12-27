@@ -1,24 +1,51 @@
-# Project and achievement highlights used in both the
-# landing page and in tailored resumes and cover letters.
-# URLs are optional. Skills would be used for matching against job descriptions.
+# Projects and achievements highlights
+# Used in landing pages, resumes, and cover letters
+# AI selects relevant items based on skill matching
+#
+# Copy this file to inputs/projects.yml and customize with your actual projects
 
 - title: "Project Alpha"
-  description: "Led a team of 5 developers to build a scalable web application that increased
-    customer engagement by 30%."
-  blog_post_url: "https://tracyatteberry.com/posts/project_alpha_details"
+  description: "Led a team of 5 developers to build a scalable web application
+    that increased customer engagement by 30%."
+
+  # Optional metadata for prioritization and context
+  year: 2024                    # or date_range: "2023-2024"
+  context: "at Example Corp"    # or "personal project", "open source", "freelance"
+  role: "Tech Lead"             # your role in the project
+
+  # Optional URLs
+  blog_post_url: "https://tracyatteberry.com/posts/project-alpha"
   github_url: "https://github.com/grymoire7/project-alpha"
   live_url: "https://project-alpha.example.com"
+
+  # Optional visual (URL or path relative to inputs/)
+  image: "inputs/projects/project-alpha-screenshot.png"
+  # OR: image: "https://example.com/screenshot.png"
+
+  # Skills for matching (required)
   skills:
     - Ruby on Rails
     - VueJS
     - PostgreSQL
     - web development
     - customer engagement
-- title: "Achievement Beta"
-  description: "Received the 'Employee of the Year' award for outstanding performance and dedication."
-  blog_post_url: "https://tracyatteberry.com/posts/achievement_beta_details"
+
+- title: "Employee of the Year Award"
+  description: "Recognized for outstanding technical leadership and mentoring
+    of junior developers."
+  year: 2023
+  context: "at Previous Corp"
   skills:
     - leadership
+    - mentoring
     - teamwork
-    - dedication
-  
+
+- title: "Open Source Contribution"
+  description: "Major contributor to popular Ruby gem with 10k+ downloads."
+  year: 2024
+  context: "personal project"
+  github_url: "https://github.com/example/gem"
+  skills:
+    - Ruby
+    - open source
+    - community engagement
