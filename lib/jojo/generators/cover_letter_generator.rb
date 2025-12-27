@@ -1,5 +1,7 @@
 require 'yaml'
 require_relative '../prompts/cover_letter_prompt'
+require_relative '../project_loader'
+require_relative '../project_selector'
 
 module Jojo
   module Generators
@@ -18,8 +20,11 @@ module Jojo
         log "Gathering inputs for cover letter generation..."
         inputs = gather_inputs
 
+        log "Loading relevant projects..."
+        projects = load_projects
+
         log "Building cover letter prompt..."
-        prompt = build_cover_letter_prompt(inputs)
+        prompt = build_cover_letter_prompt(inputs, projects)
 
         log "Generating cover letter using AI..."
         cover_letter = call_ai(prompt)
@@ -93,7 +98,7 @@ module Jojo
         nil
       end
 
-      def build_cover_letter_prompt(inputs)
+      def build_cover_letter_prompt(inputs, projects = [])
         Prompts::CoverLetter.generate_prompt(
           job_description: inputs[:job_description],
           tailored_resume: inputs[:tailored_resume],
@@ -101,7 +106,8 @@ module Jojo
           research: inputs[:research],
           job_details: inputs[:job_details],
           voice_and_tone: config.voice_and_tone,
-          company_name: inputs[:company_name]
+          company_name: inputs[:company_name],
+          highlight_projects: projects
         )
       end
 
@@ -120,6 +126,19 @@ module Jojo
 
       def log(message)
         puts "  [CoverLetterGenerator] #{message}" if verbose
+      end
+
+      def load_projects
+        return [] unless File.exist?('inputs/projects.yml')
+
+        loader = ProjectLoader.new('inputs/projects.yml')
+        all_projects = loader.load
+
+        selector = ProjectSelector.new(employer, all_projects)
+        selector.select_for_cover_letter(limit: 2)
+      rescue ProjectLoader::ValidationError => e
+        log "Warning: Projects validation failed: #{e.message}"
+        []
       end
     end
   end

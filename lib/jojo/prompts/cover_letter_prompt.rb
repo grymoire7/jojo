@@ -1,7 +1,7 @@
 module Jojo
   module Prompts
     module CoverLetter
-      def self.generate_prompt(job_description:, tailored_resume:, generic_resume:, research: nil, job_details: nil, voice_and_tone:, company_name:)
+      def self.generate_prompt(job_description:, tailored_resume:, generic_resume:, research: nil, job_details: nil, voice_and_tone:, company_name:, highlight_projects: [])
         <<~PROMPT
           You are an expert cover letter writer helping craft a compelling narrative that complements a tailored resume.
 
@@ -26,6 +26,8 @@ module Jojo
           ## Full Background (For Additional Context)
 
           #{generic_resume}
+
+          #{projects_section(highlight_projects)}
 
           # Cover Letter Instructions
 
@@ -106,6 +108,20 @@ module Jojo
 
           #{job_details.map { |k, v| "- #{k}: #{v}" }.join("\n")}
         DETAILS
+      end
+
+      def self.projects_section(projects)
+        return "" if projects.empty?
+
+        <<~SECTION
+          ## Projects to Highlight
+
+          Consider naturally weaving these relevant projects into the narrative:
+
+          #{projects.map { |p| "- **#{p[:title]}**: #{p[:description]}" }.join("\n")}
+
+          Use these to demonstrate concrete examples of your qualifications.
+        SECTION
       end
     end
   end
