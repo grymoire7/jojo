@@ -26,8 +26,11 @@ module Jojo
         log "Generating personalized branding statement using AI..."
         branding_statement = generate_branding_statement(inputs)
 
+        log "Loading relevant projects..."
+        projects = load_projects
+
         log "Preparing template variables..."
-        template_vars = prepare_template_vars(branding_statement, inputs)
+        template_vars = prepare_template_vars(branding_statement, inputs, projects)
 
         log "Rendering HTML template (#{template_name})..."
         html = render_template(template_vars)
@@ -107,7 +110,7 @@ module Jojo
         ai_client.generate_text(prompt)
       end
 
-      def prepare_template_vars(branding_statement, inputs)
+      def prepare_template_vars(branding_statement, inputs, projects = [])
         # Extract job title from job_details if available
         job_title = inputs[:job_details] ? inputs[:job_details]['job_title'] : nil
 
@@ -131,7 +134,8 @@ module Jojo
           cta_link: cta_link,
           has_branding_image: branding_image_info[:exists],
           branding_image_path: branding_image_info[:relative_path],
-          base_url: config.base_url
+          base_url: config.base_url,
+          projects: projects
         }
       end
 
@@ -155,6 +159,7 @@ module Jojo
         has_branding_image = vars[:has_branding_image]
         branding_image_path = vars[:branding_image_path]
         base_url = vars[:base_url]
+        projects = vars[:projects]
 
         ERB.new(template_content).result(binding)
       end

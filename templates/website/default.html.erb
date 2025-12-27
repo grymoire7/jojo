@@ -116,6 +116,53 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
     }
 
+    /* Projects Section */
+    .projects {
+      margin: 40px 0;
+    }
+
+    .project-list {
+      display: grid;
+      gap: 20px;
+    }
+
+    .project-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      background: white;
+    }
+
+    .project-card h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+
+    .project-meta {
+      font-size: 0.9em;
+      color: #666;
+      margin: 10px 0;
+    }
+
+    .project-meta span {
+      margin-right: 15px;
+    }
+
+    .project-links {
+      margin-top: 15px;
+    }
+
+    .project-links a {
+      display: inline-block;
+      margin-right: 15px;
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    .project-links a:hover {
+      text-decoration: underline;
+    }
+
     /* Footer Section */
     .footer {
       border-top: 2px solid var(--border-color);
@@ -203,6 +250,34 @@
     <% if cta_link && !cta_link.strip.empty? %>
     <section class="cta-section">
       <a href="<%= cta_link %>" class="cta-button"><%= cta_text %></a>
+    </section>
+    <% end %>
+
+    <!-- Projects Section -->
+    <% if projects && !projects.empty? %>
+    <section class="projects">
+      <h2>Relevant Work</h2>
+      <div class="project-list">
+        <% projects.each do |project| %>
+        <div class="project-card">
+          <h3><%= project[:title] %></h3>
+          <p><%= project[:description] %></p>
+          <% if project[:context] || project[:year] %>
+          <p class="project-meta">
+            <% if project[:year] %><span><%= project[:year] %></span><% end %>
+            <% if project[:context] %><span><%= project[:context] %></span><% end %>
+          </p>
+          <% end %>
+          <% if project[:blog_post_url] || project[:github_url] || project[:live_url] %>
+          <div class="project-links">
+            <% if project[:blog_post_url] %><a href="<%= project[:blog_post_url] %>">Blog Post</a><% end %>
+            <% if project[:github_url] %><a href="<%= project[:github_url] %>">GitHub</a><% end %>
+            <% if project[:live_url] %><a href="<%= project[:live_url] %>">Live Demo</a><% end %>
+          </div>
+          <% end %>
+        </div>
+        <% end %>
+      </div>
     </section>
     <% end %>
 

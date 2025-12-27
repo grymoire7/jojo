@@ -48,4 +48,25 @@ describe 'WebsiteGenerator with Projects' do
     _(projects.first[:title]).must_equal 'Matching Project'
     _(projects.first[:score]).must_be :>, 0
   end
+
+  it "includes projects in template variables" do
+    # Create minimal job description for full generation
+    File.write(@employer.job_description_path, "Test job description")
+    File.write(@employer.resume_path, "# Resume\n\nTest resume content")
+
+    # Mock AI client to avoid real API calls
+    mock_ai = Minitest::Mock.new
+    mock_ai.expect :generate_text, "Test branding statement", [String]
+
+    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config)
+    generator.generate
+
+    # Read generated HTML
+    html = File.read(@employer.index_html_path)
+
+    # Should mention the matching project
+    _(html).must_include 'Matching Project'
+
+    mock_ai.verify
+  end
 end
