@@ -28,6 +28,7 @@ module Jojo
 
         log "Loading relevant projects..."
         projects = load_projects
+        projects = process_project_images(projects)
 
         log "Preparing template variables..."
         template_vars = prepare_template_vars(branding_statement, inputs, projects)
@@ -233,6 +234,37 @@ module Jojo
       rescue ProjectLoader::ValidationError => e
         log "Warning: Projects validation failed: #{e.message}"
         []
+      end
+
+      def process_project_images(projects)
+        projects.map do |project|
+          project = project.dup
+
+          if project[:image]
+            if project[:image].start_with?('http://', 'https://')
+              # URL: use directly
+              project[:image_url] = project[:image]
+            else
+              # File path: copy to website/images/
+              src = File.join(Dir.pwd, project[:image])
+
+              if File.exist?(src)
+                dest_dir = File.join(employer.website_path, 'images')
+                FileUtils.mkdir_p(dest_dir)
+
+                filename = File.basename(project[:image])
+                dest = File.join(dest_dir, filename)
+                FileUtils.cp(src, dest)
+
+                project[:image_url] = "images/#{filename}"
+              else
+                log "Warning: Project image not found: #{project[:image]}"
+              end
+            end
+          end
+
+          project
+        end
       end
     end
   end

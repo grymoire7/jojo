@@ -163,6 +163,14 @@
       text-decoration: underline;
     }
 
+    .project-image {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+
     /* Footer Section */
     .footer {
       border-top: 2px solid var(--border-color);
@@ -260,6 +268,9 @@
       <div class="project-list">
         <% projects.each do |project| %>
         <div class="project-card">
+          <% if project[:image_url] %>
+          <img src="<%= project[:image_url] %>" alt="<%= project[:title] %>" class="project-image">
+          <% end %>
           <h3><%= project[:title] %></h3>
           <p><%= project[:description] %></p>
           <% if project[:context] || project[:year] %>

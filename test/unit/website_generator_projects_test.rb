@@ -69,4 +69,44 @@ describe 'WebsiteGenerator with Projects' do
 
     mock_ai.verify
   end
+
+  it "copies local project images to website directory" do
+    # Create test image
+    FileUtils.mkdir_p('inputs/images')
+    File.write('inputs/images/test.png', 'fake image data')
+
+    # Update projects.yml with image
+    File.write('inputs/projects.yml', <<~YAML)
+      - title: "Project with Image"
+        description: "Has a local image"
+        skills:
+          - Ruby on Rails
+        image: "inputs/images/test.png"
+    YAML
+
+    File.write(@employer.job_details_path, <<~YAML)
+      required_skills:
+        - Ruby on Rails
+    YAML
+
+    File.write(@employer.job_description_path, "Test job")
+    File.write(@employer.resume_path, "# Resume\n\nTest resume content")
+
+    mock_ai = Minitest::Mock.new
+    mock_ai.expect :generate_text, "Test branding", [String]
+
+    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config)
+    generator.generate
+
+    # Check image was copied
+    copied_image = File.join(@employer.website_path, 'images', 'test.png')
+    _(File.exist?(copied_image)).must_equal true
+
+    # Check HTML references image correctly
+    html = File.read(@employer.index_html_path)
+    _(html).must_include 'src="images/test.png"'
+
+    FileUtils.rm_rf('inputs/images')
+    mock_ai.verify
+  end
 end
