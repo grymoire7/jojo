@@ -1,0 +1,24 @@
+# Project and achievement highlights used in both the
+# landing page and in tailored resumes and cover letters.
+# URLs are optional. Skills would be used for matching against job descriptions.
+
+- title: "Project Alpha"
+  description: "Led a team of 5 developers to build a scalable web application that increased
+    customer engagement by 30%."
+  blog_post_url: "https://tracyatteberry.com/posts/project_alpha_details"
+  github_url: "https://github.com/grymoire7/project-alpha"
+  live_url: "https://project-alpha.example.com"
+  skills:
+    - Ruby on Rails
+    - VueJS
+    - PostgreSQL
+    - web development
+    - customer engagement
+- title: "Achievement Beta"
+  description: "Received the 'Employee of the Year' award for outstanding performance and dedication."
+  blog_post_url: "https://tracyatteberry.com/posts/achievement_beta_details"
+  skills:
+    - leadership
+    - teamwork
+    - dedication
+  

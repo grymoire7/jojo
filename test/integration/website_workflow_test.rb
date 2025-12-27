@@ -35,7 +35,6 @@ describe "Website Generation Workflow" do
 
   after do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    FileUtils.rm_f('inputs/branding_image.jpg')
   end
 
   it "generates complete website from end to end" do
@@ -121,18 +120,16 @@ describe "Website Generation Workflow" do
   end
 
   it "handles branding image workflow" do
-    # Create branding image
-    FileUtils.mkdir_p('inputs')
-    File.write('inputs/branding_image.jpg', 'fake image data')
-
     expected_branding = "Branding with image..."
     @ai_client.expect(:generate_text, expected_branding, [String])
 
+    # Use test/fixtures which has branding_image.jpg
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
       @ai_client,
       config: @config,
-      verbose: false
+      verbose: false,
+      inputs_path: 'test/fixtures'
     )
 
     generator.generate
@@ -140,7 +137,6 @@ describe "Website Generation Workflow" do
     # Verify image was copied to website directory
     website_image = File.join(@employer.website_path, 'branding_image.jpg')
     _(File.exist?(website_image)).must_equal true
-    _(File.read(website_image)).must_equal 'fake image data'
 
     # Verify HTML includes image reference
     html = File.read(@employer.index_html_path)

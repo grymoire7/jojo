@@ -6,14 +6,15 @@ require_relative '../prompts/website_prompt'
 module Jojo
   module Generators
     class WebsiteGenerator
-      attr_reader :employer, :ai_client, :config, :verbose, :template_name
+      attr_reader :employer, :ai_client, :config, :verbose, :template_name, :inputs_path
 
-      def initialize(employer, ai_client, config:, template: 'default', verbose: false)
+      def initialize(employer, ai_client, config:, template: 'default', verbose: false, inputs_path: 'inputs')
         @employer = employer
         @ai_client = ai_client
         @config = config
         @template_name = template
         @verbose = verbose
+        @inputs_path = inputs_path
       end
 
       def generate
@@ -157,10 +158,10 @@ module Jojo
       end
 
       def find_branding_image
-        # Check for branding image in inputs/ directory
+        # Check for branding image in inputs directory
         image_extensions = %w[.jpg .jpeg .png .gif]
         image_extensions.each do |ext|
-          path = "inputs/branding_image#{ext}"
+          path = File.join(inputs_path, "branding_image#{ext}")
           if File.exist?(path)
             return {
               exists: true,
@@ -178,7 +179,7 @@ module Jojo
         image_info = find_branding_image
 
         unless image_info[:exists]
-          log "No branding image found in inputs/"
+          log "No branding image found in #{inputs_path}/"
           return false
         end
 

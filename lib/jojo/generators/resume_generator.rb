@@ -4,13 +4,14 @@ require_relative '../prompts/resume_prompt'
 module Jojo
   module Generators
     class ResumeGenerator
-      attr_reader :employer, :ai_client, :config, :verbose
+      attr_reader :employer, :ai_client, :config, :verbose, :inputs_path
 
-      def initialize(employer, ai_client, config:, verbose: false)
+      def initialize(employer, ai_client, config:, verbose: false, inputs_path: 'inputs')
         @employer = employer
         @ai_client = ai_client
         @config = config
         @verbose = verbose
+        @inputs_path = inputs_path
       end
 
       def generate
@@ -43,10 +44,11 @@ module Jojo
         job_description = File.read(employer.job_description_path)
 
         # Read generic resume (REQUIRED)
-        unless File.exist?('inputs/generic_resume.md')
-          raise "Generic resume not found at inputs/generic_resume.md"
+        generic_resume_path = File.join(inputs_path, 'generic_resume.md')
+        unless File.exist?(generic_resume_path)
+          raise "Generic resume not found at #{generic_resume_path}"
         end
-        generic_resume = File.read('inputs/generic_resume.md')
+        generic_resume = File.read(generic_resume_path)
 
         # Read research (OPTIONAL)
         research = read_research

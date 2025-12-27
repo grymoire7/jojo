@@ -8,7 +8,13 @@ describe Jojo::Generators::ResearchGenerator do
     @employer = Jojo::Employer.new('Acme Corp')
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
-    @generator = Jojo::Generators::ResearchGenerator.new(@employer, @ai_client, config: @config, verbose: false)
+    @generator = Jojo::Generators::ResearchGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false,
+      inputs_path: 'test/fixtures'
+    )
 
     # Clean up and create directories
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
@@ -17,26 +23,10 @@ describe Jojo::Generators::ResearchGenerator do
     # Create job description and job details fixtures
     File.write(@employer.job_description_path, "Senior Ruby Developer role at Acme Corp...")
     File.write(@employer.job_details_path, "company_name: Acme Corp\njob_title: Senior Ruby Developer")
-
-    # Create generic resume fixture
-    FileUtils.mkdir_p('inputs')
-
-    # Backup user's generic_resume.md if it exists
-    @backup_generic_resume = File.read('inputs/generic_resume.md') if File.exist?('inputs/generic_resume.md')
-
-    File.write('inputs/generic_resume.md', "# Jane Doe\n\n## Experience\n\nSoftware Engineer...")
   end
 
   after do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-
-    # Restore user's generic_resume.md if it existed, otherwise clean up test file
-    if @backup_generic_resume
-      File.write('inputs/generic_resume.md', @backup_generic_resume)
-    else
-      FileUtils.rm_f('inputs/generic_resume.md')
-    end
-
     @config.verify if @config
   end
 
@@ -96,14 +86,21 @@ describe Jojo::Generators::ResearchGenerator do
   end
 
   it "continues when generic resume is missing" do
-    FileUtils.rm_f('inputs/generic_resume.md')
+    # Create a generator with a nonexistent inputs path
+    generator_no_resume = Jojo::Generators::ResearchGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false,
+      inputs_path: 'test/fixtures/nonexistent'
+    )
 
     web_results = "Acme Corp info..."
     expected_research = "# Company Profile\n\nResearch content..."
     @ai_client.expect(:reason, expected_research, [String])
 
-    @generator.stub(:perform_web_search, web_results) do
-      result = @generator.generate
+    generator_no_resume.stub(:perform_web_search, web_results) do
+      result = generator_no_resume.generate
       _(result).must_equal expected_research
     end
 

@@ -5,13 +5,14 @@ require_relative '../prompts/research_prompt'
 module Jojo
   module Generators
     class ResearchGenerator
-      attr_reader :employer, :ai_client, :config, :verbose
+      attr_reader :employer, :ai_client, :config, :verbose, :inputs_path
 
-      def initialize(employer, ai_client, config:, verbose: false)
+      def initialize(employer, ai_client, config:, verbose: false, inputs_path: 'inputs')
         @employer = employer
         @ai_client = ai_client
         @config = config
         @verbose = verbose
+        @inputs_path = inputs_path
       end
 
       def generate
@@ -69,7 +70,7 @@ module Jojo
       end
 
       def read_generic_resume
-        resume_path = 'inputs/generic_resume.md'
+        resume_path = File.join(inputs_path, 'generic_resume.md')
 
         unless File.exist?(resume_path)
           log "Warning: Generic resume not found at #{resume_path}, research will be less personalized"

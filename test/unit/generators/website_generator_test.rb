@@ -21,7 +21,13 @@ describe Jojo::Generators::WebsiteGenerator do
     @employer = Jojo::Employer.new('Acme Corp')
     @ai_client = Minitest::Mock.new
     @config = UnitTestConfigStub.new
-    @generator = Jojo::Generators::WebsiteGenerator.new(@employer, @ai_client, config: @config, verbose: false)
+    @generator = Jojo::Generators::WebsiteGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false,
+      inputs_path: 'test/fixtures'
+    )
 
     # Clean up and create directories
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
@@ -35,7 +41,6 @@ describe Jojo::Generators::WebsiteGenerator do
 
   after do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    FileUtils.rm_f('inputs/branding_image.jpg')
   end
 
   it "generates website with all inputs" do
@@ -134,9 +139,7 @@ describe Jojo::Generators::WebsiteGenerator do
   end
 
   it "copies branding image when it exists" do
-    FileUtils.mkdir_p('inputs')
-    File.write('inputs/branding_image.jpg', 'fake image data')
-
+    # test/fixtures already has branding_image.jpg, and @generator uses inputs_path: 'test/fixtures'
     expected_branding = "Branding with image..."
     @ai_client.expect(:generate_text, expected_branding, [String])
 
@@ -154,12 +157,19 @@ describe Jojo::Generators::WebsiteGenerator do
   end
 
   it "skips branding image when missing" do
-    # No branding image created
+    # Create a generator with nonexistent inputs path (no branding_image.jpg)
+    generator_no_image = Jojo::Generators::WebsiteGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false,
+      inputs_path: 'test/fixtures/nonexistent'
+    )
 
     expected_branding = "Branding without image..."
     @ai_client.expect(:generate_text, expected_branding, [String])
 
-    @generator.generate
+    generator_no_image.generate
 
     # Image should not exist in website directory
     image_path = File.join(@employer.website_path, 'branding_image.jpg')

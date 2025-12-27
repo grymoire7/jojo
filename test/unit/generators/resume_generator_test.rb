@@ -8,7 +8,13 @@ describe Jojo::Generators::ResumeGenerator do
     @employer = Jojo::Employer.new('Acme Corp')
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
-    @generator = Jojo::Generators::ResumeGenerator.new(@employer, @ai_client, config: @config, verbose: false)
+    @generator = Jojo::Generators::ResumeGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false,
+      inputs_path: 'test/fixtures'
+    )
 
     # Clean up and create directories
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
@@ -17,24 +23,10 @@ describe Jojo::Generators::ResumeGenerator do
     # Create required fixtures
     File.write(@employer.job_description_path, "Senior Ruby Developer role at Acme Corp...")
     File.write(@employer.research_path, "# Company Profile\n\nAcme Corp is a leading tech company...")
-    FileUtils.mkdir_p('inputs')
-
-    # Backup user's generic_resume.md if it exists
-    @backup_generic_resume = File.read('inputs/generic_resume.md') if File.exist?('inputs/generic_resume.md')
-
-    File.write('inputs/generic_resume.md', "# Jane Doe\n\n## Professional Summary\n\nExperienced developer...")
   end
 
   after do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-
-    # Restore user's generic_resume.md if it existed, otherwise clean up test file
-    if @backup_generic_resume
-      File.write('inputs/generic_resume.md', @backup_generic_resume)
-    else
-      FileUtils.rm_f('inputs/generic_resume.md')
-    end
-
     @config.verify if @config
   end
 
@@ -72,10 +64,17 @@ describe Jojo::Generators::ResumeGenerator do
   end
 
   it "fails when generic resume is missing" do
-    FileUtils.rm_f('inputs/generic_resume.md')
+    # Create a generator with a nonexistent inputs path
+    generator_no_resume = Jojo::Generators::ResumeGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false,
+      inputs_path: 'test/fixtures/nonexistent'
+    )
 
     error = assert_raises(RuntimeError) do
-      @generator.generate
+      generator_no_resume.generate
     end
 
     _(error.message).must_include "Generic resume not found"
