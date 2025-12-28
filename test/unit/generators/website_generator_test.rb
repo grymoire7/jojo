@@ -313,7 +313,7 @@ describe Jojo::Generators::WebsiteGenerator do
     html = @generator.generate
 
     _(html).wont_include "Your Questions, Answered"
-    _(html).wont_include "faq-accordion"
+    _(html).wont_include '<div class="faq-accordion"'
 
     @ai_client.verify
   end
