@@ -284,4 +284,37 @@ describe Jojo::Generators::WebsiteGenerator do
 
     @ai_client.verify
   end
+
+  it "loads and passes FAQs to template" do
+    # Create mock FAQs file
+    faqs_data = [
+      { question: "What's your experience?", answer: "I have 7 years..." },
+      { question: "Why this company?", answer: "I'm excited about..." }
+    ]
+    File.write(@employer.faq_path, JSON.generate(faqs_data))
+
+    # Mock AI for branding statement
+    @ai_client.expect(:generate_text, "Branding statement", [String])
+
+    html = @generator.generate
+
+    _(html).must_include "What's your experience?"
+    _(html).must_include "Why this company?"
+    _(html).must_include "Your Questions, Answered"
+
+    @ai_client.verify
+  end
+
+  it "handles missing FAQ file gracefully" do
+    FileUtils.rm_f(@employer.faq_path) if File.exist?(@employer.faq_path)
+
+    @ai_client.expect(:generate_text, "Branding statement", [String])
+
+    html = @generator.generate
+
+    _(html).wont_include "Your Questions, Answered"
+    _(html).wont_include "faq-accordion"
+
+    @ai_client.verify
+  end
 end

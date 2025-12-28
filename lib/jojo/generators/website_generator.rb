@@ -38,8 +38,11 @@ module Jojo
         log "Loading recommendations..."
         recommendations = load_recommendations
 
+        log "Loading FAQs..."
+        faqs = load_faqs
+
         log "Preparing template variables..."
-        template_vars = prepare_template_vars(branding_statement, inputs, projects, annotated_job_description, recommendations)
+        template_vars = prepare_template_vars(branding_statement, inputs, projects, annotated_job_description, recommendations, faqs)
 
         log "Rendering HTML template (#{template_name})..."
         html = render_template(template_vars)
@@ -119,7 +122,7 @@ module Jojo
         ai_client.generate_text(prompt)
       end
 
-      def prepare_template_vars(branding_statement, inputs, projects = [], annotated_job_description = nil, recommendations = nil)
+      def prepare_template_vars(branding_statement, inputs, projects = [], annotated_job_description = nil, recommendations = nil, faqs = nil)
         # Extract job title from job_details if available
         job_title = inputs[:job_details] ? inputs[:job_details]['job_title'] : nil
 
@@ -146,7 +149,8 @@ module Jojo
           base_url: config.base_url,
           projects: projects,
           annotated_job_description: annotated_job_description,
-          recommendations: recommendations
+          recommendations: recommendations,
+          faqs: faqs
         }
       end
 
@@ -173,6 +177,7 @@ module Jojo
         projects = vars[:projects]
         annotated_job_description = vars[:annotated_job_description]
         recommendations = vars[:recommendations]
+        faqs = vars[:faqs]
 
         ERB.new(template_content).result(binding)
       end
@@ -371,6 +376,19 @@ module Jojo
         recommendations
       rescue => e
         log "Error loading recommendations: #{e.message}"
+        nil
+      end
+
+      def load_faqs
+        return nil unless File.exist?(employer.faq_path)
+
+        faq_data = File.read(employer.faq_path)
+        JSON.parse(faq_data, symbolize_names: true)
+      rescue JSON::ParserError => e
+        log "Error: Could not parse FAQ file: #{e.message}"
+        nil
+      rescue => e
+        log "Error loading FAQs: #{e.message}"
         nil
       end
     end
