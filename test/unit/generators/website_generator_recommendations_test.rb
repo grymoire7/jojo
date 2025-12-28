@@ -37,12 +37,12 @@ describe 'WebsiteGenerator with Recommendations' do
 
   after do
     FileUtils.rm_rf(@employer.base_path)
-    FileUtils.rm_rf('inputs') if File.exist?('inputs')
+    FileUtils.rm_rf('test/fixtures/tmp_recommendations_unit') if File.exist?('test/fixtures/tmp_recommendations_unit')
   end
 
   it "includes recommendations in template vars when file exists" do
-    # Create recommendations file in inputs
-    inputs_path = 'inputs'
+    # Create recommendations file in test fixtures
+    inputs_path = 'test/fixtures/tmp_recommendations_unit'
     FileUtils.mkdir_p(inputs_path)
     File.write(
       File.join(inputs_path, 'recommendations.md'),
@@ -64,7 +64,7 @@ describe 'WebsiteGenerator with Recommendations' do
   end
 
   it "handles missing recommendations file gracefully" do
-    inputs_path = 'inputs'
+    inputs_path = 'test/fixtures/tmp_recommendations_unit'
     FileUtils.mkdir_p(inputs_path)
     # No recommendations.md file
 

@@ -24,6 +24,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **REMEMBER:** Systematic debugging is 5x faster than guess-and-check thrashing.
 
+## 🚨 INPUTS DIRECTORY PROTECTION
+
+**CRITICAL: The `inputs/` directory contains user-curated data and MUST NEVER be modified by tests or automation:**
+
+- **NEVER read from `inputs/` in tests** - use `test/fixtures/` instead
+- **NEVER write to `inputs/` in tests** - use temporary directories
+- **NEVER delete files from `inputs/`** - this directory is for production use only
+- **Test fixtures MUST go in `test/fixtures/`** - dedicated directory for test data
+
+**When writing tests:**
+1. Always use `test/fixtures/` for test input files
+2. Use temporary directories or mock data for test outputs
+3. Never use `FileUtils.rm_rf` or similar on `inputs/`
+4. Verify tests use `inputs_path: 'test/fixtures'` parameter when available
+
 ## Project Overview
 
 ## Development Commands

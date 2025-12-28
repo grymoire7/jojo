@@ -1,102 +1,66 @@
-# Jane Doe
+# Your Name
 
 ## Contact Information
-- Email: jane.doe@example.com
+- Email: your.email@example.com
 - Phone: (555) 123-4567
-- LinkedIn: linkedin.com/in/janedoe
-- GitHub: github.com/janedoe
+- LinkedIn: linkedin.com/in/yourprofile
+- GitHub: github.com/yourprofile
 
 ## Professional Summary
 
-Experienced software engineer with 8+ years building scalable web applications. Strong expertise in Ruby, Python, JavaScript, and cloud infrastructure. Proven track record of leading teams and delivering high-impact projects.
+[2-3 sentences describing your professional background and key strengths]
 
 ## Skills
 
-### Programming Languages
-- Ruby (expert)
-- Python (proficient)
-- JavaScript/TypeScript (proficient)
-- Go (intermediate)
-- Java (intermediate)
-- PHP (beginner)
-
-### Frameworks & Libraries
-- Ruby on Rails
-- React
-- Vue.js
-- Django
-- Flask
-- Node.js
-- Express
-
-### Tools & Technologies
-- Git, Docker, Kubernetes
-- PostgreSQL, MySQL, MongoDB, Redis
-- AWS, GCP, Heroku
-- CI/CD (GitHub Actions, Jenkins, CircleCI)
-- Elasticsearch, RabbitMQ
-- GraphQL, REST APIs
+### Technical Skills
+- Programming Languages: Ruby, Python, JavaScript
+- Frameworks: Rails, React, etc.
+- Tools: Git, Docker, etc.
 
 ### Soft Skills
-- Technical leadership
-- Mentoring and coaching
-- Agile/Scrum methodologies
-- Cross-functional collaboration
-- Technical writing
+- Leadership
+- Communication
+- Problem-solving
 
 ## Work Experience
 
-### Senior Software Engineer | Tech Company Inc
-*Jan 2020 - Present* | San Francisco, CA
+### Job Title | Company Name
+*Start Date - End Date* | Location
 
-- Led team of 5 engineers building customer-facing SaaS platform serving 10,000+ users
-- Architected and implemented microservices migration reducing deployment time by 60%
-- Designed and built real-time notification system processing 1M+ events daily [Ruby, Redis, WebSockets]
-- Mentored 3 junior engineers, all promoted within 18 months
-- Reduced system latency by 40% through database optimization and caching strategies
-- Implemented comprehensive test suite increasing code coverage from 45% to 95%
+- Achievement or responsibility (use action verbs)
+- Quantifiable result when possible
+- Technologies used in [brackets]
 
-### Software Engineer | StartupCo
-*Mar 2017 - Dec 2019* | Remote
+### Previous Job Title | Previous Company
+*Start Date - End Date* | Location
 
-- Built MVP for B2B marketplace platform from scratch, acquired 100+ paying customers in first year [Rails, React]
-- Developed payment processing integration with Stripe handling $2M+ in transactions
-- Implemented OAuth2 authentication and authorization system
-- Created automated deployment pipeline reducing release time from 2 hours to 15 minutes
-- Collaborated with design team to build responsive UI supporting mobile and desktop
-- Wrote technical documentation and API guides for external developers
-
-### Junior Developer | Digital Agency LLC
-*Jun 2015 - Feb 2017* | New York, NY
-
-- Developed custom WordPress plugins and themes for 20+ client projects
-- Built RESTful APIs for mobile app backends [Node.js, Express]
-- Maintained legacy PHP applications and performed security updates
-- Participated in code reviews and pair programming sessions
-- Managed client communication and gathered technical requirements
-- Implemented analytics tracking and reporting dashboards
+- Achievement or responsibility
+- Focus on impact and results
+- Include relevant technologies
 
 ## Education
 
-### Bachelor of Science in Computer Science | State University
-*2011 - 2015* | Boston, MA
+### Degree Name | University Name
+*Graduation Year* | Location
 
-- GPA: 3.7/4.0
-- Dean's List: 6 semesters
-- Relevant coursework: Data Structures, Algorithms, Database Systems, Software Engineering
+- Relevant coursework or honors
+- GPA if impressive (3.5+)
 
-## Projects
+## Projects (Optional)
 
-### Open Source Contributions
-- Contributor to popular Rails testing gem (200+ stars on GitHub)
-- Maintained Ruby static analysis tool with 500+ weekly downloads
-- Created command-line productivity tool featured in Ruby Weekly newsletter
+### Project Name
+- Brief description of the project
+- Technologies used
+- Link to GitHub/demo if available
 
-### Personal Projects
-- Built meal planning SaaS with 1,000+ registered users [Rails, React, PostgreSQL]
-- Developed browser extension for productivity tracking (5,000+ installs)
-- Created technical blog with 50+ articles on software engineering topics
+## Certifications (Optional)
+- Certification Name, Issuing Organization, Year
 
-## Certifications
-- AWS Certified Solutions Architect - Associate, 2021
-- Certified Scrum Master (CSM), 2019
+---
+
+**Instructions for use:**
+1. Copy this file to `inputs/generic_resume.md`
+2. Replace all placeholder text with your actual information
+3. Remove sections that don't apply to you
+4. Add sections as needed (Publications, Speaking, etc.)
+5. Keep formatting consistent (markdown)

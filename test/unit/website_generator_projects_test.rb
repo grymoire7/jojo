@@ -16,9 +16,9 @@ describe 'WebsiteGenerator with Projects' do
         - PostgreSQL
     YAML
 
-    # Create inputs directory and projects.yml
-    FileUtils.mkdir_p('inputs')
-    File.write('inputs/projects.yml', <<~YAML)
+    # Create test fixtures directory and projects.yml
+    FileUtils.mkdir_p('test/fixtures')
+    File.write('test/fixtures/projects.yml', <<~YAML)
       - title: "Matching Project"
         description: "This project matches job requirements"
         skills:
@@ -33,14 +33,15 @@ describe 'WebsiteGenerator with Projects' do
 
   after do
     FileUtils.rm_rf('employers/test-corp')
-    FileUtils.rm_f('inputs/projects.yml')
+    FileUtils.rm_f('test/fixtures/projects.yml')
+    FileUtils.rm_rf('test/fixtures/images') if File.exist?('test/fixtures/images')
   end
 
   it "loads and selects relevant projects" do
     # Mock AI client (not used in this test)
     mock_ai = Minitest::Mock.new
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config)
+    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config, inputs_path: 'test/fixtures')
 
     # Access private method for testing
     projects = generator.send(:load_projects)
@@ -59,7 +60,7 @@ describe 'WebsiteGenerator with Projects' do
     mock_ai = Minitest::Mock.new
     mock_ai.expect :generate_text, "Test branding statement", [String]
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config)
+    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config, inputs_path: 'test/fixtures')
     generator.generate
 
     # Read generated HTML
@@ -73,16 +74,16 @@ describe 'WebsiteGenerator with Projects' do
 
   it "copies local project images to website directory" do
     # Create test image
-    FileUtils.mkdir_p('inputs/images')
-    File.write('inputs/images/test.png', 'fake image data')
+    FileUtils.mkdir_p('test/fixtures/images')
+    File.write('test/fixtures/images/test.png', 'fake image data')
 
     # Update projects.yml with image
-    File.write('inputs/projects.yml', <<~YAML)
+    File.write('test/fixtures/projects.yml', <<~YAML)
       - title: "Project with Image"
         description: "Has a local image"
         skills:
           - Ruby on Rails
-        image: "inputs/images/test.png"
+        image: "test/fixtures/images/test.png"
     YAML
 
     File.write(@employer.job_details_path, <<~YAML)
@@ -96,7 +97,7 @@ describe 'WebsiteGenerator with Projects' do
     mock_ai = Minitest::Mock.new
     mock_ai.expect :generate_text, "Test branding", [String]
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config)
+    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config, inputs_path: 'test/fixtures')
     generator.generate
 
     # Check image was copied
@@ -107,7 +108,6 @@ describe 'WebsiteGenerator with Projects' do
     html = File.read(@employer.index_html_path)
     _(html).must_include 'src="images/test.png"'
 
-    FileUtils.rm_rf('inputs/images')
     mock_ai.verify
   end
 end

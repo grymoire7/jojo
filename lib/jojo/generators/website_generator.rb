@@ -241,9 +241,10 @@ module Jojo
       end
 
       def load_projects
-        return [] unless File.exist?('inputs/projects.yml')
+        projects_path = File.join(inputs_path, 'projects.yml')
+        return [] unless File.exist?(projects_path)
 
-        loader = ProjectLoader.new('inputs/projects.yml')
+        loader = ProjectLoader.new(projects_path)
         all_projects = loader.load
 
         selector = ProjectSelector.new(employer, all_projects)

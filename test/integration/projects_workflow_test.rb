@@ -21,8 +21,8 @@ describe 'Projects Integration Workflow' do
 
     File.write(@employer.resume_path, "# Generic Resume\n\nExperience with Ruby...")
 
-    FileUtils.mkdir_p('inputs')
-    File.write('inputs/projects.yml', <<~YAML)
+    FileUtils.mkdir_p('test/fixtures')
+    File.write('test/fixtures/projects.yml', <<~YAML)
       - title: "E-commerce Platform"
         description: "Built a scalable Rails e-commerce platform"
         year: 2024
@@ -52,7 +52,7 @@ describe 'Projects Integration Workflow' do
 
   after do
     FileUtils.rm_rf('employers/integration-test-corp')
-    FileUtils.rm_f('inputs/projects.yml')
+    FileUtils.rm_f('test/fixtures/projects.yml')
   end
 
   it "generates website with relevant projects only" do

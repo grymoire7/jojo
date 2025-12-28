@@ -28,8 +28,8 @@ describe 'Recommendations Workflow Integration' do
     File.write(@employer.job_description_path, "Software Engineer position")
     File.write(@employer.resume_path, "My resume content")
 
-    # Create inputs directory
-    @inputs_path = 'inputs'
+    # Create test inputs directory (NOT production inputs/)
+    @inputs_path = 'test/fixtures/tmp_recommendations'
     FileUtils.mkdir_p(@inputs_path)
 
     # Mock AI client

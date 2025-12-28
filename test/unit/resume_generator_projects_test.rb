@@ -10,15 +10,14 @@ describe 'ResumeGenerator with Projects' do
     @config = Jojo::Config.new('test/fixtures/valid_config.yml')
 
     File.write(@employer.job_description_path, "Ruby developer needed")
-    FileUtils.mkdir_p('inputs')
-    File.write('inputs/generic_resume.md', "# Generic Resume\n\nExperience...")
+    FileUtils.mkdir_p('test/fixtures')
 
     File.write(@employer.job_details_path, <<~YAML)
       required_skills:
         - Ruby on Rails
     YAML
 
-    File.write('inputs/projects.yml', <<~YAML)
+    File.write('test/fixtures/projects.yml', <<~YAML)
       - title: "Rails App"
         description: "Built a Rails application"
         skills:
@@ -28,8 +27,7 @@ describe 'ResumeGenerator with Projects' do
 
   after do
     FileUtils.rm_rf('employers/test-corp')
-    FileUtils.rm_f('inputs/generic_resume.md')
-    FileUtils.rm_f('inputs/projects.yml')
+    FileUtils.rm_f('test/fixtures/projects.yml')
   end
 
   it "includes relevant projects in resume prompt" do
@@ -41,7 +39,7 @@ describe 'ResumeGenerator with Projects' do
       true  # Accept any prompt for now
     end
 
-    generator = Jojo::Generators::ResumeGenerator.new(@employer, mock_ai, config: @config)
+    generator = Jojo::Generators::ResumeGenerator.new(@employer, mock_ai, config: @config, inputs_path: 'test/fixtures')
     generator.generate
 
     # Verify the prompt includes project information
