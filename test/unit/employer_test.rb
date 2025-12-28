@@ -34,6 +34,7 @@ describe Jojo::Employer do
     _(employer.status_log_path).must_equal 'employers/acme-corp/status_log.md'
     _(employer.website_path).must_equal 'employers/acme-corp/website'
     _(employer.index_html_path).must_equal 'employers/acme-corp/website/index.html'
+    _(employer.faq_path).must_equal 'employers/acme-corp/faq.json'
   end
 
   it "creates directory structure" do

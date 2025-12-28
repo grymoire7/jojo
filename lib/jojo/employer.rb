@@ -50,6 +50,10 @@ module Jojo
       File.join(website_path, 'index.html')
     end
 
+    def faq_path
+      File.join(base_path, 'faq.json')
+    end
+
     def create_directory!
       FileUtils.mkdir_p(base_path)
       FileUtils.mkdir_p(website_path)
