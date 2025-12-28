@@ -806,5 +806,136 @@
   })();
   </script>
   <% end %>
+
+  <% if recommendations && recommendations.size > 1 %>
+  <!-- Recommendations Carousel JavaScript -->
+  <script>
+  (function() {
+    'use strict';
+
+    // Carousel state
+    const carousel = {
+      track: document.querySelector('.recommendations .carousel-track'),
+      slides: document.querySelectorAll('.recommendations .carousel-slide'),
+      prevBtn: document.querySelector('.recommendations .carousel-arrow.prev'),
+      nextBtn: document.querySelector('.recommendations .carousel-arrow.next'),
+      dots: document.querySelectorAll('.recommendations .carousel-dot'),
+      currentIndex: 0,
+      totalSlides: <%= recommendations.size %>,
+      isTransitioning: false,
+      autoAdvanceInterval: null,
+      autoAdvanceDelay: 6000
+    };
+
+    // Go to specific slide
+    function goToSlide(index) {
+      if (carousel.isTransitioning) return;
+
+      carousel.isTransitioning = true;
+      carousel.currentIndex = index;
+
+      // Update transform
+      const offset = -index * 100;
+      carousel.track.style.transform = `translateX(${offset}%)`;
+
+      // Update dots
+      carousel.dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+
+      // Update ARIA
+      carousel.slides.forEach((slide, i) => {
+        slide.setAttribute('aria-hidden', i !== index);
+      });
+
+      setTimeout(() => {
+        carousel.isTransitioning = false;
+      }, 300);
+    }
+
+    // Next slide
+    function nextSlide() {
+      const next = (carousel.currentIndex + 1) % carousel.totalSlides;
+      goToSlide(next);
+    }
+
+    // Previous slide
+    function prevSlide() {
+      const prev = (carousel.currentIndex - 1 + carousel.totalSlides) % carousel.totalSlides;
+      goToSlide(prev);
+    }
+
+    // Auto-advance
+    function startAutoAdvance() {
+      if (carousel.autoAdvanceInterval) return;
+
+      carousel.autoAdvanceInterval = setInterval(() => {
+        nextSlide();
+      }, carousel.autoAdvanceDelay);
+    }
+
+    function pauseAutoAdvance() {
+      if (carousel.autoAdvanceInterval) {
+        clearInterval(carousel.autoAdvanceInterval);
+        carousel.autoAdvanceInterval = null;
+      }
+    }
+
+    function resumeAutoAdvance() {
+      pauseAutoAdvance();
+      setTimeout(startAutoAdvance, 1000);
+    }
+
+    // Event listeners
+    carousel.prevBtn.addEventListener('click', () => {
+      prevSlide();
+      pauseAutoAdvance();
+    });
+
+    carousel.nextBtn.addEventListener('click', () => {
+      nextSlide();
+      pauseAutoAdvance();
+    });
+
+    carousel.dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        goToSlide(index);
+        pauseAutoAdvance();
+      });
+    });
+
+    // Pause on hover
+    const container = document.querySelector('.recommendations');
+    container.addEventListener('mouseenter', pauseAutoAdvance);
+    container.addEventListener('mouseleave', resumeAutoAdvance);
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.target.closest('.recommendations')) {
+        if (e.key === 'ArrowLeft') {
+          prevSlide();
+          pauseAutoAdvance();
+        } else if (e.key === 'ArrowRight') {
+          nextSlide();
+          pauseAutoAdvance();
+        }
+      }
+    });
+
+    // Initialize
+    goToSlide(0);
+    startAutoAdvance();
+
+    // Pause when tab not visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        pauseAutoAdvance();
+      } else {
+        resumeAutoAdvance();
+      }
+    });
+  })();
+  </script>
+  <% end %>
 </body>
 </html>
