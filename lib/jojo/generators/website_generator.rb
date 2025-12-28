@@ -1,6 +1,7 @@
 require 'yaml'
 require 'erb'
 require 'fileutils'
+require 'json'
 require_relative '../prompts/website_prompt'
 require_relative '../project_loader'
 require_relative '../project_selector'
@@ -30,8 +31,11 @@ module Jojo
         projects = load_projects
         projects = process_project_images(projects)
 
+        log "Loading and annotating job description..."
+        annotated_job_description = annotate_job_description
+
         log "Preparing template variables..."
-        template_vars = prepare_template_vars(branding_statement, inputs, projects)
+        template_vars = prepare_template_vars(branding_statement, inputs, projects, annotated_job_description)
 
         log "Rendering HTML template (#{template_name})..."
         html = render_template(template_vars)
@@ -111,7 +115,7 @@ module Jojo
         ai_client.generate_text(prompt)
       end
 
-      def prepare_template_vars(branding_statement, inputs, projects = [])
+      def prepare_template_vars(branding_statement, inputs, projects = [], annotated_job_description = nil)
         # Extract job title from job_details if available
         job_title = inputs[:job_details] ? inputs[:job_details]['job_title'] : nil
 
@@ -136,7 +140,8 @@ module Jojo
           has_branding_image: branding_image_info[:exists],
           branding_image_path: branding_image_info[:relative_path],
           base_url: config.base_url,
-          projects: projects
+          projects: projects,
+          annotated_job_description: annotated_job_description
         }
       end
 
@@ -161,6 +166,7 @@ module Jojo
         branding_image_path = vars[:branding_image_path]
         base_url = vars[:base_url]
         projects = vars[:projects]
+        annotated_job_description = vars[:annotated_job_description]
 
         ERB.new(template_content).result(binding)
       end
@@ -265,6 +271,78 @@ module Jojo
 
           project
         end
+      end
+
+      def annotate_job_description
+        # Load annotations JSON
+        unless File.exist?(employer.job_description_annotations_path)
+          log "No annotations found at #{employer.job_description_annotations_path}"
+          return nil
+        end
+
+        annotations = load_annotations
+        return nil if annotations.nil? || annotations.empty?
+
+        # Load job description
+        unless File.exist?(employer.job_description_path)
+          log "Warning: Job description not found, cannot annotate"
+          return nil
+        end
+
+        job_description_md = File.read(employer.job_description_path)
+
+        # Convert to HTML and inject annotations
+        annotated_html = inject_annotations(job_description_md, annotations)
+        annotated_html
+      rescue => e
+        log "Error annotating job description: #{e.message}"
+        nil
+      end
+
+      def load_annotations
+        json_content = File.read(employer.job_description_annotations_path)
+        JSON.parse(json_content, symbolize_names: true)
+      rescue JSON::ParserError => e
+        log "Error: Malformed annotations JSON: #{e.message}"
+        nil
+      end
+
+      def inject_annotations(markdown_text, annotations)
+        require 'cgi'
+
+        # Convert markdown to HTML paragraphs
+        html = markdown_to_html(markdown_text)
+
+        # Inject each annotation
+        annotations.each do |annotation|
+          text = annotation[:text]
+          match = CGI.escapeHTML(annotation[:match])
+          tier = annotation[:tier]
+
+          # Replace all occurrences
+          pattern = Regexp.escape(text)
+          replacement = %(<span class="annotated" data-tier="#{tier}" data-match="#{match}">#{text}</span>)
+
+          html.gsub!(pattern, replacement)
+        end
+
+        html
+      end
+
+      def markdown_to_html(markdown)
+        # Simple markdown to HTML conversion
+        paragraphs = markdown.split("\n\n").map(&:strip).reject(&:empty?)
+
+        paragraphs.map do |para|
+          # Convert bold
+          para = para.gsub(/\*\*([^*]+)\*\*/, '<strong>\1</strong>')
+          # Convert italic
+          para = para.gsub(/\*([^*]+)\*/, '<em>\1</em>')
+          # Convert links
+          para = para.gsub(/\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
+
+          "<p>#{para}</p>"
+        end.join("\n")
       end
     end
   end
