@@ -320,7 +320,7 @@ module Jojo
           tier = annotation[:tier]
 
           # Replace all occurrences
-          pattern = Regexp.escape(text)
+          pattern = Regexp.new(Regexp.escape(text))
           replacement = %(<span class="annotated" data-tier="#{tier}" data-match="#{match}">#{text}</span>)
 
           html.gsub!(pattern, replacement)

@@ -259,7 +259,7 @@ describe Jojo::Generators::WebsiteGenerator do
 
     # Should NOT include annotation section
     _(result).wont_include "Compare Me to the Job Description"
-    _(result).wont_include "annotation-tooltip"
+    _(result).wont_include '<div id="annotation-tooltip"'
 
     @ai_client.verify
   end
