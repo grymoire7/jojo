@@ -1149,5 +1149,103 @@
   })();
   </script>
   <% end %>
+
+  <% if faqs && !faqs.empty? %>
+  <!-- FAQ Accordion JavaScript -->
+  <script>
+  (function() {
+    'use strict';
+
+    // FAQ state
+    const faq = {
+      items: document.querySelectorAll('.faq .faq-item'),
+      currentlyOpenIndex: null,
+      isAnimating: false
+    };
+
+    if (faq.items.length === 0) return;
+
+    // Toggle FAQ
+    function toggleFaq(index) {
+      if (faq.isAnimating) return;
+
+      if (faq.currentlyOpenIndex === index) {
+        // Clicking currently open FAQ - close it
+        closeFaq(index);
+        faq.currentlyOpenIndex = null;
+      } else {
+        // Opening a new FAQ
+        if (faq.currentlyOpenIndex !== null) {
+          closeFaq(faq.currentlyOpenIndex);
+        }
+        openFaq(index);
+        faq.currentlyOpenIndex = index;
+      }
+    }
+
+    // Open FAQ
+    function openFaq(index) {
+      const item = faq.items[index];
+      const button = item.querySelector('.faq-question');
+      const answer = item.querySelector('.faq-answer');
+
+      faq.isAnimating = true;
+
+      // Set max-height to scrollHeight for smooth animation
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+
+      // Update visual state
+      button.classList.add('active');
+      button.setAttribute('aria-expanded', 'true');
+
+      // Clear animation lock after transition
+      setTimeout(() => { faq.isAnimating = false; }, 300);
+    }
+
+    // Close FAQ
+    function closeFaq(index) {
+      const item = faq.items[index];
+      const button = item.querySelector('.faq-question');
+      const answer = item.querySelector('.faq-answer');
+
+      faq.isAnimating = true;
+
+      // Collapse to 0 height
+      answer.style.maxHeight = '0';
+
+      // Update visual state
+      button.classList.remove('active');
+      button.setAttribute('aria-expanded', 'false');
+
+      setTimeout(() => { faq.isAnimating = false; }, 300);
+    }
+
+    // Click event listeners
+    faq.items.forEach((item, index) => {
+      const button = item.querySelector('.faq-question');
+
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleFaq(index);
+      });
+    });
+
+    // Keyboard event listeners
+    document.addEventListener('keydown', (e) => {
+      if (e.target.classList.contains('faq-question')) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const index = Array.from(faq.items).indexOf(e.target.closest('.faq-item'));
+          toggleFaq(index);
+        } else if (e.key === 'Escape' && faq.currentlyOpenIndex !== null) {
+          e.preventDefault();
+          closeFaq(faq.currentlyOpenIndex);
+          faq.currentlyOpenIndex = null;
+        }
+      }
+    });
+  })();
+  </script>
+  <% end %>
 </body>
 </html>
