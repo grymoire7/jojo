@@ -18,6 +18,10 @@ module Jojo
       File.join(base_path, 'job_description.md')
     end
 
+    def job_description_annotations_path
+      File.join(base_path, 'job_description_annotations.json')
+    end
+
     def job_details_path
       File.join(base_path, 'job_details.yml')
     end

@@ -27,6 +27,7 @@ describe Jojo::Employer do
 
     _(employer.base_path).must_equal 'employers/acme-corp'
     _(employer.job_description_path).must_equal 'employers/acme-corp/job_description.md'
+    _(employer.job_description_annotations_path).must_equal 'employers/acme-corp/job_description_annotations.json'
     _(employer.research_path).must_equal 'employers/acme-corp/research.md'
     _(employer.resume_path).must_equal 'employers/acme-corp/resume.md'
     _(employer.cover_letter_path).must_equal 'employers/acme-corp/cover_letter.md'
