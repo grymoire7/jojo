@@ -1,15 +1,24 @@
 # LinkedIn Recommendations
 
-These recommendations can be used to tailor your resume and cover letter with specific examples and endorsements.
+These recommendations will be displayed in a carousel on your landing page.
+
+**Instructions:**
+1. Copy this file to `inputs/recommendations.md`
+2. Go to your LinkedIn profile → Recommendations
+3. Copy each recommendation you want to showcase
+4. Fill in the template below for each one
+5. Keep the most impactful 3-5 recommendations (quality over quantity)
 
 ---
 
-## Recommendation from [Recommender Name]
-**Their Title:** [Their Job Title]
-**Your Role:** [Your Job Title when working together]
-**Relationship:** [Manager, Colleague, Direct Report, Client, etc.]
+## Recommendation from [Full Name]
+**Their Title:** [Their current job title]
+**Your Role:** [Your job title when you worked together]
+**Relationship:** [Former Manager | Colleague | Direct Report | Client | etc.]
 
-> [Full text of their LinkedIn recommendation]
+> [Paste the full LinkedIn recommendation text here.
+> Keep the exact wording - authenticity matters.
+> Multi-paragraph recommendations are fine.]
 
 **Key Phrases to Use:**
 - "[Notable skill or quality they mentioned]"
@@ -18,11 +27,11 @@ These recommendations can be used to tailor your resume and cover letter with sp
 ---
 
 ## Recommendation from [Another Recommender]
-**Their Title:** [Their Job Title]
+**Their Title:** [Job Title]
 **Your Role:** [Your Job Title]
 **Relationship:** [Your relationship]
 
-> [Full text of recommendation]
+> [Full recommendation text]
 
 **Key Phrases to Use:**
 - "[Skill or quality]"
@@ -30,9 +39,15 @@ These recommendations can be used to tailor your resume and cover letter with sp
 
 ---
 
-**Instructions for use:**
-1. Copy this file to `inputs/recommendations.md` (optional)
-2. Go to your LinkedIn profile
-3. Copy each recommendation verbatim
-4. Note key phrases that would be good to reference
-5. Use these when AI tailors your materials
+## Tips for Choosing Recommendations
+
+- **Recent is better**: Prioritize recommendations from the last 2-3 years
+- **Specific over generic**: "Delivered X project ahead of schedule" beats "hard worker"
+- **Relevant skills**: Match recommendations to the types of roles you're seeking
+- **Diverse perspectives**: Include managers, peers, and direct reports if possible
+- **Achievement-focused**: Best recommendations cite concrete results
+
+## Optional: Add Headshots (Future Feature)
+
+In a future version, you'll be able to add headshot images for recommenders.
+For now, focus on the text content.
