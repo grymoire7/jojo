@@ -487,29 +487,29 @@ Each phase will include tests and be potentially shippable.
 
 **Validation**: ✅ Job description terms have hover tooltips showing relevant experience. Mobile tap interactions work. Graceful degradation when annotations unavailable.
 
-### Phase 6d: Recommendations Carousel
+### Phase 6d: Recommendations Carousel ✅
 
 **Goal**: Display recommendation quotes with carousel
 
-**Status**: PLANNED
+**Status**: COMPLETED
 
 #### Tasks:
 
-- [ ] Parse `inputs/recommendations.md`
+- [x] Parse `inputs/recommendations.md`
   - Extract individual recommendations
   - Parse author/relationship metadata
 
-- [ ] Create carousel JavaScript component
+- [x] Create carousel JavaScript component
   - Auto-advance with manual controls
   - Responsive design
 
-- [ ] Update template with recommendations section
+- [x] Update template with recommendations section
   - "What do my co-workers say?" heading
   - Carousel container
 
-- [ ] Create tests for recommendation parsing
+- [x] Create tests for recommendation parsing
 
-**Validation**: Recommendations display in rotating carousel
+**Validation**: ✅ Recommendations display in rotating carousel. Auto-advance works. Swipe gestures functional. Keyboard navigation works. Accessibility features present.
 
 ### Phase 6e: FAQ Accordion
 
