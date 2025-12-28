@@ -60,4 +60,38 @@ describe Jojo::Generators::AnnotationGenerator do
 
     @ai_client.verify
   end
+
+  it "raises error when job description missing" do
+    FileUtils.rm_f(@employer.job_description_path)
+
+    _ { @generator.generate }.must_raise RuntimeError
+  end
+
+  it "raises error when resume missing" do
+    FileUtils.rm_f(@employer.resume_path)
+
+    _ { @generator.generate }.must_raise RuntimeError
+  end
+
+  it "handles missing research gracefully" do
+    FileUtils.rm_f(@employer.research_path)
+
+    ai_response = JSON.generate([
+      { text: "Python", match: "7 years experience", tier: "strong" }
+    ])
+
+    @ai_client.expect(:reason, ai_response, [String])
+
+    # Should not raise error
+    result = @generator.generate
+    _(result).must_be_kind_of Array
+
+    @ai_client.verify
+  end
+
+  it "raises error when AI returns invalid JSON" do
+    @ai_client.expect(:reason, "This is not JSON", [String])
+
+    _ { @generator.generate }.must_raise RuntimeError
+  end
 end
