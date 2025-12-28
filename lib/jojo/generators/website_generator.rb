@@ -5,6 +5,7 @@ require 'json'
 require_relative '../prompts/website_prompt'
 require_relative '../project_loader'
 require_relative '../project_selector'
+require_relative '../recommendation_parser'
 
 module Jojo
   module Generators
@@ -34,8 +35,11 @@ module Jojo
         log "Loading and annotating job description..."
         annotated_job_description = annotate_job_description
 
+        log "Loading recommendations..."
+        recommendations = load_recommendations
+
         log "Preparing template variables..."
-        template_vars = prepare_template_vars(branding_statement, inputs, projects, annotated_job_description)
+        template_vars = prepare_template_vars(branding_statement, inputs, projects, annotated_job_description, recommendations)
 
         log "Rendering HTML template (#{template_name})..."
         html = render_template(template_vars)
@@ -115,7 +119,7 @@ module Jojo
         ai_client.generate_text(prompt)
       end
 
-      def prepare_template_vars(branding_statement, inputs, projects = [], annotated_job_description = nil)
+      def prepare_template_vars(branding_statement, inputs, projects = [], annotated_job_description = nil, recommendations = nil)
         # Extract job title from job_details if available
         job_title = inputs[:job_details] ? inputs[:job_details]['job_title'] : nil
 
@@ -141,7 +145,8 @@ module Jojo
           branding_image_path: branding_image_info[:relative_path],
           base_url: config.base_url,
           projects: projects,
-          annotated_job_description: annotated_job_description
+          annotated_job_description: annotated_job_description,
+          recommendations: recommendations
         }
       end
 
@@ -167,6 +172,7 @@ module Jojo
         base_url = vars[:base_url]
         projects = vars[:projects]
         annotated_job_description = vars[:annotated_job_description]
+        recommendations = vars[:recommendations]
 
         ERB.new(template_content).result(binding)
       end
@@ -343,6 +349,29 @@ module Jojo
 
           "<p>#{para}</p>"
         end.join("\n")
+      end
+
+      def load_recommendations
+        recommendations_path = File.join(inputs_path, 'recommendations.md')
+
+        unless File.exist?(recommendations_path)
+          log "No recommendations found at #{recommendations_path}"
+          return nil
+        end
+
+        parser = RecommendationParser.new(recommendations_path)
+        recommendations = parser.parse
+
+        if recommendations.nil? || recommendations.empty?
+          log "Warning: No valid recommendations found in #{recommendations_path}"
+          return nil
+        end
+
+        log "Loaded #{recommendations.size} recommendation(s)"
+        recommendations
+      rescue => e
+        log "Error loading recommendations: #{e.message}"
+        nil
       end
     end
   end
