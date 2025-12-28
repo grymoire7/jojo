@@ -224,4 +224,61 @@ describe Jojo::Generators::WebsiteGenerator do
 
     @ai_client.verify
   end
+
+  it "loads and injects annotations into job description HTML" do
+    # Create annotations JSON
+    annotations = [
+      { text: "Ruby", match: "7 years Ruby experience", tier: "strong" },
+      { text: "distributed systems", match: "Built message queue", tier: "moderate" }
+    ]
+    File.write(@employer.job_description_annotations_path, JSON.generate(annotations))
+
+    expected_branding = "Branding statement..."
+    @ai_client.expect(:generate_text, expected_branding, [String])
+
+    result = @generator.generate
+
+    # Should include annotated job description section
+    _(result).must_include "Compare Me to the Job Description"
+    _(result).must_include '<span class="annotated" data-tier="strong" data-match="7 years Ruby experience">Ruby</span>'
+    _(result).must_include '<span class="annotated" data-tier="moderate" data-match="Built message queue">distributed systems</span>'
+
+    @ai_client.verify
+  end
+
+  it "omits annotation section when annotations.json missing" do
+    # Don't create annotations file
+
+    expected_branding = "Branding statement..."
+    @ai_client.expect(:generate_text, expected_branding, [String])
+
+    result = @generator.generate
+
+    # Should NOT include annotation section
+    _(result).wont_include "Compare Me to the Job Description"
+    _(result).wont_include "annotation-tooltip"
+
+    @ai_client.verify
+  end
+
+  it "annotates all occurrences of same text" do
+    # Job description with duplicate text
+    File.write(@employer.job_description_path, "We need Ruby skills. Ruby is our main language. Ruby developers wanted.")
+
+    annotations = [
+      { text: "Ruby", match: "7 years Ruby experience", tier: "strong" }
+    ]
+    File.write(@employer.job_description_annotations_path, JSON.generate(annotations))
+
+    expected_branding = "Branding..."
+    @ai_client.expect(:generate_text, expected_branding, [String])
+
+    result = @generator.generate
+
+    # Count occurrences of annotated "Ruby"
+    annotation_count = result.scan(/<span class="annotated"[^>]*>Ruby<\/span>/).length
+    _(annotation_count).must_equal 3
+
+    @ai_client.verify
+  end
 end
