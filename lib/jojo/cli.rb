@@ -5,6 +5,7 @@ require_relative 'generators/research_generator'
 require_relative 'generators/resume_generator'
 require_relative 'generators/cover_letter_generator'
 require_relative 'generators/website_generator'
+require_relative 'generators/annotation_generator'
 
 module Jojo
   class CLI < Thor
@@ -31,6 +32,28 @@ module Jojo
       ensure_inputs_directory
 
       report_results(errors)
+    end
+
+    desc "annotate", "Generate job description annotations"
+    def annotate
+      validate_employer_option!
+
+      config = Jojo::Config.new
+      employer = Jojo::Employer.new(options[:employer])
+      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
+
+      say "Generating annotations for #{employer.name}...", :green
+
+      begin
+        generator = Jojo::Generators::AnnotationGenerator.new(employer, ai_client, verbose: options[:verbose])
+        annotations = generator.generate
+
+        say "✓ Generated #{annotations.length} annotations", :green
+        say "  Saved to: #{employer.job_description_annotations_path}", :green
+      rescue => e
+        say "✗ Error generating annotations: #{e.message}", :red
+        exit 1
+      end
     end
 
     desc "generate", "Generate everything: research, resume, cover letter, and website"
@@ -118,6 +141,23 @@ module Jojo
         say "✗ Error generating cover letter: #{e.message}", :red
         status_logger.log_step("Cover Letter Generation", status: "failed", error: e.message)
         exit 1
+      end
+
+      # Generate annotations
+      begin
+        generator = Jojo::Generators::AnnotationGenerator.new(employer, ai_client, verbose: options[:verbose])
+        annotations = generator.generate
+
+        say "✓ Generated #{annotations.length} job description annotations", :green
+        status_logger.log_step("Annotation Generation",
+          tokens: ai_client.total_tokens_used,
+          status: "complete",
+          annotations_count: annotations.length
+        )
+      rescue => e
+        say "✗ Error generating annotations: #{e.message}", :red
+        status_logger.log_step("Annotation Generation", status: "failed", error: e.message)
+        # Don't exit - annotations are optional, continue with website generation
       end
 
       # Generate website
@@ -512,6 +552,14 @@ module Jojo
       if errors.any?
         say "Error:", :red
         errors.each { |e| say "  #{e}", :red }
+        exit 1
+      end
+    end
+
+    def validate_employer_option!
+      unless options[:employer]
+        say "Error: --employer option is required", :red
+        say "Usage: jojo annotate -e \"Company Name\"", :yellow
         exit 1
       end
     end
