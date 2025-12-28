@@ -24,4 +24,40 @@ describe Jojo::Generators::AnnotationGenerator do
   after do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
   end
+
+  it "generates annotations from job description and resume" do
+    ai_response = JSON.generate([
+      { text: "5+ years of Python", match: "Built Python apps for 7 years", tier: "strong" },
+      { text: "distributed systems", match: "Designed fault-tolerant queue", tier: "strong" }
+    ])
+
+    @ai_client.expect(:reason, ai_response, [String])
+
+    result = @generator.generate
+
+    _(result).must_be_kind_of Array
+    _(result.length).must_equal 2
+    _(result[0][:text]).must_equal "5+ years of Python"
+    _(result[0][:tier]).must_equal "strong"
+
+    @ai_client.verify
+  end
+
+  it "saves annotations to JSON file" do
+    ai_response = JSON.generate([
+      { text: "5+ years of Python", match: "Built Python apps for 7 years", tier: "strong" }
+    ])
+
+    @ai_client.expect(:reason, ai_response, [String])
+
+    @generator.generate
+
+    _(File.exist?(@employer.job_description_annotations_path)).must_equal true
+
+    saved_data = JSON.parse(File.read(@employer.job_description_annotations_path), symbolize_names: true)
+    _(saved_data.length).must_equal 1
+    _(saved_data[0][:text]).must_equal "5+ years of Python"
+
+    @ai_client.verify
+  end
 end

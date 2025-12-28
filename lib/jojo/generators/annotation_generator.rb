@@ -11,6 +11,81 @@ module Jojo
         @ai_client = ai_client
         @verbose = verbose
       end
+
+      def generate
+        log "Gathering inputs for annotation generation..."
+        inputs = gather_inputs
+
+        log "Building annotation prompt..."
+        prompt = build_prompt(inputs)
+
+        log "Generating annotations using AI (reasoning model)..."
+        annotations_json = ai_client.reason(prompt)
+
+        log "Parsing JSON response..."
+        annotations = parse_annotations(annotations_json)
+
+        log "Saving annotations to #{employer.job_description_annotations_path}..."
+        save_annotations(annotations)
+
+        log "Annotation generation complete! Generated #{annotations.length} annotations."
+        annotations
+      end
+
+      private
+
+      def gather_inputs
+        unless File.exist?(employer.job_description_path)
+          raise "Job description not found at #{employer.job_description_path}"
+        end
+        job_description = File.read(employer.job_description_path)
+
+        unless File.exist?(employer.resume_path)
+          raise "Resume not found at #{employer.resume_path}"
+        end
+        resume = File.read(employer.resume_path)
+
+        research = read_research
+
+        {
+          job_description: job_description,
+          resume: resume,
+          research: research
+        }
+      end
+
+      def read_research
+        unless File.exist?(employer.research_path)
+          log "Warning: Research not found, annotations will be based on job description only"
+          return nil
+        end
+
+        File.read(employer.research_path)
+      end
+
+      def build_prompt(inputs)
+        Prompts::Annotation.generate_annotations_prompt(
+          job_description: inputs[:job_description],
+          resume: inputs[:resume],
+          research: inputs[:research]
+        )
+      end
+
+      def parse_annotations(json_string)
+        JSON.parse(json_string, symbolize_names: true)
+      rescue JSON::ParserError => e
+        log "Error: Failed to parse AI response as JSON: #{e.message}"
+        raise "AI returned invalid JSON: #{e.message}"
+      end
+
+      def save_annotations(annotations)
+        json_output = JSON.pretty_generate(annotations)
+        File.write(employer.job_description_annotations_path, json_output)
+      end
+
+      def log(message)
+        puts "  [AnnotationGenerator] #{message}" if verbose
+      end
     end
   end
 end
