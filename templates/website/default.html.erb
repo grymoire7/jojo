@@ -395,6 +395,184 @@
         max-width: calc(100vw - 2rem);
       }
     }
+
+    /* Recommendations Carousel Section */
+    .recommendations {
+      margin: 3rem 0;
+      padding: 2rem;
+      background-color: var(--background-alt);
+      border-radius: 8px;
+    }
+
+    .recommendations h2 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 2rem;
+      color: var(--text-color);
+    }
+
+    .carousel-container {
+      position: relative;
+      overflow: hidden;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 300ms ease-in-out;
+    }
+
+    .carousel-slide {
+      min-width: 100%;
+      flex-shrink: 0;
+      padding: 0 1rem;
+    }
+
+    .recommendation-card {
+      background: var(--background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 2.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .recommendation-card::before {
+      content: '"';
+      position: absolute;
+      top: 1rem;
+      left: 1.5rem;
+      font-size: 4rem;
+      line-height: 1;
+      color: rgba(0, 0, 0, 0.1);
+      font-family: Georgia, serif;
+    }
+
+    .recommendation-quote {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: var(--text-color);
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .recommendation-attribution {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      font-style: italic;
+    }
+
+    .recommendation-attribution strong {
+      font-weight: 600;
+      color: var(--text-color);
+      font-style: normal;
+    }
+
+    /* Carousel Navigation */
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--background);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--text-color);
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+
+    .carousel-arrow:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .carousel-arrow.prev {
+      left: -50px;
+    }
+
+    .carousel-arrow.next {
+      right: -50px;
+    }
+
+    .carousel-arrow:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-color);
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      padding: 0;
+    }
+
+    .carousel-dot.active {
+      background: var(--primary-color);
+    }
+
+    .carousel-dot:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Single recommendation - no navigation */
+    .recommendations.single-recommendation .carousel-arrow,
+    .recommendations.single-recommendation .carousel-dots {
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .recommendations {
+        padding: 1.5rem 1rem;
+      }
+
+      .recommendation-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .recommendation-card::before {
+        font-size: 3rem;
+      }
+
+      .recommendation-quote {
+        font-size: 1rem;
+      }
+
+      .carousel-arrow {
+        width: 32px;
+        height: 32px;
+        font-size: 1.25rem;
+      }
+
+      .carousel-arrow.prev {
+        left: -40px;
+      }
+
+      .carousel-arrow.next {
+        right: -40px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -429,6 +607,39 @@
         <span class="legend-item"><span class="sample mention"></span> Worth a mention</span>
         <span class="legend-hint">Hover or tap highlighted text to see details</span>
       </p>
+    </section>
+    <% end %>
+
+    <!-- Recommendations Carousel -->
+    <% if recommendations && !recommendations.empty? %>
+    <section class="recommendations<%= ' single-recommendation' if recommendations.size == 1 %>">
+      <h2>What Others Say</h2>
+      <div class="carousel-container">
+        <div class="carousel-track">
+          <% recommendations.each do |rec| %>
+          <div class="carousel-slide">
+            <div class="recommendation-card">
+              <div class="recommendation-quote">
+                <%= rec[:quote] %>
+              </div>
+              <div class="recommendation-attribution">
+                <strong><%= rec[:recommender_name] %></strong><% if rec[:recommender_title] %>, <%= rec[:recommender_title] %><% end %>
+                <br><%= rec[:relationship] %>
+              </div>
+            </div>
+          </div>
+          <% end %>
+        </div>
+        <button class="carousel-arrow prev" aria-label="Previous recommendation">‹</button>
+        <button class="carousel-arrow next" aria-label="Next recommendation">›</button>
+      </div>
+      <div class="carousel-dots" role="tablist">
+        <% recommendations.each_with_index do |_, index| %>
+        <button class="carousel-dot<%= ' active' if index == 0 %>"
+                aria-label="Go to recommendation <%= index + 1 %>"
+                data-index="<%= index %>"></button>
+        <% end %>
+      </div>
     </section>
     <% end %>
 
