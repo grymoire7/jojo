@@ -81,4 +81,72 @@ describe "FAQ Workflow Integration" do
 
     @ai_client.verify
   end
+
+  it "handles missing FAQ file gracefully in website generation" do
+    website_generator = Jojo::Generators::WebsiteGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false
+    )
+
+    # Don't create FAQ file
+    FileUtils.rm_f(@employer.faq_path) if File.exist?(@employer.faq_path)
+
+    @ai_client.expect(:generate_text, "Branding statement", [String])
+
+    html = website_generator.generate
+
+    _(html).wont_include "Your Questions, Answered"
+    _(html).wont_include '<div class="faq-accordion"'
+
+    @ai_client.verify
+  end
+
+  it "handles malformed FAQ JSON gracefully" do
+    # Write malformed JSON
+    File.write(@employer.faq_path, "This is not valid JSON")
+
+    website_generator = Jojo::Generators::WebsiteGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false
+    )
+
+    @ai_client.expect(:generate_text, "Branding statement", [String])
+
+    html = website_generator.generate
+
+    _(html).wont_include "Your Questions, Answered"
+
+    @ai_client.verify
+  end
+
+  it "renders FAQ section in correct position" do
+    # Create FAQ file
+    faqs = [{ question: "Test?", answer: "Answer" }]
+    File.write(@employer.faq_path, JSON.generate(faqs))
+
+    website_generator = Jojo::Generators::WebsiteGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false
+    )
+
+    @ai_client.expect(:generate_text, "Branding statement", [String])
+
+    html = website_generator.generate
+
+    # FAQ should come before footer
+    faq_position = html.index('Your Questions, Answered')
+    footer_position = html.index('<footer class="footer">')
+
+    _(faq_position).wont_be_nil
+    _(footer_position).wont_be_nil
+    _(faq_position).must_be :<, footer_position
+
+    @ai_client.verify
+  end
 end
