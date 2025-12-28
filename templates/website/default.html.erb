@@ -658,6 +658,26 @@
     </section>
     <% end %>
 
+    <!-- FAQ Section -->
+    <% if faqs && !faqs.empty? %>
+    <section class="faq">
+      <h2>Your Questions, Answered</h2>
+      <div class="faq-accordion" role="region" aria-label="Frequently asked questions">
+        <% faqs.each_with_index do |faq, index| %>
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" aria-controls="answer-<%= index %>">
+            <%= faq[:question] %>
+            <span class="faq-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="faq-answer" id="answer-<%= index %>">
+            <p><%= faq[:answer] %></p>
+          </div>
+        </div>
+        <% end %>
+      </div>
+    </section>
+    <% end %>
+
     <!-- Call to Action -->
     <% if cta_link && !cta_link.strip.empty? %>
     <section class="cta-section">
