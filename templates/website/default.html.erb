@@ -171,6 +171,155 @@
       margin-bottom: 15px;
     }
 
+    /* Annotated Job Description Section */
+    .job-description-comparison {
+      margin: 3rem 0;
+      padding: 2rem;
+      background-color: var(--background-alt);
+      border-radius: 8px;
+    }
+
+    .job-description-comparison h2 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      color: var(--text-color);
+    }
+
+    .job-description-content {
+      background-color: var(--background);
+      padding: 1.5rem;
+      border-radius: 6px;
+      line-height: 1.8;
+    }
+
+    .job-description-content p {
+      margin-bottom: 1rem;
+    }
+
+    .job-description-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .annotated {
+      background-color: rgba(37, 99, 235, 0.15);
+      cursor: pointer;
+      border-radius: 2px;
+      padding: 1px 2px;
+      transition: background-color 0.2s;
+      position: relative;
+    }
+
+    .annotated[data-tier="strong"] {
+      background-color: rgba(37, 99, 235, 0.25);
+    }
+
+    .annotated[data-tier="moderate"] {
+      background-color: rgba(37, 99, 235, 0.15);
+    }
+
+    .annotated[data-tier="mention"] {
+      background-color: rgba(37, 99, 235, 0.08);
+    }
+
+    .annotated:hover,
+    .annotated:focus {
+      background-color: rgba(37, 99, 235, 0.3);
+      outline: none;
+    }
+
+    .annotation-legend {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.875rem;
+      color: var(--text-light);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-item .sample {
+      display: inline-block;
+      width: 40px;
+      height: 16px;
+      border-radius: 2px;
+    }
+
+    .legend-item .sample.strong {
+      background-color: rgba(37, 99, 235, 0.25);
+    }
+
+    .legend-item .sample.moderate {
+      background-color: rgba(37, 99, 235, 0.15);
+    }
+
+    .legend-item .sample.mention {
+      background-color: rgba(37, 99, 235, 0.08);
+    }
+
+    .legend-hint {
+      font-style: italic;
+      margin-left: auto;
+    }
+
+    .annotation-tooltip {
+      position: absolute;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      max-width: 300px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+    }
+
+    .annotation-tooltip.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .tooltip-content {
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--text-color);
+    }
+
+    .tooltip-arrow {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: white;
+      border: 1px solid var(--border-color);
+      transform: rotate(45deg);
+      z-index: -1;
+    }
+
+    .annotation-tooltip.above .tooltip-arrow {
+      bottom: -6px;
+      left: 50%;
+      margin-left: -5px;
+      border-top: none;
+      border-left: none;
+    }
+
+    .annotation-tooltip.below .tooltip-arrow {
+      top: -6px;
+      left: 50%;
+      margin-left: -5px;
+      border-bottom: none;
+      border-right: none;
+    }
+
     /* Footer Section */
     .footer {
       border-top: 2px solid var(--border-color);
@@ -232,6 +381,19 @@
         flex-direction: column;
         gap: 1rem;
       }
+
+      .annotation-legend {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .legend-hint {
+        margin-left: 0;
+      }
+
+      .annotation-tooltip {
+        max-width: calc(100vw - 2rem);
+      }
     }
   </style>
 </head>
@@ -253,6 +415,22 @@
     <section class="branding">
       <%= branding_statement.split("\n\n").map { |para| "<p>#{para}</p>" }.join("\n      ") %>
     </section>
+
+    <!-- Annotated Job Description -->
+    <% if annotated_job_description %>
+    <section class="job-description-comparison">
+      <h2>Compare Me to the Job Description</h2>
+      <div class="job-description-content">
+        <%= annotated_job_description %>
+      </div>
+      <p class="annotation-legend">
+        <span class="legend-item"><span class="sample strong"></span> Strong match</span>
+        <span class="legend-item"><span class="sample moderate"></span> Moderate match</span>
+        <span class="legend-item"><span class="sample mention"></span> Worth a mention</span>
+        <span class="legend-hint">Hover or tap highlighted text to see details</span>
+      </p>
+    </section>
+    <% end %>
 
     <!-- Call to Action -->
     <% if cta_link && !cta_link.strip.empty? %>
@@ -301,5 +479,121 @@
       </div>
     </footer>
   </div>
+
+  <!-- Annotation tooltip container -->
+  <% if annotated_job_description %>
+  <div id="annotation-tooltip" class="annotation-tooltip">
+    <div class="tooltip-content"></div>
+    <div class="tooltip-arrow"></div>
+  </div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    const tooltip = document.getElementById('annotation-tooltip');
+    const tooltipContent = tooltip.querySelector('.tooltip-content');
+    const annotations = document.querySelectorAll('.annotated');
+    const isTouchDevice = window.matchMedia('(hover: none)').matches;
+    let currentAnnotation = null;
+
+    // Show tooltip
+    function showTooltip(annotation) {
+      const match = annotation.dataset.match;
+      if (!match) return;
+
+      currentAnnotation = annotation;
+      tooltipContent.textContent = match;
+
+      // Position tooltip
+      positionTooltip(annotation);
+
+      // Show with animation
+      tooltip.classList.add('visible');
+    }
+
+    // Hide tooltip
+    function hideTooltip() {
+      tooltip.classList.remove('visible');
+      currentAnnotation = null;
+    }
+
+    // Position tooltip above or below annotation
+    function positionTooltip(annotation) {
+      const rect = annotation.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const spaceAbove = rect.top;
+      const spaceBelow = viewportHeight - rect.bottom;
+
+      // Decide position: above or below
+      const showAbove = spaceAbove > tooltipRect.height + 10 && spaceBelow < tooltipRect.height + 10;
+
+      if (showAbove) {
+        tooltip.classList.add('above');
+        tooltip.classList.remove('below');
+        tooltip.style.top = (window.scrollY + rect.top - tooltipRect.height - 10) + 'px';
+      } else {
+        tooltip.classList.add('below');
+        tooltip.classList.remove('above');
+        tooltip.style.top = (window.scrollY + rect.bottom + 10) + 'px';
+      }
+
+      // Center horizontally
+      const left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+      const maxLeft = window.innerWidth - tooltipRect.width - 10;
+      tooltip.style.left = Math.max(10, Math.min(left, maxLeft)) + 'px';
+    }
+
+    // Add event listeners to each annotation
+    annotations.forEach(function(annotation) {
+      // Make focusable for keyboard navigation
+      annotation.setAttribute('tabindex', '0');
+
+      if (isTouchDevice) {
+        // Touch: tap to show, tap outside to hide
+        annotation.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (currentAnnotation === annotation) {
+            hideTooltip();
+          } else {
+            showTooltip(annotation);
+          }
+        });
+      } else {
+        // Desktop: hover to show
+        annotation.addEventListener('mouseenter', function() {
+          showTooltip(annotation);
+        });
+
+        annotation.addEventListener('mouseleave', function() {
+          hideTooltip();
+        });
+      }
+
+      // Keyboard: Enter to show, Escape to hide
+      annotation.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          showTooltip(annotation);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          hideTooltip();
+        }
+      });
+    });
+
+    // Click outside to close (for touch devices)
+    if (isTouchDevice) {
+      document.addEventListener('click', function(e) {
+        if (!tooltip.contains(e.target) && !e.target.classList.contains('annotated')) {
+          hideTooltip();
+        }
+      });
+    }
+  })();
+  </script>
+  <% end %>
 </body>
 </html>

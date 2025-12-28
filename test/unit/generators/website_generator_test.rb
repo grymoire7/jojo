@@ -226,6 +226,9 @@ describe Jojo::Generators::WebsiteGenerator do
   end
 
   it "loads and injects annotations into job description HTML" do
+    # Update job description to include text being annotated
+    File.write(@employer.job_description_path, "We need Ruby and distributed systems experience.")
+
     # Create annotations JSON
     annotations = [
       { text: "Ruby", match: "7 years Ruby experience", tier: "strong" },
