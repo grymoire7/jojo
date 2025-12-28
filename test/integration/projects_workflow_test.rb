@@ -21,6 +21,7 @@ describe 'Projects Integration Workflow' do
 
     File.write(@employer.resume_path, "# Generic Resume\n\nExperience with Ruby...")
 
+    FileUtils.mkdir_p('inputs')
     File.write('inputs/projects.yml', <<~YAML)
       - title: "E-commerce Platform"
         description: "Built a scalable Rails e-commerce platform"

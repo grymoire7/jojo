@@ -16,7 +16,8 @@ describe 'WebsiteGenerator with Projects' do
         - PostgreSQL
     YAML
 
-    # Create projects.yml
+    # Create inputs directory and projects.yml
+    FileUtils.mkdir_p('inputs')
     File.write('inputs/projects.yml', <<~YAML)
       - title: "Matching Project"
         description: "This project matches job requirements"

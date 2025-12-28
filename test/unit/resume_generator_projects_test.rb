@@ -10,6 +10,7 @@ describe 'ResumeGenerator with Projects' do
     @config = Jojo::Config.new('test/fixtures/valid_config.yml')
 
     File.write(@employer.job_description_path, "Ruby developer needed")
+    FileUtils.mkdir_p('inputs')
     File.write('inputs/generic_resume.md', "# Generic Resume\n\nExperience...")
 
     File.write(@employer.job_details_path, <<~YAML)

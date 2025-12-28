@@ -11,6 +11,7 @@ describe 'CoverLetterGenerator with Projects' do
 
     File.write(@employer.job_description_path, "Ruby developer needed")
     File.write(@employer.resume_path, "# Resume\n\nTailored resume...")
+    FileUtils.mkdir_p('inputs')
     File.write('inputs/generic_resume.md', "# Generic Resume\n\nExperience...")
 
     File.write(@employer.job_details_path, <<~YAML)
