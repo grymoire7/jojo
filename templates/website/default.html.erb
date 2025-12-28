@@ -535,6 +535,18 @@
       background: var(--primary-hover);
     }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
     /* Single recommendation - no navigation */
     .recommendations.single-recommendation .carousel-arrow,
     .recommendations.single-recommendation .carousel-dots {
@@ -614,10 +626,10 @@
     <% if recommendations && !recommendations.empty? %>
     <section class="recommendations<%= ' single-recommendation' if recommendations.size == 1 %>">
       <h2>What Others Say</h2>
-      <div class="carousel-container">
+      <div class="carousel-container" role="region" aria-label="Recommendations carousel">
         <div class="carousel-track">
-          <% recommendations.each do |rec| %>
-          <div class="carousel-slide">
+          <% recommendations.each_with_index do |rec, index| %>
+          <div class="carousel-slide" role="tabpanel" aria-hidden="<%= index != 0 %>">
             <div class="recommendation-card">
               <div class="recommendation-quote">
                 <%= rec[:quote] %>
@@ -639,6 +651,9 @@
                 aria-label="Go to recommendation <%= index + 1 %>"
                 data-index="<%= index %>"></button>
         <% end %>
+      </div>
+      <div class="sr-only" aria-live="polite" aria-atomic="true" id="carousel-status">
+        Showing recommendation <span id="carousel-current">1</span> of <%= recommendations.size %>
       </div>
     </section>
     <% end %>
@@ -827,6 +842,9 @@
       autoAdvanceDelay: 6000
     };
 
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // Go to specific slide
     function goToSlide(index) {
       if (carousel.isTransitioning) return;
@@ -848,6 +866,12 @@
         slide.setAttribute('aria-hidden', i !== index);
       });
 
+      // Update ARIA live region
+      const statusCurrent = document.getElementById('carousel-current');
+      if (statusCurrent) {
+        statusCurrent.textContent = index + 1;
+      }
+
       setTimeout(() => {
         carousel.isTransitioning = false;
       }, 300);
@@ -867,7 +891,7 @@
 
     // Auto-advance
     function startAutoAdvance() {
-      if (carousel.autoAdvanceInterval) return;
+      if (carousel.autoAdvanceInterval || prefersReducedMotion) return;
 
       carousel.autoAdvanceInterval = setInterval(() => {
         nextSlide();
