@@ -511,31 +511,31 @@ Each phase will include tests and be potentially shippable.
 
 **Validation**: ✅ Recommendations display in rotating carousel. Auto-advance works. Swipe gestures functional. Keyboard navigation works. Accessibility features present.
 
-### Phase 6e: FAQ Accordion
+### Phase 6e: FAQ Accordion ✅
 
 **Goal**: Interactive FAQ with accordion UI
 
-**Status**: PLANNED
+**Status**: COMPLETED
 
 #### Tasks:
 
-- [ ] AI generates role-specific FAQs
+- [x] AI generates role-specific FAQs
   - Standard questions (tech stack, remote work, AI philosophy)
   - Custom questions based on job description
   - Answers based on resume, research, inputs
 
-- [ ] Create accordion JavaScript component
+- [x] Create accordion JavaScript component
   - Expand/collapse interactions
   - Keyboard accessible
 
-- [ ] Update template with FAQ section
+- [x] Update template with FAQ section
   - "Your questions, answered" heading
   - Accordion container
   - Links to resume.pdf, cover_letter.pdf in answers
 
-- [ ] Create tests for FAQ generation
+- [x] Create tests for FAQ generation
 
-**Validation**: FAQ accordion displays with standard + custom questions. Resume/cover letter download links work.
+**Validation**: ✅ FAQ accordion displays with standard + custom questions. Resume/cover letter download links work.
 
 ## Phase 7: PDF Generation and Polish
 
