@@ -13,7 +13,11 @@ module Jojo
     class_option :quiet, type: :boolean, aliases: '-q', desc: 'Suppress output, rely on exit code'
     class_option :slug, type: :string, aliases: '-s', desc: 'Employer slug (unique identifier)'
     class_option :template, type: :string, aliases: '-t', desc: 'Website template name (default: default)', default: 'default'
-
+    
+    def self.exit_on_failure?
+      true
+    end
+    
     desc "version", "Show version"
     def version
       say "Jojo #{Jojo::VERSION}", :green
