@@ -110,6 +110,20 @@ class OverwriteHelperTest < Minitest::Test
     end
   end
 
+  def test_with_overwrite_check_yields_when_file_exists_and_flag_is_true
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, "existing.txt")
+      File.write(path, "original")
+      yielded = false
+
+      @cli.with_overwrite_check(path, true) do
+        yielded = true
+      end
+
+      assert yielded, "Expected block to be yielded when --overwrite is set"
+    end
+  end
+
   private
 
   def with_env(env_vars)

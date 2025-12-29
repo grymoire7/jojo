@@ -3,6 +3,9 @@ module Jojo
     def with_overwrite_check(path, overwrite_flag, &block)
       # Check if file exists
       return yield unless File.exist?(path)
+
+      # Check override mechanisms in precedence order
+      return yield if should_overwrite?(overwrite_flag)
     end
 
     private
