@@ -70,6 +70,32 @@ class OverwriteHelperTest < Minitest::Test
     end
   end
 
+  def test_should_overwrite_returns_true_when_flag_is_true
+    assert @cli.send(:should_overwrite?, true)
+  end
+
+  def test_should_overwrite_returns_false_when_flag_is_false
+    refute @cli.send(:should_overwrite?, false)
+  end
+
+  def test_should_overwrite_returns_true_when_flag_is_nil_and_env_is_truthy
+    with_env("JOJO_ALWAYS_OVERWRITE" => "true") do
+      assert @cli.send(:should_overwrite?, nil)
+    end
+  end
+
+  def test_should_overwrite_returns_false_when_flag_is_nil_and_env_is_falsy
+    with_env("JOJO_ALWAYS_OVERWRITE" => "false") do
+      refute @cli.send(:should_overwrite?, nil)
+    end
+  end
+
+  def test_should_overwrite_flag_false_overrides_env_true
+    with_env("JOJO_ALWAYS_OVERWRITE" => "true") do
+      refute @cli.send(:should_overwrite?, false)
+    end
+  end
+
   private
 
   def with_env(env_vars)
