@@ -6,14 +6,16 @@ require_relative '../project_selector'
 module Jojo
   module Generators
     class ResumeGenerator
-      attr_reader :employer, :ai_client, :config, :verbose, :inputs_path
+      attr_reader :employer, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
 
-      def initialize(employer, ai_client, config:, verbose: false, inputs_path: 'inputs')
+      def initialize(employer, ai_client, config:, verbose: false, inputs_path: 'inputs', overwrite_flag: nil, cli_instance: nil)
         @employer = employer
         @ai_client = ai_client
         @config = config
         @verbose = verbose
         @inputs_path = inputs_path
+        @overwrite_flag = overwrite_flag
+        @cli_instance = cli_instance
       end
 
       def generate
@@ -112,7 +114,13 @@ module Jojo
       end
 
       def save_resume(content)
-        File.write(employer.resume_path, content)
+        if cli_instance
+          cli_instance.with_overwrite_check(employer.resume_path, overwrite_flag) do
+            File.write(employer.resume_path, content)
+          end
+        else
+          File.write(employer.resume_path, content)
+        end
       end
 
       def log(message)

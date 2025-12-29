@@ -159,7 +159,7 @@ module Jojo
           say "⚠ Warning: Generic resume not found, skipping resume generation", :yellow
           say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
         else
-          generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+          generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
           generator.generate
 
           say "✓ Resume generated and saved", :green
@@ -323,7 +323,7 @@ module Jojo
       end
 
       begin
-        generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+        generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
         resume = generator.generate
 
         say "✓ Resume generated and saved to #{employer.resume_path}", :green
