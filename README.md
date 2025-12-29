@@ -38,8 +38,35 @@ Think of it as treating each job application like launching a product (you) to a
 
 - **Ruby 3.4.5** - Install via rbenv or your preferred Ruby version manager
 - **Bundler** - Install with `gem install bundler`
-- **Anthropic API Key** - Get one from [console.anthropic.com](https://console.anthropic.com)
+- **AI Provider API Key** - Get one from your chosen provider:
+  - [Anthropic Claude](https://console.anthropic.com) (default configuration)
+  - [OpenAI](https://platform.openai.com) (requires config changes)
+  - Other providers supported by [ruby_llm](https://github.com/alexrudall/ruby_llm)
 - **Pandoc** (optional) - For PDF generation: `brew install pandoc` on macOS
+
+### API Costs
+
+JoJo uses AI providers to generate application materials. You can configure any provider supported by [ruby_llm](https://github.com/alexrudall/ruby_llm) (Anthropic, OpenAI, etc.) in your `config.yml`.
+
+**Example costs using Anthropic's Claude** (default configuration):
+
+- **Research generation**: ~$0.15-0.30 (Sonnet model, ~30K-60K tokens)
+- **Resume generation**: ~$0.10-0.20 (Haiku model, ~20K-40K tokens)
+- **Cover letter generation**: ~$0.05-0.10 (Haiku model, ~10K-20K tokens)
+- **Website generation**: ~$0.10-0.20 (Haiku model, ~20K-40K tokens)
+- **Job description annotations**: ~$0.10-0.15 (Sonnet model, ~20K-30K tokens)
+
+**Estimated total cost per application: $0.50-0.95** (with Anthropic Claude)
+
+Actual costs vary based on:
+- AI provider and model selection
+- Length of your resume and job description
+- Amount of research content generated
+- Number of projects in your portfolio
+
+See your provider's pricing page for current rates:
+- [Anthropic pricing](https://www.anthropic.com/pricing)
+- [OpenAI pricing](https://openai.com/api/pricing/)
 
 ## Installation
 
@@ -65,7 +92,7 @@ Think of it as treating each job application like launching a product (you) to a
    ./bin/jojo setup
    ```
 
-   This creates `~/.config/jojo/config.yml` with your preferences.
+   This creates `config.yml` in the project root with your preferences.
 
 ## Configuration
 
@@ -80,7 +107,7 @@ SERPER_API_KEY=your_serper_key_here  # Optional, for web search
 
 ### User Configuration
 
-After running `./bin/jojo setup`, edit `~/.config/jojo/config.yml`:
+After running `./bin/jojo setup`, edit `config.yml` in the project root:
 
 ```yaml
 seeker_name: Your Name
@@ -119,9 +146,68 @@ Create these files in the `inputs/` directory (which is gitignored):
 
 ## Quick start
 
+### Step 0: Prepare your input files
+
+Before creating your first application, set up your input files:
+
+1. **Copy the generic resume template**:
+   ```bash
+   cp templates/generic_resume.md inputs/generic_resume.md
+   ```
+
+2. **Edit your generic resume**:
+   ```bash
+   # Use your preferred editor
+   nvim inputs/generic_resume.md
+   ```
+   Include all your experience, skills, and achievements. This will be tailored for each job.
+
+3. **(Optional) Add recommendations**:
+   ```bash
+   cp templates/recommendations.md inputs/recommendations.md
+   # Edit with your actual LinkedIn recommendations
+   ```
+
+4. **(Optional) Add portfolio projects**:
+   ```bash
+   cp templates/projects.yml inputs/projects.yml
+   # Edit with your actual projects
+   ```
+
+**Note**: The `inputs/` directory is gitignored, so your personal information stays private.
+
 ### Step 1: Create employer workspace
 
-First, create a workspace for the employer by processing their job description:
+First, create a workspace for the employer by processing their job description.
+
+#### Choosing a Slug
+
+The slug is a unique identifier for each job application. It's used to organize your files and reference the application in commands.
+
+**Format guidelines:**
+- Use lowercase letters, numbers, and hyphens only
+- No spaces or special characters
+- Keep it concise but descriptive
+- Include company name and role
+
+**Good examples:**
+```
+acme-corp-senior-dev       # Company + seniority + role
+bigco-principal-eng        # Short company name + level + role
+startup-fullstack-2024     # Include year if applying multiple times
+tech-inc-lead-backend      # Company + level + specialty
+```
+
+**Avoid:**
+```
+ACME_Corp_Senior           # Use lowercase and hyphens, not underscores
+acme                       # Too vague, which role?
+acme-corp-senior-software-development-engineer  # Too long
+```
+
+#### Creating the workspace
+
+Once you've chosen a slug, create the workspace:
 
 ```bash
 ./bin/jojo new \
@@ -201,6 +287,38 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
 ./bin/jojo website
 ```
 
+### Using Environment Variables
+
+To avoid repeating the `--slug` flag for every command, set the `JOJO_EMPLOYER_SLUG` environment variable:
+
+```bash
+# Set for the current shell session
+export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
+
+# Now you can omit --slug from all commands
+./bin/jojo research
+./bin/jojo resume
+./bin/jojo cover_letter
+./bin/jojo website
+./bin/jojo generate
+```
+
+**When to use environment variables:**
+- ✅ Working on multiple commands for the same employer
+- ✅ Running the full generation workflow step-by-step
+- ✅ Iterating on materials (regenerating resume, website, etc.)
+
+**When to use the `--slug` flag:**
+- ✅ One-off commands for different employers
+- ✅ Switching between multiple applications
+- ✅ Scripts or automation where explicit is better
+
+**Tip**: Add the export to your shell's RC file (`.bashrc`, `.zshrc`) to persist across sessions:
+```bash
+# In ~/.zshrc or ~/.bashrc
+export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
+```
+
 ## Commands
 
 | Command | Description | Required Options |
@@ -223,6 +341,50 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
 - `-t, --template TEMPLATE` - Website template name (default: "default")
 - `-v, --verbose` - Run verbosely with detailed output
 - `-q, --quiet` - Suppress output, rely on exit code only
+
+### Custom Templates
+
+JoJo supports custom website templates via the `--template` flag. The default template is a clean, professional single-page design.
+
+**Using custom templates:**
+
+```bash
+# Use a custom template
+./bin/jojo website -s acme-corp-senior-dev -t modern
+
+# Or with generate command
+./bin/jojo generate -s acme-corp-senior-dev -t modern
+```
+
+**Creating custom templates:**
+
+Templates are ERB files located in `templates/website/`. To create a custom template:
+
+1. Create a new template file:
+   ```bash
+   cp templates/website/default.html.erb templates/website/modern.html.erb
+   ```
+
+2. Edit the template with your custom HTML/CSS
+3. Use these available template variables:
+   - `<%= seeker_name %>` - Your name from config
+   - `<%= company_name %>` - Company from job details
+   - `<%= job_title %>` - Job title from job details
+   - `<%= branding_statement %>` - AI-generated branding (HTML)
+   - `<%= cta_text %>` - Call-to-action text from config
+   - `<%= cta_link %>` - Call-to-action link from config
+   - `<%= branding_image %>` - Path to branding image (if exists)
+   - `<%= projects %>` - Array of selected projects
+   - `<%= recommendations %>` - Array of recommendations
+   - `<%= faqs %>` - Array of FAQ objects
+   - `<%= annotated_job_description %>` - Annotated job description HTML
+
+4. Reference your custom template:
+   ```bash
+   ./bin/jojo website -s acme-corp -t modern
+   ```
+
+**Note**: Templates should be self-contained HTML files with inline CSS. External stylesheets and JavaScript files are not currently supported.
 
 ### Environment Variables
 
