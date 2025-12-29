@@ -139,7 +139,7 @@ module Jojo
 
       # Generate research
       begin
-        generator = Jojo::Generators::ResearchGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+        generator = Jojo::Generators::ResearchGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
         generator.generate
 
         say "✓ Research generated and saved", :green
