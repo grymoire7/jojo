@@ -6,6 +6,10 @@ class OverwriteHelperTest < Minitest::Test
   # Create a test class that includes the module
   class TestCLI
     include Jojo::OverwriteHelper
+
+    def yes?(message)
+      false
+    end
   end
 
   def setup
@@ -142,6 +146,61 @@ class OverwriteHelperTest < Minitest::Test
       assert_match /Cannot prompt in non-interactive mode/, error.message
       assert_match /--overwrite/, error.message
       assert_match /JOJO_ALWAYS_OVERWRITE/, error.message
+    ensure
+      $stdout = stdout_was
+    end
+  end
+
+  def test_with_overwrite_check_yields_when_user_says_yes
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, "existing.txt")
+      File.write(path, "original")
+      yielded = false
+
+      # Mock $stdout.isatty to return true
+      stdout_was = $stdout
+      $stdout = StringIO.new
+      def $stdout.isatty; true; end
+
+      # Mock yes? to return true
+      def @cli.yes?(message)
+        @last_prompt = message
+        true
+      end
+
+      @cli.with_overwrite_check(path, nil) do
+        yielded = true
+      end
+
+      assert yielded, "Expected block to be yielded when user says yes"
+      assert_match /existing.txt/, @cli.instance_variable_get(:@last_prompt)
+      assert_match /Overwrite/, @cli.instance_variable_get(:@last_prompt)
+    ensure
+      $stdout = stdout_was
+    end
+  end
+
+  def test_with_overwrite_check_does_not_yield_when_user_says_no
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, "existing.txt")
+      File.write(path, "original")
+      yielded = false
+
+      # Mock $stdout.isatty to return true
+      stdout_was = $stdout
+      $stdout = StringIO.new
+      def $stdout.isatty; true; end
+
+      # Mock yes? to return false
+      def @cli.yes?(message)
+        false
+      end
+
+      @cli.with_overwrite_check(path, nil) do
+        yielded = true
+      end
+
+      refute yielded, "Expected block NOT to be yielded when user says no"
     ensure
       $stdout = stdout_was
     end

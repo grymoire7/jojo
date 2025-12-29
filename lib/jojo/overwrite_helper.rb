@@ -9,7 +9,8 @@ module Jojo
 
       # Prompt user or fail in non-TTY
       if $stdout.isatty
-        # TODO: Prompt implementation
+        filename = File.basename(path)
+        yield if yes?("#{filename} exists. Overwrite?")
       else
         raise Thor::Error, "Cannot prompt in non-interactive mode. Use --overwrite or set JOJO_ALWAYS_OVERWRITE=true"
       end
