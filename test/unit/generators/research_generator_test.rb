@@ -5,7 +5,7 @@ require_relative '../../../lib/jojo/prompts/research_prompt'
 
 describe Jojo::Generators::ResearchGenerator do
   before do
-    @employer = Jojo::Employer.new('Acme Corp')
+    @employer = Jojo::Employer.new('acme-corp')
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
     @generator = Jojo::Generators::ResearchGenerator.new(

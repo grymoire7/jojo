@@ -5,7 +5,7 @@ require_relative '../../lib/jojo/config'
 
 describe 'WebsiteGenerator with Projects' do
   before do
-    @employer = Jojo::Employer.new('Test Corp')
+    @employer = Jojo::Employer.new('test-corp')
     @employer.create_directory!
     @config = Jojo::Config.new('test/fixtures/valid_config.yml')
 

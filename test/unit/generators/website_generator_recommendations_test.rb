@@ -20,7 +20,7 @@ describe 'WebsiteGenerator with Recommendations' do
   end
 
   before do
-    @employer = Jojo::Employer.new('Test Corp')
+    @employer = Jojo::Employer.new('test-corp')
 
     # Create required files
     FileUtils.mkdir_p(@employer.base_path)

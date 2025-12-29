@@ -18,7 +18,7 @@ describe Jojo::Generators::WebsiteGenerator do
   end
 
   before do
-    @employer = Jojo::Employer.new('Acme Corp')
+    @employer = Jojo::Employer.new('acme-corp')
     @ai_client = Minitest::Mock.new
     @config = UnitTestConfigStub.new
     @generator = Jojo::Generators::WebsiteGenerator.new(
@@ -37,6 +37,7 @@ describe Jojo::Generators::WebsiteGenerator do
     File.write(@employer.job_description_path, "Senior Ruby Developer role at Acme Corp...")
     File.write(@employer.resume_path, "# Jane Doe\n\n## Professional Summary\n\nSenior Ruby developer...")
     File.write(@employer.research_path, "# Company Profile\n\nAcme Corp is a leading tech company...")
+    File.write(@employer.job_details_path, "company_name: Acme Corp\nposition_title: Senior Developer\n")
   end
 
   after do

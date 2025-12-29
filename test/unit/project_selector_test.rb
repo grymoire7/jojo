@@ -4,7 +4,7 @@ require_relative '../../lib/jojo/employer'
 
 describe Jojo::ProjectSelector do
   before do
-    @employer = Jojo::Employer.new('Test Corp')
+    @employer = Jojo::Employer.new('test-corp')
     @employer.create_directory!
 
     # Create job_details.yml fixture

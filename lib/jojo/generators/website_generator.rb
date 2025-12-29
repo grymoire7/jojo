@@ -83,7 +83,7 @@ module Jojo
           resume: resume,
           research: research,
           job_details: job_details,
-          company_name: employer.name,
+          company_name: employer.company_name,
           company_slug: employer.slug
         }
       end

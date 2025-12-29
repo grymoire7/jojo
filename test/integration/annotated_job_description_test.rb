@@ -18,7 +18,7 @@ describe "Annotated Job Description Integration" do
   end
 
   before do
-    @employer = Jojo::Employer.new('TechCorp')
+    @employer = Jojo::Employer.new('techcorp')
     @ai_client = Minitest::Mock.new
     @config = IntegrationTestConfigStub.new
 
@@ -31,6 +31,7 @@ describe "Annotated Job Description Integration" do
     @resume = "# John Doe\n\nSenior Ruby developer with 7 years building web applications.\nExperience with PostgreSQL and Redis.\nBuilt distributed message queue system."
 
     File.write(@employer.job_description_path, @job_description)
+    File.write(@employer.job_details_path, "company_name: TechCorp\nposition_title: Senior Ruby Developer\n")
     File.write(@employer.resume_path, @resume)
   end
 

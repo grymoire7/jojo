@@ -6,7 +6,7 @@ require_relative '../../lib/jojo/prompts/job_description_prompts'
 
 describe Jojo::JobDescriptionProcessor do
   before do
-    @employer = Jojo::Employer.new('Test Company')
+    @employer = Jojo::Employer.new('test-company')
     @config = Minitest::Mock.new
     @ai_client = Minitest::Mock.new
     @processor = Jojo::JobDescriptionProcessor.new(@employer, @ai_client, verbose: false)

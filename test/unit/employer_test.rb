@@ -2,28 +2,20 @@ require_relative '../test_helper'
 require_relative '../../lib/jojo/employer'
 
 describe Jojo::Employer do
-  it "slugifies company name with spaces" do
-    employer = Jojo::Employer.new('Acme Corp')
+  it "accepts slug directly" do
+    employer = Jojo::Employer.new('acme-corp')
     _(employer.slug).must_equal 'acme-corp'
+    _(employer.name).must_equal 'acme-corp'
   end
 
-  it "slugifies special characters" do
-    employer = Jojo::Employer.new('AT&T Inc.')
-    _(employer.slug).must_equal 'at-t-inc'
-  end
-
-  it "slugifies multiple spaces" do
-    employer = Jojo::Employer.new('Example  Company   LLC')
-    _(employer.slug).must_equal 'example-company-llc'
-  end
-
-  it "slugifies leading and trailing special characters" do
-    employer = Jojo::Employer.new('!Company!')
-    _(employer.slug).must_equal 'company'
+  it "uses slug for paths" do
+    employer = Jojo::Employer.new('my-test-slug')
+    _(employer.slug).must_equal 'my-test-slug'
+    _(employer.base_path).must_equal 'employers/my-test-slug'
   end
 
   it "provides correct file paths" do
-    employer = Jojo::Employer.new('Acme Corp')
+    employer = Jojo::Employer.new('acme-corp')
 
     _(employer.base_path).must_equal 'employers/acme-corp'
     _(employer.job_description_path).must_equal 'employers/acme-corp/job_description.md'
@@ -38,7 +30,7 @@ describe Jojo::Employer do
   end
 
   it "creates directory structure" do
-    employer = Jojo::Employer.new('Test Company')
+    employer = Jojo::Employer.new('test-company')
 
     # Clean up before test
     FileUtils.rm_rf('employers/test-company') if Dir.exist?('employers/test-company')

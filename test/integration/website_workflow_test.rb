@@ -19,7 +19,7 @@ describe "Website Generation Workflow" do
   end
 
   before do
-    @employer = Jojo::Employer.new('Test Company')
+    @employer = Jojo::Employer.new('test-company')
     @ai_client = Minitest::Mock.new
     @config = IntegrationTestConfigStub.new
 
@@ -29,6 +29,7 @@ describe "Website Generation Workflow" do
 
     # Create required fixtures
     File.write(@employer.job_description_path, "Senior Ruby Developer role at Test Company...")
+    File.write(@employer.job_details_path, "company_name: Test Company\nposition_title: Senior Ruby Developer\n")
     File.write(@employer.resume_path, "# John Doe\n\n## Professional Summary\n\nSenior Ruby developer with 10 years experience...")
     File.write(@employer.research_path, "# Company Profile\n\nTest Company is an innovative tech startup...")
   end

@@ -3,7 +3,7 @@ require_relative '../../lib/jojo/status_logger'
 
 describe Jojo::StatusLogger do
   before do
-    @employer = Jojo::Employer.new('Test Company')
+    @employer = Jojo::Employer.new('test-company')
     @logger = Jojo::StatusLogger.new(@employer)
 
     # Clean up before tests

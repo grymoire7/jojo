@@ -11,8 +11,7 @@ module Jojo
   class CLI < Thor
     class_option :verbose, type: :boolean, aliases: '-v', desc: 'Run verbosely'
     class_option :quiet, type: :boolean, aliases: '-q', desc: 'Suppress output, rely on exit code'
-    class_option :employer, type: :string, aliases: '-e', desc: 'Employer name'
-    class_option :job, type: :string, aliases: '-j', desc: 'Job description (file path or URL)'
+    class_option :slug, type: :string, aliases: '-s', desc: 'Employer slug (unique identifier)'
     class_option :template, type: :string, aliases: '-t', desc: 'Website template name (default: default)', default: 'default'
 
     desc "version", "Show version"
@@ -34,15 +33,73 @@ module Jojo
       report_results(errors)
     end
 
-    desc "annotate", "Generate job description annotations"
-    def annotate
-      validate_employer_option!
+    desc "new", "Create employer workspace with job description"
+    long_desc <<~DESC
+      Create a new employer workspace and process the job description.
+      This command initializes all artifacts needed for generating application materials.
 
+      Examples:
+        jojo new -s acme-corp-senior-dev -j job_description.txt
+        jojo new -s bigco-principal -j https://careers.bigco.com/jobs/123
+        jojo new -s acme-corp-senior-dev -j job.txt --overwrite
+    DESC
+    method_option :slug, type: :string, aliases: '-s', required: true, desc: 'Unique employer identifier'
+    method_option :job, type: :string, aliases: '-j', required: true, desc: 'Job description (file path or URL)'
+    method_option :overwrite, type: :boolean, aliases: '-o', default: false, desc: 'Overwrite existing artifacts'
+    def new
       config = Jojo::Config.new
-      employer = Jojo::Employer.new(options[:employer])
+      employer = Jojo::Employer.new(options[:slug])
       ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
 
-      say "Generating annotations for #{employer.name}...", :green
+      say "Creating employer workspace: #{options[:slug]}", :green
+
+      # Check if artifacts already exist
+      if employer.artifacts_exist? && !options[:overwrite]
+        say "✗ Employer '#{options[:slug]}' already exists.", :red
+        say "  Use --overwrite to recreate artifacts.", :yellow
+        exit 1
+      end
+
+      # Create artifacts
+      begin
+        employer.create_artifacts(options[:job], ai_client, overwrite: options[:overwrite], verbose: options[:verbose])
+
+        say "✓ Created employer directory: #{employer.base_path}", :green
+        say "✓ Job description processed and saved", :green
+        say "✓ Job details extracted and saved", :green
+        say "\nNext steps:", :cyan
+        say "  jojo research -s #{options[:slug]}", :white
+        say "  jojo resume -s #{options[:slug]}", :white
+        say "  jojo cover_letter -s #{options[:slug]}", :white
+      rescue => e
+        say "✗ Error creating employer workspace: #{e.message}", :red
+        exit 1
+      end
+    end
+
+    desc "annotate", "Generate job description annotations"
+    long_desc <<~DESC
+      Generate annotations for the job description showing how your experience matches.
+      Requires that you've already run 'jojo new' to create the employer workspace.
+
+      Examples:
+        jojo annotate -s acme-corp-senior-dev
+        JOJO_EMPLOYER_SLUG=acme-corp jojo annotate
+    DESC
+    def annotate
+      slug = resolve_slug
+      employer = Jojo::Employer.new(slug)
+
+      unless employer.artifacts_exist?
+        say "✗ Employer '#{slug}' not found.", :red
+        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
+        exit 1
+      end
+
+      config = Jojo::Config.new
+      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
+
+      say "Generating annotations for #{employer.company_name}...", :green
 
       begin
         generator = Jojo::Generators::AnnotationGenerator.new(employer, ai_client, verbose: options[:verbose])
@@ -57,34 +114,29 @@ module Jojo
     end
 
     desc "generate", "Generate everything: research, resume, cover letter, and website"
+    long_desc <<~DESC
+      Generate all application materials for an employer.
+      Requires that you've already run 'jojo new' to create the employer workspace.
+
+      Examples:
+        jojo generate -s acme-corp-senior-dev
+        JOJO_EMPLOYER_SLUG=acme-corp jojo generate
+    DESC
     def generate
-      validate_generate_options!
+      slug = resolve_slug
+      employer = Jojo::Employer.new(slug)
+
+      unless employer.artifacts_exist?
+        say "✗ Employer '#{slug}' not found.", :red
+        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
+        exit 1
+      end
 
       config = Jojo::Config.new
-      employer = Jojo::Employer.new(options[:employer])
       ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
       status_logger = Jojo::StatusLogger.new(employer)
 
-      say "Generating application materials for #{employer.name}...", :green
-
-      employer.create_directory!
-      say "✓ Created directory: #{employer.base_path}", :green
-
-      # Process job description
-      begin
-        processor = Jojo::JobDescriptionProcessor.new(employer, ai_client, verbose: options[:verbose])
-        result = processor.process(options[:job])
-
-        say "✓ Job description processed and saved", :green
-        status_logger.log_step("Job Description Processing",
-          tokens: ai_client.total_tokens_used,
-          status: "complete"
-        )
-      rescue => e
-        say "✗ Error processing job description: #{e.message}", :red
-        status_logger.log_step("Job Description Processing", status: "failed", error: e.message)
-        exit 1
-      end
+      say "Generating application materials for #{employer.company_name}...", :green
 
       # Generate research
       begin
@@ -191,24 +243,29 @@ module Jojo
     end
 
     desc "research", "Generate company/role research only"
+    long_desc <<~DESC
+      Generate company and role research.
+      Requires that you've already run 'jojo new' to create the employer workspace.
+
+      Examples:
+        jojo research -s acme-corp-senior-dev
+        JOJO_EMPLOYER_SLUG=acme-corp jojo research
+    DESC
     def research
-      validate_generate_options!
+      slug = resolve_slug
+      employer = Jojo::Employer.new(slug)
+
+      unless employer.artifacts_exist?
+        say "✗ Employer '#{slug}' not found.", :red
+        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
+        exit 1
+      end
 
       config = Jojo::Config.new
-      employer = Jojo::Employer.new(options[:employer])
       ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
       status_logger = Jojo::StatusLogger.new(employer)
 
-      say "Generating research for #{employer.name}...", :green
-
-      # Ensure employer directory exists
-      employer.create_directory! unless Dir.exist?(employer.base_path)
-
-      # Check that job description has been processed
-      unless File.exist?(employer.job_description_path)
-        say "✗ Job description not found. Run 'generate' first or provide job description.", :red
-        exit 1
-      end
+      say "Generating research for #{employer.company_name}...", :green
 
       begin
         generator = Jojo::Generators::ResearchGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
@@ -230,24 +287,29 @@ module Jojo
     end
 
     desc "resume", "Generate tailored resume only"
+    long_desc <<~DESC
+      Generate a tailored resume for a specific employer.
+      Requires that you've already run 'jojo new' to create the employer workspace.
+
+      Examples:
+        jojo resume -s acme-corp-senior-dev
+        JOJO_EMPLOYER_SLUG=acme-corp jojo resume
+    DESC
     def resume
-      validate_generate_options!
+      slug = resolve_slug
+      employer = Jojo::Employer.new(slug)
+
+      unless employer.artifacts_exist?
+        say "✗ Employer '#{slug}' not found.", :red
+        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
+        exit 1
+      end
 
       config = Jojo::Config.new
-      employer = Jojo::Employer.new(options[:employer])
       ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
       status_logger = Jojo::StatusLogger.new(employer)
 
-      say "Generating resume for #{employer.name}...", :green
-
-      # Ensure employer directory exists
-      employer.create_directory! unless Dir.exist?(employer.base_path)
-
-      # Check that job description has been processed
-      unless File.exist?(employer.job_description_path)
-        say "✗ Job description not found. Run 'generate' first or provide job description.", :red
-        exit 1
-      end
+      say "Generating resume for #{employer.company_name}...", :green
 
       # Check that research has been generated
       unless File.exist?(employer.research_path)
@@ -281,24 +343,29 @@ module Jojo
     end
 
     desc "cover_letter", "Generate cover letter only"
+    long_desc <<~DESC
+      Generate a cover letter for a specific employer.
+      Requires that you've already run 'jojo new' and 'jojo resume' first.
+
+      Examples:
+        jojo cover_letter -s acme-corp-senior-dev
+        JOJO_EMPLOYER_SLUG=acme-corp jojo cover_letter
+    DESC
     def cover_letter
-      validate_generate_options!
+      slug = resolve_slug
+      employer = Jojo::Employer.new(slug)
+
+      unless employer.artifacts_exist?
+        say "✗ Employer '#{slug}' not found.", :red
+        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
+        exit 1
+      end
 
       config = Jojo::Config.new
-      employer = Jojo::Employer.new(options[:employer])
       ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
       status_logger = Jojo::StatusLogger.new(employer)
 
-      say "Generating cover letter for #{employer.name}...", :green
-
-      # Ensure employer directory exists
-      employer.create_directory! unless Dir.exist?(employer.base_path)
-
-      # Check job description exists
-      unless File.exist?(employer.job_description_path)
-        say "✗ Job description not found. Run 'generate' first.", :red
-        exit 1
-      end
+      say "Generating cover letter for #{employer.company_name}...", :green
 
       # Check tailored resume exists (REQUIRED)
       unless File.exist?(employer.resume_path)
@@ -338,24 +405,30 @@ module Jojo
     end
 
     desc "website", "Generate website only"
+    long_desc <<~DESC
+      Generate a landing page website for a specific employer.
+      Requires that you've already run 'jojo new' and 'jojo resume' first.
+
+      Examples:
+        jojo website -s acme-corp-senior-dev
+        jojo website -s acme-corp-senior-dev -t modern
+        JOJO_EMPLOYER_SLUG=acme-corp jojo website
+    DESC
     def website
-      validate_generate_options!
+      slug = resolve_slug
+      employer = Jojo::Employer.new(slug)
+
+      unless employer.artifacts_exist?
+        say "✗ Employer '#{slug}' not found.", :red
+        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
+        exit 1
+      end
 
       config = Jojo::Config.new
-      employer = Jojo::Employer.new(options[:employer])
       ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
       status_logger = Jojo::StatusLogger.new(employer)
 
-      say "Generating website for #{employer.name}...", :green
-
-      # Ensure employer directory exists
-      employer.create_directory! unless Dir.exist?(employer.base_path)
-
-      # Check that job description has been processed
-      unless File.exist?(employer.job_description_path)
-        say "✗ Job description not found. Run 'generate' first.", :red
-        exit 1
-      end
+      say "Generating website for #{employer.company_name}...", :green
 
       # Check that resume has been generated (REQUIRED)
       unless File.exist?(employer.resume_path)
@@ -460,6 +533,26 @@ module Jojo
 
     private
 
+    def resolve_slug
+      slug = options[:slug] || ENV['JOJO_EMPLOYER_SLUG']
+
+      unless slug
+        say "Error: No employer specified.", :red
+        say "Provide --slug or set JOJO_EMPLOYER_SLUG environment variable.", :yellow
+        say "\nExample:", :cyan
+        say "  jojo #{invoked_command} --slug acme-corp-senior", :white
+        say "  export JOJO_EMPLOYER_SLUG=acme-corp-senior && jojo #{invoked_command}", :white
+        exit 1
+      end
+
+      slug
+    end
+
+    def invoked_command
+      # Get the current command name for error messages
+      @_invocations.keys.last.to_s rescue 'command'
+    end
+
     def handle_config_yml(errors)
       if File.exist?('config.yml')
         if yes?("config.yml already exists. Overwrite?")
@@ -541,27 +634,8 @@ module Jojo
       say "1. Copy templates/generic_resume.md to inputs/generic_resume.md"
       say "2. Edit inputs/generic_resume.md with your actual work history"
       say "3. (Optional) Copy templates/recommendations.md to inputs/recommendations.md"
-      say "4. Run 'jojo generate -e \"Company Name\" -j job_description.txt' to generate materials"
-    end
-
-    def validate_generate_options!
-      errors = []
-      errors << "--employer is required" unless options[:employer]
-      errors << "--job is required" unless options[:job]
-
-      if errors.any?
-        say "Error:", :red
-        errors.each { |e| say "  #{e}", :red }
-        exit 1
-      end
-    end
-
-    def validate_employer_option!
-      unless options[:employer]
-        say "Error: --employer option is required", :red
-        say "Usage: jojo annotate -e \"Company Name\"", :yellow
-        exit 1
-      end
+      say "4. Run 'jojo new -s employer-slug -j job_description.txt' to create workspace"
+      say "5. Run 'jojo generate -s employer-slug' to generate materials"
     end
   end
 end

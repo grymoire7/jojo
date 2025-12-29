@@ -1,12 +1,13 @@
 require 'fileutils'
+require 'yaml'
 
 module Jojo
   class Employer
     attr_reader :name, :slug, :base_path
 
-    def initialize(name)
-      @name = name
-      @slug = slugify(name)
+    def initialize(slug)
+      @slug = slug
+      @name = slug  # Will be updated from job_details.yml if it exists
       @base_path = File.join('employers', @slug)
     end
 
@@ -54,18 +55,59 @@ module Jojo
       File.join(base_path, 'faq.json')
     end
 
+    def job_details
+      return {} unless File.exist?(job_details_path)
+
+      YAML.load_file(job_details_path) || {}
+    rescue => e
+      {}
+    end
+
+    def company_name
+      job_details['company_name'] || @name
+    end
+
     def create_directory!
       FileUtils.mkdir_p(base_path)
       FileUtils.mkdir_p(website_path)
     end
 
+    def create_artifacts(job_source, ai_client, overwrite: false, verbose: false)
+      # Create directory structure
+      create_directory!
+
+      # If overwriting, remove existing artifacts except directory structure
+      if overwrite
+        remove_artifacts
+      end
+
+      # Process job description using existing processor
+      require_relative 'job_description_processor'
+      processor = JobDescriptionProcessor.new(self, ai_client, verbose: verbose)
+      processor.process(job_source)
+    end
+
+    def artifacts_exist?
+      File.exist?(job_description_path) || File.exist?(job_details_path)
+    end
+
     private
 
-    def slugify(text)
-      text
-        .downcase
-        .gsub(/[^a-z0-9]+/, '-')
-        .gsub(/^-|-$/, '')
+    def remove_artifacts
+      # Remove all files except directories
+      [
+        job_description_raw_path,
+        job_description_path,
+        job_details_path,
+        job_description_annotations_path,
+        research_path,
+        resume_path,
+        cover_letter_path,
+        status_log_path,
+        faq_path
+      ].each do |path|
+        FileUtils.rm_f(path) if File.exist?(path)
+      end
     end
   end
 end

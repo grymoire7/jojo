@@ -8,7 +8,7 @@ require 'json'
 
 describe "FAQ Workflow Integration" do
   before do
-    @employer = Jojo::Employer.new('Integration Test Corp')
+    @employer = Jojo::Employer.new('integration-test-corp')
     @ai_client = Minitest::Mock.new
 
     # Create minimal config

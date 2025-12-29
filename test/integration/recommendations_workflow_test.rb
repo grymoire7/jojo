@@ -21,7 +21,7 @@ describe 'Recommendations Workflow Integration' do
   end
 
   before do
-    @employer = Jojo::Employer.new('Integration Test Corp')
+    @employer = Jojo::Employer.new('integration-test-corp')
 
     # Create required files
     FileUtils.mkdir_p(@employer.base_path)

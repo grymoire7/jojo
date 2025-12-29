@@ -5,7 +5,7 @@ require_relative '../../../lib/jojo/prompts/resume_prompt'
 
 describe Jojo::Generators::ResumeGenerator do
   before do
-    @employer = Jojo::Employer.new('Acme Corp')
+    @employer = Jojo::Employer.new('acme-corp')
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
     @generator = Jojo::Generators::ResumeGenerator.new(
@@ -23,6 +23,7 @@ describe Jojo::Generators::ResumeGenerator do
     # Create required fixtures
     File.write(@employer.job_description_path, "Senior Ruby Developer role at Acme Corp...")
     File.write(@employer.research_path, "# Company Profile\n\nAcme Corp is a leading tech company...")
+    File.write(@employer.job_details_path, "company_name: Acme Corp\nposition_title: Senior Ruby Developer\n")
   end
 
   after do

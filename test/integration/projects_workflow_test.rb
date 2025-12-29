@@ -5,13 +5,14 @@ require_relative '../../lib/jojo/config'
 
 describe 'Projects Integration Workflow' do
   before do
-    @employer = Jojo::Employer.new('Integration Test Corp')
+    @employer = Jojo::Employer.new('integration-test-corp')
     @employer.create_directory!
 
     # Setup all required files
     File.write(@employer.job_description_path, "Looking for Ruby on Rails developer")
 
     File.write(@employer.job_details_path, <<~YAML)
+      company_name: Integration Test Corp
       required_skills:
         - Ruby on Rails
         - PostgreSQL
@@ -61,7 +62,7 @@ describe 'Projects Integration Workflow' do
     mock_ai = Minitest::Mock.new
     mock_ai.expect :generate_text, "Branding statement", [String]
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: config, template: 'default')
+    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: config, template: 'default', inputs_path: 'test/fixtures')
     generator.generate
 
     html = File.read(@employer.index_html_path)

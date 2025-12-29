@@ -4,7 +4,7 @@ require_relative '../../../lib/jojo/generators/annotation_generator'
 
 describe Jojo::Generators::AnnotationGenerator do
   before do
-    @employer = Jojo::Employer.new('Acme Corp')
+    @employer = Jojo::Employer.new('acme-corp')
     @ai_client = Minitest::Mock.new
     @generator = Jojo::Generators::AnnotationGenerator.new(
       @employer,
