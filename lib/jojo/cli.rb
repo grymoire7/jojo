@@ -101,7 +101,7 @@ module Jojo
       say "Generating annotations for #{employer.company_name}...", :green
 
       begin
-        generator = Jojo::Generators::AnnotationGenerator.new(employer, ai_client, verbose: options[:verbose])
+        generator = Jojo::Generators::AnnotationGenerator.new(employer, ai_client, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
         annotations = generator.generate
 
         say "✓ Generated #{annotations.length} annotations", :green
@@ -196,7 +196,7 @@ module Jojo
 
       # Generate annotations
       begin
-        generator = Jojo::Generators::AnnotationGenerator.new(employer, ai_client, verbose: options[:verbose])
+        generator = Jojo::Generators::AnnotationGenerator.new(employer, ai_client, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
         annotations = generator.generate
 
         say "✓ Generated #{annotations.length} job description annotations", :green

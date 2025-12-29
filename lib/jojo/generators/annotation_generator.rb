@@ -4,12 +4,14 @@ require_relative '../prompts/annotation_prompt'
 module Jojo
   module Generators
     class AnnotationGenerator
-      attr_reader :employer, :ai_client, :verbose
+      attr_reader :employer, :ai_client, :verbose, :overwrite_flag, :cli_instance
 
-      def initialize(employer, ai_client, verbose: false)
+      def initialize(employer, ai_client, verbose: false, overwrite_flag: nil, cli_instance: nil)
         @employer = employer
         @ai_client = ai_client
         @verbose = verbose
+        @overwrite_flag = overwrite_flag
+        @cli_instance = cli_instance
       end
 
       def generate
@@ -80,7 +82,13 @@ module Jojo
 
       def save_annotations(annotations)
         json_output = JSON.pretty_generate(annotations)
-        File.write(employer.job_description_annotations_path, json_output)
+        if cli_instance
+          cli_instance.with_overwrite_check(employer.job_description_annotations_path, overwrite_flag) do
+            File.write(employer.job_description_annotations_path, json_output)
+          end
+        else
+          File.write(employer.job_description_annotations_path, json_output)
+        end
       end
 
       def log(message)
