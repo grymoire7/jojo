@@ -10,15 +10,17 @@ require_relative '../recommendation_parser'
 module Jojo
   module Generators
     class WebsiteGenerator
-      attr_reader :employer, :ai_client, :config, :verbose, :template_name, :inputs_path
+      attr_reader :employer, :ai_client, :config, :verbose, :template_name, :inputs_path, :overwrite_flag, :cli_instance
 
-      def initialize(employer, ai_client, config:, template: 'default', verbose: false, inputs_path: 'inputs')
+      def initialize(employer, ai_client, config:, template: 'default', verbose: false, inputs_path: 'inputs', overwrite_flag: nil, cli_instance: nil)
         @employer = employer
         @ai_client = ai_client
         @config = config
         @template_name = template
         @verbose = verbose
         @inputs_path = inputs_path
+        @overwrite_flag = overwrite_flag
+        @cli_instance = cli_instance
       end
 
       def generate
@@ -224,7 +226,13 @@ module Jojo
         FileUtils.mkdir_p(employer.website_path)
 
         # Write HTML file
-        File.write(employer.index_html_path, html)
+        if cli_instance
+          cli_instance.with_overwrite_check(employer.index_html_path, overwrite_flag) do
+            File.write(employer.index_html_path, html)
+          end
+        else
+          File.write(employer.index_html_path, html)
+        end
       end
 
       def available_templates

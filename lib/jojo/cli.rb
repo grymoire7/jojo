@@ -221,7 +221,9 @@ module Jojo
             ai_client,
             config: config,
             template: options[:template],
-            verbose: options[:verbose]
+            verbose: options[:verbose],
+            overwrite_flag: options[:overwrite],
+            cli_instance: self
           )
           generator.generate
 
@@ -446,7 +448,9 @@ module Jojo
           ai_client,
           config: config,
           template: options[:template],
-          verbose: options[:verbose]
+          verbose: options[:verbose],
+          overwrite_flag: options[:overwrite],
+          cli_instance: self
         )
         website = generator.generate
 
