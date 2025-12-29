@@ -179,7 +179,7 @@ module Jojo
         unless File.exist?(employer.resume_path)
           say "⚠ Warning: Resume not found, skipping cover letter generation", :yellow
         else
-          generator = Jojo::Generators::CoverLetterGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+          generator = Jojo::Generators::CoverLetterGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
           generator.generate
 
           say "✓ Cover letter generated and saved", :green
@@ -385,7 +385,7 @@ module Jojo
       end
 
       begin
-        generator = Jojo::Generators::CoverLetterGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+        generator = Jojo::Generators::CoverLetterGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
         cover_letter = generator.generate
 
         say "✓ Cover letter generated and saved to #{employer.cover_letter_path}", :green
