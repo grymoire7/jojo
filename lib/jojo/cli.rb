@@ -267,7 +267,7 @@ module Jojo
       say "Generating research for #{employer.company_name}...", :green
 
       begin
-        generator = Jojo::Generators::ResearchGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+        generator = Jojo::Generators::ResearchGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
         research = generator.generate
 
         say "✓ Research generated and saved to #{employer.research_path}", :green

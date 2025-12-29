@@ -5,14 +5,16 @@ require_relative '../prompts/research_prompt'
 module Jojo
   module Generators
     class ResearchGenerator
-      attr_reader :employer, :ai_client, :config, :verbose, :inputs_path
+      attr_reader :employer, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
 
-      def initialize(employer, ai_client, config:, verbose: false, inputs_path: 'inputs')
+      def initialize(employer, ai_client, config:, verbose: false, inputs_path: 'inputs', overwrite_flag: nil, cli_instance: nil)
         @employer = employer
         @ai_client = ai_client
         @config = config
         @verbose = verbose
         @inputs_path = inputs_path
+        @overwrite_flag = overwrite_flag
+        @cli_instance = cli_instance
       end
 
       def generate
@@ -135,7 +137,13 @@ module Jojo
       end
 
       def save_research(content)
-        File.write(employer.research_path, content)
+        if cli_instance
+          cli_instance.with_overwrite_check(employer.research_path, overwrite_flag) do
+            File.write(employer.research_path, content)
+          end
+        else
+          File.write(employer.research_path, content)
+        end
       end
 
       def log(message)
