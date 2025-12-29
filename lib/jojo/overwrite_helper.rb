@@ -1,5 +1,10 @@
 module Jojo
   module OverwriteHelper
+    def with_overwrite_check(path, overwrite_flag, &block)
+      # Check if file exists
+      return yield unless File.exist?(path)
+    end
+
     private
 
     def env_overwrite?

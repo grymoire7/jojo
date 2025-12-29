@@ -1,4 +1,5 @@
 require "test_helper"
+require "tmpdir"
 
 class OverwriteHelperTest < Minitest::Test
   # Create a test class that includes the module
@@ -93,6 +94,19 @@ class OverwriteHelperTest < Minitest::Test
   def test_should_overwrite_flag_false_overrides_env_true
     with_env("JOJO_ALWAYS_OVERWRITE" => "true") do
       refute @cli.send(:should_overwrite?, false)
+    end
+  end
+
+  def test_with_overwrite_check_yields_when_file_does_not_exist
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, "nonexistent.txt")
+      yielded = false
+
+      @cli.with_overwrite_check(path, nil) do
+        yielded = true
+      end
+
+      assert yielded, "Expected block to be yielded when file doesn't exist"
     end
   end
 
