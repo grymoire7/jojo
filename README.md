@@ -536,7 +536,6 @@ Created by [Tracy Atteberry](https://tracyatteberry.com) using:
 - [Ruby](https://www.ruby-lang.org/) - Programming language
 - [Thor](https://github.com/rails/thor) - CLI framework
 - [ruby_llm](https://github.com/alexrudall/ruby_llm) - AI service integration
-- [Anthropic Claude](https://www.anthropic.com/) - AI model for content generation
 - [html-to-markdown](https://github.com/soundasleep/html-to-markdown) - Job posting conversion
 - [deepsearch-rb](https://github.com/serpapi/deepsearch-rb) - Web search capabilities
 - [Claude AI](https://claude.ai) - Development assistance
