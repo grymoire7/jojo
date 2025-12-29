@@ -52,7 +52,6 @@ module Jojo
     DESC
     method_option :slug, type: :string, aliases: '-s', required: true, desc: 'Unique employer identifier'
     method_option :job, type: :string, aliases: '-j', required: true, desc: 'Job description (file path or URL)'
-    method_option :overwrite, type: :boolean, aliases: '-o', default: false, desc: 'Overwrite existing artifacts'
     def new
       config = Jojo::Config.new
       employer = Jojo::Employer.new(options[:slug])
@@ -60,16 +59,9 @@ module Jojo
 
       say "Creating employer workspace: #{options[:slug]}", :green
 
-      # Check if artifacts already exist
-      if employer.artifacts_exist? && !options[:overwrite]
-        say "✗ Employer '#{options[:slug]}' already exists.", :red
-        say "  Use --overwrite to recreate artifacts.", :yellow
-        exit 1
-      end
-
       # Create artifacts
       begin
-        employer.create_artifacts(options[:job], ai_client, overwrite: options[:overwrite], verbose: options[:verbose])
+        employer.create_artifacts(options[:job], ai_client, overwrite_flag: options[:overwrite], cli_instance: self, verbose: options[:verbose])
 
         say "✓ Created employer directory: #{employer.base_path}", :green
         say "✓ Job description processed and saved", :green

@@ -4,11 +4,13 @@ require 'html_to_markdown'
 
 module Jojo
   class JobDescriptionProcessor
-    attr_reader :employer, :ai_client, :verbose
+    attr_reader :employer, :ai_client, :verbose, :overwrite_flag, :cli_instance
 
-    def initialize(employer, ai_client, verbose: false)
+    def initialize(employer, ai_client, overwrite_flag: nil, cli_instance: nil, verbose: false)
       @employer = employer
       @ai_client = ai_client
+      @overwrite_flag = overwrite_flag
+      @cli_instance = cli_instance
       @verbose = verbose
     end
 
@@ -94,19 +96,37 @@ module Jojo
     def save_raw_content(content)
       path = employer.job_description_raw_path
       log "Saving raw content to: #{path}"
-      File.write(path, content)
+      if cli_instance
+        cli_instance.with_overwrite_check(path, overwrite_flag) do
+          File.write(path, content)
+        end
+      else
+        File.write(path, content)
+      end
     end
 
     def save_job_description(content)
       path = employer.job_description_path
       log "Saving job description to: #{path}"
-      File.write(path, content)
+      if cli_instance
+        cli_instance.with_overwrite_check(path, overwrite_flag) do
+          File.write(path, content)
+        end
+      else
+        File.write(path, content)
+      end
     end
 
     def save_job_details(yaml_content)
       path = employer.job_details_path
       log "Saving job details to: #{path}"
-      File.write(path, yaml_content)
+      if cli_instance
+        cli_instance.with_overwrite_check(path, overwrite_flag) do
+          File.write(path, yaml_content)
+        end
+      else
+        File.write(path, yaml_content)
+      end
     end
 
     def log(message)

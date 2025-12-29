@@ -72,18 +72,13 @@ module Jojo
       FileUtils.mkdir_p(website_path)
     end
 
-    def create_artifacts(job_source, ai_client, overwrite: false, verbose: false)
+    def create_artifacts(job_source, ai_client, overwrite_flag: nil, cli_instance: nil, verbose: false)
       # Create directory structure
       create_directory!
 
-      # If overwriting, remove existing artifacts except directory structure
-      if overwrite
-        remove_artifacts
-      end
-
       # Process job description using existing processor
       require_relative 'job_description_processor'
-      processor = JobDescriptionProcessor.new(self, ai_client, verbose: verbose)
+      processor = JobDescriptionProcessor.new(self, ai_client, overwrite_flag: overwrite_flag, cli_instance: cli_instance, verbose: verbose)
       processor.process(job_source)
     end
 
