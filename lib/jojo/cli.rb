@@ -9,10 +9,13 @@ require_relative 'generators/annotation_generator'
 
 module Jojo
   class CLI < Thor
+    include OverwriteHelper
+
     class_option :verbose, type: :boolean, aliases: '-v', desc: 'Run verbosely'
     class_option :quiet, type: :boolean, aliases: '-q', desc: 'Suppress output, rely on exit code'
     class_option :slug, type: :string, aliases: '-s', desc: 'Employer slug (unique identifier)'
     class_option :template, type: :string, aliases: '-t', desc: 'Website template name (default: default)', default: 'default'
+    class_option :overwrite, type: :boolean, banner: 'Overwrite existing files without prompting'
     
     def self.exit_on_failure?
       true
