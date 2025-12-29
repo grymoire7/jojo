@@ -34,6 +34,42 @@ class OverwriteHelperTest < Minitest::Test
     end
   end
 
+  def test_env_overwrite_returns_false_for_0
+    with_env("JOJO_ALWAYS_OVERWRITE" => "0") do
+      refute @cli.send(:env_overwrite?)
+    end
+  end
+
+  def test_env_overwrite_returns_false_for_false
+    with_env("JOJO_ALWAYS_OVERWRITE" => "false") do
+      refute @cli.send(:env_overwrite?)
+    end
+  end
+
+  def test_env_overwrite_returns_false_for_no
+    with_env("JOJO_ALWAYS_OVERWRITE" => "no") do
+      refute @cli.send(:env_overwrite?)
+    end
+  end
+
+  def test_env_overwrite_returns_false_for_random_string
+    with_env("JOJO_ALWAYS_OVERWRITE" => "whatever") do
+      refute @cli.send(:env_overwrite?)
+    end
+  end
+
+  def test_env_overwrite_returns_false_when_unset
+    with_env("JOJO_ALWAYS_OVERWRITE" => nil) do
+      refute @cli.send(:env_overwrite?)
+    end
+  end
+
+  def test_env_overwrite_returns_false_when_empty
+    with_env("JOJO_ALWAYS_OVERWRITE" => "") do
+      refute @cli.send(:env_overwrite?)
+    end
+  end
+
   private
 
   def with_env(env_vars)
