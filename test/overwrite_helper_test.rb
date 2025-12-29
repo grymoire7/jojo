@@ -1,5 +1,6 @@
 require "test_helper"
 require "tmpdir"
+require "stringio"
 
 class OverwriteHelperTest < Minitest::Test
   # Create a test class that includes the module
@@ -121,6 +122,28 @@ class OverwriteHelperTest < Minitest::Test
       end
 
       assert yielded, "Expected block to be yielded when --overwrite is set"
+    end
+  end
+
+  def test_with_overwrite_check_raises_error_in_non_tty_environment
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, "existing.txt")
+      File.write(path, "original")
+
+      # Mock $stdout.isatty to return false
+      stdout_was = $stdout
+      $stdout = StringIO.new
+      def $stdout.isatty; false; end
+
+      error = assert_raises(Thor::Error) do
+        @cli.with_overwrite_check(path, nil) { }
+      end
+
+      assert_match /Cannot prompt in non-interactive mode/, error.message
+      assert_match /--overwrite/, error.message
+      assert_match /JOJO_ALWAYS_OVERWRITE/, error.message
+    ensure
+      $stdout = stdout_was
     end
   end
 

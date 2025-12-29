@@ -6,6 +6,13 @@ module Jojo
 
       # Check override mechanisms in precedence order
       return yield if should_overwrite?(overwrite_flag)
+
+      # Prompt user or fail in non-TTY
+      if $stdout.isatty
+        # TODO: Prompt implementation
+      else
+        raise Thor::Error, "Cannot prompt in non-interactive mode. Use --overwrite or set JOJO_ALWAYS_OVERWRITE=true"
+      end
     end
 
     private
