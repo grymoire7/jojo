@@ -87,11 +87,34 @@ See your provider's pricing page for current rates:
    ```
 
    The setup wizard will guide you through:
-   - **LLM Provider Selection**: Choose from 11 supported providers (Anthropic, OpenAI, DeepSeek, Gemini, Mistral, etc.)
+   - **LLM Provider Selection**: Choose from 11 supported providers using numbered menu
    - **API Key Configuration**: Provide your API key for the chosen provider
-   - **Model Selection**: Choose models for reasoning tasks and text generation
+   - **Model Selection**: Choose reasoning and text generation models using numbered menus
    - **Personal Information**: Your name and website URL
    - **Template Files**: Creates resume, recommendations, and projects templates
+
+   **Example:**
+   ```
+   Which LLM provider?
+     1. anthropic
+     2. bedrock
+     3. deepseek
+     ...
+     11. vertexai
+   Choose 1-11: 1
+
+   Anthropic API key: sk-ant-***
+
+   Your name: Tracy Atteberry
+   Your website base URL: https://tracyatteberry.com
+
+   Which model for reasoning tasks (company research, resume tailoring)?
+     1. claude-3-5-haiku-20241022
+     2. claude-3-5-sonnet-20241022
+     3. claude-sonnet-4-5
+     4. claude-opus-4-5
+   Choose 1-4: 3
+   ```
 
 **Note**: The setup command is idempotent - you can run it multiple times safely. It only creates missing files.
 
