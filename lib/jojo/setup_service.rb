@@ -96,6 +96,7 @@ module Jojo
         return
       end
 
+      # Basic info
       seeker_name = @cli.ask("Your name:")
       if seeker_name.strip.empty?
         @cli.say "✗ Name is required", :red
@@ -107,6 +108,35 @@ module Jojo
         @cli.say "✗ Base URL is required", :red
         exit 1
       end
+
+      # Model selection
+      available_models = ProviderHelper.available_models(@provider_slug)
+
+      if available_models.empty?
+        @cli.say "✗ No models found for provider: #{@provider_slug}", :red
+        exit 1
+      end
+
+      @cli.say ""
+      @cli.say "Available models for #{@provider_slug}:", :cyan
+      @cli.say "  #{available_models.join(', ')}"
+      @cli.say ""
+
+      reasoning_model = @cli.ask("Which model for reasoning tasks (company research, resume tailoring)?")
+      if reasoning_model.strip.empty?
+        @cli.say "✗ Reasoning model is required", :red
+        exit 1
+      end
+
+      text_generation_model = @cli.ask("Which model for text generation tasks (faster, simpler)?")
+      if text_generation_model.strip.empty?
+        @cli.say "✗ Text generation model is required", :red
+        exit 1
+      end
+
+      # Set provider variables for config template
+      reasoning_provider = @provider_slug
+      text_generation_provider = @provider_slug
 
       begin
         template = ERB.new(File.read('templates/config.yml.erb'))

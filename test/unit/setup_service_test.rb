@@ -88,19 +88,39 @@ describe Jojo::SetupService do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           FileUtils.mkdir_p('templates')
-          File.write('templates/config.yml.erb', 'seeker_name: <%= seeker_name %>')
+          File.write('templates/config.yml.erb', <<~YAML)
+            seeker_name: <%= seeker_name %>
+            base_url: <%= base_url %>
+            reasoning_ai:
+              service: <%= reasoning_provider %>
+              model: <%= reasoning_model %>
+            text_generation_ai:
+              service: <%= text_generation_provider %>
+              model: <%= text_generation_model %>
+          YAML
 
           cli = Minitest::Mock.new
           cli.expect :ask, 'Tracy Atteberry', ["Your name:"]
           cli.expect :ask, 'https://example.com', ["Your website base URL (e.g., https://yourname.com):"]
+          cli.expect :say, nil, [""]
+          cli.expect :say, nil, ["Available models for anthropic:", :cyan]
+          cli.expect :say, nil, [String] # Model list
+          cli.expect :say, nil, [""]
+          cli.expect :ask, 'claude-sonnet-4-5', ["Which model for reasoning tasks (company research, resume tailoring)?"]
+          cli.expect :ask, 'claude-3-5-haiku-20241022', ["Which model for text generation tasks (faster, simpler)?"]
           cli.expect :say, nil, ["✓ Created config.yml", :green]
 
           service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          service.instance_variable_set(:@provider_slug, 'anthropic')
           service.send(:setup_personal_configuration)
 
           cli.verify
           _(File.exist?('config.yml')).must_equal true
-          _(File.read('config.yml')).must_include 'Tracy Atteberry'
+          content = File.read('config.yml')
+          _(content).must_include 'Tracy Atteberry'
+          _(content).must_include 'service: anthropic'
+          _(content).must_include 'model: claude-sonnet-4-5'
+          _(content).must_include 'model: claude-3-5-haiku-20241022'
         end
       end
     end
