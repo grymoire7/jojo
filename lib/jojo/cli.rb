@@ -479,10 +479,12 @@ module Jojo
         --integration  Integration tests (mocked external services)
         --service      Service tests (real API calls, may cost money)
         --all          All test categories
+        --no-service   Exclude service tests
 
       Examples:
         jojo test                        # Run unit tests only (fast)
         jojo test --all                  # Run all tests
+        jojo test --all --no-service     # Run all tests except service tests
         jojo test --unit --integration   # Run unit and integration tests
         jojo test --service              # Run service tests (with confirmation)
         jojo test -q                     # Quiet mode, check exit code
@@ -492,6 +494,18 @@ module Jojo
     method_option :service, type: :boolean, desc: 'Run service tests (may use real APIs)'
     method_option :all, type: :boolean, desc: 'Run all tests'
     def test
+      # Validate unsupported Thor auto-generated flags
+      unsupported_flags = []
+      unsupported_flags << '--no-unit or --skip-unit' if options[:unit] == false
+      unsupported_flags << '--no-integration or --skip-integration' if options[:integration] == false
+      unsupported_flags << '--no-all or --skip-all' if options[:all] == false
+
+      if unsupported_flags.any?
+        say "✗ Unsupported option(s): #{unsupported_flags.join(', ')}", :red
+        say "  Only --no-service (to exclude service tests from --all) is supported.", :yellow
+        exit 1
+      end
+
       # Determine which test categories to run
       categories = []
 
@@ -506,6 +520,9 @@ module Jojo
         # Default to unit tests if no flags specified
         categories = ['unit'] if categories.empty?
       end
+
+      # Exclude service tests if --no-service is specified (Thor's auto-generated flag)
+      categories.delete('service') if options[:service] == false
 
       # Safety confirmation for service tests
       if categories.include?('service') && !ENV['SKIP_SERVICE_CONFIRMATION']

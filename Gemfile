@@ -7,6 +7,7 @@ gem 'ruby_llm', '~> 1.9'
 gem 'deepsearch-rb', '~> 0.1'
 gem 'dotenv', '~> 3.1'
 gem 'html-to-markdown', '~> 2.16'
+gem 'reline'
 
 group :development, :test do
   gem 'minitest', '~> 5.25'
