@@ -86,7 +86,37 @@ module Jojo
     end
 
     def setup_input_files
-      # Placeholder
+      FileUtils.mkdir_p('inputs') unless Dir.exist?('inputs')
+      @cli.say "✓ inputs/ directory ready", :green
+      @cli.say ""
+      @cli.say "Setting up your profile templates...", :green
+
+      input_files = {
+        'generic_resume.md' => '(customize this file)',
+        'recommendations.md' => '(optional - customize or delete)',
+        'projects.yml' => '(optional - customize or delete)'
+      }
+
+      input_files.each do |filename, description|
+        target_path = File.join('inputs', filename)
+        source_path = File.join('templates', filename)
+
+        if File.exist?(target_path) && !@force
+          @cli.say "✓ inputs/#{filename} already exists (skipped)", :green
+          @skipped_files << "inputs/#{filename}"
+          next
+        end
+
+        unless File.exist?(source_path)
+          @cli.say "✗ Template file #{source_path} not found", :red
+          @cli.say "  This may indicate a corrupted installation.", :yellow
+          exit 1
+        end
+
+        FileUtils.cp(source_path, target_path)
+        @cli.say "✓ Created inputs/#{filename} #{description}", :green
+        @created_files << "inputs/#{filename}"
+      end
     end
 
     def show_summary

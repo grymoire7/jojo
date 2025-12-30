@@ -100,4 +100,82 @@ describe Jojo::SetupService do
       end
     end
   end
+
+  describe '#setup_input_files' do
+    it 'creates inputs directory if missing' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          FileUtils.mkdir_p('templates')
+          File.write('templates/generic_resume.md', '<!-- JOJO_TEMPLATE_PLACEHOLDER -->')
+          File.write('templates/recommendations.md', '<!-- JOJO_TEMPLATE_PLACEHOLDER -->')
+          File.write('templates/projects.yml', '# JOJO_TEMPLATE_PLACEHOLDER')
+
+          cli = Minitest::Mock.new
+          cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
+          cli.expect :say, nil, [""]
+          cli.expect :say, nil, ["Setting up your profile templates...", :green]
+          3.times { cli.expect :say, nil, [String, :green] }
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          service.send(:setup_input_files)
+
+          cli.verify
+          _(Dir.exist?('inputs')).must_equal true
+        end
+      end
+    end
+
+    it 'copies template files to inputs/' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          FileUtils.mkdir_p('templates')
+          File.write('templates/generic_resume.md', "<!-- JOJO_TEMPLATE_PLACEHOLDER -->\nResume content")
+          File.write('templates/recommendations.md', "<!-- JOJO_TEMPLATE_PLACEHOLDER -->\nRecs")
+          File.write('templates/projects.yml', "# JOJO_TEMPLATE_PLACEHOLDER\nprojects: []")
+
+          cli = Minitest::Mock.new
+          cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
+          cli.expect :say, nil, [""]
+          cli.expect :say, nil, ["Setting up your profile templates...", :green]
+          cli.expect :say, nil, ["✓ Created inputs/generic_resume.md (customize this file)", :green]
+          cli.expect :say, nil, ["✓ Created inputs/recommendations.md (optional - customize or delete)", :green]
+          cli.expect :say, nil, ["✓ Created inputs/projects.yml (optional - customize or delete)", :green]
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          service.send(:setup_input_files)
+
+          cli.verify
+          _(File.exist?('inputs/generic_resume.md')).must_equal true
+          _(File.read('inputs/generic_resume.md')).must_include 'JOJO_TEMPLATE_PLACEHOLDER'
+        end
+      end
+    end
+
+    it 'skips existing files unless force mode' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          FileUtils.mkdir_p('inputs')
+          FileUtils.mkdir_p('templates')
+          File.write('inputs/generic_resume.md', 'Existing resume')
+          File.write('templates/generic_resume.md', 'Template')
+          File.write('templates/recommendations.md', 'Recs')
+          File.write('templates/projects.yml', 'Projects')
+
+          cli = Minitest::Mock.new
+          cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
+          cli.expect :say, nil, [""]
+          cli.expect :say, nil, ["Setting up your profile templates...", :green]
+          cli.expect :say, nil, ["✓ inputs/generic_resume.md already exists (skipped)", :green]
+          cli.expect :say, nil, ["✓ Created inputs/recommendations.md (optional - customize or delete)", :green]
+          cli.expect :say, nil, ["✓ Created inputs/projects.yml (optional - customize or delete)", :green]
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          service.send(:setup_input_files)
+
+          cli.verify
+          _(File.read('inputs/generic_resume.md')).must_equal 'Existing resume'
+        end
+      end
+    end
+  end
 end
