@@ -121,18 +121,28 @@ describe Jojo::SetupService do
           cli.expect :ask, 'Tracy Atteberry', ["Your name:"]
           cli.expect :ask, 'https://example.com', ["Your website base URL (e.g., https://yourname.com):"]
           cli.expect :say, nil, [""]
-          cli.expect :say, nil, ["Available models for anthropic:", :cyan]
-          cli.expect :say, nil, [String] # Model list
           cli.expect :say, nil, [""]
-          cli.expect :ask, 'claude-sonnet-4-5', ["Which model for reasoning tasks (company research, resume tailoring)?"]
-          cli.expect :ask, 'claude-3-5-haiku-20241022', ["Which model for text generation tasks (faster, simpler)?"]
           cli.expect :say, nil, ["✓ Created config.yml", :green]
 
-          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          prompt = Minitest::Mock.new
+          available_models = Jojo::ProviderHelper.available_models('anthropic')
+          prompt.expect :select, 'claude-sonnet-4-5', [
+            "Which model for reasoning tasks (company research, resume tailoring)?",
+            available_models,
+            {per_page: 15}
+          ]
+          prompt.expect :select, 'claude-3-5-haiku-20241022', [
+            "Which model for text generation tasks (faster, simpler)?",
+            available_models,
+            {per_page: 15}
+          ]
+
+          service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
           service.instance_variable_set(:@provider_slug, 'anthropic')
           service.send(:setup_personal_configuration)
 
           cli.verify
+          prompt.verify
           _(File.exist?('config.yml')).must_equal true
           content = File.read('config.yml')
           _(content).must_include 'Tracy Atteberry'

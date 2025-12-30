@@ -129,21 +129,18 @@ module Jojo
       end
 
       @cli.say ""
-      @cli.say "Available models for #{@provider_slug}:", :cyan
-      @cli.say "  #{available_models.join(', ')}"
+      reasoning_model = @prompt.select(
+        "Which model for reasoning tasks (company research, resume tailoring)?",
+        available_models,
+        {per_page: 15}
+      )
+
       @cli.say ""
-
-      reasoning_model = @cli.ask("Which model for reasoning tasks (company research, resume tailoring)?")
-      if reasoning_model.strip.empty?
-        @cli.say "✗ Reasoning model is required", :red
-        exit 1
-      end
-
-      text_generation_model = @cli.ask("Which model for text generation tasks (faster, simpler)?")
-      if text_generation_model.strip.empty?
-        @cli.say "✗ Text generation model is required", :red
-        exit 1
-      end
+      text_generation_model = @prompt.select(
+        "Which model for text generation tasks (faster, simpler)?",
+        available_models,
+        {per_page: 15}
+      )
 
       # Set provider variables for config template
       reasoning_provider = @provider_slug
