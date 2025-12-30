@@ -224,4 +224,38 @@ describe Jojo::SetupService do
       cli.verify
     end
   end
+
+  describe '#warn_if_force_mode' do
+    it 'prompts for confirmation in force mode' do
+      cli = Minitest::Mock.new
+      cli.expect :say, nil, ["⚠ WARNING: --force will overwrite existing configuration files!", :yellow]
+      cli.expect :say, nil, ["  This will replace: .env, config.yml, and all inputs/ files", :yellow]
+      cli.expect :yes?, true, ["Continue?"]
+
+      service = Jojo::SetupService.new(cli_instance: cli, force: true)
+      service.send(:warn_if_force_mode)
+
+      cli.verify
+    end
+
+    it 'exits when user declines force mode' do
+      cli = Minitest::Mock.new
+      cli.expect :say, nil, ["⚠ WARNING: --force will overwrite existing configuration files!", :yellow]
+      cli.expect :say, nil, ["  This will replace: .env, config.yml, and all inputs/ files", :yellow]
+      cli.expect :yes?, false, ["Continue?"]
+
+      service = Jojo::SetupService.new(cli_instance: cli, force: true)
+
+      assert_raises(SystemExit) do
+        service.send(:warn_if_force_mode)
+      end
+    end
+
+    it 'does nothing when not in force mode' do
+      cli = Object.new
+      service = Jojo::SetupService.new(cli_instance: cli, force: false)
+      service.send(:warn_if_force_mode)
+      # No expectations, should complete without errors
+    end
+  end
 end

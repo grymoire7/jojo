@@ -14,6 +14,7 @@ module Jojo
       @cli.say "Setting up Jojo...", :green
       @cli.say ""
 
+      warn_if_force_mode
       setup_api_configuration
       setup_personal_configuration
       setup_input_files
@@ -21,6 +22,17 @@ module Jojo
     end
 
     private
+
+    def warn_if_force_mode
+      return unless @force
+
+      @cli.say "⚠ WARNING: --force will overwrite existing configuration files!", :yellow
+      @cli.say "  This will replace: .env, config.yml, and all inputs/ files", :yellow
+
+      unless @cli.yes?("Continue?")
+        exit 1
+      end
+    end
 
     def setup_api_configuration
       if File.exist?('.env') && !@force
