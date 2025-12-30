@@ -157,6 +157,33 @@ module Jojo
         exit 1
       end
 
+      # Validate required inputs
+      begin
+        Jojo::TemplateValidator.validate_required_file!(
+          'inputs/generic_resume.md',
+          'generic resume'
+        )
+      rescue Jojo::TemplateValidator::MissingInputError => e
+        say e.message, :red
+        exit 1
+      end
+
+      # Warn about unchanged templates
+      ['inputs/generic_resume.md', 'inputs/recommendations.md', 'inputs/projects.yml'].each do |file|
+        next unless File.exist?(file)
+
+        result = Jojo::TemplateValidator.warn_if_unchanged(
+          file,
+          File.basename(file),
+          cli_instance: self
+        )
+
+        if result == :abort
+          say "Customize your templates first, then run this command again.", :yellow
+          exit 1
+        end
+      end
+
       config = Jojo::Config.new
       ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
       status_logger = Jojo::StatusLogger.new(employer)
