@@ -1,11 +1,11 @@
 seeker_name: <%= seeker_name %>
 base_url: <%= base_url %>
 reasoning_ai:
-  service: anthropic
-  model: sonnet
+  service: <%= reasoning_provider %>
+  model: <%= reasoning_model %>
 text_generation_ai:
-  service: anthropic
-  model: haiku
+  service: <%= text_generation_provider %>
+  model: <%= text_generation_model %>
 voice_and_tone: professional and friendly
 
 # Website configuration
