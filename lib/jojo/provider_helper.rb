@@ -12,5 +12,12 @@ module Jojo
 
       provider.configuration_requirements.first.to_s.upcase
     end
+
+    def self.available_models(provider_slug)
+      RubyLLM.models
+        .filter { |m| m.provider == provider_slug }
+        .map(&:id)
+        .sort
+    end
   end
 end
