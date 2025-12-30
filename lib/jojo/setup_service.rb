@@ -1,11 +1,13 @@
 require 'fileutils'
 require 'erb'
+require 'tty-prompt'
 require_relative 'provider_helper'
 
 module Jojo
   class SetupService
-    def initialize(cli_instance:, force: false)
+    def initialize(cli_instance:, prompt: nil, force: false)
       @cli = cli_instance
+      @prompt = prompt || TTY::Prompt.new
       @force = force
       @created_files = []
       @skipped_files = []

@@ -24,6 +24,19 @@ describe Jojo::SetupService do
       _(service.instance_variable_get(:@created_files)).must_equal []
       _(service.instance_variable_get(:@skipped_files)).must_equal []
     end
+
+    it 'accepts optional prompt parameter' do
+      cli = Object.new
+      prompt = Object.new
+      service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt)
+      _(service.instance_variable_get(:@prompt)).must_be_same_as prompt
+    end
+
+    it 'creates default TTY::Prompt when prompt not provided' do
+      cli = Object.new
+      service = Jojo::SetupService.new(cli_instance: cli)
+      _(service.instance_variable_get(:@prompt)).must_be_instance_of TTY::Prompt
+    end
   end
 
   describe '#setup_api_configuration' do
