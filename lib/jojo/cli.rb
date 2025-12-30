@@ -2,6 +2,7 @@ require 'erb'
 require 'fileutils'
 require_relative 'status_logger'
 require_relative 'setup_service'
+require_relative 'template_validator'
 require_relative 'generators/research_generator'
 require_relative 'generators/resume_generator'
 require_relative 'generators/cover_letter_generator'
@@ -55,6 +56,29 @@ module Jojo
     method_option :slug, type: :string, aliases: '-s', required: true, desc: 'Unique employer identifier'
     method_option :job, type: :string, aliases: '-j', required: true, desc: 'Job description (file path or URL)'
     def new
+      # Validate required inputs exist before creating employer
+      begin
+        Jojo::TemplateValidator.validate_required_file!(
+          'inputs/generic_resume.md',
+          'generic resume'
+        )
+      rescue Jojo::TemplateValidator::MissingInputError => e
+        say e.message, :red
+        exit 1
+      end
+
+      # Warn if generic resume hasn't been customized
+      result = Jojo::TemplateValidator.warn_if_unchanged(
+        'inputs/generic_resume.md',
+        'generic resume',
+        cli_instance: self
+      )
+
+      if result == :abort
+        say "Setup your inputs first, then run this command again.", :yellow
+        exit 1
+      end
+
       config = Jojo::Config.new
       employer = Jojo::Employer.new(options[:slug])
       ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
