@@ -1,6 +1,7 @@
 require 'erb'
 require 'fileutils'
 require_relative 'status_logger'
+require_relative 'setup_service'
 require_relative 'generators/research_generator'
 require_relative 'generators/resume_generator'
 require_relative 'generators/cover_letter_generator'
@@ -27,17 +28,18 @@ module Jojo
     end
 
     desc "setup", "Setup configuration"
+    method_option :force, type: :boolean, desc: 'Overwrite existing files'
     def setup
-      errors = []
-
-      say "Setting up Jojo...", :green
-
-      # Steps will be added in next tasks
-      handle_config_yml(errors)
-      handle_env_file(errors)
-      ensure_inputs_directory
-
-      report_results(errors)
+      Jojo::SetupService.new(
+        cli_instance: self,
+        force: options[:force]
+      ).run
+    rescue SystemExit
+      # Allow clean exit from service
+      raise
+    rescue => e
+      say "✗ Setup failed: #{e.message}", :red
+      exit 1
     end
 
     desc "new", "Create employer workspace with job description"
@@ -573,79 +575,5 @@ module Jojo
       @_invocations.keys.last.to_s rescue 'command'
     end
 
-    def handle_config_yml(errors)
-      seeker_name = ask("Your name:")
-
-      if seeker_name.strip.empty?
-        errors << "Name is required for config.yml"
-        return
-      end
-
-      base_url = ask("Your website base URL (e.g., https://yourname.com):")
-
-      if base_url.strip.empty?
-        errors << "Base URL is required for config.yml"
-        return
-      end
-
-      with_overwrite_check('config.yml', options[:overwrite]) do
-        begin
-          template = ERB.new(File.read('templates/config.yml.erb'))
-          File.write('config.yml', template.result(binding))
-          say "✓ Created config.yml", :green
-        rescue => e
-          errors << "Failed to create config.yml: #{e.message}"
-        end
-      end
-    end
-
-    def handle_env_file(errors)
-      if File.exist?('.env')
-        say "✓ .env already exists", :green
-      else
-        create_env_file(errors)
-      end
-    end
-
-    def create_env_file(errors)
-      api_key = ask("Anthropic API key:")
-
-      if api_key.strip.empty?
-        errors << "API key is required for .env"
-        return
-      end
-
-      begin
-        File.write('.env', "ANTHROPIC_API_KEY=#{api_key}\n")
-        say "✓ Created .env", :green
-      rescue => e
-        errors << "Failed to create .env: #{e.message}"
-      end
-    end
-
-    def ensure_inputs_directory
-      FileUtils.mkdir_p('inputs') unless Dir.exist?('inputs')
-      say "✓ inputs/ directory ready", :green
-    end
-
-    def report_results(errors)
-      if errors.any?
-        say "\nSetup completed with errors:", :red
-        errors.each { |e| say "  - #{e}", :red }
-      end
-
-      display_next_steps
-
-      exit 1 if errors.any?
-    end
-
-    def display_next_steps
-      say "\nNext steps:", :cyan
-      say "1. Copy templates/generic_resume.md to inputs/generic_resume.md"
-      say "2. Edit inputs/generic_resume.md with your actual work history"
-      say "3. (Optional) Copy templates/recommendations.md to inputs/recommendations.md"
-      say "4. Run 'jojo new -s employer-slug -j job_description.txt' to create workspace"
-      say "5. Run 'jojo generate -s employer-slug' to generate materials"
-    end
   end
 end
