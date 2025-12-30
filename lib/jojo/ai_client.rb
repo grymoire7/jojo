@@ -40,8 +40,24 @@ module Jojo
     private
 
     def configure_ruby_llm
-      RubyLLM.configure do |config|
-        config.anthropic_api_key = ENV['ANTHROPIC_API_KEY']
+      RubyLLM.configure do |ruby_llm_config|
+        # Dynamically configure all providers based on their configuration requirements
+        RubyLLM.providers.each do |provider|
+          # Get the configuration requirements for this provider
+          config_requirements = provider.configuration_requirements
+
+          # For each requirement, check if there's a corresponding ENV var
+          config_requirements.each do |requirement|
+            env_var_name = requirement.to_s.upcase
+            env_value = ENV[env_var_name]
+
+            # Set the configuration if the ENV var exists
+            if env_value
+              setter_method = "#{requirement}="
+              ruby_llm_config.send(setter_method, env_value) if ruby_llm_config.respond_to?(setter_method)
+            end
+          end
+        end
       end
     end
 
