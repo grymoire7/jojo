@@ -81,24 +81,23 @@ See your provider's pricing page for current rates:
    bundle install
    ```
 
-3. Set up your environment:
-   ```bash
-   cp .env.example .env
-   # Edit .env and add your ANTHROPIC_API_KEY
-   ```
-
-4. Run setup to create configuration:
+3. Run setup (creates .env, config.yml, and input templates):
    ```bash
    ./bin/jojo setup
    ```
 
-   This creates `config.yml` in the project root with your preferences.
+   This will guide you through:
+   - Setting up your Anthropic API key
+   - Configuring your personal information
+   - Creating input file templates
+
+**Note**: The setup command is idempotent - you can run it multiple times safely. It only creates missing files.
 
 ## Configuration
 
 ### Environment Variables
 
-Edit `.env` in the project root:
+The setup command creates `.env` with your API key. You can edit it directly if needed:
 
 ```bash
 ANTHROPIC_API_KEY=your_api_key_here
@@ -107,7 +106,7 @@ SERPER_API_KEY=your_serper_key_here  # Optional, for web search
 
 ### User Configuration
 
-After running `./bin/jojo setup`, edit `config.yml` in the project root:
+After running `./bin/jojo setup`, you can edit `config.yml` to customize:
 
 ```yaml
 seeker_name: Your Name
@@ -130,48 +129,52 @@ website:
 
 ### Input Files
 
-Create these files in the `inputs/` directory (which is gitignored):
+The setup command creates these files in `inputs/` with example content:
 
-1. **`inputs/generic_resume.md`** - Your complete work history in markdown
-   - Copy from `templates/generic_resume.md` as a starting point
-   - Include all experience, skills, and achievements
+1. **`inputs/generic_resume.md`** (required) - Your complete work history
+   - Contains examples you should replace with your actual experience
+   - Include ALL your skills and experience - tailoring will select what's relevant
+   - **Delete the first comment line after customizing**
 
 2. **`inputs/recommendations.md`** (optional) - LinkedIn recommendations
-   - Copy from `templates/recommendations.md` for format
    - Used in website carousel
+   - Delete file if you don't want recommendations
 
 3. **`inputs/projects.yml`** (optional) - Portfolio projects
-   - Copy from `templates/projects.yml` for format
    - Used for project selection and highlighting
+   - Delete file if you don't have projects to showcase
+
+**Important**: The first line of each template file contains a marker comment. Delete this line after you customize the file - jojo will warn you if templates are unchanged.
 
 ## Quick start
 
-### Step 0: Prepare your input files
+### Step 0: Run setup
 
-Before creating your first application, set up your input files:
+If you haven't already, run setup to create your configuration and input files:
 
-1. **Copy the generic resume template**:
+```bash
+./bin/jojo setup
+```
+
+Then customize your input files:
+
+1. **Edit your generic resume**:
    ```bash
-   cp templates/generic_resume.md inputs/generic_resume.md
+   nvim inputs/generic_resume.md  # or your preferred editor
+   ```
+   Replace the example content with your actual experience, skills, and achievements.
+   **Delete the first comment line** (`<!-- JOJO_TEMPLATE_PLACEHOLDER -->`) when done.
+
+2. **(Optional) Customize or delete recommendations**:
+   ```bash
+   nvim inputs/recommendations.md
+   # Or delete: rm inputs/recommendations.md
    ```
 
-2. **Edit your generic resume**:
+3. **(Optional) Customize or delete projects**:
    ```bash
-   # Use your preferred editor
-   nvim inputs/generic_resume.md
-   ```
-   Include all your experience, skills, and achievements. This will be tailored for each job.
-
-3. **(Optional) Add recommendations**:
-   ```bash
-   cp templates/recommendations.md inputs/recommendations.md
-   # Edit with your actual LinkedIn recommendations
-   ```
-
-4. **(Optional) Add portfolio projects**:
-   ```bash
-   cp templates/projects.yml inputs/projects.yml
-   # Edit with your actual projects
+   nvim inputs/projects.yml
+   # Or delete: rm inputs/projects.yml
    ```
 
 **Note**: The `inputs/` directory is gitignored, so your personal information stays private.
