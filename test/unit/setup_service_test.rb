@@ -178,4 +178,50 @@ describe Jojo::SetupService do
       end
     end
   end
+
+  describe '#show_summary' do
+    it 'displays created files and next steps' do
+      cli = Minitest::Mock.new
+      service = Jojo::SetupService.new(cli_instance: cli)
+      service.instance_variable_set(:@created_files, ['.env', 'config.yml', 'inputs/generic_resume.md'])
+
+      cli.expect :say, nil, [""]
+      cli.expect :say, nil, ["Setup complete!", :green]
+      cli.expect :say, nil, [""]
+      cli.expect :say, nil, ["Created:"]
+      3.times { cli.expect :say, nil, [String] }
+      cli.expect :say, nil, [""]
+      cli.expect :say, nil, ["Next steps:", :cyan]
+      cli.expect :say, nil, ["  1. Customize inputs/generic_resume.md with your actual experience"]
+      cli.expect :say, nil, ["  2. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"]
+      cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+      cli.expect :say, nil, [""]
+      cli.expect :say, nil, ["💡 Tip: Delete the first comment line in each file after customizing."]
+
+      service.send(:show_summary)
+
+      cli.verify
+    end
+
+    it 'shows appropriate message when no files created' do
+      cli = Minitest::Mock.new
+      service = Jojo::SetupService.new(cli_instance: cli)
+      service.instance_variable_set(:@created_files, [])
+      service.instance_variable_set(:@skipped_files, ['.env', 'config.yml'])
+
+      cli.expect :say, nil, [""]
+      cli.expect :say, nil, ["Setup complete!", :green]
+      cli.expect :say, nil, [""]
+      cli.expect :say, nil, ["Next steps:", :cyan]
+      cli.expect :say, nil, ["  1. Customize inputs/generic_resume.md with your actual experience"]
+      cli.expect :say, nil, ["  2. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"]
+      cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+      cli.expect :say, nil, [""]
+      cli.expect :say, nil, ["💡 Tip: Delete the first comment line in each file after customizing."]
+
+      service.send(:show_summary)
+
+      cli.verify
+    end
+  end
 end

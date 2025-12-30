@@ -120,7 +120,33 @@ module Jojo
     end
 
     def show_summary
-      # Placeholder
+      @cli.say ""
+      @cli.say "Setup complete!", :green
+      @cli.say ""
+
+      if @created_files.any?
+        @cli.say "Created:"
+        file_descriptions = {
+          '.env' => 'API configuration',
+          'config.yml' => 'Personal preferences',
+          'inputs/generic_resume.md' => 'Your work history template',
+          'inputs/recommendations.md' => 'Optional recommendations',
+          'inputs/projects.yml' => 'Optional portfolio projects'
+        }
+
+        @created_files.each do |file|
+          desc = file_descriptions[file] || 'Configuration file'
+          @cli.say "  • #{file} - #{desc}"
+        end
+        @cli.say ""
+      end
+
+      @cli.say "Next steps:", :cyan
+      @cli.say "  1. Customize inputs/generic_resume.md with your actual experience"
+      @cli.say "  2. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"
+      @cli.say "  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"
+      @cli.say ""
+      @cli.say "💡 Tip: Delete the first comment line in each file after customizing."
     end
   end
 end
