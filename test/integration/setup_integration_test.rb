@@ -37,7 +37,7 @@ describe 'Setup Integration' do
         cli.expect :say, nil, ["Setting up Jojo...", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Let's configure your API access.", :green]
-        cli.expect :ask, 'anthropic', [/Which LLM provider/]
+        cli.expect :say, nil, [""]
         cli.expect :ask, 'sk-ant-test123', ["Anthropic API key:"]
         cli.expect :say, nil, ["✓ Created .env", :green]
 
@@ -45,12 +45,25 @@ describe 'Setup Integration' do
         cli.expect :ask, 'Test User', ["Your name:"]
         cli.expect :ask, 'https://test.com', [/Your website base URL/]
         cli.expect :say, nil, [""]
-        cli.expect :say, nil, ["Available models for anthropic:", :cyan]
-        cli.expect :say, nil, [String] # model list
         cli.expect :say, nil, [""]
-        cli.expect :ask, 'claude-sonnet-4-5', [/Which model for reasoning/]
-        cli.expect :ask, 'claude-3-5-haiku-20241022', [/Which model for text generation/]
         cli.expect :say, nil, ["✓ Created config.yml", :green]
+
+        # Add prompt mock
+        prompt = Minitest::Mock.new
+        providers = Jojo::ProviderHelper.available_providers
+        available_models = Jojo::ProviderHelper.available_models('anthropic')
+
+        prompt.expect :select, 'anthropic', ["Which LLM provider?", providers, {per_page: 15}]
+        prompt.expect :select, 'claude-sonnet-4-5', [
+          "Which model for reasoning tasks (company research, resume tailoring)?",
+          available_models,
+          {per_page: 15}
+        ]
+        prompt.expect :select, 'claude-3-5-haiku-20241022', [
+          "Which model for text generation tasks (faster, simpler)?",
+          available_models,
+          {per_page: 15}
+        ]
 
         # setup_input_files
         cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
@@ -72,10 +85,11 @@ describe 'Setup Integration' do
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: Delete the first comment line in each file after customizing."]
 
-        service = Jojo::SetupService.new(cli_instance: cli, force: false)
+        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
         service.run
 
         cli.verify
+        prompt.verify
 
         # Verify .env
         _(File.exist?('.env')).must_equal true
@@ -130,19 +144,32 @@ describe 'Setup Integration' do
         cli.expect :say, nil, ["Setting up Jojo...", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Let's configure your API access.", :green]
-        cli.expect :ask, 'openai', [/Which LLM provider/]
+        cli.expect :say, nil, [""]
         cli.expect :ask, 'sk-test-openai', ["Openai API key:"]
         cli.expect :say, nil, ["✓ Created .env", :green]
 
         cli.expect :ask, 'Test User', ["Your name:"]
         cli.expect :ask, 'https://test.com', [/Your website base URL/]
         cli.expect :say, nil, [""]
-        cli.expect :say, nil, ["Available models for openai:", :cyan]
-        cli.expect :say, nil, [String]
         cli.expect :say, nil, [""]
-        cli.expect :ask, 'gpt-4o', [/Which model for reasoning/]
-        cli.expect :ask, 'gpt-4o-mini', [/Which model for text generation/]
         cli.expect :say, nil, ["✓ Created config.yml", :green]
+
+        # Add prompt mock
+        prompt = Minitest::Mock.new
+        providers = Jojo::ProviderHelper.available_providers
+        available_models = Jojo::ProviderHelper.available_models('openai')
+
+        prompt.expect :select, 'openai', ["Which LLM provider?", providers, {per_page: 15}]
+        prompt.expect :select, 'gpt-4o', [
+          "Which model for reasoning tasks (company research, resume tailoring)?",
+          available_models,
+          {per_page: 15}
+        ]
+        prompt.expect :select, 'gpt-4o-mini', [
+          "Which model for text generation tasks (faster, simpler)?",
+          available_models,
+          {per_page: 15}
+        ]
 
         cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
         cli.expect :say, nil, [""]
@@ -163,10 +190,11 @@ describe 'Setup Integration' do
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: Delete the first comment line in each file after customizing."]
 
-        service = Jojo::SetupService.new(cli_instance: cli, force: false)
+        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
         service.run
 
         cli.verify
+        prompt.verify
 
         # Verify .env
         env_content = File.read('.env')
