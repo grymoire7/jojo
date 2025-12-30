@@ -70,17 +70,8 @@ module Jojo
 
       # Prompt for provider
       providers = ProviderHelper.available_providers
-      provider_slug = @cli.ask("Which LLM provider? (#{providers.join(', ')}):")
-
-      if provider_slug.strip.empty?
-        @cli.say "✗ Provider is required", :red
-        exit 1
-      end
-
-      unless providers.include?(provider_slug)
-        @cli.say "✗ Invalid provider. Choose from: #{providers.join(', ')}", :red
-        exit 1
-      end
+      @cli.say ""
+      provider_slug = @prompt.select("Which LLM provider?", providers, {per_page: 15})
 
       # Get dynamic env var name
       env_var_name = ProviderHelper.provider_env_var_name(provider_slug)

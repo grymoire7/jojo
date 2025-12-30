@@ -66,14 +66,18 @@ describe Jojo::SetupService do
 
           cli = Minitest::Mock.new
           cli.expect :say, nil, ["Let's configure your API access.", :green]
-          cli.expect :ask, 'anthropic', ["Which LLM provider? (#{Jojo::ProviderHelper.available_providers.join(', ')}):"]
+          cli.expect :say, nil, [""]
           cli.expect :ask, 'sk-ant-test-key', ["Anthropic API key:"]
           cli.expect :say, nil, ["✓ Created .env", :green]
 
-          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          prompt = Minitest::Mock.new
+          prompt.expect :select, 'anthropic', ["Which LLM provider?", Jojo::ProviderHelper.available_providers, {per_page: 15}]
+
+          service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
           service.send(:setup_api_configuration)
 
           cli.verify
+          prompt.verify
           _(File.exist?('.env')).must_equal true
           _(File.read('.env')).must_include 'ANTHROPIC_API_KEY=sk-ant-test-key'
         end
