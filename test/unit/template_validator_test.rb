@@ -30,4 +30,24 @@ describe Jojo::TemplateValidator do
       file.unlink
     end
   end
+
+  describe '.validate_required_file!' do
+    it 'raises error when required file is missing' do
+      err = assert_raises(Jojo::TemplateValidator::MissingInputError) do
+        Jojo::TemplateValidator.validate_required_file!('inputs/nonexistent.md', 'generic resume')
+      end
+      _(err.message).must_include 'inputs/nonexistent.md not found'
+      _(err.message).must_include 'jojo setup'
+    end
+
+    it 'does not raise when file exists without marker' do
+      file = Tempfile.new(['test', '.md'])
+      file.write("# Customized Resume")
+      file.close
+
+      Jojo::TemplateValidator.validate_required_file!(file.path, 'resume')
+
+      file.unlink
+    end
+  end
 end
