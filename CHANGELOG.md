@@ -12,16 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Setup prompts for reasoning and text generation models for chosen provider
 - `.env` file now uses provider-specific environment variable names (e.g., `OPENAI_API_KEY` for OpenAI)
 - `config.yml` now includes provider-specific service and model configurations
-- Setup now uses interactive numbered menus instead of free-text input for providers and models
+- Setup now uses interactive selection menus instead of free-text input for providers and models
 
 ### Added
 - Support for multiple LLM providers via RubyLLM (anthropic, bedrock, deepseek, gemini, gpustack, mistral, ollama, openai, openrouter, perplexity, vertexai)
 - `ProviderHelper` module for RubyLLM provider/model introspection
 - `.env.erb` template for dynamic environment variable generation
 - Multi-provider AI client configuration
-- Numbered selection menus for provider/model choice (type `3` instead of `claude-sonnet-4-5`)
-- Arrow key navigation for all selection menus
-- Fuzzy search support in selection menus
+- Arrow-key selection menus for provider and model choice (no typing required)
 
 ### Migration Guide
 If you have an existing Jojo installation with Anthropic:
