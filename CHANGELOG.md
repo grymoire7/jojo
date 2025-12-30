@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Improved setup process: single command creates all configuration files
+- Template validation: warns when input files haven't been customized
+- `--force` flag for setup command to overwrite existing files
+- Comprehensive template examples for resume, recommendations, and projects
+- `TemplateValidator` class for detecting unchanged template files
+- `SetupService` class for managing setup workflow
+- Interactive prompts for unchanged templates in `new` and `generate` commands
+
+### Changed
+- Setup command now creates input file templates automatically
+- Input templates include placeholder markers for validation
+- Setup is now idempotent - safe to run multiple times
+- Templates updated with clear, actionable example content
+- README updated with streamlined setup instructions
+
+### Removed
+- Manual template copying no longer required
+
 ## [0.2.0] - 2025-12-28
 
 ### Added
