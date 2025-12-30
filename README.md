@@ -341,6 +341,37 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
 - `-t, --template TEMPLATE` - Website template name (default: "default")
 - `-v, --verbose` - Run verbosely with detailed output
 - `-q, --quiet` - Suppress output, rely on exit code only
+- `--overwrite` - Overwrite existing files without prompting
+- `--no-overwrite` - Always prompt before overwriting files
+
+### Overwriting Files
+
+By default, jojo prompts before overwriting existing files:
+
+```bash
+./bin/jojo research --slug acme-corp
+# If research.md exists: "research.md exists. Overwrite? (y/n)"
+```
+
+To skip prompts and overwrite automatically:
+
+```bash
+# Using flag
+./bin/jojo research --slug acme-corp --overwrite
+
+# Using environment variable (useful for CI/CD)
+export JOJO_ALWAYS_OVERWRITE=true
+./bin/jojo generate --slug acme-corp
+
+# Force prompting even with env var set
+./bin/jojo research --slug acme-corp --no-overwrite
+```
+
+**Precedence order:**
+1. `--overwrite` flag → always overwrites
+2. `--no-overwrite` flag → always prompts
+3. `JOJO_ALWAYS_OVERWRITE=true` → overwrites
+4. Default → prompts
 
 ### Custom Templates
 
@@ -389,6 +420,7 @@ Templates are ERB files located in `templates/website/`. To create a custom temp
 ### Environment Variables
 
 - `JOJO_EMPLOYER_SLUG` - Set this to avoid repeating `--slug` flag for commands
+- `JOJO_ALWAYS_OVERWRITE` - Set to `true`, `1`, or `yes` to skip overwrite prompts
 
 ### Examples
 
