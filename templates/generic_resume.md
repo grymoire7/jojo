@@ -1,66 +1,40 @@
-# Your Name
+<!-- JOJO_TEMPLATE_PLACEHOLDER - Delete this line after customizing -->
+# Generic Resume
 
-## Contact Information
-- Email: your.email@example.com
-- Phone: (555) 123-4567
-- LinkedIn: linkedin.com/in/yourprofile
-- GitHub: github.com/yourprofile
+This is your "master resume" containing ALL your experience, skills, and achievements.
+Include everything - the tailoring process will select what's most relevant for each job.
+It's better to have too much here than too little.
 
-## Professional Summary
+## Experience
 
-[2-3 sentences describing your professional background and key strengths]
+### Senior Software Engineer | Acme Corporation | 2020-2023
+- Led team of 5 engineers building cloud infrastructure platform
+- Reduced deployment time by 70% through automation pipeline improvements
+- Mentored junior developers and conducted code reviews
+- Technologies: Python, AWS, Docker, Kubernetes
 
-## Skills
-
-### Technical Skills
-- Programming Languages: Ruby, Python, JavaScript
-- Frameworks: Rails, React, etc.
-- Tools: Git, Docker, etc.
-
-### Soft Skills
-- Leadership
-- Communication
-- Problem-solving
-
-## Work Experience
-
-### Job Title | Company Name
-*Start Date - End Date* | Location
-
-- Achievement or responsibility (use action verbs)
-- Quantifiable result when possible
-- Technologies used in [brackets]
-
-### Previous Job Title | Previous Company
-*Start Date - End Date* | Location
-
-- Achievement or responsibility
-- Focus on impact and results
-- Include relevant technologies
+### Software Engineer | Tech Startup Inc | 2018-2020
+- Built RESTful APIs serving 1M+ requests/day
+- Implemented CI/CD pipeline reducing release cycle from weeks to days
+- Technologies: Ruby on Rails, PostgreSQL, Redis
 
 ## Education
 
-### Degree Name | University Name
-*Graduation Year* | Location
+### B.S. Computer Science | State University | 2018
+- GPA: 3.8/4.0
+- Relevant coursework: Algorithms, Distributed Systems, Machine Learning
 
-- Relevant coursework or honors
-- GPA if impressive (3.5+)
+## Skills
 
-## Projects (Optional)
+**Languages**: Python, Ruby, JavaScript, Go, Java, C++, TypeScript
+**Frameworks**: Rails, Django, React, Node.js, Express
+**Technologies**: AWS, Docker, Kubernetes, PostgreSQL, Redis, MongoDB
+**Practices**: Agile, TDD, CI/CD, Code Review, Pair Programming
 
-### Project Name
-- Brief description of the project
-- Technologies used
-- Link to GitHub/demo if available
+## Projects
 
-## Certifications (Optional)
-- Certification Name, Issuing Organization, Year
+### Open Source Contributions
+- Contributed to Kubernetes: implemented feature X
+- Maintainer of popular Ruby gem with 10k downloads
 
----
-
-**Instructions for use:**
-1. Copy this file to `inputs/generic_resume.md`
-2. Replace all placeholder text with your actual information
-3. Remove sections that don't apply to you
-4. Add sections as needed (Publications, Speaking, etc.)
-5. Keep formatting consistent (markdown)
+**Tip: Include ALL skills and experience - the more complete this is, the better the tailored resumes.**
