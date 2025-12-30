@@ -61,4 +61,43 @@ describe Jojo::SetupService do
       end
     end
   end
+
+  describe '#setup_personal_configuration' do
+    it 'skips when config.yml exists and not force mode' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('config.yml', 'seeker_name: Existing')
+
+          cli = Minitest::Mock.new
+          cli.expect :say, nil, ["✓ config.yml already exists (skipped)", :green]
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          service.send(:setup_personal_configuration)
+
+          cli.verify
+        end
+      end
+    end
+
+    it 'creates config.yml from template when missing' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          FileUtils.mkdir_p('templates')
+          File.write('templates/config.yml.erb', 'seeker_name: <%= seeker_name %>')
+
+          cli = Minitest::Mock.new
+          cli.expect :ask, 'Tracy Atteberry', ["Your name:"]
+          cli.expect :ask, 'https://example.com', ["Your website base URL (e.g., https://yourname.com):"]
+          cli.expect :say, nil, ["✓ Created config.yml", :green]
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          service.send(:setup_personal_configuration)
+
+          cli.verify
+          _(File.exist?('config.yml')).must_equal true
+          _(File.read('config.yml')).must_include 'Tracy Atteberry'
+        end
+      end
+    end
+  end
 end

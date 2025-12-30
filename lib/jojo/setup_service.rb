@@ -56,7 +56,33 @@ module Jojo
     end
 
     def setup_personal_configuration
-      # Placeholder
+      if File.exist?('config.yml') && !@force
+        @cli.say "✓ config.yml already exists (skipped)", :green
+        @skipped_files << 'config.yml'
+        return
+      end
+
+      seeker_name = @cli.ask("Your name:")
+      if seeker_name.strip.empty?
+        @cli.say "✗ Name is required", :red
+        exit 1
+      end
+
+      base_url = @cli.ask("Your website base URL (e.g., https://yourname.com):")
+      if base_url.strip.empty?
+        @cli.say "✗ Base URL is required", :red
+        exit 1
+      end
+
+      begin
+        template = ERB.new(File.read('templates/config.yml.erb'))
+        File.write('config.yml', template.result(binding))
+        @cli.say "✓ Created config.yml", :green
+        @created_files << 'config.yml'
+      rescue => e
+        @cli.say "✗ Failed to create config.yml: #{e.message}", :red
+        exit 1
+      end
     end
 
     def setup_input_files
