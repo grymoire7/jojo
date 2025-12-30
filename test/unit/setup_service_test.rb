@@ -40,6 +40,7 @@ describe Jojo::SetupService do
 
           cli.verify
           _(File.read('.env')).must_equal 'ANTHROPIC_API_KEY=existing'
+          _(service.instance_variable_get(:@provider_slug)).must_equal 'anthropic'
         end
       end
     end

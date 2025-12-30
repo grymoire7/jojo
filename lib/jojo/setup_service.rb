@@ -39,6 +39,24 @@ module Jojo
       if File.exist?('.env') && !@force
         @cli.say "✓ .env already exists (skipped)", :green
         @skipped_files << '.env'
+
+        # Extract provider from existing .env file
+        env_content = File.read('.env')
+        env_content.each_line do |line|
+          # Match provider-specific API key pattern (e.g., ANTHROPIC_API_KEY=...)
+          if line =~ /^([A-Z_]+)_API_KEY=/
+            env_var_name = $1
+            # Convert env var to provider slug (e.g., ANTHROPIC → anthropic)
+            provider_slug = env_var_name.downcase
+
+            # Verify this is a valid provider
+            if ProviderHelper.available_providers.include?(provider_slug)
+              @provider_slug = provider_slug
+              break
+            end
+          end
+        end
+
         return
       end
 
