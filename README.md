@@ -86,10 +86,12 @@ See your provider's pricing page for current rates:
    ./bin/jojo setup
    ```
 
-   This will guide you through:
-   - Setting up your Anthropic API key
-   - Configuring your personal information
-   - Creating input file templates
+   The setup wizard will guide you through:
+   - **LLM Provider Selection**: Choose from 11 supported providers (Anthropic, OpenAI, DeepSeek, Gemini, Mistral, etc.)
+   - **API Key Configuration**: Provide your API key for the chosen provider
+   - **Model Selection**: Choose models for reasoning tasks and text generation
+   - **Personal Information**: Your name and website URL
+   - **Template Files**: Creates resume, recommendations, and projects templates
 
 **Note**: The setup command is idempotent - you can run it multiple times safely. It only creates missing files.
 
@@ -97,10 +99,18 @@ See your provider's pricing page for current rates:
 
 ### Environment Variables
 
-The setup command creates `.env` with your API key. You can edit it directly if needed:
+The setup command creates `.env` with your provider-specific API key. You can edit it directly if needed:
 
 ```bash
+# For Anthropic
 ANTHROPIC_API_KEY=your_api_key_here
+
+# For OpenAI
+OPENAI_API_KEY=your_api_key_here
+
+# For other providers (deepseek, gemini, mistral, etc.)
+# The env var name depends on your chosen provider
+
 SERPER_API_KEY=your_serper_key_here  # Optional, for web search
 ```
 
@@ -113,12 +123,12 @@ seeker_name: Your Name
 base_url: https://yourwebsite.com/applications
 
 reasoning_ai:
-  service: anthropic
-  model: sonnet        # or opus for higher quality
+  service: anthropic           # Your chosen provider
+  model: claude-sonnet-4-5     # For complex reasoning tasks
 
 text_generation_ai:
-  service: anthropic
-  model: haiku         # faster for simple tasks
+  service: anthropic           # Your chosen provider
+  model: claude-3-5-haiku-20241022  # Faster for simple tasks
 
 voice_and_tone: professional and friendly
 
@@ -126,6 +136,24 @@ website:
   cta_text: "Schedule a Call"
   cta_link: "https://calendly.com/yourname/30min"  # or mailto:you@email.com
 ```
+
+### Supported LLM Providers
+
+Jojo supports the following LLM providers via [RubyLLM](https://github.com/alexrudall/ruby_llm):
+
+- **Anthropic** (Claude models)
+- **OpenAI** (GPT models)
+- **DeepSeek**
+- **Google Gemini**
+- **Mistral**
+- **OpenRouter**
+- **Perplexity**
+- **Ollama** (local models)
+- **AWS Bedrock**
+- **Google Vertex AI**
+- **GPUStack**
+
+To switch providers, run `jojo setup --force` or manually edit your `config.yml` and `.env` files.
 
 ### Input Files
 
