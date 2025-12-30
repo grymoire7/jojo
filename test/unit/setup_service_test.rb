@@ -1,5 +1,6 @@
 require_relative '../test_helper'
 require_relative '../../lib/jojo/setup_service'
+require_relative '../../lib/jojo/provider_helper'
 require 'thor'
 
 describe Jojo::SetupService do
@@ -46,8 +47,12 @@ describe Jojo::SetupService do
     it 'creates .env when missing' do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
+          FileUtils.mkdir_p('templates')
+          File.write('templates/.env.erb', '<%= env_var_name %>=<%= api_key %>')
+
           cli = Minitest::Mock.new
           cli.expect :say, nil, ["Let's configure your API access.", :green]
+          cli.expect :ask, 'anthropic', ["Which LLM provider? (#{Jojo::ProviderHelper.available_providers.join(', ')}):"]
           cli.expect :ask, 'sk-ant-test-key', ["Anthropic API key:"]
           cli.expect :say, nil, ["✓ Created .env", :green]
 

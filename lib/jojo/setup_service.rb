@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'erb'
+require_relative 'provider_helper'
 
 module Jojo
   class SetupService
@@ -47,24 +48,45 @@ module Jojo
         @cli.say "Let's configure your API access.", :green
       end
 
-      api_key = @cli.ask("Anthropic API key:")
+      # Prompt for provider
+      providers = ProviderHelper.available_providers
+      provider_slug = @cli.ask("Which LLM provider? (#{providers.join(', ')}):")
+
+      if provider_slug.strip.empty?
+        @cli.say "✗ Provider is required", :red
+        exit 1
+      end
+
+      unless providers.include?(provider_slug)
+        @cli.say "✗ Invalid provider. Choose from: #{providers.join(', ')}", :red
+        exit 1
+      end
+
+      # Get dynamic env var name
+      env_var_name = ProviderHelper.provider_env_var_name(provider_slug)
+      provider_display_name = provider_slug.capitalize
+
+      # Prompt for API key
+      api_key = @cli.ask("#{provider_display_name} API key:")
 
       if api_key.strip.empty?
         @cli.say "✗ API key is required", :red
         exit 1
       end
 
-      # Optional: Validate API key format
-      if !api_key.start_with?('sk-ant-')
-        @cli.say "⚠ Warning: This doesn't look like a valid Anthropic API key (should start with 'sk-ant-')", :yellow
-        unless @cli.yes?("Continue anyway?")
-          exit 1
-        end
+      # Render .env from template
+      begin
+        template = ERB.new(File.read('templates/.env.erb'))
+        File.write('.env', template.result(binding))
+        @cli.say "✓ Created .env", :green
+        @created_files << '.env'
+      rescue => e
+        @cli.say "✗ Failed to create .env: #{e.message}", :red
+        exit 1
       end
 
-      File.write('.env', "ANTHROPIC_API_KEY=#{api_key}\n")
-      @cli.say "✓ Created .env", :green
-      @created_files << '.env'
+      # Store provider for use in setup_personal_configuration
+      @provider_slug = provider_slug
     end
 
     def setup_personal_configuration
