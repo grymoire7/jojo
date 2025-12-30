@@ -16,4 +16,18 @@ describe Jojo::ProviderHelper do
       _(providers).must_equal providers.sort
     end
   end
+
+  describe '.provider_env_var_name' do
+    it 'returns uppercase env var name for provider' do
+      _(Jojo::ProviderHelper.provider_env_var_name('anthropic')).must_equal 'ANTHROPIC_API_KEY'
+      _(Jojo::ProviderHelper.provider_env_var_name('openai')).must_equal 'OPENAI_API_KEY'
+    end
+
+    it 'raises error for unknown provider' do
+      error = assert_raises(ArgumentError) do
+        Jojo::ProviderHelper.provider_env_var_name('unknown_provider')
+      end
+      _(error.message).must_include 'Unknown provider'
+    end
+  end
 end
