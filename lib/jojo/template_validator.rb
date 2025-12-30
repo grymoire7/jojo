@@ -18,5 +18,25 @@ module Jojo
         MSG
       end
     end
+
+    def self.warn_if_unchanged(file_path, description, cli_instance: nil)
+      return :skip unless File.exist?(file_path)
+      return :continue unless appears_unchanged?(file_path)
+
+      # If no CLI instance provided (testing), return action
+      return :needs_warning unless cli_instance
+
+      # Display warning message
+      cli_instance.say "⚠ Warning: #{file_path} appears to be an unmodified template", :yellow
+      cli_instance.say "  Generated materials may be poor quality until you customize it.", :yellow
+      cli_instance.say ""
+
+      # Ask user if they want to continue
+      if cli_instance.yes?("Continue anyway?")
+        :continue
+      else
+        :abort
+      end
+    end
   end
 end

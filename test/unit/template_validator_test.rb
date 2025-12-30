@@ -50,4 +50,22 @@ describe Jojo::TemplateValidator do
       file.unlink
     end
   end
+
+  describe '.warn_if_unchanged' do
+    it 'returns :continue when file does not contain marker' do
+      file = Tempfile.new(['test', '.md'])
+      file.write("# Customized Resume")
+      file.close
+
+      result = Jojo::TemplateValidator.warn_if_unchanged(file.path, 'resume')
+      _(result).must_equal :continue
+
+      file.unlink
+    end
+
+    it 'returns :skip when file does not exist' do
+      result = Jojo::TemplateValidator.warn_if_unchanged('nonexistent.md', 'resume')
+      _(result).must_equal :skip
+    end
+  end
 end
