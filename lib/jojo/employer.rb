@@ -39,6 +39,14 @@ module Jojo
       File.join(base_path, "cover_letter.md")
     end
 
+    def resume_pdf_path
+      File.join(base_path, "resume.pdf")
+    end
+
+    def cover_letter_pdf_path
+      File.join(base_path, "cover_letter.pdf")
+    end
+
     def status_log_path
       File.join(base_path, "status_log.md")
     end
