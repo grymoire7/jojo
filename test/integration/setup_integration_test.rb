@@ -39,6 +39,11 @@ describe 'Setup Integration' do
         cli.expect :say, nil, ["Let's configure your API access.", :green]
         cli.expect :say, nil, [""]
         cli.expect :ask, 'sk-ant-test123', ["Anthropic API key:"]
+
+        # setup_search_configuration (skip)
+        cli.expect :say, nil, [""]
+
+        # write_env_file
         cli.expect :say, nil, ["✓ Created .env", :green]
 
         # setup_personal_configuration
@@ -54,6 +59,7 @@ describe 'Setup Integration' do
         available_models = Jojo::ProviderHelper.available_models('anthropic')
 
         prompt.expect :select, 'anthropic', ["Which LLM provider?", providers, {per_page: 15}]
+        prompt.expect :yes?, false, [String]  # Skip search configuration
         prompt.expect :select, 'claude-sonnet-4-5', [
           "Which model for reasoning tasks (company research, resume tailoring)?",
           available_models,
@@ -146,6 +152,11 @@ describe 'Setup Integration' do
         cli.expect :say, nil, ["Let's configure your API access.", :green]
         cli.expect :say, nil, [""]
         cli.expect :ask, 'sk-test-openai', ["Openai API key:"]
+
+        # setup_search_configuration (skip)
+        cli.expect :say, nil, [""]
+
+        # write_env_file
         cli.expect :say, nil, ["✓ Created .env", :green]
 
         cli.expect :ask, 'Test User', ["Your name:"]
@@ -160,6 +171,7 @@ describe 'Setup Integration' do
         available_models = Jojo::ProviderHelper.available_models('openai')
 
         prompt.expect :select, 'openai', ["Which LLM provider?", providers, {per_page: 15}]
+        prompt.expect :yes?, false, [String]  # Skip search configuration
         prompt.expect :select, 'gpt-4o', [
           "Which model for reasoning tasks (company research, resume tailoring)?",
           available_models,
@@ -205,6 +217,111 @@ describe 'Setup Integration' do
         _(config_content).must_include 'service: openai'
         _(config_content).must_include 'model: gpt-4o'
         _(config_content).must_include 'model: gpt-4o-mini'
+      end
+    end
+  end
+
+  it 'completes full setup flow with search provider' do
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        # Setup template files
+        FileUtils.mkdir_p('templates')
+        FileUtils.cp(
+          File.join(__dir__, '../../templates/.env.erb'),
+          'templates/.env.erb'
+        )
+        FileUtils.cp(
+          File.join(__dir__, '../../templates/config.yml.erb'),
+          'templates/config.yml.erb'
+        )
+        FileUtils.cp(
+          File.join(__dir__, '../../templates/generic_resume.md'),
+          'templates/generic_resume.md'
+        )
+        FileUtils.cp(
+          File.join(__dir__, '../../templates/recommendations.md'),
+          'templates/recommendations.md'
+        )
+        FileUtils.cp(
+          File.join(__dir__, '../../templates/projects.yml'),
+          'templates/projects.yml'
+        )
+
+        # Mock CLI interactions
+        cli = Minitest::Mock.new
+        prompt = Minitest::Mock.new
+
+        # warn_if_force_mode (skipped - not in force mode)
+
+        # setup_api_configuration
+        cli.expect :say, nil, ["Setting up Jojo...", :green]
+        cli.expect :say, nil, [""]
+        cli.expect :say, nil, ["Let's configure your API access.", :green]
+        cli.expect :say, nil, [""]
+        prompt.expect :select, 'anthropic', ["Which LLM provider?", Array, Hash]
+        cli.expect :ask, 'sk-ant-test123', ["Anthropic API key:"]
+
+        # setup_search_configuration
+        cli.expect :say, nil, [""]
+        prompt.expect :yes?, true, [String]  # Configure search?
+        prompt.expect :select, 'tavily', ["Which search provider?", Array, Hash]
+        cli.expect :ask, 'sk-tavily-test', ["Tavily API key:"]
+
+        # write_env_file
+        cli.expect :say, nil, ["✓ Created .env", :green]
+
+        # setup_personal_configuration
+        cli.expect :ask, 'Test User', ["Your name:"]
+        cli.expect :ask, 'https://test.com', [/Your website base URL/]
+        cli.expect :say, nil, [""]
+        prompt.expect :select, 'claude-sonnet-4-5', [/Which model for reasoning/, Array, Hash]
+        cli.expect :say, nil, [""]
+        prompt.expect :select, 'claude-3-5-haiku-20241022', [/Which model for text generation/, Array, Hash]
+        cli.expect :say, nil, ["✓ Created config.yml", :green]
+
+        # setup_input_files
+        cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
+        cli.expect :say, nil, [""]
+        cli.expect :say, nil, ["Setting up your profile templates...", :green]
+        3.times { cli.expect :say, nil, [String, :green] }
+
+        # show_summary
+        cli.expect :say, nil, [""]
+        cli.expect :say, nil, ["Setup complete!", :green]
+        cli.expect :say, nil, [""]
+        cli.expect :say, nil, ["Created:"]
+        5.times { cli.expect :say, nil, [String] } # 5 created files
+        cli.expect :say, nil, [""]
+        cli.expect :say, nil, ["Next steps:", :cyan]
+        cli.expect :say, nil, ["  1. Customize inputs/generic_resume.md with your actual experience"]
+        cli.expect :say, nil, ["  2. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"]
+        cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+        cli.expect :say, nil, [""]
+        cli.expect :say, nil, ["💡 Tip: Delete the first comment line in each file after customizing."]
+
+        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
+        service.run
+
+        cli.verify
+        prompt.verify
+
+        # Verify .env
+        _(File.exist?('.env')).must_equal true
+        env_content = File.read('.env')
+        _(env_content).must_include 'ANTHROPIC_API_KEY=sk-ant-test123'
+        _(env_content).must_include 'TAVILY_API_KEY=sk-tavily-test'
+
+        # Verify config.yml
+        _(File.exist?('config.yml')).must_equal true
+        config_content = File.read('config.yml')
+        _(config_content).must_include 'seeker_name: Test User'
+        _(config_content).must_include 'service: anthropic'
+        _(config_content).must_include 'search: tavily'
+
+        # Verify input files
+        _(File.exist?('inputs/generic_resume.md')).must_equal true
+        _(File.exist?('inputs/recommendations.md')).must_equal true
+        _(File.exist?('inputs/projects.yml')).must_equal true
       end
     end
   end
