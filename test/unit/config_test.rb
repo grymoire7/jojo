@@ -121,4 +121,48 @@ describe Jojo::Config do
       end
     end
   end
+
+  describe '#search_api_key' do
+    it 'returns API key from ENV based on service name' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('config.yml', "search: tavily\nseeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
+
+          ENV['TAVILY_API_KEY'] = 'test-tavily-key'
+
+          config = Jojo::Config.new('config.yml')
+          _(config.search_api_key).must_equal 'test-tavily-key'
+        ensure
+          ENV.delete('TAVILY_API_KEY')
+        end
+      end
+    end
+
+    it 'returns nil when service not configured' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('config.yml', "seeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
+
+          config = Jojo::Config.new('config.yml')
+          _(config.search_api_key).must_be_nil
+        end
+      end
+    end
+
+    it 'returns nil when ENV var not set' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('config.yml', "search: serper\nseeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
+
+          # Ensure env var is not set
+          original_value = ENV.delete('SERPER_API_KEY')
+
+          config = Jojo::Config.new('config.yml')
+          _(config.search_api_key).must_be_nil
+        ensure
+          ENV['SERPER_API_KEY'] = original_value if original_value
+        end
+      end
+    end
+  end
 end

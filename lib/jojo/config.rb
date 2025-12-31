@@ -47,6 +47,15 @@ module Jojo
       config['search']
     end
 
+    def search_api_key
+      return nil unless search_service
+
+      # Map service name to env var name
+      # tavily → TAVILY_API_KEY, serper → SERPER_API_KEY
+      env_var_name = "#{search_service.upcase}_API_KEY"
+      ENV[env_var_name]
+    end
+
     def search_provider_service
       config.dig('search_provider', 'service')
     end
