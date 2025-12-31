@@ -515,26 +515,24 @@ module Jojo
     end
 
     desc "test", "Run tests (default: --unit for fast feedback)"
-    long_desc <<~DESC
+    long_desc <<~DESC, wrap: false
       Run test suite with optional category filtering.
 
-      Categories:
-        --unit         Unit tests (fast, no external dependencies) [default]
-        --integration  Integration tests (mocked external services)
-        --service      Service tests (real API calls, may cost money)
-        --standard     Standard Ruby style checks
-        --all          All tests and checks (includes --standard)
-        --no-service   Exclude service tests
+      CATEGORIES:
+      --unit: Unit tests (fast, no external dependencies) [default]
+      --integration: Integration tests (mocked external services)
+      --service: Service tests (real API calls, may cost money)
+      --standard: Standard Ruby style checks
+      --all: All tests and checks (includes --standard)
+      --no-service: Exclude service tests
 
-      Examples:
-        jojo test                        # Run unit tests only (fast)
-        jojo test --standard             # Run Standard Ruby style checks
-        jojo test --all                  # Run all tests and style checks
-        jojo test --all --no-service     # Run all tests/checks except service tests
-        jojo test --unit --integration   # Run unit and integration tests
-        jojo test --standard --unit      # Run style checks then unit tests
-        jojo test --service              # Run service tests (with confirmation)
-        jojo test -q                     # Quiet mode, check exit code
+      EXAMPLES:
+      jojo test                      # Run unit tests only (fast)
+      jojo test --standard           # Run Standard Ruby style checks
+      jojo test --all                # Run all tests and style checks
+      jojo test --all --no-service   # Run all tests/checks except service tests
+      jojo test --standard --unit    # Run style checks then unit tests
+      jojo test --service            # Run service tests (with confirmation)
     DESC
     method_option :unit, type: :boolean, desc: "Run unit tests (default)"
     method_option :integration, type: :boolean, desc: "Run integration tests"
