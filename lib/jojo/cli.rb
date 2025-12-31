@@ -44,7 +44,7 @@ module Jojo
     end
 
     desc "new", "Create employer workspace with job description"
-    long_desc <<~DESC
+    long_desc <<~DESC, wrap: false
       Create a new employer workspace and process the job description.
       This command initializes all artifacts needed for generating application materials.
 
@@ -103,7 +103,7 @@ module Jojo
     end
 
     desc "annotate", "Generate job description annotations"
-    long_desc <<~DESC
+    long_desc <<~DESC, wrap: false
       Generate annotations for the job description showing how your experience matches.
       Requires that you've already run 'jojo new' to create the employer workspace.
 
@@ -139,7 +139,7 @@ module Jojo
     end
 
     desc "generate", "Generate everything: research, resume, cover letter, and website"
-    long_desc <<~DESC
+    long_desc <<~DESC, wrap: false
       Generate all application materials for an employer.
       Requires that you've already run 'jojo new' to create the employer workspace.
 
@@ -292,7 +292,7 @@ module Jojo
     end
 
     desc "research", "Generate company/role research only"
-    long_desc <<~DESC
+    long_desc <<~DESC, wrap: false
       Generate company and role research.
       Requires that you've already run 'jojo new' to create the employer workspace.
 
@@ -335,7 +335,7 @@ module Jojo
     end
 
     desc "resume", "Generate tailored resume only"
-    long_desc <<~DESC
+    long_desc <<~DESC, wrap: false
       Generate a tailored resume for a specific employer.
       Requires that you've already run 'jojo new' to create the employer workspace.
 
@@ -390,7 +390,7 @@ module Jojo
     end
 
     desc "cover_letter", "Generate cover letter only"
-    long_desc <<~DESC
+    long_desc <<~DESC, wrap: false
       Generate a cover letter for a specific employer.
       Requires that you've already run 'jojo new' and 'jojo resume' first.
 
@@ -451,7 +451,7 @@ module Jojo
     end
 
     desc "website", "Generate website only"
-    long_desc <<~DESC
+    long_desc <<~DESC, wrap: false
       Generate a landing page website for a specific employer.
       Requires that you've already run 'jojo new' and 'jojo resume' first.
 
