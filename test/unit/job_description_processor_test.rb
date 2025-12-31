@@ -43,7 +43,7 @@ describe Jojo::JobDescriptionProcessor do
   end
 
   it "handles file not found error" do
-    error = assert_raises(RuntimeError) do
+    error = assert_raises(Jojo::JobDescriptionProcessor::ProcessingError) do
       @processor.process("nonexistent_file.txt")
     end
 

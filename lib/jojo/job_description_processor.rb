@@ -4,6 +4,8 @@ require "html_to_markdown"
 
 module Jojo
   class JobDescriptionProcessor
+    class ProcessingError < StandardError; end
+
     attr_reader :employer, :ai_client, :verbose, :overwrite_flag, :cli_instance
 
     def initialize(employer, ai_client, overwrite_flag: nil, cli_instance: nil, verbose: false)
@@ -55,7 +57,7 @@ module Jojo
       response = Net::HTTP.get_response(uri)
 
       unless response.is_a?(Net::HTTPSuccess)
-        raise "Failed to fetch URL: #{response.code} #{response.message}"
+        raise ProcessingError, "Failed to fetch URL: #{response.code} #{response.message}\n\nPlease check:\n- The URL is correct and accessible\n- You have internet connectivity\n- The website is not blocking automated requests"
       end
 
       html = response.body
@@ -65,18 +67,28 @@ module Jojo
       log "Conversion complete"
 
       markdown
+    rescue URI::InvalidURIError
+      raise ProcessingError, "Invalid URL: #{url}\n\nPlease provide a valid URL or file path."
+    rescue ProcessingError
+      raise
     rescue => e
-      raise "Error fetching URL: #{e.message}"
+      raise ProcessingError, "Error fetching URL: #{e.message}\n\nPlease check your internet connection and try again."
     end
 
     def fetch_from_file(file_path)
       log "Reading job description from file..."
 
       unless File.exist?(file_path)
-        raise "File not found: #{file_path}"
+        raise ProcessingError, "File not found: #{file_path}\n\nPlease check:\n- The file path is correct\n- The file exists in the specified location"
       end
 
       File.read(file_path)
+    rescue ProcessingError
+      raise
+    rescue Errno::EACCES
+      raise ProcessingError, "Permission denied: #{file_path}\n\nPlease check file permissions and try again."
+    rescue => e
+      raise ProcessingError, "Error reading file: #{e.message}"
     end
 
     def extract_job_description(raw_content)

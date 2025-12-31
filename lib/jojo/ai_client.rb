@@ -2,6 +2,8 @@ require "ruby_llm"
 
 module Jojo
   class AIClient
+    class AIError < StandardError; end
+
     attr_reader :config, :verbose
 
     def initialize(config, verbose: false)
@@ -89,9 +91,23 @@ module Jojo
           sleep(2**retries) # Exponential backoff
           retry
         else
-          raise "AI #{task_type} failed after #{max_retries} retries: #{e.message}"
+          raise AIError, build_error_message(task_type, e, max_retries)
         end
       end
+    end
+
+    def build_error_message(task_type, error, max_retries)
+      base_message = "AI #{task_type} failed after #{max_retries} retries: #{error.message}"
+
+      suggestions = [
+        "\nPossible causes:",
+        "- Invalid API key (check your ANTHROPIC_API_KEY environment variable)",
+        "- Network connection issues",
+        "- Rate limiting (try again in a few minutes)",
+        "- Model unavailability or service outage"
+      ]
+
+      base_message + suggestions.join("\n")
     end
 
     def resolve_model_name(model_shortname)
