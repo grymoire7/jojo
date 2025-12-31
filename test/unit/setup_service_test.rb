@@ -139,6 +139,7 @@ describe Jojo::SetupService do
 
           service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
           service.instance_variable_set(:@provider_slug, 'anthropic')
+          service.instance_variable_set(:@search_provider_slug, nil)
           service.send(:setup_personal_configuration)
 
           cli.verify
