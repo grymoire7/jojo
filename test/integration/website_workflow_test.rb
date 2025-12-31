@@ -4,24 +4,24 @@ require_relative "../../lib/jojo/config"
 require_relative "../../lib/jojo/ai_client"
 require_relative "../../lib/jojo/generators/website_generator"
 
-describe "Website Generation Workflow" do
-  # Simple config stub
-  class IntegrationTestConfigStub
-    attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
+# Simple config stub
+class WebsiteWorkflowTestConfigStub
+  attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
 
-    def initialize
-      @seeker_name = "John Doe"
-      @voice_and_tone = "professional and friendly"
-      @website_cta_text = "Schedule a Call"
-      @website_cta_link = "https://calendly.com/johndoe/30min"
-      @base_url = "https://johndoe.com"
-    end
+  def initialize
+    @seeker_name = "John Doe"
+    @voice_and_tone = "professional and friendly"
+    @website_cta_text = "Schedule a Call"
+    @website_cta_link = "https://calendly.com/johndoe/30min"
+    @base_url = "https://johndoe.com"
   end
+end
 
+describe "Website Generation Workflow" do
   before do
     @employer = Jojo::Employer.new("test-company")
     @ai_client = Minitest::Mock.new
-    @config = IntegrationTestConfigStub.new
+    @config = WebsiteWorkflowTestConfigStub.new
 
     # Clean up and create directories
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)

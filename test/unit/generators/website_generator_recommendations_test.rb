@@ -5,20 +5,20 @@ require_relative "../../../lib/jojo/config"
 require "tmpdir"
 require "fileutils"
 
-describe "WebsiteGenerator with Recommendations" do
-  # Simple config stub to avoid complex mock expectations
-  class TestConfigStub
-    attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
+# Simple config stub to avoid complex mock expectations
+class WebsiteGeneratorRecommendationsTestConfigStub
+  attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
 
-    def initialize
-      @seeker_name = "Test User"
-      @voice_and_tone = "professional"
-      @website_cta_text = "Get in touch"
-      @website_cta_link = nil
-      @base_url = "https://example.com"
-    end
+  def initialize
+    @seeker_name = "Test User"
+    @voice_and_tone = "professional"
+    @website_cta_text = "Get in touch"
+    @website_cta_link = nil
+    @base_url = "https://example.com"
   end
+end
 
+describe "WebsiteGenerator with Recommendations" do
   before do
     @employer = Jojo::Employer.new("test-corp")
 
@@ -32,7 +32,7 @@ describe "WebsiteGenerator with Recommendations" do
     @ai_client.expect(:generate_text, "Branding statement", [String])
 
     # Config stub
-    @config = TestConfigStub.new
+    @config = WebsiteGeneratorRecommendationsTestConfigStub.new
   end
 
   after do

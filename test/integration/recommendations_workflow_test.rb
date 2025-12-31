@@ -6,20 +6,20 @@ require_relative "../../lib/jojo/config"
 require "tmpdir"
 require "fileutils"
 
-describe "Recommendations Workflow Integration" do
-  # Simple config stub to avoid complex mock expectations
-  class IntegrationTestConfigStub
-    attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
+# Simple config stub to avoid complex mock expectations
+class RecommendationsWorkflowTestConfigStub
+  attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
 
-    def initialize
-      @seeker_name = "Test User"
-      @voice_and_tone = "professional"
-      @website_cta_text = "Contact me"
-      @website_cta_link = "mailto:test@example.com"
-      @base_url = "https://example.com"
-    end
+  def initialize
+    @seeker_name = "Test User"
+    @voice_and_tone = "professional"
+    @website_cta_text = "Contact me"
+    @website_cta_link = "mailto:test@example.com"
+    @base_url = "https://example.com"
   end
+end
 
+describe "Recommendations Workflow Integration" do
   before do
     @employer = Jojo::Employer.new("integration-test-corp")
 
@@ -37,7 +37,7 @@ describe "Recommendations Workflow Integration" do
     @ai_client.expect(:generate_text, "I am the perfect fit", [String])
 
     # Config stub
-    @config = IntegrationTestConfigStub.new
+    @config = RecommendationsWorkflowTestConfigStub.new
   end
 
   after do

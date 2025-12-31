@@ -3,20 +3,20 @@ require_relative "../../lib/jojo/employer"
 require_relative "../../lib/jojo/generators/annotation_generator"
 require_relative "../../lib/jojo/generators/website_generator"
 
-describe "Annotated Job Description Integration" do
-  # Simple config stub to avoid complex mock expectations
-  class IntegrationTestConfigStub
-    attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
+# Simple config stub to avoid complex mock expectations
+class IntegrationTestConfigStub
+  attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
 
-    def initialize
-      @seeker_name = "John Doe"
-      @voice_and_tone = "professional"
-      @website_cta_text = "Contact Me"
-      @website_cta_link = "mailto:john@example.com"
-      @base_url = "https://john.example.com"
-    end
+  def initialize
+    @seeker_name = "John Doe"
+    @voice_and_tone = "professional"
+    @website_cta_text = "Contact Me"
+    @website_cta_link = "mailto:john@example.com"
+    @base_url = "https://john.example.com"
   end
+end
 
+describe "Annotated Job Description Integration" do
   before do
     @employer = Jojo::Employer.new("techcorp")
     @ai_client = Minitest::Mock.new

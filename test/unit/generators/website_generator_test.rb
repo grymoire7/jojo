@@ -3,24 +3,24 @@ require_relative "../../../lib/jojo/employer"
 require_relative "../../../lib/jojo/generators/website_generator"
 require_relative "../../../lib/jojo/prompts/website_prompt"
 
-describe Jojo::Generators::WebsiteGenerator do
-  # Simple config stub to avoid complex mock expectations
-  class UnitTestConfigStub
-    attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
+# Simple config stub to avoid complex mock expectations
+class WebsiteGeneratorTestConfigStub
+  attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
 
-    def initialize
-      @seeker_name = "Jane Doe"
-      @voice_and_tone = "professional and friendly"
-      @website_cta_text = "Schedule a Call"
-      @website_cta_link = "https://calendly.com/janedoe/30min"
-      @base_url = "https://janedoe.com"
-    end
+  def initialize
+    @seeker_name = "Jane Doe"
+    @voice_and_tone = "professional and friendly"
+    @website_cta_text = "Schedule a Call"
+    @website_cta_link = "https://calendly.com/janedoe/30min"
+    @base_url = "https://janedoe.com"
   end
+end
 
+describe Jojo::Generators::WebsiteGenerator do
   before do
     @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
-    @config = UnitTestConfigStub.new
+    @config = WebsiteGeneratorTestConfigStub.new
     @generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
       @ai_client,

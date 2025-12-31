@@ -28,7 +28,7 @@ describe Jojo::Generators::ResumeGenerator do
 
   after do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    @config.verify if @config
+    @config&.verify
   end
 
   it "generates resume from all inputs" do

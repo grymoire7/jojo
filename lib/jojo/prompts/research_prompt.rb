@@ -60,8 +60,6 @@ module Jojo
         PROMPT
       end
 
-      private
-
       def self.role_positioning_section
         <<~SECTION
           ## 3. Strategic Positioning (~300-400 words)
@@ -85,6 +83,8 @@ module Jojo
           - Suggestions for what a strong candidate would highlight
         SECTION
       end
+
+      private_class_method :role_positioning_section, :generic_recommendations_section
     end
   end
 end

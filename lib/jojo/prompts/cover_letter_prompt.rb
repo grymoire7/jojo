@@ -98,8 +98,6 @@ module Jojo
         PROMPT
       end
 
-      private
-
       def self.format_job_details(job_details)
         return "" unless job_details
 
@@ -123,6 +121,8 @@ module Jojo
           Use these to demonstrate concrete examples of your qualifications.
         SECTION
       end
+
+      private_class_method :format_job_details, :projects_section
     end
   end
 end

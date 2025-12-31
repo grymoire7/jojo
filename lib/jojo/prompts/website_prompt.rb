@@ -71,8 +71,6 @@ module Jojo
         PROMPT
       end
 
-      private
-
       def self.format_job_details(job_details)
         return "" unless job_details
 
@@ -82,6 +80,8 @@ module Jojo
           #{job_details.map { |k, v| "- #{k}: #{v}" }.join("\n")}
         DETAILS
       end
+
+      private_class_method :format_job_details
     end
   end
 end
