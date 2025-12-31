@@ -118,6 +118,26 @@ module Jojo
       end
     end
 
+    def write_env_file
+      # Set local variables for template binding
+      llm_env_var_name = @llm_env_var_name
+      llm_api_key = @llm_api_key
+      search_provider_slug = @search_provider_slug
+      search_env_var_name = @search_env_var_name
+      search_api_key = @search_api_key
+
+      # Render .env from template
+      begin
+        template = ERB.new(File.read('templates/.env.erb'))
+        File.write('.env', template.result(binding))
+        @cli.say "✓ Created .env", :green
+        @created_files << '.env'
+      rescue => e
+        @cli.say "✗ Failed to create .env: #{e.message}", :red
+        exit 1
+      end
+    end
+
     def setup_personal_configuration
       if File.exist?('config.yml') && !@force
         @cli.say "✓ config.yml already exists (skipped)", :green

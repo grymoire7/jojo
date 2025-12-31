@@ -209,6 +209,77 @@ describe Jojo::SetupService do
     end
   end
 
+  describe '#write_env_file' do
+    it 'writes .env with LLM config only when search not configured' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          FileUtils.mkdir_p('templates')
+          File.write('templates/.env.erb', <<~ERB)
+            # LLM Provider Configuration
+            # Generated during 'jojo setup' - edit this file to change your API key
+            <%= llm_env_var_name %>=<%= llm_api_key %>
+
+            <% if search_provider_slug %>
+            # Web Search Provider Configuration (for company research enhancement)
+            <%= search_env_var_name %>=<%= search_api_key %>
+            <% end %>
+          ERB
+
+          cli = Minitest::Mock.new
+          cli.expect :say, nil, ["✓ Created .env", :green]
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          service.instance_variable_set(:@llm_env_var_name, 'ANTHROPIC_API_KEY')
+          service.instance_variable_set(:@llm_api_key, 'sk-ant-test')
+          service.instance_variable_set(:@search_provider_slug, nil)
+          service.send(:write_env_file)
+
+          cli.verify
+          _(File.exist?('.env')).must_equal true
+          content = File.read('.env')
+          _(content).must_include 'ANTHROPIC_API_KEY=sk-ant-test'
+          _(content).wont_include 'TAVILY'
+          _(content).wont_include 'SERPER'
+        end
+      end
+    end
+
+    it 'writes .env with both LLM and search config' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          FileUtils.mkdir_p('templates')
+          File.write('templates/.env.erb', <<~ERB)
+            # LLM Provider Configuration
+            # Generated during 'jojo setup' - edit this file to change your API key
+            <%= llm_env_var_name %>=<%= llm_api_key %>
+
+            <% if search_provider_slug %>
+            # Web Search Provider Configuration (for company research enhancement)
+            <%= search_env_var_name %>=<%= search_api_key %>
+            <% end %>
+          ERB
+
+          cli = Minitest::Mock.new
+          cli.expect :say, nil, ["✓ Created .env", :green]
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          service.instance_variable_set(:@llm_env_var_name, 'OPENAI_API_KEY')
+          service.instance_variable_set(:@llm_api_key, 'sk-openai-test')
+          service.instance_variable_set(:@search_provider_slug, 'tavily')
+          service.instance_variable_set(:@search_env_var_name, 'TAVILY_API_KEY')
+          service.instance_variable_set(:@search_api_key, 'sk-tavily-test')
+          service.send(:write_env_file)
+
+          cli.verify
+          _(File.exist?('.env')).must_equal true
+          content = File.read('.env')
+          _(content).must_include 'OPENAI_API_KEY=sk-openai-test'
+          _(content).must_include 'TAVILY_API_KEY=sk-tavily-test'
+        end
+      end
+    end
+  end
+
   describe '#setup_input_files' do
     it 'creates inputs directory if missing' do
       Dir.mktmpdir do |dir|
