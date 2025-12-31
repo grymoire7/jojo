@@ -19,6 +19,8 @@ module Jojo
 
       warn_if_force_mode
       setup_api_configuration
+      setup_search_configuration
+      write_env_file
       setup_personal_configuration
       setup_input_files
       show_summary
