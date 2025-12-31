@@ -30,6 +30,7 @@ Think of it as treating each job application like launching a product (you) to a
 - [Quick start](#quick-start)
 - [Usage](#usage)
 - [Commands](#commands)
+- [Troubleshooting](#troubleshooting)
 - [Testing](#testing)
 - [Architecture](#architecture)
 - [Development workflow](#development-workflow)
@@ -298,8 +299,11 @@ This generates:
 - `research.md` - Company and role research
 - `resume.md` - Tailored resume
 - `cover_letter.md` - Personalized cover letter
+- `resume.pdf` - PDF version of resume (requires Pandoc)
+- `cover_letter.pdf` - PDF version of cover letter (requires Pandoc)
+- `job_description_annotations.json` - Analysis of job requirements
 - `website/index.html` - Landing page
-- `status_log.md` - Process log
+- `status_log.md` - Process log (JSON Lines format)
 
 ## Usage
 
@@ -339,6 +343,9 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
 
 # 6. Generate website
 ./bin/jojo website
+
+# 7. Generate PDF versions (requires Pandoc)
+./bin/jojo pdf
 ```
 
 ### Using Environment Variables
@@ -385,6 +392,7 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
 | `jojo cover_letter` | Generate cover letter only | `-s` or `JOJO_EMPLOYER_SLUG` |
 | `jojo annotate` | Generate annotated job description | `-s` or `JOJO_EMPLOYER_SLUG` |
 | `jojo website` | Generate website only | `-s` or `JOJO_EMPLOYER_SLUG` |
+| `jojo pdf` | Generate PDF versions of resume and cover letter | `-s` or `JOJO_EMPLOYER_SLUG` |
 | `jojo test` | Run test suite | None |
 | `jojo version` | Show version | None |
 | `jojo help [COMMAND]` | Show help | None |
@@ -503,6 +511,62 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior
 ./bin/jojo research
 ```
 
+## Troubleshooting
+
+### Pandoc not found
+
+If you see "Pandoc is not installed" when running `jojo pdf` or `jojo generate`:
+
+```bash
+# macOS
+brew install pandoc
+
+# Ubuntu/Debian
+sudo apt-get install pandoc
+
+# Fedora/RHEL
+sudo yum install pandoc
+
+# Verify installation
+pandoc --version
+```
+
+**Note**: PDF generation is optional. If Pandoc is not installed, `jojo generate` will skip PDF generation with a warning but continue successfully.
+
+### API errors
+
+If you encounter API-related errors:
+
+- **Check your API key**: Verify it's correct in your `.env` file
+- **Verify API credits**: Check your account at your provider's console (e.g., https://console.anthropic.com/)
+- **Check internet connection**: Ensure you have network connectivity
+- **Rate limiting**: If you see rate limit errors, wait a few minutes and try again
+
+### Tests failing
+
+```bash
+# Run different test categories to isolate issues
+./bin/jojo test --unit           # Fast unit tests
+./bin/jojo test --integration    # Integration tests
+./bin/jojo test --all            # All tests
+
+# Run with verbose output
+./bin/jojo test --all -v
+```
+
+### File permission errors
+
+If you get permission errors when reading or writing files:
+
+```bash
+# Check file permissions
+ls -la employers/acme-corp/
+
+# Fix permissions if needed
+chmod 644 employers/acme-corp/*.md
+chmod 755 employers/acme-corp/website/
+```
+
 ## Testing
 
 Jojo includes comprehensive testing to ensure reliability and performance.
@@ -575,10 +639,14 @@ jojo/
 └── employers/           # Generated output (gitignored)
     └── company-name/
         ├── job_description.md
+        ├── job_description_annotations.json
+        ├── job_details.yml
         ├── research.md
         ├── resume.md
+        ├── resume.pdf
         ├── cover_letter.md
-        ├── status_log.md
+        ├── cover_letter.pdf
+        ├── status_log.md  # JSON Lines format
         └── website/
             └── index.html
 ```
@@ -605,6 +673,21 @@ This is a personal project, but if you'd like to contribute:
 4. Run `./bin/jojo test --all` to verify
 5. Submit a pull request
 
+### Code Style
+
+This project uses [Standard Ruby](https://github.com/standardrb/standard) for code formatting:
+
+```bash
+# Check style
+bundle exec standardrb
+
+# Auto-fix issues
+bundle exec standardrb --fix
+
+# Or use the test command
+./bin/jojo test --standard
+```
+
 ### Commit Convention
 
 This project uses [Conventional Commits](https://www.conventionalcommits.org/):
@@ -614,6 +697,7 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/):
 - `docs:` - Documentation changes
 - `test:` - Test additions or changes
 - `refactor:` - Code refactoring
+- `style:` - Code style/formatting changes
 
 
 ## Credits
