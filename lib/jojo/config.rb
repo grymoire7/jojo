@@ -56,6 +56,10 @@ module Jojo
       ENV[env_var_name]
     end
 
+    def search_configured?
+      !search_service.nil? && !search_api_key.nil?
+    end
+
     def search_provider_service
       config.dig('search_provider', 'service')
     end

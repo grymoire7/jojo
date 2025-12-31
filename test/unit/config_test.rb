@@ -165,4 +165,45 @@ describe Jojo::Config do
       end
     end
   end
+
+  describe '#search_configured?' do
+    it 'returns true when service and API key both present' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('config.yml', "search: tavily\nseeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
+
+          ENV['TAVILY_API_KEY'] = 'test-key'
+
+          config = Jojo::Config.new('config.yml')
+          _(config.search_configured?).must_equal true
+        ensure
+          ENV.delete('TAVILY_API_KEY')
+        end
+      end
+    end
+
+    it 'returns false when service missing' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('config.yml', "seeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
+
+          config = Jojo::Config.new('config.yml')
+          _(config.search_configured?).must_equal false
+        end
+      end
+    end
+
+    it 'returns false when API key missing' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('config.yml', "search: tavily\nseeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
+
+          ENV.delete('TAVILY_API_KEY')
+
+          config = Jojo::Config.new('config.yml')
+          _(config.search_configured?).must_equal false
+        end
+      end
+    end
+  end
 end
