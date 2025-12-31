@@ -94,4 +94,31 @@ describe Jojo::Config do
       end
     }.must_raise SystemExit
   end
+
+  describe '#search_service' do
+    it 'returns search service from config' do
+      config = Jojo::Config.new('test/fixtures/valid_config.yml')
+      _(config.search_service).must_equal 'serper'
+    end
+
+    it 'returns nil when search not configured' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('config.yml', <<~YAML)
+            seeker_name: Test
+            base_url: https://example.com
+            reasoning_ai:
+              service: anthropic
+              model: sonnet
+            text_generation_ai:
+              service: anthropic
+              model: haiku
+          YAML
+
+          config = Jojo::Config.new('config.yml')
+          _(config.search_service).must_be_nil
+        end
+      end
+    end
+  end
 end

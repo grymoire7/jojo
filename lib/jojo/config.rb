@@ -43,6 +43,10 @@ module Jojo
       url
     end
 
+    def search_service
+      config['search']
+    end
+
     def search_provider_service
       config.dig('search_provider', 'service')
     end
