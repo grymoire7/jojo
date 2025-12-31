@@ -539,7 +539,7 @@ Each phase will include tests and be potentially shippable.
 
 ## Phase 7: PDF Generation and Polish
 
-**Goal**: Convert markdown to PDF, add interview prep, finalize workflow
+**Goal**: Convert markdown to PDF, finalize workflow
 
 ### Tasks:
 
@@ -551,6 +551,27 @@ Each phase will include tests and be potentially shippable.
 
 - [ ] Add PDF generation to `generate` workflow
 
+- [ ] Improve `status_log.md` formatting
+  - change to a more standard `status.log` format for easier parsing
+  - maybe JSON lines or similar
+  - Example entry:
+  ```json
+    "2025-12-27 02:28:47": {"task": "Website Generation", "tokens": 22794, "status": "complete", "metadata": {"template": "default"}}
+  ```
+
+- [ ] Add verbose mode logging throughout
+- [ ] Error handling and user-friendly messages
+
+- [ ] Create comprehensive README.md updates
+  - Installation instructions
+  - Usage examples
+  - Configuration guide
+  - Troubleshooting
+
+**Validation**: `./bin/jojo generate -e "Acme Corp" -j test_job.txt` creates complete application package with PDFs
+
+## Phase 8: Add interview prep generation (optional)
+
 - [ ] Create `lib/jojo/generators/interview_prep_generator.rb`
   - Generate interview_prep.md based on research and job description
   - Common interview questions
@@ -559,22 +580,6 @@ Each phase will include tests and be potentially shippable.
 
 - [ ] Add interview prep to `generate` workflow
 
-- [ ] Improve `status_log.md` formatting
-  - Timestamps for each step
-  - Token usage statistics
-  - Decisions made (AI model used, etc.)
-
-- [ ] Add verbose mode logging throughout
-
-- [ ] Error handling and user-friendly messages
-
-- [ ] Create comprehensive README.md
-  - Installation instructions
-  - Usage examples
-  - Configuration guide
-  - Troubleshooting
-
-**Validation**: `./bin/jojo generate -e "Acme Corp" -j test_job.txt` creates complete application package with PDFs
 
 ## Testing Strategy
 
