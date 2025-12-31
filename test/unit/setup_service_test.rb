@@ -154,6 +154,61 @@ describe Jojo::SetupService do
     end
   end
 
+  describe '#setup_search_configuration' do
+    it 'configures search when user selects yes and tavily' do
+      cli = Minitest::Mock.new
+      prompt = Minitest::Mock.new
+
+      cli.expect :say, nil, [""]
+      prompt.expect :yes?, true, ["Configure web search for company research? (requires Tavily or Serper API)"]
+      prompt.expect :select, 'tavily', ["Which search provider?", ['tavily', 'serper'], Hash]
+      cli.expect :ask, 'sk-tavily-test', ["Tavily API key:"]
+
+      service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
+      service.send(:setup_search_configuration)
+
+      cli.verify
+      prompt.verify
+      _(service.instance_variable_get(:@search_provider_slug)).must_equal 'tavily'
+      _(service.instance_variable_get(:@search_api_key)).must_equal 'sk-tavily-test'
+      _(service.instance_variable_get(:@search_env_var_name)).must_equal 'TAVILY_API_KEY'
+    end
+
+    it 'configures search when user selects yes and serper' do
+      cli = Minitest::Mock.new
+      prompt = Minitest::Mock.new
+
+      cli.expect :say, nil, [""]
+      prompt.expect :yes?, true, ["Configure web search for company research? (requires Tavily or Serper API)"]
+      prompt.expect :select, 'serper', ["Which search provider?", ['tavily', 'serper'], Hash]
+      cli.expect :ask, 'serper-key-123', ["Serper API key:"]
+
+      service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
+      service.send(:setup_search_configuration)
+
+      cli.verify
+      prompt.verify
+      _(service.instance_variable_get(:@search_provider_slug)).must_equal 'serper'
+      _(service.instance_variable_get(:@search_api_key)).must_equal 'serper-key-123'
+      _(service.instance_variable_get(:@search_env_var_name)).must_equal 'SERPER_API_KEY'
+    end
+
+    it 'skips search when user selects no' do
+      cli = Minitest::Mock.new
+      prompt = Minitest::Mock.new
+
+      cli.expect :say, nil, [""]
+      prompt.expect :yes?, false, ["Configure web search for company research? (requires Tavily or Serper API)"]
+
+      service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
+      service.send(:setup_search_configuration)
+
+      cli.verify
+      prompt.verify
+      _(service.instance_variable_get(:@search_provider_slug)).must_be_nil
+    end
+  end
+
   describe '#setup_input_files' do
     it 'creates inputs directory if missing' do
       Dir.mktmpdir do |dir|

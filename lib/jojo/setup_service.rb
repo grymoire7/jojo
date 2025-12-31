@@ -90,6 +90,34 @@ module Jojo
       @llm_provider_slug = provider_slug
     end
 
+    def setup_search_configuration
+      @cli.say ""
+      configure_search = @prompt.yes?("Configure web search for company research? (requires Tavily or Serper API)")
+
+      unless configure_search
+        @search_provider_slug = nil
+        return
+      end
+
+      # Select provider
+      @search_provider_slug = @prompt.select(
+        "Which search provider?",
+        ['tavily', 'serper'],
+        {per_page: 5}
+      )
+
+      # Get env var name
+      @search_env_var_name = "#{@search_provider_slug.upcase}_API_KEY"
+      provider_display_name = @search_provider_slug.capitalize
+
+      # Prompt for API key with loop for empty validation
+      loop do
+        @search_api_key = @cli.ask("#{provider_display_name} API key:")
+        break unless @search_api_key.strip.empty?
+        @cli.say "⚠ API key cannot be empty. Please try again.", :yellow
+      end
+    end
+
     def setup_personal_configuration
       if File.exist?('config.yml') && !@force
         @cli.say "✓ config.yml already exists (skipped)", :green
