@@ -1,3 +1,5 @@
+require "json"
+
 module Jojo
   class StatusLogger
     attr_reader :employer
@@ -7,22 +9,31 @@ module Jojo
     end
 
     def log(message)
-      timestamp = Time.now.strftime("%Y-%m-%d %H:%M:%S")
-      log_entry = "**#{timestamp}**: #{message}\n\n"
+      entry = {
+        timestamp: timestamp,
+        message: message
+      }.to_json + "\n"
 
       File.open(employer.status_log_path, "a") do |f|
-        f.write(log_entry)
+        f.write(entry)
       end
     end
 
     def log_step(step_name, metadata = {})
-      message_parts = [step_name]
+      entry = {
+        timestamp: timestamp,
+        step: step_name
+      }.merge(metadata)
 
-      metadata.each do |key, value|
-        message_parts << "#{key.to_s.capitalize}: #{value}"
+      File.open(employer.status_log_path, "a") do |f|
+        f.write(entry.to_json + "\n")
       end
+    end
 
-      log(message_parts.join(" | "))
+    private
+
+    def timestamp
+      Time.now.strftime("%Y-%m-%d %H:%M:%S")
     end
   end
 end
