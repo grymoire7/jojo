@@ -18,6 +18,7 @@ module Jojo
       @cli.say ""
 
       warn_if_force_mode
+      validate_configuration_completeness
       setup_api_configuration
       setup_search_configuration
       write_env_file
@@ -37,6 +38,36 @@ module Jojo
       unless @cli.yes?("Continue?")
         exit 1
       end
+    end
+
+    def validate_configuration_completeness
+      return if @force  # Force mode bypasses validation
+
+      env_exists = File.exist?('.env')
+      config_exists = File.exist?('config.yml')
+
+      # XOR check: fail if exactly one exists
+      if env_exists && !config_exists
+        @cli.say "✗ Partial configuration detected", :red
+        @cli.say "  Found: .env", :yellow
+        @cli.say "  Missing: config.yml", :yellow
+        @cli.say "", :yellow
+        @cli.say "Options:", :yellow
+        @cli.say "  • Run 'jojo setup --force' to recreate all configuration", :yellow
+        @cli.say "  • Manually create config.yml to match your existing .env setup", :yellow
+        exit 1
+      elsif config_exists && !env_exists
+        @cli.say "✗ Partial configuration detected", :red
+        @cli.say "  Found: config.yml", :yellow
+        @cli.say "  Missing: .env", :yellow
+        @cli.say "", :yellow
+        @cli.say "Options:", :yellow
+        @cli.say "  • Run 'jojo setup --force' to recreate all configuration", :yellow
+        @cli.say "  • Manually create .env with your API keys", :yellow
+        exit 1
+      end
+
+      # Both exist or neither exists - normal flow
     end
 
     def setup_api_configuration

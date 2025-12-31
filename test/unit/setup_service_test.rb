@@ -461,4 +461,99 @@ describe Jojo::SetupService do
       # No expectations, should complete without errors
     end
   end
+
+  describe '#validate_configuration_completeness' do
+    it 'fails when .env exists but config.yml missing (not force mode)' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('.env', 'ANTHROPIC_API_KEY=test')
+
+          cli = Minitest::Mock.new
+          cli.expect :say, nil, ["✗ Partial configuration detected", :red]
+          cli.expect :say, nil, ["  Found: .env", :yellow]
+          cli.expect :say, nil, ["  Missing: config.yml", :yellow]
+          cli.expect :say, nil, ["", :yellow]
+          cli.expect :say, nil, ["Options:", :yellow]
+          cli.expect :say, nil, ["  • Run 'jojo setup --force' to recreate all configuration", :yellow]
+          cli.expect :say, nil, ["  • Manually create config.yml to match your existing .env setup", :yellow]
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+
+          assert_raises(SystemExit) do
+            service.send(:validate_configuration_completeness)
+          end
+
+          cli.verify
+        end
+      end
+    end
+
+    it 'fails when config.yml exists but .env missing (not force mode)' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('config.yml', 'seeker_name: Test')
+
+          cli = Minitest::Mock.new
+          cli.expect :say, nil, ["✗ Partial configuration detected", :red]
+          cli.expect :say, nil, ["  Found: config.yml", :yellow]
+          cli.expect :say, nil, ["  Missing: .env", :yellow]
+          cli.expect :say, nil, ["", :yellow]
+          cli.expect :say, nil, ["Options:", :yellow]
+          cli.expect :say, nil, ["  • Run 'jojo setup --force' to recreate all configuration", :yellow]
+          cli.expect :say, nil, ["  • Manually create .env with your API keys", :yellow]
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+
+          assert_raises(SystemExit) do
+            service.send(:validate_configuration_completeness)
+          end
+
+          cli.verify
+        end
+      end
+    end
+
+    it 'succeeds when both .env and config.yml exist' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('.env', 'ANTHROPIC_API_KEY=test')
+          File.write('config.yml', 'seeker_name: Test')
+
+          cli = Object.new
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+
+          # Should not raise
+          service.send(:validate_configuration_completeness)
+        end
+      end
+    end
+
+    it 'succeeds when neither .env nor config.yml exist' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          # Empty directory - normal setup flow
+          cli = Object.new
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+
+          # Should not raise
+          service.send(:validate_configuration_completeness)
+        end
+      end
+    end
+
+    it 'proceeds when partial config detected but --force is set' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write('.env', 'ANTHROPIC_API_KEY=test')
+          # config.yml missing
+
+          cli = Object.new
+          service = Jojo::SetupService.new(cli_instance: cli, force: true)
+
+          # Should NOT raise, should proceed silently
+          service.send(:validate_configuration_completeness)
+        end
+      end
+    end
+  end
 end
