@@ -74,30 +74,20 @@ module Jojo
       provider_slug = @prompt.select("Which LLM provider?", providers, {per_page: 15})
 
       # Get dynamic env var name
-      env_var_name = ProviderHelper.provider_env_var_name(provider_slug)
+      @llm_env_var_name = ProviderHelper.provider_env_var_name(provider_slug)
       provider_display_name = provider_slug.capitalize
 
       # Prompt for API key
-      api_key = @cli.ask("#{provider_display_name} API key:")
+      @llm_api_key = @cli.ask("#{provider_display_name} API key:")
 
-      if api_key.strip.empty?
+      if @llm_api_key.strip.empty?
         @cli.say "✗ API key is required", :red
-        exit 1
-      end
-
-      # Render .env from template
-      begin
-        template = ERB.new(File.read('templates/.env.erb'))
-        File.write('.env', template.result(binding))
-        @cli.say "✓ Created .env", :green
-        @created_files << '.env'
-      rescue => e
-        @cli.say "✗ Failed to create .env: #{e.message}", :red
         exit 1
       end
 
       # Store provider for use in setup_personal_configuration
       @provider_slug = provider_slug
+      @llm_provider_slug = provider_slug
     end
 
     def setup_personal_configuration
