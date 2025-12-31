@@ -121,6 +121,9 @@ module Jojo
     end
 
     def write_env_file
+      # Skip if .env was already handled
+      return if @skipped_files.include?('.env')
+
       # Set local variables for template binding
       llm_env_var_name = @llm_env_var_name
       llm_api_key = @llm_api_key

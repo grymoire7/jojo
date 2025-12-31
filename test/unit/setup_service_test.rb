@@ -279,6 +279,29 @@ describe Jojo::SetupService do
         end
       end
     end
+
+    it 'skips writing when .env already exists in skipped_files' do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          # Create existing .env with real content
+          File.write('.env', 'ANTHROPIC_API_KEY=original-key')
+
+          cli = Minitest::Mock.new
+          # Should NOT expect "Created .env" message
+
+          service = Jojo::SetupService.new(cli_instance: cli, force: false)
+          service.instance_variable_set(:@skipped_files, ['.env'])
+          # Instance vars intentionally nil (not populated when skipped)
+          service.instance_variable_set(:@llm_env_var_name, nil)
+          service.instance_variable_set(:@llm_api_key, nil)
+          service.send(:write_env_file)
+
+          cli.verify
+          # File should NOT be overwritten
+          _(File.read('.env')).must_equal 'ANTHROPIC_API_KEY=original-key'
+        end
+      end
+    end
   end
 
   describe '#setup_input_files' do
