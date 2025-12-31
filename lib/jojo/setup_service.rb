@@ -185,6 +185,7 @@ module Jojo
       # Set provider variables for config template
       reasoning_provider = @provider_slug
       text_generation_provider = @provider_slug
+      search_provider_slug = @search_provider_slug
 
       begin
         template = ERB.new(File.read('templates/config.yml.erb'))
