@@ -44,9 +44,11 @@ module Jojo
       end
 
       # Recency bonus
-      if project[:year]
+      year = project[:year] || project[:date]&.year || 0
+
+      if year > 0
         current_year = Time.now.year
-        score += 5 if project[:year] >= (current_year - 2)
+        score += 5 if (current_year - year) <= 2
       end
 
       score

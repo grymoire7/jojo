@@ -643,7 +643,6 @@ Each phase will include tests and be potentially shippable.
 - [ ] LinkedIn message templates
 - [ ] Follow-up tracking and reminders
 - [ ] Analytics: which applications got responses
-- [ ] Multi-model support: OpenAI, local models
 - [ ] Interactive mode: ask questions during generation
 - [ ] Resume optimization suggestions
 - [ ] Skill gap analysis

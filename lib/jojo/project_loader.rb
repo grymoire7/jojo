@@ -14,8 +14,7 @@ module Jojo
 
     def load
       return [] unless File.exist?(file_path)
-
-      projects = YAML.load_file(file_path)
+      projects = YAML.load_file(file_path, permitted_classes: [Date])
       validate_projects!(projects)
       projects.map { |p| symbolize_keys(p) }
     end
