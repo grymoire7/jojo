@@ -58,17 +58,16 @@ describe Jojo::SetupService do
       end
     end
 
-    it 'creates .env when missing' do
+    it 'gathers LLM config when .env missing' do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           FileUtils.mkdir_p('templates')
-          File.write('templates/.env.erb', '<%= env_var_name %>=<%= api_key %>')
+          File.write('templates/.env.erb', '<%= llm_env_var_name %>=<%= llm_api_key %>')
 
           cli = Minitest::Mock.new
           cli.expect :say, nil, ["Let's configure your API access.", :green]
           cli.expect :say, nil, [""]
           cli.expect :ask, 'sk-ant-test-key', ["Anthropic API key:"]
-          cli.expect :say, nil, ["✓ Created .env", :green]
 
           prompt = Minitest::Mock.new
           prompt.expect :select, 'anthropic', ["Which LLM provider?", Jojo::ProviderHelper.available_providers, {per_page: 15}]
@@ -78,8 +77,9 @@ describe Jojo::SetupService do
 
           cli.verify
           prompt.verify
-          _(File.exist?('.env')).must_equal true
-          _(File.read('.env')).must_include 'ANTHROPIC_API_KEY=sk-ant-test-key'
+          _(File.exist?('.env')).must_equal false  # File not created yet
+          _(service.instance_variable_get(:@llm_provider_slug)).must_equal 'anthropic'
+          _(service.instance_variable_get(:@llm_api_key)).must_equal 'sk-ant-test-key'
         end
       end
     end
