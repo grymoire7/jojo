@@ -8,6 +8,7 @@ require_relative "generators/resume_generator"
 require_relative "generators/cover_letter_generator"
 require_relative "generators/website_generator"
 require_relative "generators/annotation_generator"
+require_relative "pdf_generator"
 
 module Jojo
   class CLI < Thor
@@ -510,6 +511,63 @@ module Jojo
       rescue => e
         say "✗ Error generating website: #{e.message}", :red
         status_logger.log_step("Website Generation", status: "failed", error: e.message)
+        exit 1
+      end
+    end
+
+    desc "pdf", "Generate PDF versions of resume and cover letter"
+    long_desc <<~DESC, wrap: false
+      Generate PDF files from markdown resume and cover letter.
+      Requires Pandoc to be installed.
+
+      Examples:
+        jojo pdf -s acme-corp-senior-dev
+        JOJO_EMPLOYER_SLUG=acme-corp jojo pdf
+    DESC
+    def pdf
+      slug = resolve_slug
+      employer = Jojo::Employer.new(slug)
+
+      unless employer.artifacts_exist?
+        say "✗ Employer '#{slug}' not found.", :red
+        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
+        exit 1
+      end
+
+      status_logger = Jojo::StatusLogger.new(employer)
+
+      say "Generating PDFs for #{employer.company_name}...", :green
+
+      begin
+        generator = Jojo::PdfGenerator.new(employer, verbose: options[:verbose])
+        results = generator.generate_all
+
+        # Report what was generated
+        results[:generated].each do |doc_type|
+          say "✓ #{doc_type.to_s.capitalize} PDF generated", :green
+        end
+
+        # Report what was skipped
+        results[:skipped].each do |doc_type|
+          say "⚠ Skipped #{doc_type}: markdown file not found", :yellow
+        end
+
+        if results[:generated].any?
+          status_logger.log_step("PDF Generation",
+            status: "complete",
+            generated: results[:generated].length)
+          say "\n✓ PDF generation complete!", :green
+        else
+          say "\n⚠ No PDFs generated. Generate resume and cover letter first.", :yellow
+          exit 1
+        end
+      rescue Jojo::PandocChecker::PandocNotFoundError => e
+        say "✗ #{e.message}", :red
+        status_logger.log_step("PDF Generation", status: "failed", error: "Pandoc not installed")
+        exit 1
+      rescue => e
+        say "✗ Error generating PDFs: #{e.message}", :red
+        status_logger.log_step("PDF Generation", status: "failed", error: e.message)
         exit 1
       end
     end
