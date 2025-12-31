@@ -11,8 +11,6 @@ gem 'reline'
 gem 'tty-prompt', '~> 0.23'
 
 group :development, :test do
-  gem 'rbs'
-  gem 'steep', require: false
   gem 'minitest', '~> 5.25'
   gem 'minitest-reporters', '~> 1.7'
 end
