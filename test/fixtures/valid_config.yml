@@ -7,6 +7,4 @@ text_generation_ai:
   service: anthropic
   model: haiku
 voice_and_tone: professional and friendly
-search_provider:
-  service: serper
-  api_key: test_api_key
+search: serper
