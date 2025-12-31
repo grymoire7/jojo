@@ -1,35 +1,35 @@
-require 'erb'
-require 'fileutils'
-require_relative 'status_logger'
-require_relative 'setup_service'
-require_relative 'template_validator'
-require_relative 'generators/research_generator'
-require_relative 'generators/resume_generator'
-require_relative 'generators/cover_letter_generator'
-require_relative 'generators/website_generator'
-require_relative 'generators/annotation_generator'
+require "erb"
+require "fileutils"
+require_relative "status_logger"
+require_relative "setup_service"
+require_relative "template_validator"
+require_relative "generators/research_generator"
+require_relative "generators/resume_generator"
+require_relative "generators/cover_letter_generator"
+require_relative "generators/website_generator"
+require_relative "generators/annotation_generator"
 
 module Jojo
   class CLI < Thor
     include OverwriteHelper
 
-    class_option :verbose, type: :boolean, aliases: '-v', desc: 'Run verbosely'
-    class_option :quiet, type: :boolean, aliases: '-q', desc: 'Suppress output, rely on exit code'
-    class_option :slug, type: :string, aliases: '-s', desc: 'Employer slug (unique identifier)'
-    class_option :template, type: :string, aliases: '-t', desc: 'Website template name (default: default)', default: 'default'
-    class_option :overwrite, type: :boolean, banner: 'Overwrite existing files without prompting'
-    
+    class_option :verbose, type: :boolean, aliases: "-v", desc: "Run verbosely"
+    class_option :quiet, type: :boolean, aliases: "-q", desc: "Suppress output, rely on exit code"
+    class_option :slug, type: :string, aliases: "-s", desc: "Employer slug (unique identifier)"
+    class_option :template, type: :string, aliases: "-t", desc: "Website template name (default: default)", default: "default"
+    class_option :overwrite, type: :boolean, banner: "Overwrite existing files without prompting"
+
     def self.exit_on_failure?
       true
     end
-    
+
     desc "version", "Show version"
     def version
       say "Jojo #{Jojo::VERSION}", :green
     end
 
     desc "setup", "Setup configuration"
-    method_option :force, type: :boolean, desc: 'Overwrite existing files'
+    method_option :force, type: :boolean, desc: "Overwrite existing files"
     def setup
       Jojo::SetupService.new(
         cli_instance: self,
@@ -53,14 +53,14 @@ module Jojo
         jojo new -s bigco-principal -j https://careers.bigco.com/jobs/123
         jojo new -s acme-corp-senior-dev -j job.txt --overwrite
     DESC
-    method_option :slug, type: :string, aliases: '-s', required: true, desc: 'Unique employer identifier'
-    method_option :job, type: :string, aliases: '-j', required: true, desc: 'Job description (file path or URL)'
+    method_option :slug, type: :string, aliases: "-s", required: true, desc: "Unique employer identifier"
+    method_option :job, type: :string, aliases: "-j", required: true, desc: "Job description (file path or URL)"
     def new
       # Validate required inputs exist before creating employer
       begin
         Jojo::TemplateValidator.validate_required_file!(
-          'inputs/generic_resume.md',
-          'generic resume'
+          "inputs/generic_resume.md",
+          "generic resume"
         )
       rescue Jojo::TemplateValidator::MissingInputError => e
         say e.message, :red
@@ -69,8 +69,8 @@ module Jojo
 
       # Warn if generic resume hasn't been customized
       result = Jojo::TemplateValidator.warn_if_unchanged(
-        'inputs/generic_resume.md',
-        'generic resume',
+        "inputs/generic_resume.md",
+        "generic resume",
         cli_instance: self
       )
 
@@ -160,8 +160,8 @@ module Jojo
       # Validate required inputs
       begin
         Jojo::TemplateValidator.validate_required_file!(
-          'inputs/generic_resume.md',
-          'generic resume'
+          "inputs/generic_resume.md",
+          "generic resume"
         )
       rescue Jojo::TemplateValidator::MissingInputError => e
         say e.message, :red
@@ -169,7 +169,7 @@ module Jojo
       end
 
       # Warn about unchanged templates
-      ['inputs/generic_resume.md', 'inputs/recommendations.md', 'inputs/projects.yml'].each do |file|
+      ["inputs/generic_resume.md", "inputs/recommendations.md", "inputs/projects.yml"].each do |file|
         next unless File.exist?(file)
 
         result = Jojo::TemplateValidator.warn_if_unchanged(
@@ -198,8 +198,7 @@ module Jojo
         say "✓ Research generated and saved", :green
         status_logger.log_step("Research Generation",
           tokens: ai_client.total_tokens_used,
-          status: "complete"
-        )
+          status: "complete")
       rescue => e
         say "✗ Error generating research: #{e.message}", :red
         status_logger.log_step("Research Generation", status: "failed", error: e.message)
@@ -208,18 +207,17 @@ module Jojo
 
       # Generate resume
       begin
-        unless File.exist?('inputs/generic_resume.md')
-          say "⚠ Warning: Generic resume not found, skipping resume generation", :yellow
-          say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
-        else
+        if File.exist?("inputs/generic_resume.md")
           generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
           generator.generate
 
           say "✓ Resume generated and saved", :green
           status_logger.log_step("Resume Generation",
             tokens: ai_client.total_tokens_used,
-            status: "complete"
-          )
+            status: "complete")
+        else
+          say "⚠ Warning: Generic resume not found, skipping resume generation", :yellow
+          say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
         end
       rescue => e
         say "✗ Error generating resume: #{e.message}", :red
@@ -229,17 +227,16 @@ module Jojo
 
       # Generate cover letter
       begin
-        unless File.exist?(employer.resume_path)
-          say "⚠ Warning: Resume not found, skipping cover letter generation", :yellow
-        else
+        if File.exist?(employer.resume_path)
           generator = Jojo::Generators::CoverLetterGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
           generator.generate
 
           say "✓ Cover letter generated and saved", :green
           status_logger.log_step("Cover Letter Generation",
             tokens: ai_client.total_tokens_used,
-            status: "complete"
-          )
+            status: "complete")
+        else
+          say "⚠ Warning: Resume not found, skipping cover letter generation", :yellow
         end
       rescue => e
         say "✗ Error generating cover letter: #{e.message}", :red
@@ -256,8 +253,7 @@ module Jojo
         status_logger.log_step("Annotation Generation",
           tokens: ai_client.total_tokens_used,
           status: "complete",
-          annotations_count: annotations.length
-        )
+          annotations_count: annotations.length)
       rescue => e
         say "✗ Error generating annotations: #{e.message}", :red
         status_logger.log_step("Annotation Generation", status: "failed", error: e.message)
@@ -266,9 +262,7 @@ module Jojo
 
       # Generate website
       begin
-        unless File.exist?(employer.resume_path)
-          say "⚠ Warning: Resume not found, skipping website generation", :yellow
-        else
+        if File.exist?(employer.resume_path)
           generator = Jojo::Generators::WebsiteGenerator.new(
             employer,
             ai_client,
@@ -284,8 +278,9 @@ module Jojo
           status_logger.log_step("Website Generation",
             tokens: ai_client.total_tokens_used,
             status: "complete",
-            metadata: { template: options[:template] }
-          )
+            metadata: {template: options[:template]})
+        else
+          say "⚠ Warning: Resume not found, skipping website generation", :yellow
         end
       rescue => e
         say "✗ Error generating website: #{e.message}", :red
@@ -323,14 +318,13 @@ module Jojo
 
       begin
         generator = Jojo::Generators::ResearchGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
-        research = generator.generate
+        generator.generate
 
         say "✓ Research generated and saved to #{employer.research_path}", :green
 
         status_logger.log_step("Research Generation",
           tokens: ai_client.total_tokens_used,
-          status: "complete"
-        )
+          status: "complete")
 
         say "\n✓ Research complete!", :green
       rescue => e
@@ -371,7 +365,7 @@ module Jojo
       end
 
       # Check that generic resume exists
-      unless File.exist?('inputs/generic_resume.md')
+      unless File.exist?("inputs/generic_resume.md")
         say "✗ Generic resume not found at inputs/generic_resume.md", :red
         say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
         exit 1
@@ -379,14 +373,13 @@ module Jojo
 
       begin
         generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
-        resume = generator.generate
+        generator.generate
 
         say "✓ Resume generated and saved to #{employer.resume_path}", :green
 
         status_logger.log_step("Resume Generation",
           tokens: ai_client.total_tokens_used,
-          status: "complete"
-        )
+          status: "complete")
 
         say "\n✓ Resume complete!", :green
       rescue => e
@@ -428,7 +421,7 @@ module Jojo
       end
 
       # Check generic resume exists (REQUIRED)
-      unless File.exist?('inputs/generic_resume.md')
+      unless File.exist?("inputs/generic_resume.md")
         say "✗ Generic resume not found at inputs/generic_resume.md", :red
         say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
         exit 1
@@ -441,14 +434,13 @@ module Jojo
 
       begin
         generator = Jojo::Generators::CoverLetterGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
-        cover_letter = generator.generate
+        generator.generate
 
         say "✓ Cover letter generated and saved to #{employer.cover_letter_path}", :green
 
         status_logger.log_step("Cover Letter Generation",
           tokens: ai_client.total_tokens_used,
-          status: "complete"
-        )
+          status: "complete")
 
         say "\n✓ Cover letter complete!", :green
       rescue => e
@@ -505,15 +497,14 @@ module Jojo
           overwrite_flag: options[:overwrite],
           cli_instance: self
         )
-        website = generator.generate
+        generator.generate
 
         say "✓ Website generated and saved to #{employer.index_html_path}", :green
 
         status_logger.log_step("Website Generation",
           tokens: ai_client.total_tokens_used,
           status: "complete",
-          metadata: { template: options[:template] }
-        )
+          metadata: {template: options[:template]})
 
         say "\n✓ Website complete!", :green
       rescue => e
@@ -542,19 +533,19 @@ module Jojo
         jojo test --service              # Run service tests (with confirmation)
         jojo test -q                     # Quiet mode, check exit code
     DESC
-    method_option :unit, type: :boolean, desc: 'Run unit tests (default)'
-    method_option :integration, type: :boolean, desc: 'Run integration tests'
-    method_option :service, type: :boolean, desc: 'Run service tests (may use real APIs)'
-    method_option :all, type: :boolean, desc: 'Run all tests'
+    method_option :unit, type: :boolean, desc: "Run unit tests (default)"
+    method_option :integration, type: :boolean, desc: "Run integration tests"
+    method_option :service, type: :boolean, desc: "Run service tests (may use real APIs)"
+    method_option :all, type: :boolean, desc: "Run all tests"
     def test
       # Validate unsupported Thor auto-generated flags
       unsupported_flags = []
-      unsupported_flags << '--no-unit or --skip-unit' if options[:unit] == false
-      unsupported_flags << '--no-integration or --skip-integration' if options[:integration] == false
-      unsupported_flags << '--no-all or --skip-all' if options[:all] == false
+      unsupported_flags << "--no-unit or --skip-unit" if options[:unit] == false
+      unsupported_flags << "--no-integration or --skip-integration" if options[:integration] == false
+      unsupported_flags << "--no-all or --skip-all" if options[:all] == false
 
       if unsupported_flags.any?
-        say "✗ Unsupported option(s): #{unsupported_flags.join(', ')}", :red
+        say "✗ Unsupported option(s): #{unsupported_flags.join(", ")}", :red
         say "  Only --no-service (to exclude service tests from --all) is supported.", :yellow
         exit 1
       end
@@ -563,25 +554,25 @@ module Jojo
       categories = []
 
       if options[:all]
-        categories = ['unit', 'integration', 'service']
+        categories = ["unit", "integration", "service"]
       else
         # Collect specified categories
-        categories << 'unit' if options[:unit]
-        categories << 'integration' if options[:integration]
-        categories << 'service' if options[:service]
+        categories << "unit" if options[:unit]
+        categories << "integration" if options[:integration]
+        categories << "service" if options[:service]
 
         # Default to unit tests if no flags specified
-        categories = ['unit'] if categories.empty?
+        categories = ["unit"] if categories.empty?
       end
 
       # Exclude service tests if --no-service is specified (Thor's auto-generated flag)
-      categories.delete('service') if options[:service] == false
+      categories.delete("service") if options[:service] == false
 
       # Safety confirmation for service tests
-      if categories.include?('service') && !ENV['SKIP_SERVICE_CONFIRMATION']
+      if categories.include?("service") && !ENV["SKIP_SERVICE_CONFIRMATION"]
         unless yes?("⚠️  Run service tests? These may cost money and require API keys. Continue? (y/n)")
           # Remove service from categories if user declines
-          categories.delete('service')
+          categories.delete("service")
           # Exit if service was the only category requested
           if categories.empty?
             say "No tests to run.", :yellow
@@ -594,7 +585,7 @@ module Jojo
       patterns = categories.map { |cat| "test/#{cat}/**/*_test.rb" }
 
       # Build and execute test command
-      pattern_glob = patterns.join(',')
+      pattern_glob = patterns.join(",")
       test_cmd = "ruby -Ilib:test -e 'Dir.glob(\"{#{pattern_glob}}\").each { |f| require f.sub(/^test\\//, \"\") }'"
 
       if options[:quiet]
@@ -607,7 +598,7 @@ module Jojo
     private
 
     def resolve_slug
-      slug = options[:slug] || ENV['JOJO_EMPLOYER_SLUG']
+      slug = options[:slug] || ENV["JOJO_EMPLOYER_SLUG"]
 
       unless slug
         say "Error: No employer specified.", :red
@@ -623,8 +614,10 @@ module Jojo
 
     def invoked_command
       # Get the current command name for error messages
-      @_invocations.keys.last.to_s rescue 'command'
-    end
 
+      @_invocations.keys.last.to_s
+    rescue
+      "command"
+    end
   end
 end

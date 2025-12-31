@@ -1,12 +1,12 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/employer'
-require_relative '../../lib/jojo/ai_client'
-require_relative '../../lib/jojo/job_description_processor'
-require_relative '../../lib/jojo/prompts/job_description_prompts'
+require_relative "../test_helper"
+require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/ai_client"
+require_relative "../../lib/jojo/job_description_processor"
+require_relative "../../lib/jojo/prompts/job_description_prompts"
 
 describe Jojo::JobDescriptionProcessor do
   before do
-    @employer = Jojo::Employer.new('test-company')
+    @employer = Jojo::Employer.new("test-company")
     @config = Minitest::Mock.new
     @ai_client = Minitest::Mock.new
     @processor = Jojo::JobDescriptionProcessor.new(@employer, @ai_client, verbose: false)
@@ -16,8 +16,8 @@ describe Jojo::JobDescriptionProcessor do
     @employer.create_directory!
 
     # Create test job description file
-    @test_file = 'test/fixtures/test_job.txt'
-    FileUtils.mkdir_p('test/fixtures')
+    @test_file = "test/fixtures/test_job.txt"
+    FileUtils.mkdir_p("test/fixtures")
     File.write(@test_file, "Senior Ruby Developer\n\nWe are looking for a senior Ruby developer...")
   end
 
@@ -44,7 +44,7 @@ describe Jojo::JobDescriptionProcessor do
 
   it "handles file not found error" do
     error = assert_raises(RuntimeError) do
-      @processor.process('nonexistent_file.txt')
+      @processor.process("nonexistent_file.txt")
     end
 
     _(error.message).must_include "File not found"

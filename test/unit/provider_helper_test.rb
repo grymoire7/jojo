@@ -1,53 +1,53 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/provider_helper'
+require_relative "../test_helper"
+require_relative "../../lib/jojo/provider_helper"
 
 describe Jojo::ProviderHelper do
-  describe '.available_providers' do
-    it 'returns list of provider slugs from RubyLLM' do
+  describe ".available_providers" do
+    it "returns list of provider slugs from RubyLLM" do
       providers = Jojo::ProviderHelper.available_providers
       _(providers).must_be_kind_of Array
-      _(providers).must_include 'anthropic'
-      _(providers).must_include 'openai'
+      _(providers).must_include "anthropic"
+      _(providers).must_include "openai"
       _(providers.length).must_be :>, 5
     end
 
-    it 'returns providers in alphabetical order' do
+    it "returns providers in alphabetical order" do
       providers = Jojo::ProviderHelper.available_providers
       _(providers).must_equal providers.sort
     end
   end
 
-  describe '.provider_env_var_name' do
-    it 'returns uppercase env var name for provider' do
-      _(Jojo::ProviderHelper.provider_env_var_name('anthropic')).must_equal 'ANTHROPIC_API_KEY'
-      _(Jojo::ProviderHelper.provider_env_var_name('openai')).must_equal 'OPENAI_API_KEY'
+  describe ".provider_env_var_name" do
+    it "returns uppercase env var name for provider" do
+      _(Jojo::ProviderHelper.provider_env_var_name("anthropic")).must_equal "ANTHROPIC_API_KEY"
+      _(Jojo::ProviderHelper.provider_env_var_name("openai")).must_equal "OPENAI_API_KEY"
     end
 
-    it 'raises error for unknown provider' do
+    it "raises error for unknown provider" do
       error = assert_raises(ArgumentError) do
-        Jojo::ProviderHelper.provider_env_var_name('unknown_provider')
+        Jojo::ProviderHelper.provider_env_var_name("unknown_provider")
       end
-      _(error.message).must_include 'Unknown provider'
+      _(error.message).must_include "Unknown provider"
     end
   end
 
-  describe '.available_models' do
-    it 'returns models for specified provider' do
-      models = Jojo::ProviderHelper.available_models('anthropic')
+  describe ".available_models" do
+    it "returns models for specified provider" do
+      models = Jojo::ProviderHelper.available_models("anthropic")
       _(models).must_be_kind_of Array
-      _(models).must_include 'claude-sonnet-4-5'
-      _(models).must_include 'claude-3-5-haiku-20241022'
+      _(models).must_include "claude-sonnet-4-5"
+      _(models).must_include "claude-3-5-haiku-20241022"
       _(models.all? { |m| m.is_a?(String) }).must_equal true
     end
 
-    it 'returns models in alphabetical order' do
-      models = Jojo::ProviderHelper.available_models('anthropic')
+    it "returns models in alphabetical order" do
+      models = Jojo::ProviderHelper.available_models("anthropic")
       _(models).must_equal models.sort
     end
 
-    it 'returns empty array for provider with no models' do
+    it "returns empty array for provider with no models" do
       # Note: All providers should have models, but test the edge case
-      models = Jojo::ProviderHelper.available_models('unknown')
+      models = Jojo::ProviderHelper.available_models("unknown")
       _(models).must_equal []
     end
   end

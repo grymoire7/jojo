@@ -1,5 +1,5 @@
-require_relative '../../test_helper'
-require_relative '../../../lib/jojo/prompts/annotation_prompt'
+require_relative "../../test_helper"
+require_relative "../../../lib/jojo/prompts/annotation_prompt"
 
 describe Jojo::Prompts::Annotation do
   it "generates prompt with all required context" do

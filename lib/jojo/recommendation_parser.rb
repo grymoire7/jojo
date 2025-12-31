@@ -34,13 +34,13 @@ module Jojo
 
       # Extract relationship
       relationship_match = section.match(/\*\*Relationship:\*\*\s+(.+)$/i)
-      relationship = relationship_match ? relationship_match[1].strip : 'Colleague'
+      relationship = relationship_match ? relationship_match[1].strip : "Colleague"
 
       # Extract quote (blockquote lines starting with >)
-      quote_lines = section.lines.select { |line| line.strip.start_with?('>') }
+      quote_lines = section.lines.select { |line| line.strip.start_with?(">") }
       return nil if quote_lines.empty?
 
-      quote = quote_lines.map { |line| line.sub(/^>\s*/, '').strip }.join(' ')
+      quote = quote_lines.map { |line| line.sub(/^>\s*/, "").strip }.join(" ")
 
       {
         recommender_name: recommender_name,

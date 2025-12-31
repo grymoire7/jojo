@@ -1,13 +1,13 @@
-require 'yaml'
-require 'deepsearch'
-require_relative '../prompts/research_prompt'
+require "yaml"
+require "deepsearch"
+require_relative "../prompts/research_prompt"
 
 module Jojo
   module Generators
     class ResearchGenerator
       attr_reader :employer, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
 
-      def initialize(employer, ai_client, config:, verbose: false, inputs_path: 'inputs', overwrite_flag: nil, cli_instance: nil)
+      def initialize(employer, ai_client, config:, verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
         @employer = employer
         @ai_client = ai_client
         @config = config
@@ -65,14 +65,14 @@ module Jojo
         end
 
         job_details = YAML.load_file(employer.job_details_path)
-        job_details['company_name'] || employer.name
+        job_details["company_name"] || employer.name
       rescue => e
         log "Warning: Could not parse job details, using employer name: #{e.message}"
         employer.name
       end
 
       def read_generic_resume
-        resume_path = File.join(inputs_path, 'generic_resume.md')
+        resume_path = File.join(inputs_path, "generic_resume.md")
 
         unless File.exist?(resume_path)
           log "Warning: Generic resume not found at #{resume_path}, research will be less personalized"

@@ -1,7 +1,7 @@
 module Jojo
   module Prompts
     module Resume
-      def self.generate_prompt(job_description:, generic_resume:, research: nil, job_details: nil, voice_and_tone:, relevant_projects: [])
+      def self.generate_prompt(job_description:, generic_resume:, voice_and_tone:, research: nil, job_details: nil, relevant_projects: [])
         <<~PROMPT
           You are an expert resume writer helping tailor a generic resume to a specific job opportunity.
 
@@ -16,9 +16,9 @@ module Jojo
 
           #{job_description}
 
-          #{job_details ? format_job_details(job_details) : ""}
+          #{format_job_details(job_details) if job_details}
 
-          #{research ? "## Research Insights\n\n#{research}" : ""}
+          #{"## Research Insights\n\n#{research}" if research}
 
           # Source Material
 

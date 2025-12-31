@@ -2,8 +2,8 @@ module Jojo
   module Prompts
     module Faq
       def self.generate_faq_prompt(job_description:, resume:, research:, job_details:, base_url:, seeker_name:, voice_and_tone:)
-        company_name = (job_details && job_details['company_name']) ? job_details['company_name'] : 'this company'
-        company_slug = company_name.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/^-|-$/, '')
+        company_name = (job_details && job_details["company_name"]) ? job_details["company_name"] : "this company"
+        company_slug = company_name.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/^-|-$/, "")
 
         <<~PROMPT
           You are an expert at creating engaging FAQ sections for job application landing pages.
@@ -16,7 +16,7 @@ module Jojo
 
           #{job_description}
 
-          #{research ? "## Company Research\n\n#{research}" : ""}
+          #{"## Company Research\n\n#{research}" if research}
 
           ## Candidate's Resume
 

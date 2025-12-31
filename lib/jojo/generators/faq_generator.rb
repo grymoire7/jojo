@@ -1,7 +1,7 @@
-require 'json'
-require 'fileutils'
-require 'yaml'
-require_relative '../prompts/faq_prompt'
+require "json"
+require "fileutils"
+require "yaml"
+require_relative "../prompts/faq_prompt"
 
 module Jojo
   module Generators

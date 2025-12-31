@@ -1,5 +1,5 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/prompts/website_prompt'
+require_relative "../test_helper"
+require_relative "../../lib/jojo/prompts/website_prompt"
 
 describe Jojo::Prompts::Website do
   it "generates branding statement prompt with all required parameters" do
@@ -47,7 +47,7 @@ describe Jojo::Prompts::Website do
   end
 
   it "includes job details when available" do
-    job_details = { 'job_title' => 'Senior Ruby Developer', 'location' => 'Remote' }
+    job_details = {"job_title" => "Senior Ruby Developer", "location" => "Remote"}
 
     prompt = Jojo::Prompts::Website.generate_branding_statement(
       job_description: "Job description...",

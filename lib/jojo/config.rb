@@ -1,42 +1,42 @@
-require 'yaml'
+require "yaml"
 
 module Jojo
   class Config
-    def initialize(config_path = 'config.yml')
+    def initialize(config_path = "config.yml")
       @config_path = config_path
       @config = nil
     end
 
     def seeker_name
-      config['seeker_name']
+      config["seeker_name"]
     end
 
     def reasoning_ai_service
-      validate_ai_config!('reasoning_ai')
-      config['reasoning_ai']['service']
+      validate_ai_config!("reasoning_ai")
+      config["reasoning_ai"]["service"]
     end
 
     def reasoning_ai_model
-      validate_ai_config!('reasoning_ai')
-      config['reasoning_ai']['model']
+      validate_ai_config!("reasoning_ai")
+      config["reasoning_ai"]["model"]
     end
 
     def text_generation_ai_service
-      validate_ai_config!('text_generation_ai')
-      config['text_generation_ai']['service']
+      validate_ai_config!("text_generation_ai")
+      config["text_generation_ai"]["service"]
     end
 
     def text_generation_ai_model
-      validate_ai_config!('text_generation_ai')
-      config['text_generation_ai']['model']
+      validate_ai_config!("text_generation_ai")
+      config["text_generation_ai"]["model"]
     end
 
     def voice_and_tone
-      config['voice_and_tone'] || 'professional and friendly'
+      config["voice_and_tone"] || "professional and friendly"
     end
 
     def base_url
-      url = config['base_url']
+      url = config["base_url"]
       if url.nil? || url.strip.empty?
         abort "Error: base_url is required in config.yml"
       end
@@ -44,7 +44,7 @@ module Jojo
     end
 
     def search_service
-      config['search']
+      config["search"]
     end
 
     def search_api_key
@@ -61,11 +61,11 @@ module Jojo
     end
 
     def website_cta_text
-      config.dig('website', 'cta_text') || 'Get in Touch'
+      config.dig("website", "cta_text") || "Get in Touch"
     end
 
     def website_cta_link
-      config.dig('website', 'cta_link')
+      config.dig("website", "cta_link")
     end
 
     private
@@ -85,7 +85,7 @@ module Jojo
     end
 
     def validate_ai_config!(key)
-      unless config[key] && config[key]['service'] && config[key]['model']
+      unless config[key] && config[key]["service"] && config[key]["model"]
         abort "Error: Invalid AI configuration for #{key} in config.yml"
       end
     end

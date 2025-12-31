@@ -1,6 +1,6 @@
-require 'uri'
-require 'net/http'
-require 'html_to_markdown'
+require "uri"
+require "net/http"
+require "html_to_markdown"
 
 module Jojo
   class JobDescriptionProcessor

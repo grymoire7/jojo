@@ -1,9 +1,9 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/status_logger'
+require_relative "../test_helper"
+require_relative "../../lib/jojo/status_logger"
 
 describe Jojo::StatusLogger do
   before do
-    @employer = Jojo::Employer.new('test-company')
+    @employer = Jojo::Employer.new("test-company")
     @logger = Jojo::StatusLogger.new(@employer)
 
     # Clean up before tests
@@ -36,14 +36,14 @@ describe Jojo::StatusLogger do
     @logger.log("Test message")
 
     content = File.read(@employer.status_log_path)
-    _(content).must_match /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/
+    _(content).must_match(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)
   end
 
   it "formats log entry as markdown bold timestamp" do
     @logger.log("Test message")
 
     content = File.read(@employer.status_log_path)
-    _(content).must_match /\*\*\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\*\*: Test message/
+    _(content).must_match(/\*\*\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\*\*: Test message/)
   end
 
   it "logs step with metadata" do

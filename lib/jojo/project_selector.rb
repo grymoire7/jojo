@@ -1,4 +1,4 @@
-require 'yaml'
+require "yaml"
 
 module Jojo
   class ProjectSelector
@@ -60,11 +60,11 @@ module Jojo
     end
 
     def required_skills
-      job_details['required_skills'] || []
+      job_details["required_skills"] || []
     end
 
     def desired_skills
-      job_details['desired_skills'] || []
+      job_details["desired_skills"] || []
     end
   end
 end

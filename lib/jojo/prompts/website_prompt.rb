@@ -13,7 +13,7 @@ module Jojo
 
           #{job_description}
 
-          #{job_details ? format_job_details(job_details) : ""}
+          #{format_job_details(job_details) if job_details}
 
           #{research ? "## Company Research\n\n#{research}" : "Note: No company research available - focus on job description analysis."}
 

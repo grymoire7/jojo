@@ -20,7 +20,7 @@ module Jojo
 
           #{web_results ? "Web Research Results:\n\n#{web_results}" : "Note: no additional web research available - analyze based on job description only."}
 
-          #{resume ? "## Job Seeker's Background\n\n#{resume}" : ""}
+          #{"## Job Seeker's Background\n\n#{resume}" if resume}
 
           # Your Task
 

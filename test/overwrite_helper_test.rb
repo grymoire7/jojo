@@ -137,15 +137,17 @@ class OverwriteHelperTest < Minitest::Test
       # Mock $stdout.isatty to return false
       stdout_was = $stdout
       $stdout = StringIO.new
-      def $stdout.isatty; false; end
-
-      error = assert_raises(Thor::Error) do
-        @cli.with_overwrite_check(path, nil) { }
+      def $stdout.isatty
+        false
       end
 
-      assert_match /Cannot prompt in non-interactive mode/, error.message
-      assert_match /--overwrite/, error.message
-      assert_match /JOJO_ALWAYS_OVERWRITE/, error.message
+      error = assert_raises(Thor::Error) do
+        @cli.with_overwrite_check(path, nil) {}
+      end
+
+      assert_match(/Cannot prompt in non-interactive mode/, error.message)
+      assert_match(/--overwrite/, error.message)
+      assert_match(/JOJO_ALWAYS_OVERWRITE/, error.message)
     ensure
       $stdout = stdout_was
     end
@@ -160,7 +162,9 @@ class OverwriteHelperTest < Minitest::Test
       # Mock $stdout.isatty to return true
       stdout_was = $stdout
       $stdout = StringIO.new
-      def $stdout.isatty; true; end
+      def $stdout.isatty
+        true
+      end
 
       # Mock yes? to return true
       def @cli.yes?(message)
@@ -173,8 +177,8 @@ class OverwriteHelperTest < Minitest::Test
       end
 
       assert yielded, "Expected block to be yielded when user says yes"
-      assert_match /existing.txt/, @cli.instance_variable_get(:@last_prompt)
-      assert_match /Overwrite/, @cli.instance_variable_get(:@last_prompt)
+      assert_match(/existing.txt/, @cli.instance_variable_get(:@last_prompt))
+      assert_match(/Overwrite/, @cli.instance_variable_get(:@last_prompt))
     ensure
       $stdout = stdout_was
     end
@@ -189,7 +193,9 @@ class OverwriteHelperTest < Minitest::Test
       # Mock $stdout.isatty to return true
       stdout_was = $stdout
       $stdout = StringIO.new
-      def $stdout.isatty; true; end
+      def $stdout.isatty
+        true
+      end
 
       # Mock yes? to return false
       def @cli.yes?(message)

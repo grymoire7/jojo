@@ -1,4 +1,4 @@
-require 'ruby_llm'
+require "ruby_llm"
 
 module Jojo
   module ProviderHelper

@@ -1,4 +1,4 @@
-require 'ruby_llm'
+require "ruby_llm"
 
 module Jojo
   class AIClient
@@ -18,7 +18,7 @@ module Jojo
         service: config.reasoning_ai_service,
         model: config.reasoning_ai_model,
         max_retries: max_retries,
-        task_type: 'reasoning'
+        task_type: "reasoning"
       )
     end
 
@@ -29,7 +29,7 @@ module Jojo
         service: config.text_generation_ai_service,
         model: config.text_generation_ai_model,
         max_retries: max_retries,
-        task_type: 'text generation'
+        task_type: "text generation"
       )
     end
 
@@ -86,7 +86,7 @@ module Jojo
         retries += 1
         if retries <= max_retries
           log_verbose "Error during #{task_type}, retrying (#{retries}/#{max_retries}): #{e.message}"
-          sleep(2 ** retries) # Exponential backoff
+          sleep(2**retries) # Exponential backoff
           retry
         else
           raise "AI #{task_type} failed after #{max_retries} retries: #{e.message}"
@@ -97,12 +97,12 @@ module Jojo
     def resolve_model_name(model_shortname)
       # Map config shortnames to full model IDs
       case model_shortname.to_s.downcase
-      when 'sonnet'
-        'claude-sonnet-4'
-      when 'haiku'
-        'claude-3-5-haiku-20241022'
-      when 'opus'
-        'claude-opus-4'
+      when "sonnet"
+        "claude-sonnet-4"
+      when "haiku"
+        "claude-3-5-haiku-20241022"
+      when "opus"
+        "claude-opus-4"
       else
         model_shortname # Return as-is if not a known shortname
       end

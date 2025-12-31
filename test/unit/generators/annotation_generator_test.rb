@@ -1,10 +1,10 @@
-require_relative '../../test_helper'
-require_relative '../../../lib/jojo/employer'
-require_relative '../../../lib/jojo/generators/annotation_generator'
+require_relative "../../test_helper"
+require_relative "../../../lib/jojo/employer"
+require_relative "../../../lib/jojo/generators/annotation_generator"
 
 describe Jojo::Generators::AnnotationGenerator do
   before do
-    @employer = Jojo::Employer.new('acme-corp')
+    @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @generator = Jojo::Generators::AnnotationGenerator.new(
       @employer,
@@ -27,8 +27,8 @@ describe Jojo::Generators::AnnotationGenerator do
 
   it "generates annotations from job description and resume" do
     ai_response = JSON.generate([
-      { text: "5+ years of Python", match: "Built Python apps for 7 years", tier: "strong" },
-      { text: "distributed systems", match: "Designed fault-tolerant queue", tier: "strong" }
+      {text: "5+ years of Python", match: "Built Python apps for 7 years", tier: "strong"},
+      {text: "distributed systems", match: "Designed fault-tolerant queue", tier: "strong"}
     ])
 
     @ai_client.expect(:reason, ai_response, [String])
@@ -45,7 +45,7 @@ describe Jojo::Generators::AnnotationGenerator do
 
   it "saves annotations to JSON file" do
     ai_response = JSON.generate([
-      { text: "5+ years of Python", match: "Built Python apps for 7 years", tier: "strong" }
+      {text: "5+ years of Python", match: "Built Python apps for 7 years", tier: "strong"}
     ])
 
     @ai_client.expect(:reason, ai_response, [String])
@@ -77,7 +77,7 @@ describe Jojo::Generators::AnnotationGenerator do
     FileUtils.rm_f(@employer.research_path)
 
     ai_response = JSON.generate([
-      { text: "Python", match: "7 years experience", tier: "strong" }
+      {text: "Python", match: "7 years experience", tier: "strong"}
     ])
 
     @ai_client.expect(:reason, ai_response, [String])

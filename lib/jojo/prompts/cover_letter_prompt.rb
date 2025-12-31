@@ -1,7 +1,7 @@
 module Jojo
   module Prompts
     module CoverLetter
-      def self.generate_prompt(job_description:, tailored_resume:, generic_resume:, research: nil, job_details: nil, voice_and_tone:, company_name:, highlight_projects: [])
+      def self.generate_prompt(job_description:, tailored_resume:, generic_resume:, voice_and_tone:, company_name:, research: nil, job_details: nil, highlight_projects: [])
         <<~PROMPT
           You are an expert cover letter writer helping craft a compelling narrative that complements a tailored resume.
 
@@ -13,7 +13,7 @@ module Jojo
 
           #{job_description}
 
-          #{job_details ? format_job_details(job_details) : ""}
+          #{format_job_details(job_details) if job_details}
 
           #{research ? "## Company Research\n\n#{research}" : "Note: No company research available - analyze based on job description only."}
 

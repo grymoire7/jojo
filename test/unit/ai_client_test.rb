@@ -1,13 +1,13 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/ai_client'
-require_relative '../../lib/jojo/config'
+require_relative "../test_helper"
+require_relative "../../lib/jojo/ai_client"
+require_relative "../../lib/jojo/config"
 
 describe Jojo::AIClient do
-  describe '#initialize' do
-    it 'initializes successfully with anthropic provider' do
+  describe "#initialize" do
+    it "initializes successfully with anthropic provider" do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
-          File.write('config.yml', <<~YAML)
+          File.write("config.yml", <<~YAML)
             seeker_name: Test User
             base_url: https://example.com
             reasoning_ai:
@@ -18,24 +18,24 @@ describe Jojo::AIClient do
               model: claude-3-5-haiku-20241022
           YAML
 
-          ENV['ANTHROPIC_API_KEY'] = 'test-key'
+          ENV["ANTHROPIC_API_KEY"] = "test-key"
 
-          config = Jojo::Config.new('config.yml')
+          config = Jojo::Config.new("config.yml")
           client = Jojo::AIClient.new(config)
 
           # Verify client initialized successfully
           _(client).must_be_instance_of Jojo::AIClient
           _(client.config).must_equal config
         ensure
-          ENV.delete('ANTHROPIC_API_KEY')
+          ENV.delete("ANTHROPIC_API_KEY")
         end
       end
     end
 
-    it 'initializes successfully with openai provider' do
+    it "initializes successfully with openai provider" do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
-          File.write('config.yml', <<~YAML)
+          File.write("config.yml", <<~YAML)
             seeker_name: Test User
             base_url: https://example.com
             reasoning_ai:
@@ -46,16 +46,16 @@ describe Jojo::AIClient do
               model: gpt-4o-mini
           YAML
 
-          ENV['OPENAI_API_KEY'] = 'test-openai-key'
+          ENV["OPENAI_API_KEY"] = "test-openai-key"
 
-          config = Jojo::Config.new('config.yml')
+          config = Jojo::Config.new("config.yml")
           client = Jojo::AIClient.new(config)
 
           # Verify client initialized successfully
           _(client).must_be_instance_of Jojo::AIClient
           _(client.config).must_equal config
         ensure
-          ENV.delete('OPENAI_API_KEY')
+          ENV.delete("OPENAI_API_KEY")
         end
       end
     end

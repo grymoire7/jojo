@@ -1,11 +1,11 @@
-require_relative '../../test_helper'
-require_relative '../../../lib/jojo/employer'
-require_relative '../../../lib/jojo/generators/website_generator'
-require_relative '../../../lib/jojo/config'
-require 'tmpdir'
-require 'fileutils'
+require_relative "../../test_helper"
+require_relative "../../../lib/jojo/employer"
+require_relative "../../../lib/jojo/generators/website_generator"
+require_relative "../../../lib/jojo/config"
+require "tmpdir"
+require "fileutils"
 
-describe 'WebsiteGenerator with Recommendations' do
+describe "WebsiteGenerator with Recommendations" do
   # Simple config stub to avoid complex mock expectations
   class TestConfigStub
     attr_accessor :seeker_name, :voice_and_tone, :website_cta_text, :website_cta_link, :base_url
@@ -20,7 +20,7 @@ describe 'WebsiteGenerator with Recommendations' do
   end
 
   before do
-    @employer = Jojo::Employer.new('test-corp')
+    @employer = Jojo::Employer.new("test-corp")
 
     # Create required files
     FileUtils.mkdir_p(@employer.base_path)
@@ -37,16 +37,16 @@ describe 'WebsiteGenerator with Recommendations' do
 
   after do
     FileUtils.rm_rf(@employer.base_path)
-    FileUtils.rm_rf('test/fixtures/tmp_recommendations_unit') if File.exist?('test/fixtures/tmp_recommendations_unit')
+    FileUtils.rm_rf("test/fixtures/tmp_recommendations_unit") if File.exist?("test/fixtures/tmp_recommendations_unit")
   end
 
   it "includes recommendations in template vars when file exists" do
     # Create recommendations file in test fixtures
-    inputs_path = 'test/fixtures/tmp_recommendations_unit'
+    inputs_path = "test/fixtures/tmp_recommendations_unit"
     FileUtils.mkdir_p(inputs_path)
     File.write(
-      File.join(inputs_path, 'recommendations.md'),
-      File.read('test/fixtures/recommendations.md')
+      File.join(inputs_path, "recommendations.md"),
+      File.read("test/fixtures/recommendations.md")
     )
 
     generator = Jojo::Generators::WebsiteGenerator.new(
@@ -59,12 +59,12 @@ describe 'WebsiteGenerator with Recommendations' do
     html = generator.generate
 
     # Should include recommendations in output
-    _(html).must_include 'Jane Smith'
-    _(html).must_include 'excellent engineer'
+    _(html).must_include "Jane Smith"
+    _(html).must_include "excellent engineer"
   end
 
   it "handles missing recommendations file gracefully" do
-    inputs_path = 'test/fixtures/tmp_recommendations_unit'
+    inputs_path = "test/fixtures/tmp_recommendations_unit"
     FileUtils.mkdir_p(inputs_path)
     # No recommendations.md file
 

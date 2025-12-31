@@ -13,7 +13,7 @@ module Jojo
 
           #{job_description}
 
-          #{research ? "## Company Research\n\n#{research}" : ""}
+          #{"## Company Research\n\n#{research}" if research}
 
           ## Candidate's Resume
 

@@ -1,11 +1,11 @@
-require_relative '../../test_helper'
-require_relative '../../../lib/jojo/employer'
-require_relative '../../../lib/jojo/generators/research_generator'
-require_relative '../../../lib/jojo/prompts/research_prompt'
+require_relative "../../test_helper"
+require_relative "../../../lib/jojo/employer"
+require_relative "../../../lib/jojo/generators/research_generator"
+require_relative "../../../lib/jojo/prompts/research_prompt"
 
 describe Jojo::Generators::ResearchGenerator do
   before do
-    @employer = Jojo::Employer.new('acme-corp')
+    @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
     @generator = Jojo::Generators::ResearchGenerator.new(
@@ -13,7 +13,7 @@ describe Jojo::Generators::ResearchGenerator do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: 'test/fixtures'
+      inputs_path: "test/fixtures"
     )
 
     # Clean up and create directories
@@ -92,7 +92,7 @@ describe Jojo::Generators::ResearchGenerator do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: 'test/fixtures/nonexistent'
+      inputs_path: "test/fixtures/nonexistent"
     )
 
     web_results = "Acme Corp info..."

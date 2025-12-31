@@ -1,12 +1,12 @@
-require_relative '../../test_helper'
-require_relative '../../../lib/jojo/prompts/resume_prompt'
+require_relative "../../test_helper"
+require_relative "../../../lib/jojo/prompts/resume_prompt"
 
 describe Jojo::Prompts::Resume do
   it "generates prompt with all inputs" do
     job_description = "Senior Ruby Developer role..."
     research = "# Company Profile\n\nAcme Corp..."
     generic_resume = "# Jane Doe\n\n## Experience..."
-    job_details = { 'job_title' => 'Senior Ruby Developer', 'company_name' => 'Acme Corp' }
+    job_details = {"job_title" => "Senior Ruby Developer", "company_name" => "Acme Corp"}
     voice_and_tone = "professional and friendly"
 
     prompt = Jojo::Prompts::Resume.generate_prompt(

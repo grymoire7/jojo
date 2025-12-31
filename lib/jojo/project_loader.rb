@@ -1,4 +1,4 @@
-require 'yaml'
+require "yaml"
 
 module Jojo
   class ProjectLoader
@@ -32,12 +32,12 @@ module Jojo
           end
         end
 
-        if project['skills'] && !project['skills'].is_a?(Array)
+        if project["skills"] && !project["skills"].is_a?(Array)
           errors << "Project #{index + 1}: 'skills' must be an array"
         end
       end
 
-      raise ValidationError, errors.join('; ') unless errors.empty?
+      raise ValidationError, errors.join("; ") unless errors.empty?
     end
 
     def symbolize_keys(hash)

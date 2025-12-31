@@ -1,16 +1,17 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-ruby '3.4.5'
+ruby "3.4.5"
 
-gem 'thor', '~> 1.3'
-gem 'ruby_llm', '~> 1.9'
-gem 'deepsearch-rb', '~> 0.1'
-gem 'dotenv', '~> 3.1'
-gem 'html-to-markdown', '~> 2.16'
-gem 'reline'
-gem 'tty-prompt', '~> 0.23'
+gem "thor", "~> 1.3"
+gem "ruby_llm", "~> 1.9"
+gem "deepsearch-rb", "~> 0.1"
+gem "dotenv", "~> 3.1"
+gem "html-to-markdown", "~> 2.16"
+gem "reline"
+gem "tty-prompt", "~> 0.23"
 
 group :development, :test do
-  gem 'minitest', '~> 5.25'
-  gem 'minitest-reporters', '~> 1.7'
+  gem "minitest", "~> 5.25"
+  gem "minitest-reporters", "~> 1.7"
+  gem "standard", "~> 1.0"
 end

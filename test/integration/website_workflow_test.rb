@@ -1,8 +1,8 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/employer'
-require_relative '../../lib/jojo/config'
-require_relative '../../lib/jojo/ai_client'
-require_relative '../../lib/jojo/generators/website_generator'
+require_relative "../test_helper"
+require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/config"
+require_relative "../../lib/jojo/ai_client"
+require_relative "../../lib/jojo/generators/website_generator"
 
 describe "Website Generation Workflow" do
   # Simple config stub
@@ -19,7 +19,7 @@ describe "Website Generation Workflow" do
   end
 
   before do
-    @employer = Jojo::Employer.new('test-company')
+    @employer = Jojo::Employer.new("test-company")
     @ai_client = Minitest::Mock.new
     @config = IntegrationTestConfigStub.new
 
@@ -47,11 +47,11 @@ describe "Website Generation Workflow" do
       @employer,
       @ai_client,
       config: @config,
-      template: 'default',
+      template: "default",
       verbose: false
     )
 
-    result = generator.generate
+    generator.generate
 
     # Verify file was created
     _(File.exist?(@employer.index_html_path)).must_equal true
@@ -82,7 +82,7 @@ describe "Website Generation Workflow" do
 
   it "works with custom template" do
     # Create custom template
-    FileUtils.mkdir_p('templates/website')
+    FileUtils.mkdir_p("templates/website")
     custom_template = <<~HTML
       <!DOCTYPE html>
       <html>
@@ -96,7 +96,7 @@ describe "Website Generation Workflow" do
       </body>
       </html>
     HTML
-    File.write('templates/website/custom.html.erb', custom_template)
+    File.write("templates/website/custom.html.erb", custom_template)
 
     expected_branding = "Custom branding statement..."
     @ai_client.expect(:generate_text, expected_branding, [String])
@@ -105,7 +105,7 @@ describe "Website Generation Workflow" do
       @employer,
       @ai_client,
       config: @config,
-      template: 'custom',
+      template: "custom",
       verbose: false
     )
 
@@ -116,7 +116,7 @@ describe "Website Generation Workflow" do
     _(result).must_include expected_branding
     _(result).must_include "https://calendly.com/johndoe/30min"
 
-    FileUtils.rm_f('templates/website/custom.html.erb')
+    FileUtils.rm_f("templates/website/custom.html.erb")
     @ai_client.verify
   end
 
@@ -130,18 +130,18 @@ describe "Website Generation Workflow" do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: 'test/fixtures'
+      inputs_path: "test/fixtures"
     )
 
     generator.generate
 
     # Verify image was copied to website directory
-    website_image = File.join(@employer.website_path, 'branding_image.jpg')
+    website_image = File.join(@employer.website_path, "branding_image.jpg")
     _(File.exist?(website_image)).must_equal true
 
     # Verify HTML includes image reference
     html = File.read(@employer.index_html_path)
-    _(html).must_include 'branding_image.jpg'
+    _(html).must_include "branding_image.jpg"
     _(html).must_include '<img src="branding_image.jpg"'
 
     @ai_client.verify

@@ -1,12 +1,12 @@
-require_relative '../../test_helper'
-require_relative '../../../lib/jojo/prompts/website_prompt'
+require_relative "../../test_helper"
+require_relative "../../../lib/jojo/prompts/website_prompt"
 
 describe Jojo::Prompts::Website do
   it "generates branding statement prompt with all inputs" do
     job_description = "Senior Ruby Developer role at Acme Corp..."
     research = "# Company Profile\n\nAcme Corp is a leading tech company..."
     resume = "# Jane Doe\n\n## Professional Summary\n\nSenior Ruby developer..."
-    job_details = { 'job_title' => 'Senior Ruby Developer', 'company_name' => 'Acme Corp' }
+    job_details = {"job_title" => "Senior Ruby Developer", "company_name" => "Acme Corp"}
     company_name = "Acme Corp"
     seeker_name = "Jane Doe"
     voice_and_tone = "professional and friendly"
@@ -93,7 +93,7 @@ describe Jojo::Prompts::Website do
   end
 
   it "includes job details when provided" do
-    job_details = { 'job_title' => 'Lead Developer', 'location' => 'Remote' }
+    job_details = {"job_title" => "Lead Developer", "location" => "Remote"}
 
     prompt = Jojo::Prompts::Website.generate_branding_statement(
       job_description: "Developer role",

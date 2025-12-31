@@ -1,18 +1,18 @@
-require 'yaml'
-require 'erb'
-require 'fileutils'
-require 'json'
-require_relative '../prompts/website_prompt'
-require_relative '../project_loader'
-require_relative '../project_selector'
-require_relative '../recommendation_parser'
+require "yaml"
+require "erb"
+require "fileutils"
+require "json"
+require_relative "../prompts/website_prompt"
+require_relative "../project_loader"
+require_relative "../project_selector"
+require_relative "../recommendation_parser"
 
 module Jojo
   module Generators
     class WebsiteGenerator
       attr_reader :employer, :ai_client, :config, :verbose, :template_name, :inputs_path, :overwrite_flag, :cli_instance
 
-      def initialize(employer, ai_client, config:, template: 'default', verbose: false, inputs_path: 'inputs', overwrite_flag: nil, cli_instance: nil)
+      def initialize(employer, ai_client, config:, template: "default", verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
         @employer = employer
         @ai_client = ai_client
         @config = config
@@ -126,7 +126,7 @@ module Jojo
 
       def prepare_template_vars(branding_statement, inputs, projects = [], annotated_job_description = nil, recommendations = nil, faqs = nil)
         # Extract job title from job_details if available
-        job_title = inputs[:job_details] ? inputs[:job_details]['job_title'] : nil
+        job_title = inputs[:job_details] ? inputs[:job_details]["job_title"] : nil
 
         # Check for branding image
         branding_image_info = find_branding_image
@@ -157,10 +157,10 @@ module Jojo
       end
 
       def render_template(vars)
-        template_path = File.join('templates', 'website', "#{template_name}.html.erb")
+        template_path = File.join("templates", "website", "#{template_name}.html.erb")
 
         unless File.exist?(template_path)
-          raise "Template not found: #{template_path}. Available templates: #{available_templates.join(', ')}"
+          raise "Template not found: #{template_path}. Available templates: #{available_templates.join(", ")}"
         end
 
         template_content = File.read(template_path)
@@ -199,7 +199,7 @@ module Jojo
           end
         end
 
-        { exists: false, source_path: nil, relative_path: nil, extension: nil }
+        {exists: false, source_path: nil, relative_path: nil, extension: nil}
       end
 
       def copy_branding_image
@@ -236,11 +236,11 @@ module Jojo
       end
 
       def available_templates
-        template_dir = 'templates/website'
+        template_dir = "templates/website"
         return [] unless Dir.exist?(template_dir)
 
-        Dir.glob(File.join(template_dir, '*.html.erb')).map do |path|
-          File.basename(path, '.html.erb')
+        Dir.glob(File.join(template_dir, "*.html.erb")).map do |path|
+          File.basename(path, ".html.erb")
         end
       end
 
@@ -249,7 +249,7 @@ module Jojo
       end
 
       def load_projects
-        projects_path = File.join(inputs_path, 'projects.yml')
+        projects_path = File.join(inputs_path, "projects.yml")
         return [] unless File.exist?(projects_path)
 
         loader = ProjectLoader.new(projects_path)
@@ -267,7 +267,7 @@ module Jojo
           project = project.dup
 
           if project[:image]
-            if project[:image].start_with?('http://', 'https://')
+            if project[:image].start_with?("http://", "https://")
               # URL: use directly
               project[:image_url] = project[:image]
             else
@@ -275,7 +275,7 @@ module Jojo
               src = File.join(Dir.pwd, project[:image])
 
               if File.exist?(src)
-                dest_dir = File.join(employer.website_path, 'images')
+                dest_dir = File.join(employer.website_path, "images")
                 FileUtils.mkdir_p(dest_dir)
 
                 filename = File.basename(project[:image])
@@ -312,8 +312,7 @@ module Jojo
         job_description_md = File.read(employer.job_description_path)
 
         # Convert to HTML and inject annotations
-        annotated_html = inject_annotations(job_description_md, annotations)
-        annotated_html
+        inject_annotations(job_description_md, annotations)
       rescue => e
         log "Error annotating job description: #{e.message}"
         nil
@@ -328,7 +327,7 @@ module Jojo
       end
 
       def inject_annotations(markdown_text, annotations)
-        require 'cgi'
+        require "cgi"
 
         # Convert markdown to HTML paragraphs
         html = markdown_to_html(markdown_text)
@@ -366,7 +365,7 @@ module Jojo
       end
 
       def load_recommendations
-        recommendations_path = File.join(inputs_path, 'recommendations.md')
+        recommendations_path = File.join(inputs_path, "recommendations.md")
 
         unless File.exist?(recommendations_path)
           log "No recommendations found at #{recommendations_path}"

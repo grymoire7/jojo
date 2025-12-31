@@ -1,7 +1,7 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/employer'
-require_relative '../../lib/jojo/generators/annotation_generator'
-require_relative '../../lib/jojo/generators/website_generator'
+require_relative "../test_helper"
+require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/generators/annotation_generator"
+require_relative "../../lib/jojo/generators/website_generator"
 
 describe "Annotated Job Description Integration" do
   # Simple config stub to avoid complex mock expectations
@@ -18,7 +18,7 @@ describe "Annotated Job Description Integration" do
   end
 
   before do
-    @employer = Jojo::Employer.new('techcorp')
+    @employer = Jojo::Employer.new("techcorp")
     @ai_client = Minitest::Mock.new
     @config = IntegrationTestConfigStub.new
 
@@ -44,9 +44,9 @@ describe "Annotated Job Description Integration" do
     annotation_generator = Jojo::Generators::AnnotationGenerator.new(@employer, @ai_client, verbose: false)
 
     annotations_json = JSON.generate([
-      { text: "5+ years of Ruby", match: "Built Ruby apps for 7 years", tier: "strong" },
-      { text: "distributed systems", match: "Built distributed message queue system", tier: "strong" },
-      { text: "PostgreSQL", match: "Experience with PostgreSQL and Redis", tier: "moderate" }
+      {text: "5+ years of Ruby", match: "Built Ruby apps for 7 years", tier: "strong"},
+      {text: "distributed systems", match: "Built distributed message queue system", tier: "strong"},
+      {text: "PostgreSQL", match: "Experience with PostgreSQL and Redis", tier: "moderate"}
     ])
 
     @ai_client.expect(:reason, annotations_json, [String])
@@ -59,7 +59,7 @@ describe "Annotated Job Description Integration" do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: 'test/fixtures'
+      inputs_path: "test/fixtures"
     )
 
     @ai_client.expect(:generate_text, "I'm a great fit for TechCorp...", [String])
@@ -95,7 +95,7 @@ describe "Annotated Job Description Integration" do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: 'test/fixtures'
+      inputs_path: "test/fixtures"
     )
 
     @ai_client.expect(:generate_text, "I'm a great fit for TechCorp...", [String])

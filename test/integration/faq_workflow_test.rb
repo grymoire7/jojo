@@ -1,26 +1,26 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/employer'
-require_relative '../../lib/jojo/generators/faq_generator'
-require_relative '../../lib/jojo/generators/website_generator'
-require_relative '../../lib/jojo/config'
-require 'yaml'
-require 'json'
+require_relative "../test_helper"
+require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/generators/faq_generator"
+require_relative "../../lib/jojo/generators/website_generator"
+require_relative "../../lib/jojo/config"
+require "yaml"
+require "json"
 
 describe "FAQ Workflow Integration" do
   before do
-    @employer = Jojo::Employer.new('integration-test-corp')
+    @employer = Jojo::Employer.new("integration-test-corp")
     @ai_client = Minitest::Mock.new
 
     # Create minimal config
     config_data = {
-      'seeker_name' => 'John Doe',
-      'voice_and_tone' => 'professional and friendly',
-      'base_url' => 'https://johndoe.com',
-      'reasoning_ai' => { 'service' => 'anthropic', 'model' => 'sonnet' },
-      'text_generation_ai' => { 'service' => 'anthropic', 'model' => 'haiku' }
+      "seeker_name" => "John Doe",
+      "voice_and_tone" => "professional and friendly",
+      "base_url" => "https://johndoe.com",
+      "reasoning_ai" => {"service" => "anthropic", "model" => "sonnet"},
+      "text_generation_ai" => {"service" => "anthropic", "model" => "haiku"}
     }
-    File.write('config.yml', YAML.dump(config_data))
-    @config = Jojo::Config.new('config.yml')
+    File.write("config.yml", YAML.dump(config_data))
+    @config = Jojo::Config.new("config.yml")
 
     # Clean up and create directories
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
@@ -34,7 +34,7 @@ describe "FAQ Workflow Integration" do
 
   after do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    FileUtils.rm_f('config.yml') if File.exist?('config.yml')
+    FileUtils.rm_f("config.yml") if File.exist?("config.yml")
   end
 
   it "generates FAQs and includes them in website" do
@@ -47,9 +47,9 @@ describe "FAQ Workflow Integration" do
     )
 
     faq_response = JSON.generate([
-      { question: "What's your Ruby experience?", answer: "I have 7 years of Ruby experience..." },
-      { question: "Why this company?", answer: "Integration Test Corp's mission resonates..." },
-      { question: "Where can I find your resume?", answer: "<a href='...'>Resume</a>" }
+      {question: "What's your Ruby experience?", answer: "I have 7 years of Ruby experience..."},
+      {question: "Why this company?", answer: "Integration Test Corp's mission resonates..."},
+      {question: "Where can I find your resume?", answer: "<a href='...'>Resume</a>"}
     ])
 
     @ai_client.expect(:reason, faq_response, [String])
@@ -125,7 +125,7 @@ describe "FAQ Workflow Integration" do
 
   it "renders FAQ section in correct position" do
     # Create FAQ file
-    faqs = [{ question: "Test?", answer: "Answer" }]
+    faqs = [{question: "Test?", answer: "Answer"}]
     File.write(@employer.faq_path, JSON.generate(faqs))
 
     website_generator = Jojo::Generators::WebsiteGenerator.new(
@@ -140,7 +140,7 @@ describe "FAQ Workflow Integration" do
     html = website_generator.generate
 
     # FAQ should come before footer
-    faq_position = html.index('Your Questions, Answered')
+    faq_position = html.index("Your Questions, Answered")
     footer_position = html.index('<footer class="footer">')
 
     _(faq_position).wont_be_nil

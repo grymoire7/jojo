@@ -1,10 +1,10 @@
-require_relative '../test_helper'
-require_relative '../../lib/jojo/project_selector'
-require_relative '../../lib/jojo/employer'
+require_relative "../test_helper"
+require_relative "../../lib/jojo/project_selector"
+require_relative "../../lib/jojo/employer"
 
 describe Jojo::ProjectSelector do
   before do
-    @employer = Jojo::Employer.new('test-corp')
+    @employer = Jojo::Employer.new("test-corp")
     @employer.create_directory!
 
     # Create job_details.yml fixture
@@ -18,25 +18,25 @@ describe Jojo::ProjectSelector do
 
     @projects = [
       {
-        title: 'Project Alpha',
-        description: 'Web app project',
-        skills: ['Ruby on Rails', 'PostgreSQL', 'web development']
+        title: "Project Alpha",
+        description: "Web app project",
+        skills: ["Ruby on Rails", "PostgreSQL", "web development"]
       },
       {
-        title: 'Project Beta',
-        description: 'Unrelated project',
-        skills: ['Python', 'MongoDB']
+        title: "Project Beta",
+        description: "Unrelated project",
+        skills: ["Python", "MongoDB"]
       },
       {
-        title: 'Leadership Award',
-        description: 'Employee award',
-        skills: ['leadership', 'teamwork']
+        title: "Leadership Award",
+        description: "Employee award",
+        skills: ["leadership", "teamwork"]
       }
     ]
   end
 
   after do
-    FileUtils.rm_rf('employers/test-corp')
+    FileUtils.rm_rf("employers/test-corp")
   end
 
   it "selects projects based on skill matching" do
@@ -44,7 +44,7 @@ describe Jojo::ProjectSelector do
     selected = selector.select_for_landing_page(limit: 3)
 
     _(selected.size).must_equal 2  # Only 2 projects match
-    _(selected.first[:title]).must_equal 'Project Alpha'
+    _(selected.first[:title]).must_equal "Project Alpha"
     _(selected.first[:score]).must_be :>, 0
   end
 
@@ -52,15 +52,15 @@ describe Jojo::ProjectSelector do
     current_year = Time.now.year
     projects = [
       {
-        title: 'Old Project',
-        description: 'From 5 years ago',
-        skills: ['Ruby on Rails'],
+        title: "Old Project",
+        description: "From 5 years ago",
+        skills: ["Ruby on Rails"],
         year: current_year - 5
       },
       {
-        title: 'Recent Project',
-        description: 'From last year',
-        skills: ['Ruby on Rails'],
+        title: "Recent Project",
+        description: "From last year",
+        skills: ["Ruby on Rails"],
         year: current_year - 1
       }
     ]
@@ -68,16 +68,16 @@ describe Jojo::ProjectSelector do
     selector = Jojo::ProjectSelector.new(@employer, projects)
     selected = selector.select_for_landing_page(limit: 2)
 
-    _(selected.first[:title]).must_equal 'Recent Project'
+    _(selected.first[:title]).must_equal "Recent Project"
     _(selected.first[:score]).must_be :>, selected.last[:score]
   end
 
   it "returns empty array when no projects match" do
     projects = [
       {
-        title: 'Unrelated Project',
-        description: 'No matching skills',
-        skills: ['Python', 'Java']
+        title: "Unrelated Project",
+        description: "No matching skills",
+        skills: ["Python", "Java"]
       }
     ]
 

@@ -1,7 +1,7 @@
-require_relative '../../test_helper'
-require_relative '../../../lib/jojo/employer'
-require_relative '../../../lib/jojo/generators/website_generator'
-require_relative '../../../lib/jojo/prompts/website_prompt'
+require_relative "../../test_helper"
+require_relative "../../../lib/jojo/employer"
+require_relative "../../../lib/jojo/generators/website_generator"
+require_relative "../../../lib/jojo/prompts/website_prompt"
 
 describe Jojo::Generators::WebsiteGenerator do
   # Simple config stub to avoid complex mock expectations
@@ -18,7 +18,7 @@ describe Jojo::Generators::WebsiteGenerator do
   end
 
   before do
-    @employer = Jojo::Employer.new('acme-corp')
+    @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = UnitTestConfigStub.new
     @generator = Jojo::Generators::WebsiteGenerator.new(
@@ -26,7 +26,7 @@ describe Jojo::Generators::WebsiteGenerator do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: 'test/fixtures'
+      inputs_path: "test/fixtures"
     )
 
     # Clean up and create directories
@@ -89,10 +89,10 @@ describe Jojo::Generators::WebsiteGenerator do
 
   it "generates website with custom template" do
     # Create test template
-    FileUtils.mkdir_p('templates/website')
-    File.write('templates/website/modern.html.erb', '<html><body><h1><%= seeker_name %></h1></body></html>')
+    FileUtils.mkdir_p("templates/website")
+    File.write("templates/website/modern.html.erb", "<html><body><h1><%= seeker_name %></h1></body></html>")
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, @ai_client, config: @config, template: 'modern', verbose: false)
+    generator = Jojo::Generators::WebsiteGenerator.new(@employer, @ai_client, config: @config, template: "modern", verbose: false)
 
     expected_branding = "Modern branding..."
     @ai_client.expect(:generate_text, expected_branding, [String])
@@ -101,12 +101,12 @@ describe Jojo::Generators::WebsiteGenerator do
 
     _(result).must_include "<h1>Jane Doe</h1>"
 
-    FileUtils.rm_f('templates/website/modern.html.erb')
+    FileUtils.rm_f("templates/website/modern.html.erb")
     @ai_client.verify
   end
 
   it "raises error when template is missing" do
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, @ai_client, config: @config, template: 'nonexistent', verbose: false)
+    generator = Jojo::Generators::WebsiteGenerator.new(@employer, @ai_client, config: @config, template: "nonexistent", verbose: false)
 
     expected_branding = "Branding..."
     @ai_client.expect(:generate_text, expected_branding, [String])
@@ -147,12 +147,12 @@ describe Jojo::Generators::WebsiteGenerator do
     @generator.generate
 
     # Check that image was copied
-    image_path = File.join(@employer.website_path, 'branding_image.jpg')
+    image_path = File.join(@employer.website_path, "branding_image.jpg")
     _(File.exist?(image_path)).must_equal true
 
     # Check that HTML references the image
     html = File.read(@employer.index_html_path)
-    _(html).must_include 'branding_image.jpg'
+    _(html).must_include "branding_image.jpg"
 
     @ai_client.verify
   end
@@ -164,7 +164,7 @@ describe Jojo::Generators::WebsiteGenerator do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: 'test/fixtures/nonexistent'
+      inputs_path: "test/fixtures/nonexistent"
     )
 
     expected_branding = "Branding without image..."
@@ -173,7 +173,7 @@ describe Jojo::Generators::WebsiteGenerator do
     generator_no_image.generate
 
     # Image should not exist in website directory
-    image_path = File.join(@employer.website_path, 'branding_image.jpg')
+    image_path = File.join(@employer.website_path, "branding_image.jpg")
     _(File.exist?(image_path)).must_equal false
 
     @ai_client.verify
@@ -232,8 +232,8 @@ describe Jojo::Generators::WebsiteGenerator do
 
     # Create annotations JSON
     annotations = [
-      { text: "Ruby", match: "7 years Ruby experience", tier: "strong" },
-      { text: "distributed systems", match: "Built message queue", tier: "moderate" }
+      {text: "Ruby", match: "7 years Ruby experience", tier: "strong"},
+      {text: "distributed systems", match: "Built message queue", tier: "moderate"}
     ]
     File.write(@employer.job_description_annotations_path, JSON.generate(annotations))
 
@@ -270,7 +270,7 @@ describe Jojo::Generators::WebsiteGenerator do
     File.write(@employer.job_description_path, "We need Ruby skills. Ruby is our main language. Ruby developers wanted.")
 
     annotations = [
-      { text: "Ruby", match: "7 years Ruby experience", tier: "strong" }
+      {text: "Ruby", match: "7 years Ruby experience", tier: "strong"}
     ]
     File.write(@employer.job_description_annotations_path, JSON.generate(annotations))
 
@@ -289,8 +289,8 @@ describe Jojo::Generators::WebsiteGenerator do
   it "loads and passes FAQs to template" do
     # Create mock FAQs file
     faqs_data = [
-      { question: "What's your experience?", answer: "I have 7 years..." },
-      { question: "Why this company?", answer: "I'm excited about..." }
+      {question: "What's your experience?", answer: "I have 7 years..."},
+      {question: "Why this company?", answer: "I'm excited about..."}
     ]
     File.write(@employer.faq_path, JSON.generate(faqs_data))
 

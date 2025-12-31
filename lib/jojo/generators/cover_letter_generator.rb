@@ -1,14 +1,14 @@
-require 'yaml'
-require_relative '../prompts/cover_letter_prompt'
-require_relative '../project_loader'
-require_relative '../project_selector'
+require "yaml"
+require_relative "../prompts/cover_letter_prompt"
+require_relative "../project_loader"
+require_relative "../project_selector"
 
 module Jojo
   module Generators
     class CoverLetterGenerator
       attr_reader :employer, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
 
-      def initialize(employer, ai_client, config:, verbose: false, inputs_path: 'inputs', overwrite_flag: nil, cli_instance: nil)
+      def initialize(employer, ai_client, config:, verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
         @employer = employer
         @ai_client = ai_client
         @config = config
@@ -57,7 +57,7 @@ module Jojo
         tailored_resume = File.read(employer.resume_path)
 
         # Read generic resume (REQUIRED)
-        generic_resume_path = File.join(inputs_path, 'generic_resume.md')
+        generic_resume_path = File.join(inputs_path, "generic_resume.md")
         unless File.exist?(generic_resume_path)
           raise "Generic resume not found at #{generic_resume_path}"
         end
@@ -137,7 +137,7 @@ module Jojo
       end
 
       def load_projects
-        projects_path = File.join(inputs_path, 'projects.yml')
+        projects_path = File.join(inputs_path, "projects.yml")
         return [] unless File.exist?(projects_path)
 
         loader = ProjectLoader.new(projects_path)

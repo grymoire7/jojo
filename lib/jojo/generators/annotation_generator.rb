@@ -1,5 +1,5 @@
-require 'json'
-require_relative '../prompts/annotation_prompt'
+require "json"
+require_relative "../prompts/annotation_prompt"
 
 module Jojo
   module Generators

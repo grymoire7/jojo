@@ -1,7 +1,7 @@
-require 'fileutils'
-require 'erb'
-require 'tty-prompt'
-require_relative 'provider_helper'
+require "fileutils"
+require "erb"
+require "tty-prompt"
+require_relative "provider_helper"
 
 module Jojo
   class SetupService
@@ -43,8 +43,8 @@ module Jojo
     def validate_configuration_completeness
       return if @force  # Force mode bypasses validation
 
-      env_exists = File.exist?('.env')
-      config_exists = File.exist?('config.yml')
+      env_exists = File.exist?(".env")
+      config_exists = File.exist?("config.yml")
 
       # XOR check: fail if exactly one exists
       if env_exists && !config_exists
@@ -71,12 +71,12 @@ module Jojo
     end
 
     def setup_api_configuration
-      if File.exist?('.env') && !@force
+      if File.exist?(".env") && !@force
         @cli.say "✓ .env already exists (skipped)", :green
-        @skipped_files << '.env'
+        @skipped_files << ".env"
 
         # Extract provider from existing .env file
-        env_content = File.read('.env')
+        env_content = File.read(".env")
         env_content.each_line do |line|
           # Match provider-specific API key pattern (e.g., ANTHROPIC_API_KEY=...)
           if line =~ /^([A-Z_]+)_API_KEY=/
@@ -95,7 +95,7 @@ module Jojo
         return
       end
 
-      if @force && File.exist?('.env')
+      if @force && File.exist?(".env")
         @cli.say "⚠ Recreating .env (--force mode)", :yellow
       else
         @cli.say "Let's configure your API access.", :green
@@ -135,7 +135,7 @@ module Jojo
       # Select provider
       @search_provider_slug = @prompt.select(
         "Which search provider?",
-        ['tavily', 'serper'],
+        ["tavily", "serper"],
         {per_page: 5}
       )
 
@@ -153,7 +153,7 @@ module Jojo
 
     def write_env_file
       # Skip if .env was already handled
-      return if @skipped_files.include?('.env')
+      return if @skipped_files.include?(".env")
 
       # Set local variables for template binding
       llm_env_var_name = @llm_env_var_name
@@ -164,10 +164,10 @@ module Jojo
 
       # Render .env from template
       begin
-        template = ERB.new(File.read('templates/.env.erb'))
-        File.write('.env', template.result(binding))
+        template = ERB.new(File.read("templates/.env.erb"))
+        File.write(".env", template.result(binding))
         @cli.say "✓ Created .env", :green
-        @created_files << '.env'
+        @created_files << ".env"
       rescue => e
         @cli.say "✗ Failed to create .env: #{e.message}", :red
         exit 1
@@ -175,9 +175,9 @@ module Jojo
     end
 
     def setup_personal_configuration
-      if File.exist?('config.yml') && !@force
+      if File.exist?("config.yml") && !@force
         @cli.say "✓ config.yml already exists (skipped)", :green
-        @skipped_files << 'config.yml'
+        @skipped_files << "config.yml"
         return
       end
 
@@ -222,10 +222,10 @@ module Jojo
       search_provider_slug = @search_provider_slug
 
       begin
-        template = ERB.new(File.read('templates/config.yml.erb'))
-        File.write('config.yml', template.result(binding))
+        template = ERB.new(File.read("templates/config.yml.erb"))
+        File.write("config.yml", template.result(binding))
         @cli.say "✓ Created config.yml", :green
-        @created_files << 'config.yml'
+        @created_files << "config.yml"
       rescue => e
         @cli.say "✗ Failed to create config.yml: #{e.message}", :red
         exit 1
@@ -233,20 +233,20 @@ module Jojo
     end
 
     def setup_input_files
-      FileUtils.mkdir_p('inputs') unless Dir.exist?('inputs')
+      FileUtils.mkdir_p("inputs") unless Dir.exist?("inputs")
       @cli.say "✓ inputs/ directory ready", :green
       @cli.say ""
       @cli.say "Setting up your profile templates...", :green
 
       input_files = {
-        'generic_resume.md' => '(customize this file)',
-        'recommendations.md' => '(optional - customize or delete)',
-        'projects.yml' => '(optional - customize or delete)'
+        "generic_resume.md" => "(customize this file)",
+        "recommendations.md" => "(optional - customize or delete)",
+        "projects.yml" => "(optional - customize or delete)"
       }
 
       input_files.each do |filename, description|
-        target_path = File.join('inputs', filename)
-        source_path = File.join('templates', filename)
+        target_path = File.join("inputs", filename)
+        source_path = File.join("templates", filename)
 
         if File.exist?(target_path) && !@force
           @cli.say "✓ inputs/#{filename} already exists (skipped)", :green
@@ -274,15 +274,15 @@ module Jojo
       if @created_files.any?
         @cli.say "Created:"
         file_descriptions = {
-          '.env' => 'API configuration',
-          'config.yml' => 'Personal preferences',
-          'inputs/generic_resume.md' => 'Your work history template',
-          'inputs/recommendations.md' => 'Optional recommendations',
-          'inputs/projects.yml' => 'Optional portfolio projects'
+          ".env" => "API configuration",
+          "config.yml" => "Personal preferences",
+          "inputs/generic_resume.md" => "Your work history template",
+          "inputs/recommendations.md" => "Optional recommendations",
+          "inputs/projects.yml" => "Optional portfolio projects"
         }
 
         @created_files.each do |file|
-          desc = file_descriptions[file] || 'Configuration file'
+          desc = file_descriptions[file] || "Configuration file"
           @cli.say "  • #{file} - #{desc}"
         end
         @cli.say ""

@@ -1,10 +1,10 @@
-require_relative '../../test_helper'
-require_relative '../../../lib/jojo/employer'
-require_relative '../../../lib/jojo/generators/faq_generator'
+require_relative "../../test_helper"
+require_relative "../../../lib/jojo/employer"
+require_relative "../../../lib/jojo/generators/faq_generator"
 
 describe Jojo::Generators::FaqGenerator do
   before do
-    @employer = Jojo::Employer.new('acme-corp')
+    @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
     @generator = Jojo::Generators::FaqGenerator.new(
@@ -33,8 +33,8 @@ describe Jojo::Generators::FaqGenerator do
     @config.expect(:base_url, "https://example.com")
 
     ai_response = JSON.generate([
-      { question: "What's your Python experience?", answer: "I have 7 years of Python experience..." },
-      { question: "Where can I find your resume?", answer: "Download here: <a href='...'>Resume</a>" }
+      {question: "What's your Python experience?", answer: "I have 7 years of Python experience..."},
+      {question: "Where can I find your resume?", answer: "Download here: <a href='...'>Resume</a>"}
     ])
 
     @ai_client.expect(:reason, ai_response, [String])
@@ -55,7 +55,7 @@ describe Jojo::Generators::FaqGenerator do
     @config.expect(:base_url, "https://example.com")
 
     ai_response = JSON.generate([
-      { question: "What's your experience?", answer: "I have experience..." }
+      {question: "What's your experience?", answer: "I have experience..."}
     ])
 
     @ai_client.expect(:reason, ai_response, [String])
@@ -93,10 +93,10 @@ describe Jojo::Generators::FaqGenerator do
     @config.expect(:base_url, "https://example.com")
 
     ai_response = JSON.generate([
-      { question: "Valid question?", answer: "Valid answer" },
-      { question: "", answer: "Missing question" },
-      { question: "Missing answer?", answer: "" },
-      { answer: "Missing question field" }
+      {question: "Valid question?", answer: "Valid answer"},
+      {question: "", answer: "Missing question"},
+      {question: "Missing answer?", answer: ""},
+      {answer: "Missing question field"}
     ])
 
     @ai_client.expect(:reason, ai_response, [String])
@@ -118,7 +118,7 @@ describe Jojo::Generators::FaqGenerator do
     @config.expect(:base_url, "https://example.com")
 
     ai_response = JSON.generate([
-      { question: "Question?", answer: "Answer" }
+      {question: "Question?", answer: "Answer"}
     ])
 
     @ai_client.expect(:reason, ai_response, [String])
