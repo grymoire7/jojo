@@ -289,6 +289,31 @@ module Jojo
         exit 1
       end
 
+      # Generate PDFs
+      begin
+        generator = Jojo::PdfGenerator.new(employer, verbose: options[:verbose])
+        results = generator.generate_all
+
+        if results[:generated].any?
+          results[:generated].each do |doc_type|
+            say "✓ #{doc_type.to_s.capitalize} PDF generated", :green
+          end
+
+          status_logger.log_step("PDF Generation",
+            status: "complete",
+            generated: results[:generated].length)
+        else
+          say "⚠ Warning: No PDFs generated (markdown files not found)", :yellow
+        end
+      rescue Jojo::PandocChecker::PandocNotFoundError => e
+        say "⚠ Warning: Skipping PDF generation - #{e.message.lines.first.strip}", :yellow
+        status_logger.log_step("PDF Generation", status: "skipped", reason: "Pandoc not installed")
+      rescue => e
+        say "⚠ Warning: PDF generation failed - #{e.message}", :yellow
+        status_logger.log_step("PDF Generation", status: "failed", error: e.message)
+        # Don't exit - PDFs are optional
+      end
+
       say "\n✓ Generation complete!", :green
     end
 
