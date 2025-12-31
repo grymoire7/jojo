@@ -7,6 +7,9 @@ text_generation_ai:
   service: <%= text_generation_provider %>
   model: <%= text_generation_model %>
 voice_and_tone: professional and friendly
+<% if search_provider_slug %>
+search: <%= search_provider_slug %>
+<% end %>
 
 # Website configuration
 website:
