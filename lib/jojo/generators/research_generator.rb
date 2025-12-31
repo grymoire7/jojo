@@ -94,7 +94,7 @@ module Jojo
         # If search provider is not configured, research generation continues
         # using only job description analysis (graceful degradation)
 
-        unless config.search_provider_configured?
+        unless config.search_configured?
           log "Warning: Search provider not configured, skipping web search"
           return nil
         end
@@ -103,8 +103,8 @@ module Jojo
 
         # Configure deepsearch with the search provider
         search_client = DeepSearch::Client.new(
-          service: config.search_provider_service,
-          api_key: config.search_provider_api_key
+          service: config.search_service,
+          api_key: config.search_api_key
         )
 
         # Search for company information
