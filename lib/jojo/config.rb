@@ -60,18 +60,6 @@ module Jojo
       !search_service.nil? && !search_api_key.nil?
     end
 
-    def search_provider_service
-      config.dig('search_provider', 'service')
-    end
-
-    def search_provider_api_key
-      config.dig('search_provider', 'api_key')
-    end
-
-    def search_provider_configured?
-      !search_provider_service.nil? && !search_provider_api_key.nil?
-    end
-
     def website_cta_text
       config.dig('website', 'cta_text') || 'Get in Touch'
     end
