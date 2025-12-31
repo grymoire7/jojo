@@ -522,32 +522,57 @@ module Jojo
         --unit         Unit tests (fast, no external dependencies) [default]
         --integration  Integration tests (mocked external services)
         --service      Service tests (real API calls, may cost money)
-        --all          All test categories
+        --standard     Standard Ruby style checks
+        --all          All tests and checks (includes --standard)
         --no-service   Exclude service tests
 
       Examples:
         jojo test                        # Run unit tests only (fast)
-        jojo test --all                  # Run all tests
-        jojo test --all --no-service     # Run all tests except service tests
+        jojo test --standard             # Run Standard Ruby style checks
+        jojo test --all                  # Run all tests and style checks
+        jojo test --all --no-service     # Run all tests/checks except service tests
         jojo test --unit --integration   # Run unit and integration tests
+        jojo test --standard --unit      # Run style checks then unit tests
         jojo test --service              # Run service tests (with confirmation)
         jojo test -q                     # Quiet mode, check exit code
     DESC
     method_option :unit, type: :boolean, desc: "Run unit tests (default)"
     method_option :integration, type: :boolean, desc: "Run integration tests"
     method_option :service, type: :boolean, desc: "Run service tests (may use real APIs)"
-    method_option :all, type: :boolean, desc: "Run all tests"
+    method_option :standard, type: :boolean, desc: "Run Standard Ruby style checks"
+    method_option :all, type: :boolean, desc: "Run all tests and checks"
     def test
       # Validate unsupported Thor auto-generated flags
       unsupported_flags = []
       unsupported_flags << "--no-unit or --skip-unit" if options[:unit] == false
       unsupported_flags << "--no-integration or --skip-integration" if options[:integration] == false
       unsupported_flags << "--no-all or --skip-all" if options[:all] == false
+      unsupported_flags << "--no-standard or --skip-standard" if options[:standard] == false
 
       if unsupported_flags.any?
         say "✗ Unsupported option(s): #{unsupported_flags.join(", ")}", :red
         say "  Only --no-service (to exclude service tests from --all) is supported.", :yellow
         exit 1
+      end
+
+      # Handle --standard flag specially (runs before tests)
+      run_standard = options[:standard] || options[:all]
+
+      if run_standard
+        say "Running Standard Ruby style checks...", :cyan
+        system("bundle exec standardrb")
+        standard_exit_code = $?.exitstatus
+
+        if standard_exit_code != 0
+          say "✗ Standard Ruby style checks failed", :red
+          exit standard_exit_code
+        end
+        say "✓ Standard Ruby style checks passed", :green
+      end
+
+      # If only --standard was specified, exit after running it
+      if options[:standard] && !options[:all] && !options[:unit] && !options[:integration] && !options[:service]
+        exit 0
       end
 
       # Determine which test categories to run
@@ -561,7 +586,7 @@ module Jojo
         categories << "integration" if options[:integration]
         categories << "service" if options[:service]
 
-        # Default to unit tests if no flags specified
+        # Default to unit tests if no flags specified (and --standard wasn't the only thing)
         categories = ["unit"] if categories.empty?
       end
 
