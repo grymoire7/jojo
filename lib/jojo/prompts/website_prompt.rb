@@ -62,6 +62,25 @@ module Jojo
           - Compelling and authentic voice
           - Reads naturally, not templated
 
+          ## CRITICAL: NO TECHNOLOGY/SKILL/TOOL FABRICATION
+          When mentioning technical expertise, tools, or interests:
+          ❌ FORBIDDEN: Claiming experience with technologies not in the resume
+          ❌ FORBIDDEN: Claiming interest in or enthusiasm for tools not in the resume
+          ❌ FORBIDDEN: Inferring skills from similar ones (Vue ≠ React, Java ≠ Kotlin, Aider ≠ Cursor)
+          ❌ FORBIDDEN: Mentioning development tools from job description as if candidate uses them
+          ✅ ALLOWED: Mentioning technologies exactly as they appear in resume
+          ✅ ALLOWED: Highlighting transferable skills authentically
+          ✅ ALLOWED: Acknowledging company's use of tools (e.g., "excited to work with your team's use of Cursor")
+
+          Example: Resume has "Vue", job wants "React"
+          ❌ WRONG: "expertise spans...Ruby on Rails, React, AWS"
+          ✅ RIGHT: "expertise spans...Ruby on Rails, Vue, AWS"
+
+          Example: Resume has "Aider", job mentions "Cursor" and "Claude"
+          ❌ WRONG: "enthusiasm for exploring tools like Cursor and Claude"
+          ✅ RIGHT: "experience with AI-assisted development tools like Aider"
+          ✅ ALSO RIGHT: "excited to join a team leveraging cutting-edge AI tools"
+
           # Important:
           - Output ONLY the branding statement text (plain paragraphs)
           - NO headers, NO markdown formatting, NO commentary

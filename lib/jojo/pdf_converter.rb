@@ -1,7 +1,7 @@
 require_relative "pandoc_checker"
 
 module Jojo
-  class PdfGenerator
+  class PdfConverter
     class SourceFileNotFoundError < StandardError; end
     class PandocExecutionError < StandardError; end
 

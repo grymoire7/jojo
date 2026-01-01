@@ -8,7 +8,8 @@ require_relative "generators/resume_generator"
 require_relative "generators/cover_letter_generator"
 require_relative "generators/website_generator"
 require_relative "generators/annotation_generator"
-require_relative "pdf_generator"
+require_relative "generators/faq_generator"
+require_relative "pdf_converter"
 
 module Jojo
   class CLI < Thor
@@ -261,6 +262,26 @@ module Jojo
         # Don't exit - annotations are optional, continue with website generation
       end
 
+      # Generate FAQs
+      begin
+        if File.exist?(employer.resume_path)
+          generator = Jojo::Generators::FaqGenerator.new(employer, ai_client, config: config, verbose: options[:verbose])
+          faqs = generator.generate
+
+          say "✓ Generated #{faqs.length} FAQs", :green
+          status_logger.log_step("FAQ Generation",
+            tokens: ai_client.total_tokens_used,
+            status: "complete",
+            faq_count: faqs.length)
+        else
+          say "⚠ Warning: Resume not found, skipping FAQ generation", :yellow
+        end
+      rescue => e
+        say "✗ Error generating FAQs: #{e.message}", :red
+        status_logger.log_step("FAQ Generation", status: "failed", error: e.message)
+        # Don't exit - FAQs are optional, continue with website generation
+      end
+
       # Generate website
       begin
         if File.exist?(employer.resume_path)
@@ -291,7 +312,7 @@ module Jojo
 
       # Generate PDFs
       begin
-        generator = Jojo::PdfGenerator.new(employer, verbose: options[:verbose])
+        generator = Jojo::PdfConverter.new(employer, verbose: options[:verbose])
         results = generator.generate_all
 
         if results[:generated].any?
@@ -564,7 +585,7 @@ module Jojo
       say "Generating PDFs for #{employer.company_name}...", :green
 
       begin
-        generator = Jojo::PdfGenerator.new(employer, verbose: options[:verbose])
+        generator = Jojo::PdfConverter.new(employer, verbose: options[:verbose])
         results = generator.generate_all
 
         # Report what was generated

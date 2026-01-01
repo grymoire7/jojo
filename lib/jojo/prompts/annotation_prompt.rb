@@ -56,7 +56,6 @@ module Jojo
 
           Return ONLY a valid JSON array with this structure:
 
-          ```json
           [
             {
               "text": "exact phrase from job description",
@@ -64,11 +63,9 @@ module Jojo
               "tier": "strong|moderate|mention"
             }
           ]
-          ```
 
           ## Example Output:
 
-          ```json
           [
             {
               "text": "5+ years of Python",
@@ -86,7 +83,6 @@ module Jojo
               "tier": "moderate"
             }
           ]
-          ```
 
           # Important:
 

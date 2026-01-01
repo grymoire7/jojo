@@ -88,7 +88,10 @@ module Jojo
       end
 
       def parse_faqs(json_string)
-        faqs = JSON.parse(json_string, symbolize_names: true)
+        # Strip markdown code fences if present (e.g., ```json ... ```)
+        cleaned_json = json_string.strip.gsub(/\A```(?:json)?\n?/, "").gsub(/\n?```\z/, "")
+
+        faqs = JSON.parse(cleaned_json, symbolize_names: true)
 
         # Filter out invalid FAQs (missing question or answer)
         valid_faqs = faqs.select do |faq|

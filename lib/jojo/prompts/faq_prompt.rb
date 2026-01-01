@@ -49,6 +49,21 @@ module Jojo
           - Be honest and accurate (no fabrication)
           - For the documents FAQ, use HTML links: <a href="URL">Link Text</a>
 
+          ## CRITICAL: NO TECHNOLOGY/SKILL/TOOL FABRICATION
+
+          When answering questions about technical experience, tools, or interests:
+          ❌ FORBIDDEN: Mentioning technologies/tools not in the resume
+          ❌ FORBIDDEN: Claiming interest in or use of tools from job description not in resume
+          ❌ FORBIDDEN: Inferring tools from similar ones (Aider ≠ Cursor ≠ GitHub Copilot)
+          ✅ ALLOWED: Mentioning technologies/tools exactly as they appear in resume
+          ✅ ALLOWED: Describing transferable skills without fabricating direct experience
+          ✅ ALLOWED: Acknowledging interest in company's tools (e.g., "excited to work with your team's use of X")
+
+          Example: Resume has "Aider", job mentions "Cursor"
+          ❌ WRONG: "I use tools like Cursor and Aider for AI-assisted development"
+          ✅ RIGHT: "I use Aider for AI-assisted development"
+          ✅ ALSO RIGHT: "I'm experienced with AI-assisted development tools"
+
           ## Document URLs
 
           - Resume: #{base_url}/resume/#{company_slug}

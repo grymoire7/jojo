@@ -1,9 +1,9 @@
 require "test_helper"
-require "jojo/pdf_generator"
+require "jojo/pdf_converter"
 require "jojo/employer"
 require "tmpdir"
 
-class PdfGeneratorTest < Minitest::Test
+class PdfConverterTest < Minitest::Test
   def setup
     @tmpdir = Dir.mktmpdir
     @employer = Jojo::Employer.new("test-employer")
@@ -18,7 +18,7 @@ class PdfGeneratorTest < Minitest::Test
     # Create a markdown resume
     File.write(@employer.resume_path, "# My Resume\n\nContent here")
 
-    generator = Jojo::PdfGenerator.new(@employer, verbose: false)
+    generator = Jojo::PdfConverter.new(@employer, verbose: false)
 
     # Mock Pandoc being available
     Jojo::PandocChecker.stub :check!, true do
@@ -39,7 +39,7 @@ class PdfGeneratorTest < Minitest::Test
     # Create a markdown cover letter
     File.write(@employer.cover_letter_path, "# Cover Letter\n\nContent here")
 
-    generator = Jojo::PdfGenerator.new(@employer, verbose: false)
+    generator = Jojo::PdfConverter.new(@employer, verbose: false)
 
     Jojo::PandocChecker.stub :check!, true do
       generator.stub :system, lambda { |cmd|
@@ -58,7 +58,7 @@ class PdfGeneratorTest < Minitest::Test
     File.write(@employer.resume_path, "# Resume")
     File.write(@employer.cover_letter_path, "# Cover Letter")
 
-    generator = Jojo::PdfGenerator.new(@employer, verbose: false)
+    generator = Jojo::PdfConverter.new(@employer, verbose: false)
 
     Jojo::PandocChecker.stub :check!, true do
       call_count = 0
@@ -84,7 +84,7 @@ class PdfGeneratorTest < Minitest::Test
   def test_generate_all_skips_missing_files
     # Don't create any files
 
-    generator = Jojo::PdfGenerator.new(@employer, verbose: false)
+    generator = Jojo::PdfConverter.new(@employer, verbose: false)
 
     result = generator.generate_all
 
@@ -93,9 +93,9 @@ class PdfGeneratorTest < Minitest::Test
   end
 
   def test_generate_resume_raises_error_if_markdown_missing
-    generator = Jojo::PdfGenerator.new(@employer, verbose: false)
+    generator = Jojo::PdfConverter.new(@employer, verbose: false)
 
-    error = assert_raises(Jojo::PdfGenerator::SourceFileNotFoundError) do
+    error = assert_raises(Jojo::PdfConverter::SourceFileNotFoundError) do
       generator.generate_resume_pdf
     end
 
@@ -106,7 +106,7 @@ class PdfGeneratorTest < Minitest::Test
     File.write(@employer.resume_path, "# Resume")
 
     output = StringIO.new
-    generator = Jojo::PdfGenerator.new(@employer, verbose: true, output: output)
+    generator = Jojo::PdfConverter.new(@employer, verbose: true, output: output)
 
     Jojo::PandocChecker.stub :check!, true do
       generator.stub :system, true do

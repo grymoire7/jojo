@@ -69,6 +69,17 @@ module Jojo
           - Maintain factual accuracy in all claims
           - Reference only real experiences from candidate's background
 
+          ## CRITICAL: NO TECHNOLOGY/SKILL FABRICATION
+          When mentioning technical skills or tools:
+          ❌ FORBIDDEN: Claiming experience with technologies not in the resume
+          ❌ FORBIDDEN: Inferring skills from similar ones (Vue ≠ React, PostgreSQL ≠ MySQL)
+          ✅ ALLOWED: Mentioning technologies exactly as they appear in resume
+          ✅ ALLOWED: Describing transferable skills without claiming direct experience
+
+          If resume says "Vue" and job wants "React":
+          ❌ WRONG: "I have experience with React and Vue frameworks"
+          ✅ RIGHT: "I've built production applications with Vue" (let transferability speak for itself)
+
           ## AVOID:
           - Generic openings ("I am excited to apply...")
           - Resume repetition (listing bullet points)

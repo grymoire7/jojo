@@ -74,7 +74,11 @@ module Jojo
       end
 
       def parse_annotations(json_string)
-        JSON.parse(json_string, symbolize_names: true)
+        # Strip markdown code fences if present (defensive programming)
+        # AI models sometimes wrap JSON in ```json ... ``` despite instructions
+        cleaned_json = json_string.strip.gsub(/\A```(?:json)?\n?/, "").gsub(/\n?```\z/, "")
+
+        JSON.parse(cleaned_json, symbolize_names: true)
       rescue JSON::ParserError => e
         log "Error: Failed to parse AI response as JSON: #{e.message}"
         raise "AI returned invalid JSON: #{e.message}"

@@ -65,8 +65,44 @@ module Jojo
           - Include quantifiable results where present in original
           - Maintain professional formatting and consistency
 
+          # CRITICAL ANTI-FABRICATION RULES
+
+          ## NEVER ADD TECHNOLOGIES/SKILLS/TOOLS NOT IN GENERIC RESUME:
+          ❌ FORBIDDEN: If generic resume lists "Vue", DO NOT add "React" or "Vue/React"
+          ❌ FORBIDDEN: If generic resume lists "PostgreSQL", DO NOT add "MySQL" or "NoSQL databases"
+          ❌ FORBIDDEN: If generic resume lists "Docker", DO NOT add "Kubernetes" or "container orchestration"
+          ❌ FORBIDDEN: If generic resume lists "Aider", DO NOT add "Cursor", "GitHub Copilot", or other AI tools
+          ❌ FORBIDDEN: If projects mention "Claude" for one project, DO NOT add it as a general development tool
+          ✅ ALLOWED: If generic resume lists "Vue", you can say "Vue.js" or "modern JavaScript frameworks"
+
+          ## NEVER ADD EXPERIENCES NOT IN GENERIC RESUME:
+          ❌ FORBIDDEN: Adding technologies to "Technologies used:" that weren't in original
+          ❌ FORBIDDEN: Claiming experience with tools/frameworks not mentioned in generic resume
+          ❌ FORBIDDEN: Inferring skills from similar technologies (Vue ≠ React, Java ≠ Kotlin, Aider ≠ Cursor)
+          ❌ FORBIDDEN: Adding development tools even if they're in the same category (AI tools, IDEs, etc.)
+          ✅ ALLOWED: Rephrasing existing experiences with different action verbs
+          ✅ ALLOWED: Emphasizing existing relevant skills
+
+          ## TRANSFERABLE SKILLS - THE RIGHT WAY:
+          If job requires X but resume has similar Y:
+          ❌ WRONG: Add X to skills list
+          ✅ RIGHT: Emphasize Y and let employer see transferability
+
+          Example: Job wants "React", resume has "Vue"
+          ❌ WRONG: "Technologies: Vue, React, Python"
+          ✅ RIGHT: "Technologies: Vue, Python" (let Vue speak for itself)
+
+          Example: Job wants "Cursor", resume has "Aider"
+          ❌ WRONG: "Development Tools: Aider, Cursor, Git"
+          ✅ RIGHT: "Development Tools: Aider, Git" (Aider demonstrates AI-assisted development)
+
+          ## THE ABSOLUTE RULE:
+          Every technology, skill, tool, framework, development tool, AI tool, IDE, or achievement in the tailored resume MUST exist EXACTLY as written in the generic resume or relevant projects. No exceptions. No inference. No "close enough." No adding similar tools in the same category.
+
+          When in doubt: OMIT, don't fabricate.
+
           # Important:
-          - Do NOT add experiences, skills, or achievements not in the generic resume
+          - Do NOT add experiences, skills, or achievements not in the generic resume or projects
           - Do NOT modify dates or factual details
           - Focus on SELECTING and REPHRASING existing content strategically
           - Output ONLY the tailored resume markdown, no commentary

@@ -46,6 +46,13 @@ module Jojo
 
           #{job_description}
 
+          IMPORTANT:
+          - Output ONLY valid YAML format
+          - Do NOT use markdown code fences (no ```yaml or ```)
+          - Do NOT add any explanatory text, commentary, or preamble
+          - Do NOT add any text after the YAML
+          - Start directly with the YAML structure
+
           Output the information in this YAML format:
 
           company_name: ""
@@ -57,8 +64,6 @@ module Jojo
           key_technologies:
             - ""
           application_deadline: ""
-
-          Please extract the details:
         PROMPT
       end
     end

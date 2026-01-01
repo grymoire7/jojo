@@ -94,4 +94,29 @@ describe Jojo::Generators::AnnotationGenerator do
 
     _ { @generator.generate }.must_raise RuntimeError
   end
+
+  it "handles JSON wrapped in markdown code fences" do
+    # AI returns JSON wrapped in markdown code fences (common behavior)
+    ai_response = <<~RESPONSE.strip
+      ```json
+      [
+        {
+          "text": "5+ years of Python",
+          "match": "Built Python apps for 7 years",
+          "tier": "strong"
+        }
+      ]
+      ```
+    RESPONSE
+
+    @ai_client.expect(:reason, ai_response, [String])
+
+    result = @generator.generate
+
+    _(result).must_be_kind_of Array
+    _(result.length).must_equal 1
+    _(result[0][:text]).must_equal "5+ years of Python"
+
+    @ai_client.verify
+  end
 end
