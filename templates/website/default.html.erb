@@ -16,6 +16,9 @@
       --border-color: #e5e7eb;
       --max-width: 800px;
       --spacing-unit: 1rem;
+      --header-background: #333333;
+      --header-color: #B3B3A9;
+      --header-hover: #FFFFFF;
     }
 
     * {
@@ -24,17 +27,96 @@
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
       line-height: 1.6;
       color: var(--text-color);
       background-color: var(--background);
       padding: 2rem 1rem;
+      padding-top: 5rem;
     }
 
     .container {
       max-width: var(--max-width);
       margin: 0 auto;
+    }
+
+    /* Fixed Header */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      /* background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%); */
+      background-color: var(--header-background);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      height: 70px;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .header-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .header-nav a {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .header-nav a:hover {
+      color: white;
+    }
+
+    .header-cta {
+      flex-shrink: 0;
+    }
+
+    .header-cta .cta-button {
+      color: white;
+      background-color: var(--primary-color);
+      padding: 0.625rem 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .header-cta .cta-button:hover {
+      color: rgba(255, 255, 255, 0.95);
+      background-color: var(--primary-hover);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     /* Masthead Section */
@@ -348,8 +430,42 @@
 
     /* Responsive Design */
     @media (max-width: 640px) {
+      .site-header {
+        height: auto;
+        padding: 0.75rem 0;
+      }
+
+      .header-container {
+        padding: 0 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .header-logo {
+        font-size: 1rem;
+      }
+
+      .header-nav {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 1rem;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+      }
+
+      .header-nav a {
+        font-size: 0.875rem;
+      }
+
+      .header-cta .cta-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+
       body {
         padding: 1rem 0.5rem;
+        padding-top: 6rem;
       }
 
       .masthead {
@@ -724,6 +840,27 @@
   </style>
 </head>
 <body>
+  <!-- Fixed Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="#" class="header-logo"><%= seeker_name %></a>
+
+      <nav class="header-nav">
+        <% if branding_statement %><a href="#branding">About</a><% end %>
+        <% if annotated_job_description %><a href="#job-description">Match</a><% end %>
+        <% if recommendations && !recommendations.empty? %><a href="#recommendations">Recommendations</a><% end %>
+        <% if faqs && !faqs.empty? %><a href="#faq">FAQ</a><% end %>
+        <% if projects && !projects.empty? %><a href="#projects">Projects</a><% end %>
+      </nav>
+
+      <% if cta_link && !cta_link.strip.empty? %>
+      <div class="header-cta">
+        <a href="<%= cta_link %>" class="cta-button"><%= cta_text %></a>
+      </div>
+      <% end %>
+    </div>
+  </header>
+
   <div class="container">
     <!-- Masthead -->
     <header class="masthead">
@@ -738,13 +875,13 @@
     </header>
 
     <!-- Branding Statement -->
-    <section class="branding">
+    <section class="branding" id="branding">
       <%= branding_statement.split("\n\n").map { |para| "<p>#{para}</p>" }.join("\n      ") %>
     </section>
 
     <!-- Annotated Job Description -->
     <% if annotated_job_description %>
-    <section class="job-description-comparison">
+    <section class="job-description-comparison" id="job-description">
       <h2>Compare Me to the Job Description</h2>
       <div class="job-description-content">
         <%= annotated_job_description %>
@@ -760,7 +897,7 @@
 
     <!-- Recommendations Carousel -->
     <% if recommendations && !recommendations.empty? %>
-    <section class="recommendations<%= ' single-recommendation' if recommendations.size == 1 %>">
+    <section class="recommendations<%= ' single-recommendation' if recommendations.size == 1 %>" id="recommendations">
       <h2>What Others Say</h2>
       <div class="carousel-container" role="region" aria-label="Recommendations carousel">
         <div class="carousel-track">
@@ -796,7 +933,7 @@
 
     <!-- FAQ Section -->
     <% if faqs && !faqs.empty? %>
-    <section class="faq">
+    <section class="faq" id="faq">
       <h2>Your Questions, Answered</h2>
       <div class="faq-accordion" role="region" aria-label="Frequently asked questions">
         <% faqs.each_with_index do |faq, index| %>
@@ -823,8 +960,8 @@
 
     <!-- Projects Section -->
     <% if projects && !projects.empty? %>
-    <section class="projects">
-      <h2>Relevant Work</h2>
+    <section class="projects" id="projects">
+      <h2>Relevant Projects</h2>
       <div class="project-list">
         <% projects.each do |project| %>
         <div class="project-card">
