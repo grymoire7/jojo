@@ -71,7 +71,11 @@ module Jojo
 
           # Output Format
 
-          Return ONLY a valid JSON array with this structure:
+          ⚠️ OUTPUT THE RAW JSON ARRAY ONLY - NO CODE BLOCKS, NO COMMENTARY ⚠️
+          - DO NOT wrap output in ```json...``` code blocks
+          - DO NOT add introductory text or explanations
+          - Start IMMEDIATELY with the opening bracket [
+          - Return ONLY a valid JSON array with this structure:
 
           ```json
           [
@@ -103,7 +107,7 @@ module Jojo
 
           # Important
 
-          - Output ONLY the JSON array (no commentary, no markdown, no extra text)
+          - OUTPUT THE RAW JSON ARRAY ONLY - no code blocks, no preamble, no commentary whatsoever
           - Ensure valid JSON syntax
           - All questions must end with "?"
           - Include the resume/cover letter download FAQ

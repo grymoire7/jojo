@@ -88,6 +88,14 @@ module Jojo
 
           # Output Requirements
 
+          ## CRITICAL OUTPUT FORMAT:
+          ⚠️ OUTPUT THE COVER LETTER DIRECTLY AS RAW MARKDOWN - NO CODE BLOCKS, NO COMMENTARY ⚠️
+          - DO NOT wrap output in ```markdown...``` code blocks
+          - DO NOT add introductory text like "Here is the cover letter..."
+          - DO NOT add explanations or commentary
+          - Start IMMEDIATELY with the letter content
+          - The output should be a pure markdown file ready to save
+
           ## Format:
           - Clean markdown
           - Professional but warm structure
@@ -102,7 +110,7 @@ module Jojo
           - Clear connection between candidate and opportunity
 
           # Important:
-          - Output ONLY the cover letter text, no commentary
+          - OUTPUT THE RAW MARKDOWN COVER LETTER ONLY - no code blocks, no preamble, no commentary whatsoever
           - DO NOT include date, address header, or signature block (just the letter body)
           - Focus on authentic storytelling, not generic templates
           - Use research insights to show genuine interest in the company

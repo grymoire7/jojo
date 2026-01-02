@@ -978,9 +978,9 @@
           <% end %>
           <% if project[:blog_post_url] || project[:github_url] || project[:live_url] %>
           <div class="project-links">
-            <% if project[:blog_post_url] %><a href="<%= project[:blog_post_url] %>">Blog Post</a><% end %>
-            <% if project[:github_url] %><a href="<%= project[:github_url] %>">GitHub</a><% end %>
-            <% if project[:live_url] %><a href="<%= project[:live_url] %>">Live Demo</a><% end %>
+            <% if project[:blog_post_url] %><a href="<%= project[:blog_post_url] %>" class="project-link post-link">Blog Post</a><% end %>
+            <% if project[:github_url] %><a href="<%= project[:github_url] %>" class="project-link source-link">GitHub</a><% end %>
+            <% if project[:live_url] %><a href="<%= project[:live_url] %>" class="project-link demo-link">Live Demo</a><% end %>
           </div>
           <% end %>
         </div>
@@ -993,8 +993,8 @@
     <footer class="footer">
       <p>Application materials for <%= company_name %></p>
       <div class="footer-links">
-        <a href="<%= base_url %>/resume/<%= company_slug %>" target="_blank">View Resume</a>
-        <a href="<%= base_url %>/cover-letter/<%= company_slug %>" target="_blank">View Cover Letter</a>
+        <a href="<%= base_url %>/resume/<%= company_slug %>/resume.pdf" target="_blank">View Resume</a>
+        <a href="<%= base_url %>/resume/<%= company_slug %>/cover_letter.pdf" target="_blank">View Cover Letter</a>
       </div>
     </footer>
   </div>

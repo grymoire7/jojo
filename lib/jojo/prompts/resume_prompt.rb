@@ -50,6 +50,14 @@ module Jojo
 
           # Output Requirements
 
+          ## CRITICAL OUTPUT FORMAT:
+          ⚠️ OUTPUT THE RESUME DIRECTLY AS RAW MARKDOWN - NO CODE BLOCKS, NO COMMENTARY ⚠️
+          - DO NOT wrap output in ```markdown...``` code blocks
+          - DO NOT add introductory text like "Here is the tailored resume..."
+          - DO NOT add explanations or commentary
+          - Start IMMEDIATELY with the resume content (e.g., contact info, headers)
+          - The output should be a pure markdown file ready to save
+
           ## Format:
           - Clean markdown matching the generic resume structure
           - Same section headings as original resume
@@ -105,7 +113,7 @@ module Jojo
           - Do NOT add experiences, skills, or achievements not in the generic resume or projects
           - Do NOT modify dates or factual details
           - Focus on SELECTING and REPHRASING existing content strategically
-          - Output ONLY the tailored resume markdown, no commentary
+          - OUTPUT THE RAW MARKDOWN RESUME ONLY - no code blocks, no preamble, no commentary whatsoever
         PROMPT
       end
 
