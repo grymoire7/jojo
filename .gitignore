@@ -35,3 +35,6 @@ employers/
 inputs/
 config.yml
 vendor/bundle/
+
+# Git worktrees
+.worktrees/
