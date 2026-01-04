@@ -121,5 +121,27 @@ module Jojo
       reordered = indices.map { |i| items[i] }
       set_field(data, field_path, reordered)
     end
+
+    def rewrite_field(field_path, data)
+      original = get_field(data, field_path)
+      return unless original.is_a?(String)
+
+      # Simple, focused prompt
+      prompt = <<~PROMPT
+        Tailor this content for the specific job opportunity.
+        Use the original as factual baseline - no new claims.
+
+        Job Description:
+        #{@job_context[:job_description]}
+
+        Original Content:
+        #{original}
+
+        Return only the tailored content, no explanations.
+      PROMPT
+
+      tailored = @ai_client.generate_text(prompt)
+      set_field(data, field_path, tailored)
+    end
   end
 end

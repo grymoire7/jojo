@@ -158,4 +158,34 @@ describe Jojo::ResumeTransformer do
       @ai_client.verify
     end
   end
+
+  describe "#rewrite_field" do
+    it "rewrites text field using AI" do
+      data = {"summary" => "Generic software engineer with broad experience"}
+
+      tailored = "Ruby specialist with 10+ years of backend development"
+      @ai_client.expect(:generate_text, tailored, [String])
+
+      @transformer.send(:rewrite_field, "summary", data)
+
+      _(data["summary"]).must_equal tailored
+      @ai_client.verify
+    end
+
+    it "does nothing for non-string fields" do
+      data = {"skills" => ["Ruby", "Python"]}
+
+      @transformer.send(:rewrite_field, "skills", data)
+
+      _(data["skills"]).must_equal ["Ruby", "Python"]
+    end
+
+    it "does nothing for missing fields" do
+      data = {"summary" => "text"}
+
+      @transformer.send(:rewrite_field, "nonexistent", data)
+
+      _(data["summary"]).must_equal "text"
+    end
+  end
 end
