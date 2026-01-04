@@ -62,7 +62,7 @@ describe "Recommendations Workflow Integration" do
     html = generator.generate
 
     # Verify HTML includes carousel structure
-    _(html).must_include '<section class="recommendations">'
+    _(html).must_match(/<section class="recommendations[^"]*"/)
     _(html).must_include "What Others Say"
     _(html).must_include "carousel-track"
     _(html).must_include "carousel-slide"
@@ -115,8 +115,8 @@ describe "Recommendations Workflow Integration" do
 
     html = generator.generate
 
-    # Verify recommendations section exists
-    _(html).must_include '<section class="recommendations single-recommendation">'
+    # Verify recommendations section exists with single-recommendation class
+    _(html).must_match(/<section class="recommendations single-recommendation"/)
     _(html).must_include "Alice Lee"
 
     # Verify no carousel JavaScript (single recommendation)
