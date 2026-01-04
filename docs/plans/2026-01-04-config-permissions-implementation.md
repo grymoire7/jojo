@@ -1415,75 +1415,96 @@ git commit -m "feat: implement ResumeCurationService integration"
 
 ---
 
-## Phase 11: Update ResumeGenerator
+## Phase 11: Replace ResumeGenerator Implementation
 
-### Task 11.1: Add config option for resume generation mode
-
-**Files:**
-- Modify: `config.yml`
-- Modify: `test/fixtures/valid_config.yml`
-
-**Step 1: Add resume_mode configuration**
-
-Add to config files:
-
-```yaml
-# Resume generation mode: "legacy" or "data_driven"
-resume_mode: legacy  # Change to "data_driven" to use new pipeline
-```
-
-**Step 2: Commit**
-
-```bash
-git add config.yml test/fixtures/valid_config.yml
-git commit -m "feat: add resume_mode config option"
-```
-
----
-
-### Task 11.2: Update ResumeGenerator to support both modes
+### Task 11.1: Replace ResumeGenerator with new pipeline
 
 **Files:**
 - Modify: `lib/jojo/generators/resume_generator.rb`
 - Modify: `test/unit/generators/resume_generator_test.rb`
 
-**Step 1: Write test for data-driven mode**
+**Step 1: Write test for new implementation**
 
-Add to test file:
+Replace existing tests in test file:
 
 ```ruby
-describe "data-driven mode" do
-  before do
-    @config_dd = Minitest::Mock.new
-    @config_dd.expect(:resume_mode, "data_driven")
-    @config_dd.expect(:dig,
-      {"skills" => ["remove", "reorder"]},
-      ["resume_data", "permissions"])
+require_relative "../../test_helper"
+require_relative "../../../lib/jojo/employer"
+require_relative "../../../lib/jojo/generators/resume_generator"
 
-    @generator_dd = Jojo::Generators::ResumeGenerator.new(
+describe Jojo::Generators::ResumeGenerator do
+  before do
+    @employer = Jojo::Employer.new("acme-corp")
+    @ai_client = Minitest::Mock.new
+    @config = Minitest::Mock.new
+    @generator = Jojo::Generators::ResumeGenerator.new(
       @employer,
       @ai_client,
-      config: @config_dd,
+      config: @config,
       verbose: false,
       inputs_path: "test/fixtures"
     )
+
+    # Clean up and create directories
+    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    @employer.create_directory!
+
+    # Create required fixtures
+    File.write(@employer.job_description_path, "Senior Ruby Developer role at Acme Corp...")
   end
 
-  it "uses ResumeCurationService when resume_mode is data_driven" do
-    # Create resume_data.yml for test
-    resume_data_path = File.join("test/fixtures", "resume_data.yml")
-    template_path = File.join("test/fixtures/templates", "resume_template.md.erb")
+  after do
+    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+  end
+
+  it "generates resume using ResumeCurationService" do
+    # Mock config for permissions and base_url
+    @config.expect(:dig, {"skills" => ["remove", "reorder"]}, ["resume_data", "permissions"])
+    @config.expect(:resume_template, nil)
+    @config.expect(:base_url, "https://example.com")
 
     # Mock AI calls for transformation
     @ai_client.expect(:generate_text, "[0, 1]", [String])
     @ai_client.expect(:generate_text, "[1, 0]", [String])
 
-    @config_dd.expect(:base_url, "https://example.com")
-
-    result = @generator_dd.generate
+    result = @generator.generate
 
     _(result).must_include "# Jane Doe"
     _(result).must_include "Specifically for Acme Corp"
+    _(result).must_include "https://example.com/resume/acme-corp"
+
+    @ai_client.verify
+  end
+
+  it "saves resume to file" do
+    @config.expect(:dig, {"skills" => ["remove", "reorder"]}, ["resume_data", "permissions"])
+    @config.expect(:resume_template, nil)
+    @config.expect(:base_url, "https://example.com")
+
+    @ai_client.expect(:generate_text, "[0, 1]", [String])
+    @ai_client.expect(:generate_text, "[1, 0]", [String])
+
+    @generator.generate
+
+    _(File.exist?(@employer.resume_path)).must_equal true
+    content = File.read(@employer.resume_path)
+    _(content).must_include "Specifically for Acme Corp"
+  end
+
+  it "fails when resume_data.yml is missing" do
+    generator_no_data = Jojo::Generators::ResumeGenerator.new(
+      @employer,
+      @ai_client,
+      config: @config,
+      verbose: false,
+      inputs_path: "test/fixtures/nonexistent"
+    )
+
+    error = assert_raises(Jojo::ResumeDataLoader::LoadError) do
+      generator_no_data.generate
+    end
+
+    _(error.message).must_include "not found"
   end
 end
 ```
@@ -1491,101 +1512,97 @@ end
 **Step 2: Run test to verify it fails**
 
 Run: `ruby -Ilib:test test/unit/generators/resume_generator_test.rb`
-Expected: FAIL
+Expected: FAIL (old implementation doesn't use ResumeCurationService)
 
-**Step 3: Update ResumeGenerator**
+**Step 3: Replace ResumeGenerator implementation**
 
-Add require at top:
+Modify: `lib/jojo/generators/resume_generator.rb`
+
+Replace entire file:
 
 ```ruby
+require "yaml"
 require_relative "../resume_curation_service"
-```
 
-Replace `generate` method:
+module Jojo
+  module Generators
+    class ResumeGenerator
+      attr_reader :employer, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
 
-```ruby
-def generate
-  if config.resume_mode == "data_driven"
-    generate_data_driven
-  else
-    generate_legacy
+      def initialize(employer, ai_client, config:, verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
+        @employer = employer
+        @ai_client = ai_client
+        @config = config
+        @verbose = verbose
+        @inputs_path = inputs_path
+        @overwrite_flag = overwrite_flag
+        @cli_instance = cli_instance
+      end
+
+      def generate
+        log "Generating config-based resume..."
+
+        resume_data_path = File.join(inputs_path, "resume_data.yml")
+        template_path = config.resume_template ||
+                        File.join(inputs_path, "templates", "default_resume.md.erb")
+
+        cache_path = File.join(employer.base_path, "resume_data_curated.yml")
+
+        job_context = {
+          job_description: File.read(employer.job_description_path)
+        }
+
+        log "Using transformation pipeline..."
+        service = ResumeCurationService.new(
+          ai_client: ai_client,
+          config: config,
+          resume_data_path: resume_data_path,
+          template_path: template_path,
+          cache_path: cache_path
+        )
+
+        resume = service.generate(job_context)
+        resume_with_link = add_landing_page_link(resume)
+
+        log "Saving resume to #{employer.resume_path}..."
+        save_resume(resume_with_link)
+
+        log "Resume generation complete!"
+        resume_with_link
+      end
+
+      private
+
+      def add_landing_page_link(resume_content)
+        link = "**Specifically for #{employer.company_name}**: #{config.base_url}/resume/#{employer.slug}"
+        "#{link}\n\n#{resume_content}"
+      end
+
+      def save_resume(content)
+        if cli_instance
+          cli_instance.with_overwrite_check(employer.resume_path, overwrite_flag) do
+            File.write(employer.resume_path, content)
+          end
+        else
+          File.write(employer.resume_path, content)
+        end
+      end
+
+      def log(message)
+        puts "  [ResumeGenerator] #{message}" if verbose
+      end
+    end
   end
 end
-
-private
-
-def generate_data_driven
-  log "Using data-driven resume generation..."
-
-  resume_data_path = File.join(inputs_path, "resume_data.yml")
-  template_path = config.resume_template ||
-                  File.join(inputs_path, "templates", "default_resume.md.erb")
-
-  cache_path = File.join(employer.base_path, "resume_data_curated.yml")
-
-  job_context = {
-    job_description: File.read(employer.job_description_path)
-  }
-
-  service = ResumeCurationService.new(
-    ai_client: ai_client,
-    config: config,
-    resume_data_path: resume_data_path,
-    template_path: template_path,
-    cache_path: cache_path
-  )
-
-  resume = service.generate(job_context)
-  resume_with_link = add_landing_page_link_simple(resume)
-
-  log "Saving resume to #{employer.resume_path}..."
-  save_resume(resume_with_link)
-
-  log "Resume generation complete!"
-  resume_with_link
-end
-
-def generate_legacy
-  # Keep existing implementation
-  log "Gathering inputs for resume generation..."
-  inputs = gather_inputs
-
-  log "Loading relevant projects..."
-  projects = load_projects
-
-  log "Building resume prompt..."
-  prompt = build_resume_prompt(inputs, projects)
-
-  log "Generating tailored resume using AI..."
-  resume = call_ai(prompt)
-
-  log "Adding landing page link..."
-  resume_with_link = add_landing_page_link(resume, inputs)
-
-  log "Saving resume to #{employer.resume_path}..."
-  save_resume(resume_with_link)
-
-  log "Resume generation complete!"
-  resume_with_link
-end
-
-def add_landing_page_link_simple(resume_content)
-  link = "**Specifically for #{employer.company_name}**: #{config.base_url}/resume/#{employer.slug}"
-  "#{link}\n\n#{resume_content}"
-end
 ```
 
-**Step 4: Update Config class to support resume_mode**
+**Step 4: Update Config class to support resume_template**
 
 Modify: `lib/jojo/config.rb`
 
 Add reader method:
 
 ```ruby
-def resume_mode
-  @data["resume_mode"] || "legacy"
-end
-
 def resume_template
   @data["resume_template"]
 end
@@ -1600,7 +1617,7 @@ Expected: PASS
 
 ```bash
 git add lib/jojo/generators/resume_generator.rb lib/jojo/config.rb test/unit/generators/resume_generator_test.rb
-git commit -m "feat: integrate data-driven mode into ResumeGenerator"
+git commit -m "feat: replace ResumeGenerator with config-based pipeline"
 ```
 
 ---
@@ -1627,16 +1644,15 @@ Add at end of design doc:
 - ✅ Config-based permission system
 - ✅ ERB template rendering
 - ✅ ResumeCurationService integration
-- ✅ ResumeGenerator dual-mode support
+- ✅ ResumeGenerator replaced with new pipeline
 - ✅ Comprehensive test coverage
 
-**Migration Path:**
-1. Keep `resume_mode: legacy` for existing users
-2. Create `inputs/resume_data.yml` from `inputs/generic_resume.md`
-3. Create `inputs/templates/default_resume.md.erb`
-4. Set `resume_mode: data_driven` in config.yml
-5. Test with sample employer
-6. Verify cost reduction and reliability
+**Migration Requirements:**
+1. Create `inputs/resume_data.yml` from existing resume content
+2. Create `inputs/templates/default_resume.md.erb` template
+3. Add `resume_data.permissions` to `config.yml`
+4. Test with sample employer
+5. Verify cost reduction and reliability
 
 **Validation:**
 Run: `ruby -Ilib:test test/unit/resume_transformer_test.rb`
@@ -1808,12 +1824,12 @@ git commit -m "docs: add example resume_data.yml and permissions config"
 
 ## Next Steps After Implementation
 
-1. **Manual Testing**: Create actual `inputs/resume_data.yml` from your real resume
+1. **Data Migration**: Create actual `inputs/resume_data.yml` from existing resume content
 2. **Template Creation**: Design `inputs/templates/default_resume.md.erb`
-3. **Mode Switch**: Change `resume_mode: data_driven` in config.yml
+3. **Permissions Setup**: Configure `resume_data.permissions` in `config.yml`
 4. **Real-World Test**: Generate resume for actual employer
-5. **Cost Analysis**: Compare API costs between legacy and data-driven modes
-6. **Deprecation**: Plan removal of legacy mode after validation period
+5. **Cost Analysis**: Measure API costs with focused prompts vs. previous implementation
+6. **Iteration**: Refine permissions and templates based on results
 
 ---
 
@@ -1824,4 +1840,4 @@ git commit -m "docs: add example resume_data.yml and permissions config"
 - Frequent commits after each passing test
 - Ruby enforces permissions, not LLM
 - Focused prompts replace complex single prompt
-- Backward compatible via `resume_mode` config
+- Direct replacement - no backward compatibility needed
