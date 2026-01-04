@@ -30,5 +30,25 @@ module Jojo
 
       current
     end
+
+    def set_field(data, field_path, value)
+      parts = field_path.split(".")
+      *path, key = parts
+
+      if path.empty?
+        # Top-level field
+        data[key] = value
+      else
+        # Navigate to parent
+        target = path.reduce(data) { |obj, k| obj[k] }
+
+        if target.is_a?(Array)
+          # Setting field on array items
+          target.each { |item| item[key] = value }
+        else
+          target[key] = value
+        end
+      end
+    end
   end
 end

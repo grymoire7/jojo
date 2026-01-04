@@ -49,4 +49,30 @@ describe Jojo::ResumeTransformer do
       _(result).must_be_nil
     end
   end
+
+  describe "#set_field" do
+    it "sets top-level field" do
+      data = {"skills" => ["Ruby"]}
+      @transformer.send(:set_field, data, "skills", ["Python"])
+      _(data["skills"]).must_equal ["Python"]
+    end
+
+    it "sets field on all array items" do
+      data = {
+        "experience" => [
+          {"description" => "old"},
+          {"description" => "old"}
+        ]
+      }
+      @transformer.send(:set_field, data, "experience.description", "new")
+      _(data["experience"][0]["description"]).must_equal "new"
+      _(data["experience"][1]["description"]).must_equal "new"
+    end
+
+    it "sets nested scalar field" do
+      data = {"contact" => {"email" => "old@example.com"}}
+      @transformer.send(:set_field, data, "contact.email", "new@example.com")
+      _(data["contact"]["email"]).must_equal "new@example.com"
+    end
+  end
 end
