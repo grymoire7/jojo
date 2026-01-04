@@ -27,11 +27,6 @@ module Jojo
         instance_variable_set("@#{key}", value)
       end
 
-      # Define method_missing to handle missing fields gracefully
-      def self.method_missing(method_name, *args, &block)
-        @data[method_name.to_s]
-      end
-
       # Define methods to access instance variables in ERB
       data.keys.each do |key|
         define_singleton_method(key) do
@@ -40,6 +35,14 @@ module Jojo
       end
 
       binding
+    end
+
+    def method_missing(method_name, *args, &block)
+      @data&.dig(method_name.to_s)
+    end
+
+    def respond_to_missing?(method_name, include_private = false)
+      @data&.key?(method_name.to_s) || super
     end
   end
 end
