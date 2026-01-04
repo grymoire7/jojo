@@ -1841,3 +1841,59 @@ git commit -m "docs: add example resume_data.yml and permissions config"
 - Ruby enforces permissions, not LLM
 - Focused prompts replace complex single prompt
 - Direct replacement - no backward compatibility needed
+
+## Implementation Status
+
+**Status:** ✅ COMPLETED (2026-01-04)
+
+**Implemented Components:**
+- ✅ ResumeTransformer with Ruby-enforced permissions
+- ✅ Focused prompts for filter/reorder/rewrite
+- ✅ Config-based permission system
+- ✅ ERB template rendering
+- ✅ ResumeCurationService integration
+- ✅ ResumeGenerator replaced with new pipeline
+- ✅ Comprehensive test coverage (unit + service tests)
+
+**Test Results:**
+```
+Unit Tests:
+- PermissionViolation: 2 tests, 2 assertions ✅
+- ResumeTransformer: 19 tests, 29 assertions ✅
+- ErbRenderer: 2 tests, 16 assertions ✅
+- ResumeDataLoader: 3 tests, 9 assertions ✅
+- ResumeCurationService: 2 tests, 10 assertions ✅
+- ResumeGenerator: 3 tests, 12 assertions ✅
+
+Service Tests (Real Haiku):
+- 5 tests, 19 assertions ✅
+- ~500 tokens used, all transformations working correctly
+```
+
+**Architecture Verified:**
+```
+ResumeGenerator
+  ↓
+ResumeCurationService
+  ├─ ResumeDataLoader (YAML → data)
+  ├─ ResumeTransformer (filter/reorder/rewrite with permissions)
+  └─ ErbRenderer (data → markdown)
+```
+
+**Migration Requirements:**
+1. Create `inputs/resume_data.yml` from existing resume content
+2. Create `inputs/templates/default_resume.md.erb` template
+3. Add `resume_data.permissions` to `config.yml`
+4. Test with sample employer
+5. Verify cost reduction and reliability
+
+**Key Achievements:**
+- ✅ Ruby enforces all permissions (not LLM)
+- ✅ Focused prompts (~100-200 tokens each vs. 1000+ tokens single prompt)
+- ✅ Clean separation: data (YAML) + config (permissions) + presentation (ERB)
+- ✅ Unit testable transformations
+- ✅ Service tests validate real AI behavior
+- ✅ Cache support reduces redundant AI calls
+
+**Next Steps:**
+See "Next Steps After Implementation" section above.
