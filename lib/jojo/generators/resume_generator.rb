@@ -1,7 +1,5 @@
 require "yaml"
-require_relative "../prompts/resume_prompt"
-require_relative "../project_loader"
-require_relative "../project_selector"
+require_relative "../resume_curation_service"
 
 module Jojo
   module Generators
@@ -19,20 +17,29 @@ module Jojo
       end
 
       def generate
-        log "Gathering inputs for resume generation..."
-        inputs = gather_inputs
+        log "Generating config-based resume..."
 
-        log "Loading relevant projects..."
-        projects = load_projects
+        resume_data_path = File.join(inputs_path, "resume_data.yml")
+        template_path = config.resume_template ||
+          File.join(inputs_path, "templates", "default_resume.md.erb")
 
-        log "Building resume prompt..."
-        prompt = build_resume_prompt(inputs, projects)
+        cache_path = File.join(employer.base_path, "resume_data_curated.yml")
 
-        log "Generating tailored resume using AI..."
-        resume = call_ai(prompt)
+        job_context = {
+          job_description: File.read(employer.job_description_path)
+        }
 
-        log "Adding landing page link..."
-        resume_with_link = add_landing_page_link(resume, inputs)
+        log "Using transformation pipeline..."
+        service = ResumeCurationService.new(
+          ai_client: ai_client,
+          config: config,
+          resume_data_path: resume_data_path,
+          template_path: template_path,
+          cache_path: cache_path
+        )
+
+        resume = service.generate(job_context)
+        resume_with_link = add_landing_page_link(resume)
 
         log "Saving resume to #{employer.resume_path}..."
         save_resume(resume_with_link)
@@ -43,73 +50,8 @@ module Jojo
 
       private
 
-      def gather_inputs
-        # Read job description (REQUIRED)
-        unless File.exist?(employer.job_description_path)
-          raise "Job description not found at #{employer.job_description_path}"
-        end
-        job_description = File.read(employer.job_description_path)
-
-        # Read generic resume (REQUIRED)
-        generic_resume_path = File.join(inputs_path, "generic_resume.md")
-        unless File.exist?(generic_resume_path)
-          raise "Generic resume not found at #{generic_resume_path}"
-        end
-        generic_resume = File.read(generic_resume_path)
-
-        # Read research (OPTIONAL)
-        research = read_research
-
-        # Read job details (OPTIONAL)
-        job_details = read_job_details
-
-        {
-          job_description: job_description,
-          generic_resume: generic_resume,
-          research: research,
-          job_details: job_details,
-          company_name: employer.company_name,
-          company_slug: employer.slug
-        }
-      end
-
-      def read_research
-        unless File.exist?(employer.research_path)
-          log "Warning: Research not found at #{employer.research_path}, resume will be less targeted"
-          return nil
-        end
-
-        File.read(employer.research_path)
-      end
-
-      def read_job_details
-        unless File.exist?(employer.job_details_path)
-          return nil
-        end
-
-        YAML.load_file(employer.job_details_path)
-      rescue => e
-        log "Warning: Could not parse job details: #{e.message}"
-        nil
-      end
-
-      def build_resume_prompt(inputs, projects = [])
-        Prompts::Resume.generate_prompt(
-          job_description: inputs[:job_description],
-          generic_resume: inputs[:generic_resume],
-          research: inputs[:research],
-          job_details: inputs[:job_details],
-          voice_and_tone: config.voice_and_tone,
-          relevant_projects: projects
-        )
-      end
-
-      def call_ai(prompt)
-        ai_client.generate_text(prompt)
-      end
-
-      def add_landing_page_link(resume_content, inputs)
-        link = "**Specifically for #{inputs[:company_name]}**: #{config.base_url}/resume/#{inputs[:company_slug]}"
+      def add_landing_page_link(resume_content)
+        link = "**Specifically for #{employer.company_name}**: #{config.base_url}/resume/#{employer.slug}"
         "#{link}\n\n#{resume_content}"
       end
 
@@ -125,20 +67,6 @@ module Jojo
 
       def log(message)
         puts "  [ResumeGenerator] #{message}" if verbose
-      end
-
-      def load_projects
-        projects_path = File.join(inputs_path, "projects.yml")
-        return [] unless File.exist?(projects_path)
-
-        loader = ProjectLoader.new(projects_path)
-        all_projects = loader.load
-
-        selector = ProjectSelector.new(employer, all_projects)
-        selector.select_for_resume(limit: 3)
-      rescue ProjectLoader::ValidationError => e
-        log "Warning: Projects validation failed: #{e.message}"
-        []
       end
     end
   end

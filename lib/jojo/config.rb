@@ -68,6 +68,10 @@ module Jojo
       config.dig("website", "cta_link")
     end
 
+    def resume_template
+      config["resume_template"]
+    end
+
     private
 
     def config
