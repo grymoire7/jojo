@@ -10,7 +10,7 @@ describe "Jojo::ResumeTransformer Service Tests" do
     skip "ANTHROPIC_API_KEY not set" unless ENV["ANTHROPIC_API_KEY"]
 
     @config = Jojo::Config.new("test/fixtures/valid_config.yml")
-    @ai_client = Jojo::AIClient.new(@config, verbose: true)
+    @ai_client = Jojo::AIClient.new(@config, verbose: false)
     @config_hash = YAML.load_file("test/fixtures/valid_config.yml")
     @job_context = {
       job_description: "Looking for a Senior Ruby on Rails developer with PostgreSQL and Docker experience. Must have strong backend skills and experience with microservices architecture."
@@ -39,8 +39,6 @@ describe "Jojo::ResumeTransformer Service Tests" do
       data["skills"].each do |skill|
         _(["Ruby", "Python", "JavaScript", "Java", "C++", "Go", "PHP", "Rust"]).must_include skill
       end
-
-      puts "\nFiltered skills: #{data["skills"].inspect}"
     end
   end
 
@@ -66,9 +64,7 @@ describe "Jojo::ResumeTransformer Service Tests" do
       companies = data["experience"].map { |exp| exp["company"] }.sort
       _(companies).must_equal ["ConsultingCo", "StartupXYZ", "TechCorp"]
 
-      puts "\nReordered experience:"
       data["experience"].each_with_index do |exp, i|
-        puts "  #{i + 1}. #{exp["company"]} - #{exp["title"]}"
       end
     end
 
@@ -83,8 +79,6 @@ describe "Jojo::ResumeTransformer Service Tests" do
       # Verify we can have fewer items
       _(data["skills"].length).must_be :>, 0
       _(data["skills"].length).must_be :<=, 5
-
-      puts "\nReordered/filtered skills: #{data["skills"].inspect}"
     end
   end
 
@@ -104,9 +98,6 @@ describe "Jojo::ResumeTransformer Service Tests" do
 
       # Verify it changed
       _(data["summary"]).wont_equal original_summary
-
-      puts "\nOriginal summary: #{original_summary}"
-      puts "Tailored summary: #{data["summary"]}"
     end
   end
 
@@ -129,11 +120,9 @@ describe "Jojo::ResumeTransformer Service Tests" do
         @transformer.send(:reorder_field, "languages", data, can_remove: false)
         # If successful, verify all items preserved
         _(data["languages"].length).must_equal 5
-        puts "\nAI correctly preserved all languages during reorder"
       rescue Jojo::PermissionViolation => e
         # If AI tried to remove items, verify error was caught
         _(e.message).must_include "removed items"
-        puts "\nAI attempted to remove items, PermissionViolation raised correctly"
       end
     end
   end

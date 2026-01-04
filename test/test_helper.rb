@@ -1,3 +1,4 @@
+require "dotenv/load"  # Load .env file for service tests
 require "minitest/autorun"
 require "minitest/spec"
 require "minitest/reporters"

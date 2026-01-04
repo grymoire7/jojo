@@ -21,8 +21,6 @@ describe Jojo::JobDescriptionProcessor do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
   end
 
-  it "saves raw content when processing URL" do
-    # Skip this test if no network or we want unit tests only
-    skip "URL processing requires network and mocking"
-  end
+  # Note: No tests currently implemented
+  # URL processing tests require network mocking to be added
 end
