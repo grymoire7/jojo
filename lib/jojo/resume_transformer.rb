@@ -11,7 +11,25 @@ module Jojo
     end
 
     def transform(data)
-      # To be implemented
+      permissions = @config.dig("resume_data", "permissions") || {}
+
+      permissions.each do |field_path, perms|
+        next unless perms.is_a?(Array)
+
+        # Apply transformations in order
+        if perms.include?("remove")
+          filter_field(field_path, data)
+        end
+
+        if perms.include?("reorder")
+          reorder_field(field_path, data, can_remove: perms.include?("remove"))
+        end
+
+        if perms.include?("rewrite")
+          rewrite_field(field_path, data)
+        end
+      end
+
       data
     end
 

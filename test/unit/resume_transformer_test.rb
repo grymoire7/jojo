@@ -188,4 +188,69 @@ describe Jojo::ResumeTransformer do
       _(data["summary"]).must_equal "text"
     end
   end
+
+  describe "#transform" do
+    before do
+      @full_config = {
+        "resume_data" => {
+          "permissions" => {
+            "skills" => ["remove", "reorder"],
+            "experience" => ["reorder"],
+            "summary" => ["rewrite"]
+          }
+        }
+      }
+      @full_transformer = Jojo::ResumeTransformer.new(
+        ai_client: @ai_client,
+        config: @full_config,
+        job_context: @job_context
+      )
+    end
+
+    it "applies all transformations based on permissions" do
+      data = {
+        "skills" => ["Ruby", "Python", "Java", "C++"],
+        "experience" => ["exp1", "exp2", "exp3"],
+        "summary" => "Generic summary"
+      }
+
+      # Mock filter call for skills (remove + reorder)
+      @ai_client.expect(:generate_text, "[0, 1, 2]", [String])
+      # Mock reorder call for filtered skills
+      @ai_client.expect(:generate_text, "[2, 0, 1]", [String])
+      # Mock reorder call for experience (reorder only)
+      @ai_client.expect(:generate_text, "[2, 1, 0]", [String])
+      # Mock rewrite call for summary
+      @ai_client.expect(:generate_text, "Tailored summary", [String])
+
+      result = @full_transformer.transform(data)
+
+      # Skills filtered and reordered
+      _(result["skills"].length).must_equal 3
+      # Experience reordered (all 3 preserved)
+      _(result["experience"]).must_equal ["exp3", "exp2", "exp1"]
+      # Summary rewritten
+      _(result["summary"]).must_equal "Tailored summary"
+
+      @ai_client.verify
+    end
+
+    it "skips fields without permissions" do
+      data = {
+        "skills" => ["Ruby"],
+        "name" => "Jane Doe",
+        "email" => "jane@example.com"
+      }
+
+      # Only skills has permissions
+      @ai_client.expect(:generate_text, "[0]", [String])
+      @ai_client.expect(:generate_text, "[0]", [String])
+
+      result = @full_transformer.transform(data)
+
+      # Read-only fields preserved exactly
+      _(result["name"]).must_equal "Jane Doe"
+      _(result["email"]).must_equal "jane@example.com"
+    end
+  end
 end
