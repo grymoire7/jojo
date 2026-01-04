@@ -8,3 +8,25 @@ text_generation_ai:
   model: haiku
 voice_and_tone: professional and friendly
 search: serper
+
+# Resume data transformation permissions
+resume_data:
+  permissions:
+    # Top-level array fields
+    skills: [remove, reorder]
+    languages: [reorder]
+    databases: [remove, reorder]
+    tools: [remove, reorder]
+    projects: [reorder]
+    experience: [reorder]
+    endorsements: [remove]
+
+    # Scalar/text fields
+    summary: [rewrite]
+
+    # Nested fields (dot notation)
+    projects.skills: [reorder]
+    experience.description: [rewrite]
+    experience.technologies: [remove, reorder]
+    experience.tags: [remove, reorder]
+    education.description: [rewrite]
