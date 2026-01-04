@@ -11,5 +11,24 @@ module Jojo
       # To be implemented
       data
     end
+
+    private
+
+    def get_field(data, field_path)
+      parts = field_path.split(".")
+      current = data
+
+      parts.each do |key|
+        return nil if current.nil?
+
+        current = if current.is_a?(Array)
+          current.first&.dig(key)
+        else
+          current.dig(key)
+        end
+      end
+
+      current
+    end
   end
 end
