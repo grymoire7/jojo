@@ -1,0 +1,98 @@
+# test/fixtures/resume_data.yml
+name: "Jane Doe"
+email: "jane@example.com"
+phone: "+1-555-0123"
+location: "San Francisco, CA"
+
+summary: "Experienced software engineer with 10+ years building scalable web applications."
+
+skills:
+  - Ruby
+  - Python
+  - JavaScript
+  - PostgreSQL
+  - Docker
+  - Git
+
+languages:
+  - English (native)
+  - Spanish (conversational)
+
+databases:
+  - PostgreSQL
+  - MySQL
+  - Redis
+  - MongoDB
+
+tools:
+  - Docker
+  - Git
+  - VS Code
+  - Linux
+
+experience:
+  - company: "TechCorp Inc"
+    title: "Senior Software Engineer"
+    start_date: "2020-01"
+    end_date: "present"
+    description: "Led development of microservices architecture serving 1M+ users"
+    technologies:
+      - Ruby on Rails
+      - PostgreSQL
+      - Docker
+    tags:
+      - backend
+      - architecture
+      - leadership
+
+  - company: "StartupXYZ"
+    title: "Software Engineer"
+    start_date: "2018-06"
+    end_date: "2019-12"
+    description: "Built RESTful APIs and improved database query performance by 40%"
+    technologies:
+      - Python
+      - Django
+      - MySQL
+    tags:
+      - backend
+      - api-development
+
+  - company: "ConsultingCo"
+    title: "Junior Developer"
+    start_date: "2015-03"
+    end_date: "2018-05"
+    description: "Developed client-facing web applications and automated deployment pipelines"
+    technologies:
+      - JavaScript
+      - Node.js
+      - PostgreSQL
+    tags:
+      - frontend
+      - devops
+
+projects:
+  - name: "Open Source CLI Tool"
+    description: "Built command-line interface for managing cloud deployments"
+    skills:
+      - Ruby
+      - AWS
+      - Docker
+
+  - name: "E-commerce Platform"
+    description: "Developed payment processing integration with Stripe"
+    skills:
+      - Python
+      - PostgreSQL
+      - Redis
+
+education:
+  - degree: "BS Computer Science"
+    institution: "State University"
+    year: "2015"
+    description: "Focus on algorithms and distributed systems"
+
+endorsements:
+  - "Jane is an exceptional engineer who consistently delivers high-quality work"
+  - "Her technical leadership transformed our team's productivity"
+  - "Outstanding problem solver with strong communication skills"
