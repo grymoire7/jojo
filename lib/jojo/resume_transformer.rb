@@ -11,7 +11,9 @@ module Jojo
     end
 
     def transform(data)
-      permissions = @config.dig("resume_data", "permissions") || {}
+      # Handle both Config objects and hashes
+      config_hash = @config.respond_to?(:to_h) ? @config.to_h : @config
+      permissions = config_hash.dig("resume_data", "permissions") || {}
 
       permissions.each do |field_path, perms|
         next unless perms.is_a?(Array)

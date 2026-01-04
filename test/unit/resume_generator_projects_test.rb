@@ -31,21 +31,43 @@ describe "ResumeGenerator with Projects" do
     FileUtils.rm_f("test/fixtures/projects.yml")
   end
 
-  it "includes relevant projects in resume prompt" do
-    prompt_received = nil
+  it "generates resume using config-based pipeline" do
+    # Note: The new implementation doesn't use project selection in prompts
+    # Projects are now part of resume_data.yml and can be filtered/reordered
+    # This test now validates the basic generation works
 
     mock_ai = Minitest::Mock.new
-    mock_ai.expect(:generate_text, "Generated resume with projects") do |prompt|
-      prompt_received = prompt
-      true  # Accept any prompt for now
-    end
+    # Mock AI calls for all transformations based on permissions config
+    # Top-level array fields
+    mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # skills: remove
+    mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # skills: reorder
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # languages: reorder
+    mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # databases: remove
+    mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # databases: reorder
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # tools: remove
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # tools: reorder
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # projects: reorder
+    mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # experience: reorder
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # endorsements: remove
+
+    # Scalar/text fields
+    mock_ai.expect(:generate_text, "Tailored summary", [String]) # summary: rewrite
+
+    # Nested fields (dot notation)
+    mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # projects.skills: reorder (3 skills in first project)
+    mock_ai.expect(:generate_text, "Tailored description", [String]) # experience.description: rewrite
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience.technologies: remove
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience.technologies: reorder
+    mock_ai.expect(:generate_text, "[0]", [String]) # experience.tags: remove
+    mock_ai.expect(:generate_text, "[0]", [String]) # experience.tags: reorder
+    mock_ai.expect(:generate_text, "Tailored education description", [String]) # education.description: rewrite
 
     generator = Jojo::Generators::ResumeGenerator.new(@employer, mock_ai, config: @config, inputs_path: "test/fixtures")
-    generator.generate
+    result = generator.generate
 
-    # Verify the prompt includes project information
-    _(prompt_received).must_include "Rails App"
-    _(prompt_received).must_include "Relevant Projects and Achievements"
+    # Verify resume was generated
+    _(result).must_include "# Jane Doe"
+    _(result).must_include "Test Corp"
 
     mock_ai.verify
   end

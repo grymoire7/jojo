@@ -72,6 +72,10 @@ module Jojo
       config["resume_template"]
     end
 
+    def to_h
+      config
+    end
+
     private
 
     def config

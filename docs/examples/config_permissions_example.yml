@@ -1,0 +1,21 @@
+# Example permissions configuration
+resume_data:
+  permissions:
+    # Arrays: can remove irrelevant items, reorder by relevance
+    skills: [remove, reorder]
+    databases: [remove, reorder]
+    tools: [remove, reorder]
+    endorsements: [remove]
+
+    # Arrays: reorder only (keep all items)
+    experience: [reorder]
+    projects: [reorder]
+    languages: [reorder]
+
+    # Text fields: can be rewritten for job
+    summary: [rewrite]
+    experience.description: [rewrite]
+    education.description: [rewrite]
+
+    # Fields without permissions are read-only
+    # (name, email, phone, dates, etc.)

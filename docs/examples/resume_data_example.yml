@@ -1,0 +1,70 @@
+# Example resume_data.yml - Structured resume data
+#
+# This file contains your base resume data in a structured format.
+# The transformer will apply permissions from config.yml to curate
+# this data for specific job opportunities.
+
+name: "Your Full Name"
+email: "your.email@example.com"
+phone: "+1-555-0123"
+location: "City, State"
+
+# Professional summary - can be rewritten per job
+summary: "Experienced software engineer with X years building..."
+
+# Skills - can be filtered and reordered
+skills:
+  - Ruby
+  - Python
+  - JavaScript
+  # ... add all your skills
+
+# Languages you speak
+languages:
+  - English (native)
+  - Spanish (professional)
+
+# Database technologies
+databases:
+  - PostgreSQL
+  - MySQL
+  - Redis
+
+# Development tools
+tools:
+  - Docker
+  - Git
+  - VS Code
+
+# Work experience - can be reordered, descriptions rewritten
+experience:
+  - company: "Company Name"
+    title: "Job Title"
+    start_date: "YYYY-MM"
+    end_date: "present"  # or "YYYY-MM"
+    description: "High-level summary of role and impact"
+    technologies:
+      - Tech1
+      - Tech2
+    tags:
+      - backend
+      - leadership
+
+# Education - descriptions can be rewritten
+education:
+  - degree: "BS Computer Science"
+    institution: "University Name"
+    year: "YYYY"
+    description: "Relevant coursework or achievements"
+
+# Projects - can be reordered
+projects:
+  - name: "Project Name"
+    description: "What you built and why it matters"
+    skills:
+      - Ruby
+      - PostgreSQL
+
+# Endorsements/recommendations - can be filtered
+endorsements:
+  - "Quote from colleague or manager"
