@@ -75,4 +75,34 @@ describe Jojo::ResumeTransformer do
       _(data["contact"]["email"]).must_equal "new@example.com"
     end
   end
+
+  describe "#filter_field" do
+    it "filters array items using AI" do
+      data = {"skills" => ["Ruby", "Python", "Java", "C++", "Go"]}
+
+      # Mock AI to return indices [0, 1, 4] (keep Ruby, Python, Go)
+      @ai_client.expect(:generate_text, "[0, 1, 4]", [String])
+
+      @transformer.send(:filter_field, "skills", data)
+
+      _(data["skills"]).must_equal ["Ruby", "Python", "Go"]
+      @ai_client.verify
+    end
+
+    it "does nothing for non-array fields" do
+      data = {"summary" => "Some text"}
+
+      @transformer.send(:filter_field, "summary", data)
+
+      _(data["summary"]).must_equal "Some text"
+    end
+
+    it "does nothing for missing fields" do
+      data = {"skills" => ["Ruby"]}
+
+      @transformer.send(:filter_field, "nonexistent", data)
+
+      _(data["skills"]).must_equal ["Ruby"]
+    end
+  end
 end

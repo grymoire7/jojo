@@ -1,4 +1,6 @@
 # lib/jojo/resume_transformer.rb
+require "json"
+
 module Jojo
   class ResumeTransformer
     def initialize(ai_client:, config:, job_context:)
@@ -49,6 +51,32 @@ module Jojo
           target[key] = value
         end
       end
+    end
+
+    def filter_field(field_path, data)
+      items = get_field(data, field_path)
+      return unless items.is_a?(Array)
+
+      # Simple, focused prompt
+      prompt = <<~PROMPT
+        Filter these items by relevance to the job description.
+        Keep approximately 70% of the most relevant items.
+
+        Job Description:
+        #{@job_context[:job_description]}
+
+        Items (JSON):
+        #{items.to_json}
+
+        Return ONLY a JSON array of indices to keep (e.g., [0, 2, 3]).
+        No explanations, just the JSON array.
+      PROMPT
+
+      response = @ai_client.generate_text(prompt)
+      indices = JSON.parse(response)
+      filtered = indices.map { |i| items[i] }
+
+      set_field(data, field_path, filtered)
     end
   end
 end
