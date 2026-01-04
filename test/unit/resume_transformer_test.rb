@@ -105,4 +105,57 @@ describe Jojo::ResumeTransformer do
       _(data["skills"]).must_equal ["Ruby"]
     end
   end
+
+  describe "#reorder_field" do
+    it "reorders array items using AI" do
+      data = {"skills" => ["Ruby", "Python", "Java"]}
+
+      # Mock AI to return reordered indices [2, 0, 1]
+      @ai_client.expect(:generate_text, "[2, 0, 1]", [String])
+
+      @transformer.send(:reorder_field, "skills", data, can_remove: true)
+
+      _(data["skills"]).must_equal ["Java", "Ruby", "Python"]
+      @ai_client.verify
+    end
+
+    it "raises error when LLM removes items from reorder-only field" do
+      data = {"experience" => ["exp1", "exp2", "exp3"]}
+
+      # Mock AI returns only 2 indices (violating reorder-only)
+      @ai_client.expect(:generate_text, "[1, 0]", [String])
+
+      error = assert_raises(Jojo::PermissionViolation) do
+        @transformer.send(:reorder_field, "experience", data, can_remove: false)
+      end
+
+      _(error.message).must_include "removed items"
+      _(error.message).must_include "experience"
+    end
+
+    it "raises error when LLM returns invalid indices" do
+      data = {"experience" => ["exp1", "exp2", "exp3"]}
+
+      # Mock AI returns invalid indices
+      @ai_client.expect(:generate_text, "[5, 1, 2]", [String])
+
+      error = assert_raises(Jojo::PermissionViolation) do
+        @transformer.send(:reorder_field, "experience", data, can_remove: false)
+      end
+
+      _(error.message).must_include "invalid indices"
+    end
+
+    it "allows removal when can_remove is true" do
+      data = {"skills" => ["Ruby", "Python", "Java"]}
+
+      # Returns only 2 items - should be allowed
+      @ai_client.expect(:generate_text, "[0, 2]", [String])
+
+      @transformer.send(:reorder_field, "skills", data, can_remove: true)
+
+      _(data["skills"]).must_equal ["Ruby", "Java"]
+      @ai_client.verify
+    end
+  end
 end

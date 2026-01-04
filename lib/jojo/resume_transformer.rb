@@ -1,5 +1,6 @@
 # lib/jojo/resume_transformer.rb
 require "json"
+require_relative "errors"
 
 module Jojo
   class ResumeTransformer
@@ -77,6 +78,48 @@ module Jojo
       filtered = indices.map { |i| items[i] }
 
       set_field(data, field_path, filtered)
+    end
+
+    def reorder_field(field_path, data, can_remove:)
+      items = get_field(data, field_path)
+      return unless items.is_a?(Array)
+
+      original_count = items.length
+
+      # Simple, focused prompt
+      prompt = <<~PROMPT
+        Reorder these items by relevance to the job description.
+        Most relevant should be first.
+
+        Job Description:
+        #{@job_context[:job_description]}
+
+        Items (JSON):
+        #{items.to_json}
+
+        Return ONLY a JSON array of indices in new order (e.g., [2, 0, 1]).
+        #{"CRITICAL: Return ALL #{items.length} indices." unless can_remove}
+        No explanations, just the JSON array.
+      PROMPT
+
+      response = @ai_client.generate_text(prompt)
+      indices = JSON.parse(response)
+
+      # Ruby enforces the permission
+      unless can_remove
+        if indices.length != original_count
+          raise PermissionViolation,
+            "LLM removed items from reorder-only field: #{field_path}"
+        end
+
+        if indices.sort != (0...original_count).to_a
+          raise PermissionViolation,
+            "LLM returned invalid indices for field: #{field_path}"
+        end
+      end
+
+      reordered = indices.map { |i| items[i] }
+      set_field(data, field_path, reordered)
     end
   end
 end
