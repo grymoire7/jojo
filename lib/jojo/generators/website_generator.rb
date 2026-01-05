@@ -248,16 +248,18 @@ module Jojo
       end
 
       def load_projects
-        projects_path = File.join(inputs_path, "projects.yml")
-        return [] unless File.exist?(projects_path)
+        resume_data_path = File.join(inputs_path, "resume_data.yml")
+        return [] unless File.exist?(resume_data_path)
 
-        loader = ProjectLoader.new(projects_path)
-        all_projects = loader.load
+        loader = ResumeDataLoader.new(resume_data_path)
+        resume_data = loader.load
 
-        selector = ProjectSelector.new(employer, all_projects)
-        selector.select_for_landing_page(limit: 5)
-      rescue ProjectLoader::ValidationError => e
-        log "Warning: Projects validation failed: #{e.message}"
+        projects = resume_data["projects"] || []
+
+        # Convert to symbol keys for consistency
+        projects.map { |p| p.transform_keys(&:to_sym) }
+      rescue ResumeDataLoader::LoadError, ResumeDataLoader::ValidationError => e
+        log "Warning: Could not load projects from resume_data.yml: #{e.message}"
         []
       end
 

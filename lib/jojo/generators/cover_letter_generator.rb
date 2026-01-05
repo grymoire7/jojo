@@ -20,8 +20,8 @@ module Jojo
         log "Gathering inputs for cover letter generation..."
         inputs = gather_inputs
 
-        log "Loading relevant projects..."
-        projects = load_projects
+        # Projects removed - now part of resume_data.yml
+        projects = []
 
         log "Building cover letter prompt..."
         prompt = build_cover_letter_prompt(inputs, projects)
@@ -132,20 +132,6 @@ module Jojo
 
       def log(message)
         puts "  [CoverLetterGenerator] #{message}" if verbose
-      end
-
-      def load_projects
-        projects_path = File.join(inputs_path, "projects.yml")
-        return [] unless File.exist?(projects_path)
-
-        loader = ProjectLoader.new(projects_path)
-        all_projects = loader.load
-
-        selector = ProjectSelector.new(employer, all_projects)
-        selector.select_for_cover_letter(limit: 2)
-      rescue ProjectLoader::ValidationError => e
-        log "Warning: Projects validation failed: #{e.message}"
-        []
       end
     end
   end
