@@ -20,10 +20,6 @@ describe "Setup Integration" do
           "templates/resume_data.yml"
         )
         FileUtils.cp(
-          File.join(__dir__, "../../templates/recommendations.md"),
-          "templates/recommendations.md"
-        )
-        FileUtils.cp(
           File.join(__dir__, "../../templates/default_resume.md.erb"),
           "templates/default_resume.md.erb"
         )
@@ -75,20 +71,19 @@ describe "Setup Integration" do
         cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setting up your profile templates...", :green]
-        3.times { cli.expect :say, nil, [String, :green] }
+        2.times { cli.expect :say, nil, [String, :green] }
 
         # show_summary
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setup complete!", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Created:"]
-        5.times { cli.expect :say, nil, [String] } # 5 created files
+        4.times { cli.expect :say, nil, [String] } # 4 created files
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Next steps:", :cyan]
         cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
         cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
-        cli.expect :say, nil, ["  3. Edit or delete inputs/recommendations.md if not needed"]
-        cli.expect :say, nil, ["  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+        cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
@@ -112,7 +107,6 @@ describe "Setup Integration" do
         _(config_content).must_include "model: claude-3-5-haiku-20241022"
 
         # Verify input files
-        _(File.exist?("inputs/recommendations.md")).must_equal true
       end
     end
   end
@@ -133,10 +127,6 @@ describe "Setup Integration" do
         FileUtils.cp(
           File.join(__dir__, "../../templates/resume_data.yml"),
           "templates/resume_data.yml"
-        )
-        FileUtils.cp(
-          File.join(__dir__, "../../templates/recommendations.md"),
-          "templates/recommendations.md"
         )
         FileUtils.cp(
           File.join(__dir__, "../../templates/default_resume.md.erb"),
@@ -187,20 +177,19 @@ describe "Setup Integration" do
         cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setting up your profile templates...", :green]
-        3.times { cli.expect :say, nil, [String, :green] }
+        2.times { cli.expect :say, nil, [String, :green] }
 
         # show_summary
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setup complete!", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Created:"]
-        5.times { cli.expect :say, nil, [String] } # 5 created files
+        4.times { cli.expect :say, nil, [String] } # 4 created files
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Next steps:", :cyan]
         cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
         cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
-        cli.expect :say, nil, ["  3. Edit or delete inputs/recommendations.md if not needed"]
-        cli.expect :say, nil, ["  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+        cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
@@ -239,10 +228,6 @@ describe "Setup Integration" do
         FileUtils.cp(
           File.join(__dir__, "../../templates/resume_data.yml"),
           "templates/resume_data.yml"
-        )
-        FileUtils.cp(
-          File.join(__dir__, "../../templates/recommendations.md"),
-          "templates/recommendations.md"
         )
         FileUtils.cp(
           File.join(__dir__, "../../templates/default_resume.md.erb"),
@@ -285,20 +270,19 @@ describe "Setup Integration" do
         cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setting up your profile templates...", :green]
-        3.times { cli.expect :say, nil, [String, :green] }
+        2.times { cli.expect :say, nil, [String, :green] }
 
         # show_summary
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setup complete!", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Created:"]
-        5.times { cli.expect :say, nil, [String] } # 5 created files
+        4.times { cli.expect :say, nil, [String] } # 4 created files
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Next steps:", :cyan]
         cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
         cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
-        cli.expect :say, nil, ["  3. Edit or delete inputs/recommendations.md if not needed"]
-        cli.expect :say, nil, ["  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+        cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
@@ -322,7 +306,6 @@ describe "Setup Integration" do
         _(config_content).must_include "search: tavily"
 
         # Verify input files
-        _(File.exist?("inputs/recommendations.md")).must_equal true
       end
     end
   end

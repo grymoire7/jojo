@@ -5,6 +5,7 @@ require_relative "../../lib/jojo/generators/website_generator"
 require_relative "../../lib/jojo/config"
 require "tmpdir"
 require "fileutils"
+require "yaml"
 
 # Simple config stub to avoid complex mock expectations
 class RecommendationsWorkflowTestConfigStub
@@ -46,11 +47,29 @@ describe "Recommendations Workflow Integration" do
   end
 
   it "generates complete website with recommendations carousel" do
-    # Create recommendations file
-    File.write(
-      File.join(@inputs_path, "recommendations.md"),
-      File.read("test/fixtures/recommendations.md")
-    )
+    # Create resume_data.yml with recommendations
+    resume_data = {
+      "name" => "Test User",
+      "email" => "test@example.com",
+      "summary" => "Test summary",
+      "skills" => ["Ruby"],
+      "experience" => [],
+      "recommendations" => [
+        {
+          "name" => "Jane Smith",
+          "title" => "Senior Engineering Manager",
+          "relationship" => "Former Manager at Acme Corp",
+          "quote" => "Jane is an excellent engineer who consistently delivers high-quality work"
+        },
+        {
+          "name" => "Bob Johnson",
+          "title" => "Lead Developer",
+          "relationship" => "Colleague at Tech Co",
+          "quote" => "Exceptional technical expertise combined with collaborative approach"
+        }
+      ]
+    }
+    File.write(File.join(@inputs_path, "resume_data.yml"), resume_data.to_yaml)
 
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
@@ -100,11 +119,23 @@ describe "Recommendations Workflow Integration" do
   end
 
   it "generates static card for single recommendation" do
-    # Create recommendations file with single recommendation
-    File.write(
-      File.join(@inputs_path, "recommendations.md"),
-      File.read("test/fixtures/recommendations_minimal.md")
-    )
+    # Create resume_data.yml with single recommendation
+    resume_data = {
+      "name" => "Test User",
+      "email" => "test@example.com",
+      "summary" => "Test summary",
+      "skills" => ["Ruby"],
+      "experience" => [],
+      "recommendations" => [
+        {
+          "name" => "Alice Lee",
+          "title" => "Developer",
+          "relationship" => "Colleague",
+          "quote" => "Great to work with"
+        }
+      ]
+    }
+    File.write(File.join(@inputs_path, "resume_data.yml"), resume_data.to_yaml)
 
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
@@ -125,14 +156,22 @@ describe "Recommendations Workflow Integration" do
 
   it "positions recommendations after job description and before projects" do
     # Add all sections
-    File.write(
-      File.join(@inputs_path, "recommendations.md"),
-      File.read("test/fixtures/recommendations.md")
-    )
-    File.write(
-      File.join(@inputs_path, "resume_data.yml"),
-      File.read("test/fixtures/resume_data.yml")
-    )
+    resume_data = {
+      "name" => "Test User",
+      "email" => "test@example.com",
+      "summary" => "Test summary",
+      "skills" => ["Ruby"],
+      "experience" => [],
+      "recommendations" => [
+        {
+          "name" => "Jane Smith",
+          "title" => "Manager",
+          "relationship" => "Former Manager",
+          "quote" => "Great engineer"
+        }
+      ]
+    }
+    File.write(File.join(@inputs_path, "resume_data.yml"), resume_data.to_yaml)
     File.write(@employer.job_description_annotations_path, "[]")
 
     generator = Jojo::Generators::WebsiteGenerator.new(
@@ -157,26 +196,5 @@ describe "Recommendations Workflow Integration" do
     if recommendations_pos && projects_pos
       _(projects_pos).must_be :>, recommendations_pos
     end
-  end
-
-  it "handles malformed recommendations gracefully" do
-    File.write(
-      File.join(@inputs_path, "recommendations.md"),
-      File.read("test/fixtures/recommendations_malformed.md")
-    )
-
-    generator = Jojo::Generators::WebsiteGenerator.new(
-      @employer,
-      @ai_client,
-      config: @config,
-      inputs_path: @inputs_path
-    )
-
-    # Should not raise error
-    html = generator.generate
-
-    # Should include valid recommendation, skip invalid
-    _(html).must_include "Valid Person"
-    _(html).wont_include "Missing Name"
   end
 end
