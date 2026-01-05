@@ -4,7 +4,6 @@ require "fileutils"
 require "json"
 require_relative "../prompts/website_prompt"
 require_relative "../resume_data_loader"
-require_relative "../recommendation_parser"
 
 module Jojo
   module Generators
