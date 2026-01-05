@@ -16,14 +16,16 @@ class PandocCheckerTest < Minitest::Test
   end
 
   def test_pandoc_version_returns_version_string
-    version_output = "pandoc 3.1.11\n"
-    Jojo::PandocChecker.stub :`, version_output do
-      assert_equal "3.1.11", Jojo::PandocChecker.version
+    # Stub both available? and the backtick command execution
+    Jojo::PandocChecker.stub :available?, true do
+      Jojo::PandocChecker.stub :`, "pandoc 3.1.11\n" do
+        assert_equal "3.1.11", Jojo::PandocChecker.version
+      end
     end
   end
 
   def test_pandoc_version_returns_nil_when_not_installed
-    Jojo::PandocChecker.stub :`, "" do
+    Jojo::PandocChecker.stub :available?, false do
       assert_nil Jojo::PandocChecker.version
     end
   end

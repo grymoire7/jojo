@@ -86,10 +86,12 @@ class PdfConverterTest < Minitest::Test
 
     generator = Jojo::PdfConverter.new(@employer, verbose: false)
 
-    result = generator.generate_all
+    Jojo::PandocChecker.stub :check!, true do
+      result = generator.generate_all
 
-    assert_empty result[:generated]
-    assert_equal 2, result[:skipped].length
+      assert_empty result[:generated]
+      assert_equal 2, result[:skipped].length
+    end
   end
 
   def test_generate_resume_raises_error_if_markdown_missing
