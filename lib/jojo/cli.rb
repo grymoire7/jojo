@@ -31,11 +31,10 @@ module Jojo
     end
 
     desc "setup", "Setup configuration"
-    method_option :force, type: :boolean, desc: "Overwrite existing files"
     def setup
       Jojo::SetupService.new(
         cli_instance: self,
-        force: options[:force]
+        overwrite: options[:overwrite]
       ).run
     rescue SystemExit
       # Allow clean exit from service

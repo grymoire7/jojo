@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Setup command now uses global `--overwrite` flag instead of command-specific `--force` flag for consistency
 - **BREAKING**: Setup now prompts for LLM provider selection instead of assuming Anthropic
 - Setup prompts for reasoning and text generation models for chosen provider
 - `.env` file now uses provider-specific environment variable names (e.g., `OPENAI_API_KEY` for OpenAI)
@@ -24,14 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Migration Guide
 If you have an existing Jojo installation with Anthropic:
 1. Your existing `.env` and `config.yml` will continue to work
-2. To switch providers, run `jojo setup --force` and select new provider
+2. To switch providers, run `jojo setup --overwrite` and select new provider
 3. Or manually edit `.env` to use provider-specific key (e.g., `OPENAI_API_KEY`)
 4. And edit `config.yml` to update `service:` and `model:` fields
 
 ### Added
 - Improved setup process: single command creates all configuration files
 - Template validation: warns when input files haven't been customized
-- `--force` flag for setup command to overwrite existing files
+- `--overwrite` flag for setup command to overwrite existing files
 - Comprehensive template examples for resume, recommendations, and projects
 - `TemplateValidator` class for detecting unchanged template files
 - `SetupService` class for managing setup workflow

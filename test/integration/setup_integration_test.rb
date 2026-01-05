@@ -31,7 +31,7 @@ describe "Setup Integration" do
         # Mock CLI interactions
         cli = Minitest::Mock.new
 
-        # warn_if_force_mode (skipped - not in force mode)
+        # warn_if_overwrite_mode (skipped - not in overwrite mode)
 
         # setup_api_configuration
         cli.expect :say, nil, ["Setting up Jojo...", :green]
@@ -92,7 +92,7 @@ describe "Setup Integration" do
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
-        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
+        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, overwrite: false)
         service.run
 
         cli.verify
@@ -204,7 +204,7 @@ describe "Setup Integration" do
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
-        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
+        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, overwrite: false)
         service.run
 
         cli.verify
@@ -253,7 +253,7 @@ describe "Setup Integration" do
         cli = Minitest::Mock.new
         prompt = Minitest::Mock.new
 
-        # warn_if_force_mode (skipped - not in force mode)
+        # warn_if_overwrite_mode (skipped - not in overwrite mode)
 
         # setup_api_configuration
         cli.expect :say, nil, ["Setting up Jojo...", :green]
@@ -302,7 +302,7 @@ describe "Setup Integration" do
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
-        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
+        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, overwrite: false)
         service.run
 
         cli.verify

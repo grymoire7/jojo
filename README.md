@@ -202,7 +202,7 @@ Jojo supports the following LLM providers via [RubyLLM](https://github.com/alexr
 - **Google Vertex AI**
 - **GPUStack**
 
-To switch providers, run `jojo setup --force` or manually edit your `config.yml` and `.env` files.
+To switch providers, run `jojo setup --overwrite` or manually edit your `config.yml` and `.env` files.
 
 ### Input Files
 

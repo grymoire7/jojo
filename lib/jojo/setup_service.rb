@@ -5,10 +5,10 @@ require_relative "provider_helper"
 
 module Jojo
   class SetupService
-    def initialize(cli_instance:, prompt: nil, force: false)
+    def initialize(cli_instance:, prompt: nil, overwrite: false)
       @cli = cli_instance
       @prompt = prompt || TTY::Prompt.new
-      @force = force
+      @overwrite = overwrite
       @created_files = []
       @skipped_files = []
     end
@@ -17,7 +17,7 @@ module Jojo
       @cli.say "Setting up Jojo...", :green
       @cli.say ""
 
-      warn_if_force_mode
+      warn_if_overwrite_mode
       validate_configuration_completeness
       setup_api_configuration
       setup_search_configuration
@@ -29,10 +29,10 @@ module Jojo
 
     private
 
-    def warn_if_force_mode
-      return unless @force
+    def warn_if_overwrite_mode
+      return unless @overwrite
 
-      @cli.say "⚠ WARNING: --force will overwrite existing configuration files!", :yellow
+      @cli.say "⚠ WARNING: --overwrite will overwrite existing configuration files!", :yellow
       @cli.say "  This will replace: .env, config.yml, and all inputs/ files", :yellow
 
       unless @cli.yes?("Continue?")
@@ -41,7 +41,7 @@ module Jojo
     end
 
     def validate_configuration_completeness
-      return if @force  # Force mode bypasses validation
+      return if @overwrite  # Overwrite mode bypasses validation
 
       env_exists = File.exist?(".env")
       config_exists = File.exist?("config.yml")
@@ -53,7 +53,7 @@ module Jojo
         @cli.say "  Missing: config.yml", :yellow
         @cli.say "", :yellow
         @cli.say "Options:", :yellow
-        @cli.say "  • Run 'jojo setup --force' to recreate all configuration", :yellow
+        @cli.say "  • Run 'jojo setup --overwrite' to recreate all configuration", :yellow
         @cli.say "  • Manually create config.yml to match your existing .env setup", :yellow
         exit 1
       elsif config_exists && !env_exists
@@ -62,7 +62,7 @@ module Jojo
         @cli.say "  Missing: .env", :yellow
         @cli.say "", :yellow
         @cli.say "Options:", :yellow
-        @cli.say "  • Run 'jojo setup --force' to recreate all configuration", :yellow
+        @cli.say "  • Run 'jojo setup --overwrite' to recreate all configuration", :yellow
         @cli.say "  • Manually create .env with your API keys", :yellow
         exit 1
       end
@@ -71,7 +71,7 @@ module Jojo
     end
 
     def setup_api_configuration
-      if File.exist?(".env") && !@force
+      if File.exist?(".env") && !@overwrite
         @cli.say "✓ .env already exists (skipped)", :green
         @skipped_files << ".env"
 
@@ -95,8 +95,8 @@ module Jojo
         return
       end
 
-      if @force && File.exist?(".env")
-        @cli.say "⚠ Recreating .env (--force mode)", :yellow
+      if @overwrite && File.exist?(".env")
+        @cli.say "⚠ Recreating .env (--overwrite mode)", :yellow
       else
         @cli.say "Let's configure your API access.", :green
       end
@@ -175,7 +175,7 @@ module Jojo
     end
 
     def setup_personal_configuration
-      if File.exist?("config.yml") && !@force
+      if File.exist?("config.yml") && !@overwrite
         @cli.say "✓ config.yml already exists (skipped)", :green
         @skipped_files << "config.yml"
         return
@@ -248,7 +248,7 @@ module Jojo
         target_path = File.join("inputs", filename)
         source_path = File.join("templates", filename)
 
-        if File.exist?(target_path) && !@force
+        if File.exist?(target_path) && !@overwrite
           @cli.say "✓ inputs/#{filename} already exists (skipped)", :green
           @skipped_files << "inputs/#{filename}"
           next
@@ -270,7 +270,7 @@ module Jojo
       target_template_path = File.join("inputs", "templates", template_file)
       source_template_path = File.join("templates", template_file)
 
-      if File.exist?(target_template_path) && !@force
+      if File.exist?(target_template_path) && !@overwrite
         @cli.say "✓ inputs/templates/#{template_file} already exists (skipped)", :green
         @skipped_files << "inputs/templates/#{template_file}"
       else
