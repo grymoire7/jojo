@@ -135,7 +135,7 @@ module Jojo
 
           Consider naturally weaving these relevant projects into the narrative:
 
-          #{projects.map { |p| "- **#{p[:title]}**: #{p[:description]}" }.join("\n")}
+          #{projects.map { |p| "- **#{p[:name]}**: #{p[:description]}" }.join("\n")}
 
           Use these to demonstrate concrete examples of your qualifications.
         SECTION
