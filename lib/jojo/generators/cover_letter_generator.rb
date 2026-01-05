@@ -55,12 +55,14 @@ module Jojo
         end
         tailored_resume = File.read(employer.resume_path)
 
-        # Read generic resume (REQUIRED)
-        generic_resume_path = File.join(inputs_path, "generic_resume.md")
-        unless File.exist?(generic_resume_path)
-          raise "Generic resume not found at #{generic_resume_path}"
+        # Read resume data (REQUIRED)
+        resume_data_path = File.join(inputs_path, "resume_data.yml")
+        unless File.exist?(resume_data_path)
+          raise "Resume data not found at #{resume_data_path}"
         end
-        generic_resume = File.read(generic_resume_path)
+        loader = ResumeDataLoader.new(resume_data_path)
+        resume_data = loader.load
+        generic_resume = format_resume_data(resume_data)
 
         # Read research (OPTIONAL)
         research = read_research
@@ -149,6 +151,31 @@ module Jojo
       rescue ResumeDataLoader::LoadError, ResumeDataLoader::ValidationError => e
         log "Warning: Could not load projects from resume_data.yml: #{e.message}"
         []
+      end
+
+      def format_resume_data(data)
+        # Convert structured resume_data to readable text format for prompts
+        output = []
+        output << "# #{data["name"]}"
+        output << "#{data["email"]} | #{data["location"]}"
+        output << ""
+        output << "## Summary"
+        output << data["summary"]
+        output << ""
+        output << "## Skills"
+        output << data["skills"].join(", ")
+        output << ""
+        output << "## Experience"
+        data["experience"].each do |exp|
+          output << "### #{exp["title"]} at #{exp["company"]}"
+          output << exp["description"]
+          if exp["technologies"]
+            output << "Technologies: #{exp["technologies"].join(", ")}"
+          end
+          output << ""
+        end
+
+        output.join("\n")
       end
     end
   end
