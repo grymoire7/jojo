@@ -241,9 +241,7 @@ module Jojo
 
       input_files = {
         "resume_data.yml" => "(customize with your experience)",
-        "generic_resume.md" => "(legacy format - optional)",
-        "recommendations.md" => "(optional - customize or delete)",
-        "projects.yml" => "(optional - customize or delete)"
+        "recommendations.md" => "(optional - customize or delete)"
       }
 
       input_files.each do |filename, description|

@@ -3,8 +3,7 @@ require "erb"
 require "fileutils"
 require "json"
 require_relative "../prompts/website_prompt"
-require_relative "../project_loader"
-require_relative "../project_selector"
+require_relative "../resume_data_loader"
 require_relative "../recommendation_parser"
 
 module Jojo
