@@ -36,7 +36,13 @@ describe Jojo::ErbRenderer do
           "skills" => ["Ruby"]
         }
       ],
-      "endorsements" => ["Great engineer"]
+      "recommendations" => [
+        {
+          "name" => "Jane Smith",
+          "title" => "Manager",
+          "quote" => "Great engineer"
+        }
+      ]
     }
 
     renderer = Jojo::ErbRenderer.new(template_path)
@@ -48,6 +54,7 @@ describe Jojo::ErbRenderer do
     _(result).must_include "Ruby • Python"
     _(result).must_include "### Senior Dev at TechCo"
     _(result).must_include "> Great engineer"
+    _(result).must_include "Jane Smith"
   end
 
   it "handles missing optional fields" do
@@ -68,6 +75,6 @@ describe Jojo::ErbRenderer do
     result = renderer.render(data)
 
     _(result).must_include "# John Doe"
-    _(result).wont_include "## Endorsements"
+    _(result).wont_include "## Recommendations"
   end
 end

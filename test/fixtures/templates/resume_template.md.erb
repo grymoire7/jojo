@@ -34,10 +34,14 @@
 - **<%= proj["name"] %>**: <%= proj["description"] %> (Skills: <%= proj["skills"].join(", ") %>)
 <% end %>
 
-<% if endorsements && !endorsements.empty? %>
-## Endorsements
+<% if recommendations && !recommendations.empty? %>
+## Recommendations
 
-<% endorsements.each do |endorsement| %>
-> <%= endorsement %>
+<% recommendations.each do |rec| %>
+> <%= rec["quote"] %>
+<% if rec["name"] %>
+— **<%= rec["name"] %><% if rec["title"] %>, <%= rec["title"] %><% end %>**
+<% end %>
+
 <% end %>
 <% end %>

@@ -41,7 +41,7 @@ describe "ResumeGenerator with Projects" do
     mock_ai.expect(:generate_text, "[0, 1]", [String]) # tools: reorder
     mock_ai.expect(:generate_text, "[0, 1]", [String]) # projects: reorder
     mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # experience: reorder
-    mock_ai.expect(:generate_text, "[0, 1]", [String]) # endorsements: remove
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # recommendations: remove
 
     # Scalar/text fields
     mock_ai.expect(:generate_text, "Tailored summary", [String]) # summary: rewrite
