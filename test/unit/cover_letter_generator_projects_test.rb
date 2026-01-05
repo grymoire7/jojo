@@ -11,7 +11,6 @@ describe "CoverLetterGenerator with Projects" do
 
     File.write(@employer.job_description_path, "Ruby developer needed")
     File.write(@employer.resume_path, "# Resume\n\nTailored resume...")
-    FileUtils.mkdir_p("test/fixtures")
 
     File.write(@employer.job_details_path, <<~YAML)
       company_name: Test Corp
@@ -19,7 +18,9 @@ describe "CoverLetterGenerator with Projects" do
         - Ruby on Rails
     YAML
 
-    @resume_data_path = "test/fixtures/test_resume_data.yml"
+    # Create separate test directory to avoid conflicts
+    @test_fixtures_dir = Dir.mktmpdir("jojo-test-fixtures-")
+    @resume_data_path = File.join(@test_fixtures_dir, "resume_data.yml")
     File.write(@resume_data_path, <<~YAML)
       name: "Jane Doe"
       email: "jane@example.com"
@@ -38,7 +39,7 @@ describe "CoverLetterGenerator with Projects" do
 
   after do
     FileUtils.rm_rf("employers/test-corp")
-    FileUtils.rm_f(@resume_data_path)
+    FileUtils.rm_rf(@test_fixtures_dir) if @test_fixtures_dir && File.exist?(@test_fixtures_dir)
   end
 
   it "includes relevant projects in cover letter prompt" do
@@ -50,7 +51,7 @@ describe "CoverLetterGenerator with Projects" do
       true
     end
 
-    generator = Jojo::Generators::CoverLetterGenerator.new(@employer, mock_ai, config: @config, inputs_path: "test/fixtures")
+    generator = Jojo::Generators::CoverLetterGenerator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
     # Verify the prompt includes project information

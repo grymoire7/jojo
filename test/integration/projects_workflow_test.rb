@@ -22,8 +22,9 @@ describe "Projects Integration Workflow" do
 
     File.write(@employer.resume_path, "# Generic Resume\n\nExperience with Ruby...")
 
-    FileUtils.mkdir_p("test/fixtures")
-    @resume_data_path = "test/fixtures/integration_resume_data.yml"
+    # Create separate test directory to avoid conflicts
+    @test_fixtures_dir = Dir.mktmpdir("jojo-test-fixtures-")
+    @resume_data_path = File.join(@test_fixtures_dir, "resume_data.yml")
     File.write(@resume_data_path, <<~YAML)
       name: "Jane Doe"
       email: "jane@example.com"
@@ -63,7 +64,7 @@ describe "Projects Integration Workflow" do
 
   after do
     FileUtils.rm_rf("employers/integration-test-corp")
-    FileUtils.rm_f(@resume_data_path)
+    FileUtils.rm_rf(@test_fixtures_dir) if @test_fixtures_dir && File.exist?(@test_fixtures_dir)
   end
 
   it "generates website with projects from resume_data.yml" do
@@ -72,7 +73,7 @@ describe "Projects Integration Workflow" do
     mock_ai = Minitest::Mock.new
     mock_ai.expect :generate_text, "Branding statement", [String]
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: config, template: "default", inputs_path: "test/fixtures")
+    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: config, template: "default", inputs_path: @test_fixtures_dir)
     generator.generate
 
     html = File.read(@employer.index_html_path)
