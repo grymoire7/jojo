@@ -240,8 +240,7 @@ module Jojo
       @cli.say "Setting up your profile templates...", :green
 
       input_files = {
-        "resume_data.yml" => "(customize with your experience)",
-        "recommendations.md" => "(optional - customize or delete)"
+        "resume_data.yml" => "(customize with your experience)"
       }
 
       input_files.each do |filename, description|
@@ -297,7 +296,6 @@ module Jojo
           ".env" => "API configuration",
           "config.yml" => "Personal preferences and permissions",
           "inputs/resume_data.yml" => "Structured resume data (recommended)",
-          "inputs/recommendations.md" => "Optional recommendations",
           "inputs/templates/default_resume.md.erb" => "Resume rendering template"
         }
 
@@ -311,8 +309,7 @@ module Jojo
       @cli.say "Next steps:", :cyan
       @cli.say "  1. Customize inputs/resume_data.yml with your experience (structured format)"
       @cli.say "  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"
-      @cli.say "  3. Edit or delete inputs/recommendations.md if not needed"
-      @cli.say "  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"
+      @cli.say "  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"
       @cli.say ""
       @cli.say "💡 Tip: The config.yml file contains resume_data.permissions to control curation."
     end

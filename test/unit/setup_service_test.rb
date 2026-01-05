@@ -310,14 +310,13 @@ describe Jojo::SetupService do
         Dir.chdir(dir) do
           FileUtils.mkdir_p("templates")
           File.write("templates/resume_data.yml", "# JOJO_TEMPLATE_PLACEHOLDER")
-          File.write("templates/recommendations.md", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->")
           File.write("templates/default_resume.md.erb", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->")
 
           cli = Minitest::Mock.new
           cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
           cli.expect :say, nil, [""]
           cli.expect :say, nil, ["Setting up your profile templates...", :green]
-          3.times { cli.expect :say, nil, [String, :green] }
+          2.times { cli.expect :say, nil, [String, :green] }
 
           service = Jojo::SetupService.new(cli_instance: cli, overwrite: false)
           service.send(:setup_input_files)
@@ -334,7 +333,6 @@ describe Jojo::SetupService do
         Dir.chdir(dir) do
           FileUtils.mkdir_p("templates")
           File.write("templates/resume_data.yml", "# JOJO_TEMPLATE_PLACEHOLDER\nname: Test")
-          File.write("templates/recommendations.md", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->\nRecs")
           File.write("templates/default_resume.md.erb", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->\n<%= name %>")
 
           cli = Minitest::Mock.new
@@ -342,7 +340,6 @@ describe Jojo::SetupService do
           cli.expect :say, nil, [""]
           cli.expect :say, nil, ["Setting up your profile templates...", :green]
           cli.expect :say, nil, ["✓ Created inputs/resume_data.yml (customize with your experience)", :green]
-          cli.expect :say, nil, ["✓ Created inputs/recommendations.md (optional - customize or delete)", :green]
           cli.expect :say, nil, ["✓ Created inputs/templates/default_resume.md.erb (resume ERB template)", :green]
 
           service = Jojo::SetupService.new(cli_instance: cli, overwrite: false)
@@ -351,8 +348,6 @@ describe Jojo::SetupService do
           cli.verify
           _(File.exist?("inputs/resume_data.yml")).must_equal true
           _(File.read("inputs/resume_data.yml")).must_include "JOJO_TEMPLATE_PLACEHOLDER"
-          _(File.exist?("inputs/recommendations.md")).must_equal true
-          _(File.read("inputs/recommendations.md")).must_include "JOJO_TEMPLATE_PLACEHOLDER"
           _(File.exist?("inputs/templates/default_resume.md.erb")).must_equal true
           _(File.read("inputs/templates/default_resume.md.erb")).must_include "JOJO_TEMPLATE_PLACEHOLDER"
         end
@@ -366,9 +361,7 @@ describe Jojo::SetupService do
           FileUtils.mkdir_p("inputs/templates")
           FileUtils.mkdir_p("templates")
           File.write("inputs/resume_data.yml", "Existing data")
-          File.write("inputs/recommendations.md", "Existing recs")
           File.write("templates/resume_data.yml", "Template data")
-          File.write("templates/recommendations.md", "Recs")
           File.write("templates/default_resume.md.erb", "Template ERB")
 
           cli = Minitest::Mock.new
@@ -376,7 +369,6 @@ describe Jojo::SetupService do
           cli.expect :say, nil, [""]
           cli.expect :say, nil, ["Setting up your profile templates...", :green]
           cli.expect :say, nil, ["✓ inputs/resume_data.yml already exists (skipped)", :green]
-          cli.expect :say, nil, ["✓ inputs/recommendations.md already exists (skipped)", :green]
           cli.expect :say, nil, ["✓ Created inputs/templates/default_resume.md.erb (resume ERB template)", :green]
 
           service = Jojo::SetupService.new(cli_instance: cli, overwrite: false)
@@ -384,7 +376,6 @@ describe Jojo::SetupService do
 
           cli.verify
           _(File.read("inputs/resume_data.yml")).must_equal "Existing data"
-          _(File.read("inputs/recommendations.md")).must_equal "Existing recs"
         end
       end
     end
@@ -405,8 +396,7 @@ describe Jojo::SetupService do
       cli.expect :say, nil, ["Next steps:", :cyan]
       cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
       cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
-      cli.expect :say, nil, ["  3. Edit or delete inputs/recommendations.md if not needed"]
-      cli.expect :say, nil, ["  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+      cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
       cli.expect :say, nil, [""]
       cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
@@ -427,8 +417,7 @@ describe Jojo::SetupService do
       cli.expect :say, nil, ["Next steps:", :cyan]
       cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
       cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
-      cli.expect :say, nil, ["  3. Edit or delete inputs/recommendations.md if not needed"]
-      cli.expect :say, nil, ["  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+      cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
       cli.expect :say, nil, [""]
       cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
