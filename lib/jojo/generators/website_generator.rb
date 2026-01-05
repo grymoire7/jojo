@@ -366,23 +366,21 @@ module Jojo
       end
 
       def load_recommendations
-        recommendations_path = File.join(inputs_path, "recommendations.md")
+        resume_data_path = File.join(inputs_path, "resume_data.yml")
 
-        unless File.exist?(recommendations_path)
-          log "No recommendations found at #{recommendations_path}"
+        unless File.exist?(resume_data_path)
+          log "No resume data found at #{resume_data_path}"
           return nil
         end
 
-        parser = RecommendationParser.new(recommendations_path)
-        recommendations = parser.parse
+        loader = ResumeDataLoader.new(resume_data_path)
+        resume_data = loader.load
 
-        if recommendations.nil? || recommendations.empty?
-          log "Warning: No valid recommendations found in #{recommendations_path}"
-          return nil
-        end
+        recommendations = resume_data["recommendations"]
+        return nil if recommendations.nil? || recommendations.empty?
 
-        log "Loaded #{recommendations.size} recommendation(s)"
-        recommendations
+        # Convert to symbol keys for template compatibility
+        recommendations.map { |r| r.transform_keys(&:to_sym) }
       rescue => e
         log "Error loading recommendations: #{e.message}"
         nil

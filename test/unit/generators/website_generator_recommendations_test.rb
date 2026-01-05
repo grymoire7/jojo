@@ -4,6 +4,7 @@ require_relative "../../../lib/jojo/generators/website_generator"
 require_relative "../../../lib/jojo/config"
 require "tmpdir"
 require "fileutils"
+require "yaml"
 
 # Simple config stub to avoid complex mock expectations
 class WebsiteGeneratorRecommendationsTestConfigStub
@@ -40,14 +41,21 @@ describe "WebsiteGenerator with Recommendations" do
     FileUtils.rm_rf("test/fixtures/tmp_recommendations_unit") if File.exist?("test/fixtures/tmp_recommendations_unit")
   end
 
-  it "includes recommendations in template vars when file exists" do
-    # Create recommendations file in test fixtures
+  it "loads recommendations from resume_data_yml" do
+    resume_data_content = {
+      "recommendations" => [
+        {
+          "name" => "Jane Smith",
+          "title" => "Engineering Manager",
+          "relationship" => "Former Manager",
+          "quote" => "Great engineer"
+        }
+      ]
+    }.to_yaml
+
     inputs_path = "test/fixtures/tmp_recommendations_unit"
     FileUtils.mkdir_p(inputs_path)
-    File.write(
-      File.join(inputs_path, "recommendations.md"),
-      File.read("test/fixtures/recommendations.md")
-    )
+    File.write(File.join(inputs_path, "resume_data.yml"), resume_data_content)
 
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
@@ -56,17 +64,17 @@ describe "WebsiteGenerator with Recommendations" do
       inputs_path: inputs_path
     )
 
-    html = generator.generate
+    recommendations = generator.send(:load_recommendations)
 
-    # Should include recommendations in output
-    _(html).must_include "Jane Smith"
-    _(html).must_include "excellent engineer"
+    _(recommendations.length).must_equal 1
+    _(recommendations[0][:name]).must_equal "Jane Smith"
+    _(recommendations[0][:quote]).must_equal "Great engineer"
   end
 
-  it "handles missing recommendations file gracefully" do
+  it "handles missing resume_data_yml gracefully" do
     inputs_path = "test/fixtures/tmp_recommendations_unit"
     FileUtils.mkdir_p(inputs_path)
-    # No recommendations.md file
+    # No resume_data.yml file
 
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
@@ -75,8 +83,7 @@ describe "WebsiteGenerator with Recommendations" do
       inputs_path: inputs_path
     )
 
-    # Should not raise error
-    html = generator.generate
-    _(html).wont_be_nil
+    recommendations = generator.send(:load_recommendations)
+    _(recommendations).must_be_nil
   end
 end
