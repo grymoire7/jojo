@@ -19,17 +19,26 @@ describe "CoverLetterGenerator with Projects" do
         - Ruby on Rails
     YAML
 
-    File.write("test/fixtures/projects.yml", <<~YAML)
-      - title: "Rails App"
-        description: "Built a Rails application"
-        skills:
-          - Ruby on Rails
+    @resume_data_path = "test/fixtures/test_resume_data.yml"
+    File.write(@resume_data_path, <<~YAML)
+      name: "Jane Doe"
+      email: "jane@example.com"
+      location: "San Francisco, CA"
+      summary: "Test engineer"
+      skills:
+        - Ruby
+      experience: []
+      projects:
+        - name: "Rails App"
+          description: "Built a Rails application"
+          skills:
+            - Ruby on Rails
     YAML
   end
 
   after do
     FileUtils.rm_rf("employers/test-corp")
-    FileUtils.rm_f("test/fixtures/projects.yml")
+    FileUtils.rm_f(@resume_data_path)
   end
 
   it "includes relevant projects in cover letter prompt" do

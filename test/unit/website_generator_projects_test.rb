@@ -16,28 +16,38 @@ describe "WebsiteGenerator with Projects" do
         - PostgreSQL
     YAML
 
-    # Create test fixtures directory and projects.yml
+    # Create test fixtures directory and resume_data.yml with projects
     FileUtils.mkdir_p("test/fixtures")
-    File.write("test/fixtures/projects.yml", <<~YAML)
-      - title: "Matching Project"
-        description: "This project matches job requirements"
-        skills:
-          - Ruby on Rails
-          - PostgreSQL
-      - title: "Non-matching Project"
-        description: "This does not match"
-        skills:
-          - Python
+    @resume_data_path = "test/fixtures/test_resume_data.yml"
+    File.write(@resume_data_path, <<~YAML)
+      name: "Jane Doe"
+      email: "jane@example.com"
+      location: "San Francisco, CA"
+      summary: "Test engineer"
+      skills:
+        - Ruby
+        - Python
+      experience: []
+      projects:
+        - name: "Rails Project"
+          description: "This project matches job requirements"
+          skills:
+            - Ruby on Rails
+            - PostgreSQL
+        - name: "Python Project"
+          description: "This does not match"
+          skills:
+            - Python
     YAML
   end
 
   after do
     FileUtils.rm_rf("employers/test-corp")
-    FileUtils.rm_f("test/fixtures/projects.yml")
+    FileUtils.rm_f(@resume_data_path)
     FileUtils.rm_rf("test/fixtures/images") if File.exist?("test/fixtures/images")
   end
 
-  it "loads and selects relevant projects" do
+  it "loads projects from resume_data.yml" do
     # Mock AI client (not used in this test)
     mock_ai = Minitest::Mock.new
 
@@ -47,8 +57,8 @@ describe "WebsiteGenerator with Projects" do
     projects = generator.send(:load_projects)
 
     _(projects).wont_be_empty
-    _(projects.first[:title]).must_equal "Matching Project"
-    _(projects.first[:score]).must_be :>, 0
+    _(projects.first[:name]).must_equal "Rails Project"
+    _(projects.first[:skills]).must_include "Ruby on Rails"
   end
 
   it "includes projects in template variables" do
@@ -66,8 +76,8 @@ describe "WebsiteGenerator with Projects" do
     # Read generated HTML
     html = File.read(@employer.index_html_path)
 
-    # Should mention the matching project
-    _(html).must_include "Matching Project"
+    # Should mention the project
+    _(html).must_include "Rails Project"
 
     mock_ai.verify
   end
@@ -77,13 +87,21 @@ describe "WebsiteGenerator with Projects" do
     FileUtils.mkdir_p("test/fixtures/images")
     File.write("test/fixtures/images/test.png", "fake image data")
 
-    # Update projects.yml with image
-    File.write("test/fixtures/projects.yml", <<~YAML)
-      - title: "Project with Image"
-        description: "Has a local image"
-        skills:
-          - Ruby on Rails
-        image: "test/fixtures/images/test.png"
+    # Update resume_data.yml with image
+    File.write(@resume_data_path, <<~YAML)
+      name: "Jane Doe"
+      email: "jane@example.com"
+      location: "San Francisco, CA"
+      summary: "Test engineer"
+      skills:
+        - Ruby
+      experience: []
+      projects:
+        - name: "Project with Image"
+          description: "Has a local image"
+          skills:
+            - Ruby on Rails
+          image: "test/fixtures/images/test.png"
     YAML
 
     File.write(@employer.job_details_path, <<~YAML)

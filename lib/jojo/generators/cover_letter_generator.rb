@@ -1,5 +1,6 @@
 require "yaml"
 require_relative "../prompts/cover_letter_prompt"
+require_relative "../resume_data_loader"
 
 module Jojo
   module Generators
@@ -20,8 +21,8 @@ module Jojo
         log "Gathering inputs for cover letter generation..."
         inputs = gather_inputs
 
-        # Projects removed - now part of resume_data.yml
-        projects = []
+        log "Loading relevant projects from resume_data.yml..."
+        projects = load_projects
 
         log "Building cover letter prompt..."
         prompt = build_cover_letter_prompt(inputs, projects)
@@ -132,6 +133,22 @@ module Jojo
 
       def log(message)
         puts "  [CoverLetterGenerator] #{message}" if verbose
+      end
+
+      def load_projects
+        resume_data_path = File.join(inputs_path, "resume_data.yml")
+        return [] unless File.exist?(resume_data_path)
+
+        loader = ResumeDataLoader.new(resume_data_path)
+        resume_data = loader.load
+
+        projects = resume_data["projects"] || []
+
+        # Convert to symbol keys for consistency
+        projects.map { |p| p.transform_keys(&:to_sym) }
+      rescue ResumeDataLoader::LoadError, ResumeDataLoader::ValidationError => e
+        log "Warning: Could not load projects from resume_data.yml: #{e.message}"
+        []
       end
     end
   end

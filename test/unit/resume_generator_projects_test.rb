@@ -18,23 +18,16 @@ describe "ResumeGenerator with Projects" do
         - Ruby on Rails
     YAML
 
-    File.write("test/fixtures/projects.yml", <<~YAML)
-      - title: "Rails App"
-        description: "Built a Rails application"
-        skills:
-          - Ruby on Rails
-    YAML
+    # Use existing resume_data.yml fixture which has projects
   end
 
   after do
     FileUtils.rm_rf("employers/test-corp")
-    FileUtils.rm_f("test/fixtures/projects.yml")
   end
 
   it "generates resume using config-based pipeline" do
-    # Note: The new implementation doesn't use project selection in prompts
-    # Projects are now part of resume_data.yml and can be filtered/reordered
-    # This test now validates the basic generation works
+    # Note: Projects are now part of resume_data.yml and can be filtered/reordered
+    # This test validates the basic generation works with projects in resume_data
 
     mock_ai = Minitest::Mock.new
     # Mock AI calls for all transformations based on permissions config
