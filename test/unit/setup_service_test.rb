@@ -310,16 +310,14 @@ describe Jojo::SetupService do
         Dir.chdir(dir) do
           FileUtils.mkdir_p("templates")
           File.write("templates/resume_data.yml", "# JOJO_TEMPLATE_PLACEHOLDER")
-          File.write("templates/generic_resume.md", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->")
           File.write("templates/recommendations.md", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->")
-          File.write("templates/projects.yml", "# JOJO_TEMPLATE_PLACEHOLDER")
           File.write("templates/default_resume.md.erb", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->")
 
           cli = Minitest::Mock.new
           cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
           cli.expect :say, nil, [""]
           cli.expect :say, nil, ["Setting up your profile templates...", :green]
-          5.times { cli.expect :say, nil, [String, :green] }
+          3.times { cli.expect :say, nil, [String, :green] }
 
           service = Jojo::SetupService.new(cli_instance: cli, force: false)
           service.send(:setup_input_files)
@@ -336,9 +334,7 @@ describe Jojo::SetupService do
         Dir.chdir(dir) do
           FileUtils.mkdir_p("templates")
           File.write("templates/resume_data.yml", "# JOJO_TEMPLATE_PLACEHOLDER\nname: Test")
-          File.write("templates/generic_resume.md", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->\nResume content")
           File.write("templates/recommendations.md", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->\nRecs")
-          File.write("templates/projects.yml", "# JOJO_TEMPLATE_PLACEHOLDER\nprojects: []")
           File.write("templates/default_resume.md.erb", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->\n<%= name %>")
 
           cli = Minitest::Mock.new
@@ -346,9 +342,7 @@ describe Jojo::SetupService do
           cli.expect :say, nil, [""]
           cli.expect :say, nil, ["Setting up your profile templates...", :green]
           cli.expect :say, nil, ["✓ Created inputs/resume_data.yml (customize with your experience)", :green]
-          cli.expect :say, nil, ["✓ Created inputs/generic_resume.md (legacy format - optional)", :green]
           cli.expect :say, nil, ["✓ Created inputs/recommendations.md (optional - customize or delete)", :green]
-          cli.expect :say, nil, ["✓ Created inputs/projects.yml (optional - customize or delete)", :green]
           cli.expect :say, nil, ["✓ Created inputs/templates/default_resume.md.erb (resume ERB template)", :green]
 
           service = Jojo::SetupService.new(cli_instance: cli, force: false)
@@ -357,8 +351,8 @@ describe Jojo::SetupService do
           cli.verify
           _(File.exist?("inputs/resume_data.yml")).must_equal true
           _(File.read("inputs/resume_data.yml")).must_include "JOJO_TEMPLATE_PLACEHOLDER"
-          _(File.exist?("inputs/generic_resume.md")).must_equal true
-          _(File.read("inputs/generic_resume.md")).must_include "JOJO_TEMPLATE_PLACEHOLDER"
+          _(File.exist?("inputs/recommendations.md")).must_equal true
+          _(File.read("inputs/recommendations.md")).must_include "JOJO_TEMPLATE_PLACEHOLDER"
           _(File.exist?("inputs/templates/default_resume.md.erb")).must_equal true
           _(File.read("inputs/templates/default_resume.md.erb")).must_include "JOJO_TEMPLATE_PLACEHOLDER"
         end
@@ -372,11 +366,9 @@ describe Jojo::SetupService do
           FileUtils.mkdir_p("inputs/templates")
           FileUtils.mkdir_p("templates")
           File.write("inputs/resume_data.yml", "Existing data")
-          File.write("inputs/generic_resume.md", "Existing resume")
+          File.write("inputs/recommendations.md", "Existing recs")
           File.write("templates/resume_data.yml", "Template data")
-          File.write("templates/generic_resume.md", "Template")
           File.write("templates/recommendations.md", "Recs")
-          File.write("templates/projects.yml", "Projects")
           File.write("templates/default_resume.md.erb", "Template ERB")
 
           cli = Minitest::Mock.new
@@ -384,9 +376,7 @@ describe Jojo::SetupService do
           cli.expect :say, nil, [""]
           cli.expect :say, nil, ["Setting up your profile templates...", :green]
           cli.expect :say, nil, ["✓ inputs/resume_data.yml already exists (skipped)", :green]
-          cli.expect :say, nil, ["✓ inputs/generic_resume.md already exists (skipped)", :green]
-          cli.expect :say, nil, ["✓ Created inputs/recommendations.md (optional - customize or delete)", :green]
-          cli.expect :say, nil, ["✓ Created inputs/projects.yml (optional - customize or delete)", :green]
+          cli.expect :say, nil, ["✓ inputs/recommendations.md already exists (skipped)", :green]
           cli.expect :say, nil, ["✓ Created inputs/templates/default_resume.md.erb (resume ERB template)", :green]
 
           service = Jojo::SetupService.new(cli_instance: cli, force: false)
@@ -394,7 +384,7 @@ describe Jojo::SetupService do
 
           cli.verify
           _(File.read("inputs/resume_data.yml")).must_equal "Existing data"
-          _(File.read("inputs/generic_resume.md")).must_equal "Existing resume"
+          _(File.read("inputs/recommendations.md")).must_equal "Existing recs"
         end
       end
     end

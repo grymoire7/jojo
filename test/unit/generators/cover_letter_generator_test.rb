@@ -89,7 +89,7 @@ describe Jojo::Generators::CoverLetterGenerator do
       generator_no_resume.generate
     end
 
-    _(error.message).must_include "Generic resume not found"
+    _(error.message).must_include "Resume data not found"
   end
 
   it "fails when job description is missing" do
