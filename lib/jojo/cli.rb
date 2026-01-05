@@ -713,7 +713,7 @@ module Jojo
 
       # Build and execute test command
       pattern_glob = patterns.join(",")
-      test_cmd = "ruby -Ilib:test -e 'Dir.glob(\"{#{pattern_glob}}\").each { |f| require f.sub(/^test\\//, \"\") }'"
+      test_cmd = "bundle exec ruby -Ilib:test -e 'Dir.glob(\"{#{pattern_glob}}\").each { |f| require f.sub(/^test\\//, \"\") }'"
 
       if options[:quiet]
         exec "#{test_cmd} > /dev/null 2>&1"

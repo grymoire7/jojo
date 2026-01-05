@@ -114,12 +114,13 @@ describe Jojo::Config do
         Dir.chdir(dir) do
           File.write("config.yml", "search: tavily\nseeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
 
+          original_key = ENV["TAVILY_API_KEY"]
           ENV["TAVILY_API_KEY"] = "test-tavily-key"
 
           config = Jojo::Config.new("config.yml")
           _(config.search_api_key).must_equal "test-tavily-key"
         ensure
-          ENV.delete("TAVILY_API_KEY")
+          ENV["TAVILY_API_KEY"] = original_key
         end
       end
     end
@@ -158,12 +159,13 @@ describe Jojo::Config do
         Dir.chdir(dir) do
           File.write("config.yml", "search: tavily\nseeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
 
+          original_key = ENV["TAVILY_API_KEY"]
           ENV["TAVILY_API_KEY"] = "test-key"
 
           config = Jojo::Config.new("config.yml")
           _(config.search_configured?).must_equal true
         ensure
-          ENV.delete("TAVILY_API_KEY")
+          ENV["TAVILY_API_KEY"] = original_key
         end
       end
     end
@@ -184,10 +186,13 @@ describe Jojo::Config do
         Dir.chdir(dir) do
           File.write("config.yml", "search: tavily\nseeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
 
+          original_key = ENV["TAVILY_API_KEY"]
           ENV.delete("TAVILY_API_KEY")
 
           config = Jojo::Config.new("config.yml")
           _(config.search_configured?).must_equal false
+        ensure
+          ENV["TAVILY_API_KEY"] = original_key
         end
       end
     end

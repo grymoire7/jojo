@@ -18,6 +18,7 @@ describe Jojo::AIClient do
               model: claude-3-5-haiku-20241022
           YAML
 
+          original_key = ENV["ANTHROPIC_API_KEY"]
           ENV["ANTHROPIC_API_KEY"] = "test-key"
 
           config = Jojo::Config.new("config.yml")
@@ -27,7 +28,7 @@ describe Jojo::AIClient do
           _(client).must_be_instance_of Jojo::AIClient
           _(client.config).must_equal config
         ensure
-          ENV.delete("ANTHROPIC_API_KEY")
+          ENV["ANTHROPIC_API_KEY"] = original_key
         end
       end
     end
@@ -46,6 +47,7 @@ describe Jojo::AIClient do
               model: gpt-4o-mini
           YAML
 
+          original_key = ENV["OPENAI_API_KEY"]
           ENV["OPENAI_API_KEY"] = "test-openai-key"
 
           config = Jojo::Config.new("config.yml")
@@ -55,7 +57,7 @@ describe Jojo::AIClient do
           _(client).must_be_instance_of Jojo::AIClient
           _(client.config).must_equal config
         ensure
-          ENV.delete("OPENAI_API_KEY")
+          ENV["OPENAI_API_KEY"] = original_key
         end
       end
     end
