@@ -1,0 +1,91 @@
+# Resume Data Template
+#
+# This file contains your base resume data in a structured format.
+# During resume generation, the transformer will apply permissions from
+# config.yml to curate this data for specific job opportunities.
+#
+# Copy this file to inputs/resume_data.yml and customize with your information.
+
+name: "Your Full Name"
+email: "your.email@example.com"
+phone: "+1-555-0123"
+location: "City, State/Country"
+
+# Professional summary - can be rewritten per job (if permission granted)
+summary: "Experienced software engineer with X years building scalable applications..."
+
+# Skills - can be filtered and reordered (if permissions granted)
+skills:
+  - Ruby
+  - Python
+  - JavaScript
+  - PostgreSQL
+  - Docker
+  - Git
+  # Add all your technical skills here
+
+# Languages you speak
+languages:
+  - English (native)
+  - Spanish (professional)
+
+# Database technologies
+databases:
+  - PostgreSQL
+  - MySQL
+  - Redis
+
+# Development tools
+tools:
+  - Docker
+  - Git
+  - VS Code
+  - Linux
+
+# Work experience - can be reordered, descriptions can be rewritten
+experience:
+  - company: "Company Name"
+    title: "Job Title"
+    start_date: "2020-01"
+    end_date: "present"  # or "YYYY-MM" for past roles
+    description: "High-level summary of your role, responsibilities, and impact"
+    technologies:
+      - Ruby on Rails
+      - PostgreSQL
+      - Docker
+    tags:
+      - backend
+      - leadership
+      - architecture
+
+  - company: "Previous Company"
+    title: "Previous Role"
+    start_date: "2018-06"
+    end_date: "2019-12"
+    description: "What you built and the impact it had"
+    technologies:
+      - Python
+      - Django
+    tags:
+      - backend
+      - api-development
+
+# Projects - can be reordered
+projects:
+  - name: "Project Name"
+    description: "What you built and why it matters"
+    skills:
+      - Ruby
+      - PostgreSQL
+
+# Education - descriptions can be rewritten
+education:
+  - degree: "BS Computer Science"
+    institution: "University Name"
+    year: "2015"
+    description: "Relevant coursework, honors, or achievements"
+
+# Endorsements/recommendations - can be filtered
+endorsements:
+  - "Quote from colleague or manager about your work"
+  - "Another endorsement highlighting specific strengths"

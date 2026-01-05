@@ -15,3 +15,30 @@ search: <%= search_provider_slug %>
 website:
   cta_text: "Schedule a Call"
   cta_link: "https://calendly.com/yourname/30min"  # or mailto:you@email.com
+
+# Resume data transformation permissions
+# Controls how resume_data.yml is curated for each job opportunity
+resume_data:
+  permissions:
+    # Array fields that can be filtered (remove irrelevant items) and reordered
+    skills: [remove, reorder]
+    databases: [remove, reorder]
+    tools: [remove, reorder]
+    endorsements: [remove]
+
+    # Array fields that can only be reordered (all items preserved)
+    experience: [reorder]
+    projects: [reorder]
+    languages: [reorder]
+
+    # Text fields that can be rewritten to emphasize relevant experience
+    summary: [rewrite]
+    experience.description: [rewrite]
+    education.description: [rewrite]
+
+    # Nested array fields
+    experience.technologies: [remove, reorder]
+    experience.tags: [remove, reorder]
+    projects.skills: [reorder]
+
+    # Fields without permissions are read-only (name, email, dates, etc.)
