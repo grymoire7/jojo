@@ -16,6 +16,10 @@ describe "Setup Integration" do
           "templates/config.yml.erb"
         )
         FileUtils.cp(
+          File.join(__dir__, "../../templates/resume_data.yml"),
+          "templates/resume_data.yml"
+        )
+        FileUtils.cp(
           File.join(__dir__, "../../templates/generic_resume.md"),
           "templates/generic_resume.md"
         )
@@ -26,6 +30,10 @@ describe "Setup Integration" do
         FileUtils.cp(
           File.join(__dir__, "../../templates/projects.yml"),
           "templates/projects.yml"
+        )
+        FileUtils.cp(
+          File.join(__dir__, "../../templates/default_resume.md.erb"),
+          "templates/default_resume.md.erb"
         )
 
         # Mock CLI interactions
@@ -75,21 +83,22 @@ describe "Setup Integration" do
         cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setting up your profile templates...", :green]
-        3.times { cli.expect :say, nil, [String, :green] }
+        5.times { cli.expect :say, nil, [String, :green] }
 
         # show_summary
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setup complete!", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Created:"]
-        5.times { cli.expect :say, nil, [String] } # 5 created files
+        7.times { cli.expect :say, nil, [String] } # 7 created files
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Next steps:", :cyan]
-        cli.expect :say, nil, ["  1. Customize inputs/generic_resume.md with your actual experience"]
-        cli.expect :say, nil, ["  2. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"]
-        cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+        cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
+        cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
+        cli.expect :say, nil, ["  3. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"]
+        cli.expect :say, nil, ["  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
         cli.expect :say, nil, [""]
-        cli.expect :say, nil, ["💡 Tip: Delete the first comment line in each file after customizing."]
+        cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
         service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
         service.run
@@ -132,6 +141,10 @@ describe "Setup Integration" do
           "templates/config.yml.erb"
         )
         FileUtils.cp(
+          File.join(__dir__, "../../templates/resume_data.yml"),
+          "templates/resume_data.yml"
+        )
+        FileUtils.cp(
           File.join(__dir__, "../../templates/generic_resume.md"),
           "templates/generic_resume.md"
         )
@@ -142,6 +155,10 @@ describe "Setup Integration" do
         FileUtils.cp(
           File.join(__dir__, "../../templates/projects.yml"),
           "templates/projects.yml"
+        )
+        FileUtils.cp(
+          File.join(__dir__, "../../templates/default_resume.md.erb"),
+          "templates/default_resume.md.erb"
         )
 
         # Mock CLI interactions
@@ -186,21 +203,22 @@ describe "Setup Integration" do
         cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setting up your profile templates...", :green]
-        3.times { cli.expect :say, nil, [String, :green] }
+        5.times { cli.expect :say, nil, [String, :green] }
 
         # show_summary
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setup complete!", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Created:"]
-        5.times { cli.expect :say, nil, [String] } # 5 created files
+        7.times { cli.expect :say, nil, [String] } # 7 created files
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Next steps:", :cyan]
-        cli.expect :say, nil, ["  1. Customize inputs/generic_resume.md with your actual experience"]
-        cli.expect :say, nil, ["  2. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"]
-        cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+        cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
+        cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
+        cli.expect :say, nil, ["  3. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"]
+        cli.expect :say, nil, ["  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
         cli.expect :say, nil, [""]
-        cli.expect :say, nil, ["💡 Tip: Delete the first comment line in each file after customizing."]
+        cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
         service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
         service.run
@@ -235,6 +253,10 @@ describe "Setup Integration" do
           "templates/config.yml.erb"
         )
         FileUtils.cp(
+          File.join(__dir__, "../../templates/resume_data.yml"),
+          "templates/resume_data.yml"
+        )
+        FileUtils.cp(
           File.join(__dir__, "../../templates/generic_resume.md"),
           "templates/generic_resume.md"
         )
@@ -245,6 +267,10 @@ describe "Setup Integration" do
         FileUtils.cp(
           File.join(__dir__, "../../templates/projects.yml"),
           "templates/projects.yml"
+        )
+        FileUtils.cp(
+          File.join(__dir__, "../../templates/default_resume.md.erb"),
+          "templates/default_resume.md.erb"
         )
 
         # Mock CLI interactions
@@ -283,21 +309,22 @@ describe "Setup Integration" do
         cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setting up your profile templates...", :green]
-        3.times { cli.expect :say, nil, [String, :green] }
+        5.times { cli.expect :say, nil, [String, :green] }
 
         # show_summary
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Setup complete!", :green]
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Created:"]
-        5.times { cli.expect :say, nil, [String] } # 5 created files
+        7.times { cli.expect :say, nil, [String] } # 7 created files
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["Next steps:", :cyan]
-        cli.expect :say, nil, ["  1. Customize inputs/generic_resume.md with your actual experience"]
-        cli.expect :say, nil, ["  2. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"]
-        cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
+        cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
+        cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
+        cli.expect :say, nil, ["  3. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"]
+        cli.expect :say, nil, ["  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
         cli.expect :say, nil, [""]
-        cli.expect :say, nil, ["💡 Tip: Delete the first comment line in each file after customizing."]
+        cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
         service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, force: false)
         service.run

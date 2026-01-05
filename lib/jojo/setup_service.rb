@@ -234,12 +234,14 @@ module Jojo
 
     def setup_input_files
       FileUtils.mkdir_p("inputs") unless Dir.exist?("inputs")
+      FileUtils.mkdir_p("inputs/templates") unless Dir.exist?("inputs/templates")
       @cli.say "✓ inputs/ directory ready", :green
       @cli.say ""
       @cli.say "Setting up your profile templates...", :green
 
       input_files = {
-        "generic_resume.md" => "(customize this file)",
+        "resume_data.yml" => "(customize with your experience)",
+        "generic_resume.md" => "(legacy format - optional)",
         "recommendations.md" => "(optional - customize or delete)",
         "projects.yml" => "(optional - customize or delete)"
       }
@@ -264,6 +266,26 @@ module Jojo
         @cli.say "✓ Created inputs/#{filename} #{description}", :green
         @created_files << "inputs/#{filename}"
       end
+
+      # Copy resume template to inputs/templates/
+      template_file = "default_resume.md.erb"
+      target_template_path = File.join("inputs", "templates", template_file)
+      source_template_path = File.join("templates", template_file)
+
+      if File.exist?(target_template_path) && !@force
+        @cli.say "✓ inputs/templates/#{template_file} already exists (skipped)", :green
+        @skipped_files << "inputs/templates/#{template_file}"
+      else
+        unless File.exist?(source_template_path)
+          @cli.say "✗ Template file #{source_template_path} not found", :red
+          @cli.say "  This may indicate a corrupted installation.", :yellow
+          exit 1
+        end
+
+        FileUtils.cp(source_template_path, target_template_path)
+        @cli.say "✓ Created inputs/templates/#{template_file} (resume ERB template)", :green
+        @created_files << "inputs/templates/#{template_file}"
+      end
     end
 
     def show_summary
@@ -275,10 +297,12 @@ module Jojo
         @cli.say "Created:"
         file_descriptions = {
           ".env" => "API configuration",
-          "config.yml" => "Personal preferences",
-          "inputs/generic_resume.md" => "Your work history template",
+          "config.yml" => "Personal preferences and permissions",
+          "inputs/resume_data.yml" => "Structured resume data (recommended)",
+          "inputs/generic_resume.md" => "Legacy resume format (optional)",
           "inputs/recommendations.md" => "Optional recommendations",
-          "inputs/projects.yml" => "Optional portfolio projects"
+          "inputs/projects.yml" => "Optional portfolio projects",
+          "inputs/templates/default_resume.md.erb" => "Resume rendering template"
         }
 
         @created_files.each do |file|
@@ -289,11 +313,12 @@ module Jojo
       end
 
       @cli.say "Next steps:", :cyan
-      @cli.say "  1. Customize inputs/generic_resume.md with your actual experience"
-      @cli.say "  2. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"
-      @cli.say "  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"
+      @cli.say "  1. Customize inputs/resume_data.yml with your experience (structured format)"
+      @cli.say "  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"
+      @cli.say "  3. Edit or delete inputs/recommendations.md and inputs/projects.yml if not needed"
+      @cli.say "  4. Run 'jojo new -s <slug> -j <job-file>' to start your first application"
       @cli.say ""
-      @cli.say "💡 Tip: Delete the first comment line in each file after customizing."
+      @cli.say "💡 Tip: The config.yml file contains resume_data.permissions to control curation."
     end
   end
 end
