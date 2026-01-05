@@ -170,7 +170,7 @@ module Jojo
       end
 
       # Warn about unchanged templates
-      ["inputs/resume_data.yml", "inputs/recommendations.md"].each do |file|
+      ["inputs/resume_data.yml"].each do |file|
         next unless File.exist?(file)
 
         result = Jojo::TemplateValidator.warn_if_unchanged(
