@@ -19,7 +19,7 @@ resume_data:
     tools: [remove, reorder]
     projects: [reorder]
     experience: [reorder]
-    endorsements: [remove]
+    recommendations: [remove]
 
     # Scalar/text fields
     summary: [rewrite]

@@ -92,7 +92,16 @@ education:
     year: "2015"
     description: "Focus on algorithms and distributed systems"
 
-endorsements:
-  - "Jane is an exceptional engineer who consistently delivers high-quality work"
-  - "Her technical leadership transformed our team's productivity"
-  - "Outstanding problem solver with strong communication skills"
+recommendations:
+  - name: "Alice Johnson"
+    title: "Engineering Manager"
+    relationship: "Former Manager at TechCorp Inc"
+    quote: "Jane is an exceptional engineer who consistently delivers high-quality work"
+  - name: "Bob Smith"
+    title: "Senior Developer"
+    relationship: "Colleague at StartupXYZ"
+    quote: "Her technical leadership transformed our team's productivity"
+  - name: "Carol Williams"
+    title: "Tech Lead"
+    relationship: "Former Colleague at ConsultingCo"
+    quote: "Outstanding problem solver with strong communication skills"
