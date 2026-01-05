@@ -159,6 +159,31 @@ voice_and_tone: professional and friendly
 website:
   cta_text: "Schedule a Call"
   cta_link: "https://calendly.com/yourname/30min"  # or mailto:you@email.com
+
+# Resume data transformation permissions
+# Controls how resume_data.yml is curated for each job opportunity
+resume_data:
+  permissions:
+    # Array fields that can be filtered and reordered
+    skills: [remove, reorder]
+    databases: [remove, reorder]
+    tools: [remove, reorder]
+    endorsements: [remove]
+
+    # Array fields that can only be reordered (all items preserved)
+    experience: [reorder]
+    projects: [reorder]
+    languages: [reorder]
+
+    # Text fields that can be rewritten to emphasize relevant experience
+    summary: [rewrite]
+    experience.description: [rewrite]
+    education.description: [rewrite]
+
+    # Nested array fields
+    experience.technologies: [remove, reorder]
+    experience.tags: [remove, reorder]
+    projects.skills: [reorder]
 ```
 
 ### Supported LLM Providers
@@ -183,16 +208,27 @@ To switch providers, run `jojo setup --force` or manually edit your `config.yml`
 
 The setup command creates these files in `inputs/` with example content:
 
-1. **`inputs/generic_resume.md`** (required) - Your complete work history
-   - Contains examples you should replace with your actual experience
-   - Include ALL your skills and experience - tailoring will select what's relevant
+1. **`inputs/resume_data.yml`** (recommended) - Structured resume data
+   - YAML format containing your complete work history, skills, and experience
+   - Used with config-based permissions for intelligent resume curation
+   - Permissions in `config.yml` control which fields can be filtered, reordered, or rewritten
    - **Delete the first comment line after customizing**
 
-2. **`inputs/recommendations.md`** (optional) - LinkedIn recommendations
+2. **`inputs/generic_resume.md`** (legacy) - Markdown resume format
+   - Plain markdown format (older approach)
+   - Still supported but `resume_data.yml` is recommended for new setups
+   - **Delete the first comment line after customizing**
+
+3. **`inputs/templates/default_resume.md.erb`** - Resume rendering template
+   - ERB template used to render `resume_data.yml` into markdown
+   - Customize to change how your resume is formatted
+   - Uses standard ERB syntax with resume data fields as variables
+
+4. **`inputs/recommendations.md`** (optional) - LinkedIn recommendations
    - Used in website carousel
    - Delete file if you don't want recommendations
 
-3. **`inputs/projects.yml`** (optional) - Portfolio projects
+5. **`inputs/projects.yml`** (optional) - Portfolio projects
    - Used for project selection and highlighting
    - Delete file if you don't have projects to showcase
 
@@ -210,20 +246,27 @@ If you haven't already, run setup to create your configuration and input files:
 
 Then customize your input files:
 
-1. **Edit your generic resume**:
+1. **Edit your structured resume data** (recommended):
    ```bash
-   nvim inputs/generic_resume.md  # or your preferred editor
+   nvim inputs/resume_data.yml  # or your preferred editor
    ```
    Replace the example content with your actual experience, skills, and achievements.
-   **Delete the first comment line** (`<!-- JOJO_TEMPLATE_PLACEHOLDER -->`) when done.
+   The config-based permissions in `config.yml` control how this data is curated for each job.
+   **Delete the first comment line** when done.
 
-2. **(Optional) Customize or delete recommendations**:
+2. **(Optional) Customize the resume template**:
+   ```bash
+   nvim inputs/templates/default_resume.md.erb
+   ```
+   Customize how your resume is rendered from the structured data.
+
+3. **(Optional) Customize or delete recommendations**:
    ```bash
    nvim inputs/recommendations.md
    # Or delete: rm inputs/recommendations.md
    ```
 
-3. **(Optional) Customize or delete projects**:
+4. **(Optional) Customize or delete projects**:
    ```bash
    nvim inputs/projects.yml
    # Or delete: rm inputs/projects.yml
