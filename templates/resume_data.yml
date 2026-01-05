@@ -85,7 +85,14 @@ education:
     year: "2015"
     description: "Relevant coursework, honors, or achievements"
 
-# Endorsements/recommendations - can be filtered
-endorsements:
-  - "Quote from colleague or manager about your work"
-  - "Another endorsement highlighting specific strengths"
+# Recommendations from colleagues, managers, clients
+# Used in both resume (curated) and website (all)
+recommendations:
+  - name: "Jane Smith"
+    title: "Senior Engineering Manager"
+    relationship: "Former Manager at Acme Corp"
+    quote: "Outstanding engineer with excellent problem-solving skills and strong technical leadership. Consistently delivered high-quality work under tight deadlines."
+  - name: "Bob Johnson"
+    title: "Lead Developer"
+    relationship: "Colleague at Tech Co"
+    quote: "Exceptional technical expertise combined with collaborative approach. Made complex systems understandable to the entire team."
