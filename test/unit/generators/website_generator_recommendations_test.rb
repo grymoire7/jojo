@@ -43,6 +43,11 @@ describe "WebsiteGenerator with Recommendations" do
 
   it "loads recommendations from resume_data_yml" do
     resume_data_content = {
+      "name" => "Test User",
+      "email" => "test@example.com",
+      "summary" => "Test summary",
+      "skills" => ["Ruby"],
+      "experience" => [],
       "recommendations" => [
         {
           "name" => "Jane Smith",
