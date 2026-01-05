@@ -168,7 +168,7 @@ resume_data:
     skills: [remove, reorder]
     databases: [remove, reorder]
     tools: [remove, reorder]
-    endorsements: [remove]
+    recommendations: [remove]
 
     # Array fields that can only be reordered (all items preserved)
     experience: [reorder]
