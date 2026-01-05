@@ -61,18 +61,18 @@ module Jojo
       # Validate required inputs exist before creating employer
       begin
         Jojo::TemplateValidator.validate_required_file!(
-          "inputs/generic_resume.md",
-          "generic resume"
+          "inputs/resume_data.yml",
+          "resume data"
         )
       rescue Jojo::TemplateValidator::MissingInputError => e
         say e.message, :red
         exit 1
       end
 
-      # Warn if generic resume hasn't been customized
+      # Warn if resume data hasn't been customized
       result = Jojo::TemplateValidator.warn_if_unchanged(
-        "inputs/generic_resume.md",
-        "generic resume",
+        "inputs/resume_data.yml",
+        "resume data",
         cli_instance: self
       )
 
@@ -162,8 +162,8 @@ module Jojo
       # Validate required inputs
       begin
         Jojo::TemplateValidator.validate_required_file!(
-          "inputs/generic_resume.md",
-          "generic resume"
+          "inputs/resume_data.yml",
+          "resume data"
         )
       rescue Jojo::TemplateValidator::MissingInputError => e
         say e.message, :red
@@ -171,12 +171,12 @@ module Jojo
       end
 
       # Warn about unchanged templates
-      ["inputs/generic_resume.md", "inputs/recommendations.md", "inputs/projects.yml"].each do |file|
+      ["inputs/resume_data.yml", "inputs/recommendations.md"].each do |file|
         next unless File.exist?(file)
 
         result = Jojo::TemplateValidator.warn_if_unchanged(
           file,
-          File.basename(file),
+          File.basename(file, ".*"),
           cli_instance: self
         )
 
@@ -209,7 +209,7 @@ module Jojo
 
       # Generate resume
       begin
-        if File.exist?("inputs/generic_resume.md")
+        if File.exist?("inputs/resume_data.yml")
           generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
           generator.generate
 
@@ -218,8 +218,8 @@ module Jojo
             tokens: ai_client.total_tokens_used,
             status: "complete")
         else
-          say "⚠ Warning: Generic resume not found, skipping resume generation", :yellow
-          say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
+          say "⚠ Warning: Resume data not found, skipping resume generation", :yellow
+          say "  Run 'jojo setup' or copy templates/resume_data.yml to inputs/ and customize it.", :yellow
         end
       rescue => e
         say "✗ Error generating resume: #{e.message}", :red
@@ -411,10 +411,10 @@ module Jojo
         say "⚠ Warning: Research not found. Resume will be less targeted.", :yellow
       end
 
-      # Check that generic resume exists
-      unless File.exist?("inputs/generic_resume.md")
-        say "✗ Generic resume not found at inputs/generic_resume.md", :red
-        say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
+      # Check that resume data exists
+      unless File.exist?("inputs/resume_data.yml")
+        say "✗ Resume data not found at inputs/resume_data.yml", :red
+        say "  Run 'jojo setup' or copy templates/resume_data.yml to inputs/ and customize it.", :yellow
         exit 1
       end
 
@@ -467,10 +467,10 @@ module Jojo
         exit 1
       end
 
-      # Check generic resume exists (REQUIRED)
-      unless File.exist?("inputs/generic_resume.md")
-        say "✗ Generic resume not found at inputs/generic_resume.md", :red
-        say "  Copy templates/generic_resume.md to inputs/ and customize it.", :yellow
+      # Check resume data exists (REQUIRED)
+      unless File.exist?("inputs/resume_data.yml")
+        say "✗ Resume data not found at inputs/resume_data.yml", :red
+        say "  Run 'jojo setup' or copy templates/resume_data.yml to inputs/ and customize it.", :yellow
         exit 1
       end
 

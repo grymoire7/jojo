@@ -130,8 +130,8 @@ describe "Recommendations Workflow Integration" do
       File.read("test/fixtures/recommendations.md")
     )
     File.write(
-      File.join(@inputs_path, "projects.yml"),
-      File.read("test/fixtures/valid_projects.yml")
+      File.join(@inputs_path, "resume_data.yml"),
+      File.read("test/fixtures/resume_data.yml")
     )
     File.write(@employer.job_description_annotations_path, "[]")
 

@@ -92,7 +92,7 @@ See your provider's pricing page for current rates:
    - **API Key Configuration**: Provide your API key for the chosen provider
    - **Model Selection**: Choose reasoning and text generation models using arrow keys
    - **Personal Information**: Your name and website URL
-   - **Template Files**: Creates resume, recommendations, and projects templates
+   - **Template Files**: Creates resume data template and recommendations template
 
    **Example:**
    ```
@@ -208,29 +208,21 @@ To switch providers, run `jojo setup --force` or manually edit your `config.yml`
 
 The setup command creates these files in `inputs/` with example content:
 
-1. **`inputs/resume_data.yml`** (recommended) - Structured resume data
-   - YAML format containing your complete work history, skills, and experience
+1. **`inputs/resume_data.yml`** - Structured resume data (required)
+   - YAML format containing your complete work history, skills, experience, and projects
    - Used with config-based permissions for intelligent resume curation
    - Permissions in `config.yml` control which fields can be filtered, reordered, or rewritten
+   - Includes your projects as part of the structured data
    - **Delete the first comment line after customizing**
 
-2. **`inputs/generic_resume.md`** (legacy) - Markdown resume format
-   - Plain markdown format (older approach)
-   - Still supported but `resume_data.yml` is recommended for new setups
-   - **Delete the first comment line after customizing**
-
-3. **`inputs/templates/default_resume.md.erb`** - Resume rendering template
+2. **`inputs/templates/default_resume.md.erb`** - Resume rendering template
    - ERB template used to render `resume_data.yml` into markdown
    - Customize to change how your resume is formatted
    - Uses standard ERB syntax with resume data fields as variables
 
-4. **`inputs/recommendations.md`** (optional) - LinkedIn recommendations
+3. **`inputs/recommendations.md`** (optional) - LinkedIn recommendations
    - Used in website carousel
    - Delete file if you don't want recommendations
-
-5. **`inputs/projects.yml`** (optional) - Portfolio projects
-   - Used for project selection and highlighting
-   - Delete file if you don't have projects to showcase
 
 **Important**: The first line of each template file contains a marker comment. Delete this line after you customize the file - jojo will warn you if templates are unchanged.
 
@@ -246,11 +238,11 @@ If you haven't already, run setup to create your configuration and input files:
 
 Then customize your input files:
 
-1. **Edit your structured resume data** (recommended):
+1. **Edit your structured resume data** (required):
    ```bash
    nvim inputs/resume_data.yml  # or your preferred editor
    ```
-   Replace the example content with your actual experience, skills, and achievements.
+   Replace the example content with your actual experience, skills, projects, and achievements.
    The config-based permissions in `config.yml` control how this data is curated for each job.
    **Delete the first comment line** when done.
 
@@ -264,12 +256,6 @@ Then customize your input files:
    ```bash
    nvim inputs/recommendations.md
    # Or delete: rm inputs/recommendations.md
-   ```
-
-4. **(Optional) Customize or delete projects**:
-   ```bash
-   nvim inputs/projects.yml
-   # Or delete: rm inputs/projects.yml
    ```
 
 **Note**: The `inputs/` directory is gitignored, so your personal information stays private.

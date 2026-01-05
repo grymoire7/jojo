@@ -273,7 +273,7 @@ module Jojo
               project[:image_url] = project[:image]
             else
               # File path: copy to website/images/
-              src = File.join(Dir.pwd, project[:image])
+              src = File.join(inputs_path, project[:image])
 
               if File.exist?(src)
                 dest_dir = File.join(employer.website_path, "images")

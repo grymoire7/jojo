@@ -101,7 +101,7 @@ describe "WebsiteGenerator with Projects" do
           description: "Has a local image"
           skills:
             - Ruby on Rails
-          image: "test/fixtures/images/test.png"
+          image: "images/test.png"
     YAML
 
     File.write(@employer.job_details_path, <<~YAML)

@@ -2,6 +2,7 @@ require "yaml"
 require "deepsearch"
 require_relative "../prompts/research_prompt"
 require_relative "../resume_data_loader"
+require_relative "../resume_data_formatter"
 
 module Jojo
   module Generators
@@ -84,35 +85,10 @@ module Jojo
         resume_data = loader.load
 
         # Format resume data as text for the prompt
-        format_resume_data(resume_data)
+        Jojo::ResumeDataFormatter.format(resume_data)
       rescue ResumeDataLoader::LoadError, ResumeDataLoader::ValidationError => e
         log "Warning: Could not load resume data: #{e.message}"
         nil
-      end
-
-      def format_resume_data(data)
-        # Convert structured resume_data to readable text format
-        output = []
-        output << "# #{data["name"]}"
-        output << "#{data["email"]} | #{data["location"]}"
-        output << ""
-        output << "## Summary"
-        output << data["summary"]
-        output << ""
-        output << "## Skills"
-        output << data["skills"].join(", ")
-        output << ""
-        output << "## Experience"
-        data["experience"].each do |exp|
-          output << "### #{exp["title"]} at #{exp["company"]}"
-          output << exp["description"]
-          if exp["technologies"]
-            output << "Technologies: #{exp["technologies"].join(", ")}"
-          end
-          output << ""
-        end
-
-        output.join("\n")
       end
 
       def perform_web_search(company_name)

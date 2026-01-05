@@ -1,5 +1,7 @@
 # Remove Legacy Template Support Implementation Plan
 
+> **Status**: ✅ **COMPLETED** (2026-01-04)
+>
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Remove support for legacy template files (`generic_resume.md` and `projects.yml`) and consolidate on `resume_data.yml` as the single source of truth.

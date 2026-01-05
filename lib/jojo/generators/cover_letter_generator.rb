@@ -1,6 +1,7 @@
 require "yaml"
 require_relative "../prompts/cover_letter_prompt"
 require_relative "../resume_data_loader"
+require_relative "../resume_data_formatter"
 
 module Jojo
   module Generators
@@ -62,7 +63,7 @@ module Jojo
         end
         loader = ResumeDataLoader.new(resume_data_path)
         resume_data = loader.load
-        generic_resume = format_resume_data(resume_data)
+        generic_resume = Jojo::ResumeDataFormatter.format(resume_data)
 
         # Read research (OPTIONAL)
         research = read_research
@@ -151,31 +152,6 @@ module Jojo
       rescue ResumeDataLoader::LoadError, ResumeDataLoader::ValidationError => e
         log "Warning: Could not load projects from resume_data.yml: #{e.message}"
         []
-      end
-
-      def format_resume_data(data)
-        # Convert structured resume_data to readable text format for prompts
-        output = []
-        output << "# #{data["name"]}"
-        output << "#{data["email"]} | #{data["location"]}"
-        output << ""
-        output << "## Summary"
-        output << data["summary"]
-        output << ""
-        output << "## Skills"
-        output << data["skills"].join(", ")
-        output << ""
-        output << "## Experience"
-        data["experience"].each do |exp|
-          output << "### #{exp["title"]} at #{exp["company"]}"
-          output << exp["description"]
-          if exp["technologies"]
-            output << "Technologies: #{exp["technologies"].join(", ")}"
-          end
-          output << ""
-        end
-
-        output.join("\n")
       end
     end
   end
