@@ -48,7 +48,7 @@ module Jojo
     end
 
     def status_log_path
-      File.join(base_path, "status_log.md")
+      File.join(base_path, "status.log")
     end
 
     def website_path

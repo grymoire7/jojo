@@ -5,13 +5,15 @@ require_relative "../../lib/jojo/generators/website_generator"
 require_relative "../../lib/jojo/config"
 require "yaml"
 require "json"
+require "tempfile"
 
 describe "FAQ Workflow Integration" do
   before do
     @employer = Jojo::Employer.new("integration-test-corp")
     @ai_client = Minitest::Mock.new
 
-    # Create minimal config
+    # Create minimal config in a temp file
+    @config_file = Tempfile.new(["config", ".yml"])
     config_data = {
       "seeker_name" => "John Doe",
       "voice_and_tone" => "professional and friendly",
@@ -19,8 +21,9 @@ describe "FAQ Workflow Integration" do
       "reasoning_ai" => {"service" => "anthropic", "model" => "sonnet"},
       "text_generation_ai" => {"service" => "anthropic", "model" => "haiku"}
     }
-    File.write("config.yml", YAML.dump(config_data))
-    @config = Jojo::Config.new("config.yml")
+    @config_file.write(YAML.dump(config_data))
+    @config_file.close
+    @config = Jojo::Config.new(@config_file.path)
 
     # Clean up and create directories
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
@@ -34,7 +37,8 @@ describe "FAQ Workflow Integration" do
 
   after do
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    FileUtils.rm_f("config.yml") if File.exist?("config.yml")
+    @config_file.close!
+    @config_file.unlink if @config_file.path && File.exist?(@config_file.path)
   end
 
   it "generates FAQs and includes them in website" do

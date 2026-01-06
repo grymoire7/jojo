@@ -23,7 +23,7 @@ describe Jojo::Employer do
     _(employer.research_path).must_equal "employers/acme-corp/research.md"
     _(employer.resume_path).must_equal "employers/acme-corp/resume.md"
     _(employer.cover_letter_path).must_equal "employers/acme-corp/cover_letter.md"
-    _(employer.status_log_path).must_equal "employers/acme-corp/status_log.md"
+    _(employer.status_log_path).must_equal "employers/acme-corp/status.log"
     _(employer.website_path).must_equal "employers/acme-corp/website"
     _(employer.index_html_path).must_equal "employers/acme-corp/website/index.html"
     _(employer.faq_path).must_equal "employers/acme-corp/faq.json"

@@ -24,10 +24,12 @@ skills:
   - Git
   # Add all your technical skills here
 
-# Languages you speak
+# Computer languages you know
 languages:
-  - English (native)
-  - Spanish (professional)
+  - Ruby
+  - Ruby on Rails
+  - Java
+  - C/C++
 
 # Database technologies
 databases:
