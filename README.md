@@ -8,7 +8,9 @@
 
 ## What is this?
 
-JoJo is a Job Search Management System - a Ruby CLI that transforms job applications into comprehensive, personalized marketing campaigns. Instead of sending a generic resume and cover letter, JoJo generates:
+JoJo is a Job Search Management System - a Ruby CLI that transforms job
+applications into comprehensive, personalized marketing campaigns. Instead of
+sending a generic resume and cover letter, JoJo generates:
 
 - **Tailored Resume**: Customized from your generic resume to match specific job requirements
 - **Persuasive Cover Letter**: Written based on company research and role analysis
@@ -16,7 +18,8 @@ JoJo is a Job Search Management System - a Ruby CLI that transforms job applicat
 - **Company Research**: AI-generated insights about the company and role
 - **Job Description Annotations**: Analysis of how your experience matches requirements
 
-Think of it as treating each job application like launching a product (you) to a specific customer (the employer).
+Think of it as treating each job application like launching a product (you) to
+a specific customer (the employer).
 
 **[Read the technical blog post](https://tracyatteberry.com/posts/jojo)** about building this tool with Claude AI assistance.
 
@@ -39,15 +42,15 @@ Think of it as treating each job application like launching a product (you) to a
 
 - **Ruby 3.4.5** - Install via rbenv or your preferred Ruby version manager
 - **Bundler** - Install with `gem install bundler`
-- **AI Provider API Key** - Get one from your chosen provider:
-  - [Anthropic Claude](https://console.anthropic.com) (default configuration)
-  - [OpenAI](https://platform.openai.com) (requires config changes)
-  - Other providers supported by [ruby_llm](https://github.com/alexrudall/ruby_llm)
+- **AI Provider API Key** - Get one from your chosen provider
+  - Jojo supports all providers supported by [ruby_llm](https://rubyllm.com/available-models/)
 - **Pandoc** (optional) - For PDF generation: `brew install pandoc` on macOS
 
 ### API Costs
 
-JoJo uses AI providers to generate application materials. You can configure any provider supported by [ruby_llm](https://github.com/alexrudall/ruby_llm) (Anthropic, OpenAI, etc.) in your `config.yml`.
+JoJo uses AI providers to generate application materials. You can configure any
+provider supported by [ruby_llm](https://github.com/crmne/ruby_llm) (Anthropic,
+OpenAI, etc.) in your `config.yml`.
 
 **Example costs using Anthropic's Claude** (default configuration):
 
@@ -188,7 +191,7 @@ resume_data:
 
 ### Supported LLM Providers
 
-Jojo supports the following LLM providers via [RubyLLM](https://github.com/alexrudall/ruby_llm):
+Jojo supports LLM providers via [RubyLLM](https://rubyllm.com/available-models/) including:
 
 - **Anthropic** (Claude models)
 - **OpenAI** (GPT models)
@@ -577,23 +580,12 @@ If you encounter API-related errors:
 # Run different test categories to isolate issues
 ./bin/jojo test --unit           # Fast unit tests
 ./bin/jojo test --integration    # Integration tests
-./bin/jojo test --all            # All tests
+./bin/jojo test --service        # Service tests (real API calls that cost money)
+./bin/jojo test --standard       # Code style checks
+./bin/jojo test --all            # All tests (includes service tests)
 
 # Run with verbose output
 ./bin/jojo test --all -v
-```
-
-### File permission errors
-
-If you get permission errors when reading or writing files:
-
-```bash
-# Check file permissions
-ls -la employers/acme-corp/
-
-# Fix permissions if needed
-chmod 644 employers/acme-corp/*.md
-chmod 755 employers/acme-corp/website/
 ```
 
 ## Testing
@@ -605,6 +597,7 @@ Jojo includes comprehensive testing to ensure reliability and performance.
 - **Unit tests** - Fast tests with no external dependencies (default)
 - **Integration tests** - Tests with mocked external services
 - **Service tests** - Tests that make real API calls (may incur costs)
+- **Standard tests** - Code style checks using Standard Ruby
 
 ### Running Tests
 
@@ -612,7 +605,7 @@ Jojo includes comprehensive testing to ensure reliability and performance.
 # Run unit tests (fast, default)
 ./bin/jojo test
 
-# Run all tests
+# Run all tests (including service tests)
 ./bin/jojo test --all
 
 # Run specific categories
@@ -620,7 +613,7 @@ Jojo includes comprehensive testing to ensure reliability and performance.
 ./bin/jojo test --service  # Requires confirmation
 
 # Quiet mode (CI-friendly)
-./bin/jojo test --all -q
+./bin/jojo test --unit --integration --standard -q
 ```
 
 Service tests require real API keys and may cost money. You'll be prompted for confirmation unless `SKIP_SERVICE_CONFIRMATION=true` is set in your environment.
@@ -734,10 +727,11 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/):
 Created by [Tracy Atteberry](https://tracyatteberry.com) using:
 - [Ruby](https://www.ruby-lang.org/) - Programming language
 - [Thor](https://github.com/rails/thor) - CLI framework
-- [ruby_llm](https://github.com/alexrudall/ruby_llm) - AI service integration
-- [html-to-markdown](https://github.com/soundasleep/html-to-markdown) - Job posting conversion
-- [deepsearch-rb](https://github.com/serpapi/deepsearch-rb) - Web search capabilities
+- [ruby_llm](https://github.com/crmne/ruby_llm) - AI service integration
+- [html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown) - Job posting conversion
+- [deepsearch-rb](https://github.com/alexshagov/deepsearch-rb) - Web search capabilities
 - [Claude AI](https://claude.ai) - Development assistance
+- [Z AI](https://z.ai) - Development assistance
 
 **[Read the full technical blog post](https://tracyatteberry.com/posts/jojo)** about the development process and lessons learned.
 
