@@ -332,17 +332,57 @@ module Jojo
         # Convert markdown to HTML paragraphs
         html = markdown_to_html(markdown_text)
 
-        # Inject each annotation
-        annotations.each do |annotation|
+        # Sort annotations by text length (longest first) to reduce overlapping issues
+        sorted_annotations = annotations.sort_by { |a| -a[:text].length }
+
+        # Track annotated regions as [start_pos, end_pos] to prevent overlaps
+        annotated_regions = []
+
+        sorted_annotations.each do |annotation|
           text = annotation[:text]
           match = CGI.escapeHTML(annotation[:match])
           tier = annotation[:tier]
 
-          # Replace all occurrences
-          pattern = Regexp.new(Regexp.escape(text))
-          replacement = %(<span class="annotated" data-tier="#{tier}" data-match="#{match}">#{text}</span>)
+          # Find all occurrences of this text
+          offset = 0
+          while (pos = html.index(text, offset))
+            region_start = pos
+            region_end = pos + text.length
 
-          html.gsub!(pattern, replacement)
+            # Check if this region overlaps with any already-annotated region
+            overlaps = annotated_regions.any? do |r_start, r_end|
+              !(region_end <= r_start || region_start >= r_end)
+            end
+
+            if overlaps
+              # Skip this occurrence - it's already inside an annotation
+              offset = region_end
+              next
+            end
+
+            # Insert the annotation span
+            html = html[0...region_start] +
+              %(<span class="annotated" data-tier="#{tier}" data-match="#{match}">#{text}</span>) +
+              html[region_end..]
+
+            # Track this region (accounting for inserted span tags)
+            inserted_tag_length = %(<span class="annotated" data-tier="#{tier}" data-match="#{match}">).length
+            closing_tag_length = 7  # </span>
+            total_inserted = inserted_tag_length + closing_tag_length
+
+            annotated_regions << [region_start, region_end + total_inserted]
+
+            # Adjust all existing regions to account for the insertion
+            annotated_regions.each do |r|
+              if r[0] > region_start
+                r[0] += total_inserted
+                r[1] += total_inserted
+              end
+            end
+
+            # Move offset past the annotated region
+            offset = region_end + total_inserted
+          end
         end
 
         html

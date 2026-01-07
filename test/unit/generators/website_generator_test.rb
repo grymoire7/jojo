@@ -286,6 +286,43 @@ describe Jojo::Generators::WebsiteGenerator do
     @ai_client.verify
   end
 
+  it "prevents nested spans when annotation texts overlap" do
+    # Job description with overlapping text patterns
+    # "Ruby" appears alone and within "Ruby on Rails"
+    File.write(@employer.job_description_path, "We need Ruby developers who know Ruby on Rails.\n\nRuby is great. Ruby on Rails is a framework.")
+
+    # Create overlapping annotations (shorter text appears within longer text)
+    annotations = [
+      {text: "Ruby", match: "7 years Ruby experience", tier: "strong"},
+      {text: "Ruby on Rails", match: "Full-stack Ruby on Rails experience", tier: "strong"}
+    ]
+    File.write(@employer.job_description_annotations_path, JSON.generate(annotations))
+
+    expected_branding = "Branding..."
+    @ai_client.expect(:generate_text, expected_branding, [String])
+
+    result = @generator.generate
+
+    # Check that standalone "Ruby" is annotated
+    _(result).must_match(/<span class="annotated"[^>]*>Ruby<\/span> developers who know/)
+
+    # Check that "Ruby on Rails" is annotated as a whole phrase
+    _(result).must_match(/know <span class="annotated"[^>]*>Ruby on Rails<\/span>\./)
+
+    # Check that "Ruby" WITHIN "Ruby on Rails" is NOT separately annotated (no nested spans)
+    # This regex looks for a span containing another span - which would indicate nesting
+    nested_spans = result.scan(/<span class="annotated"[^>]*>(.*?)<\/span>/m).any? do |match|
+      match[0].include?("<span class=\"annotated\"")
+    end
+    _(nested_spans).must_equal false
+
+    # Check that data-match attributes don't contain span tags (malformed HTML)
+    data_match_with_spans = result.scan(/data-match="([^"]*<span[^"]*)"/)
+    _(data_match_with_spans.empty?).must_equal true
+
+    @ai_client.verify
+  end
+
   it "loads and passes FAQs to template" do
     # Create mock FAQs file
     faqs_data = [
