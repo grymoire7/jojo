@@ -8,20 +8,19 @@
 
 ## What is this?
 
-JoJo is a Job Search Management System - a Ruby CLI that transforms job
-applications into comprehensive, personalized marketing campaigns. Instead of
-sending a generic resume and cover letter, JoJo generates:
+JoJo is a Ruby CLI that transforms job applications into comprehensive,
+personalized marketing campaigns. Instead of sending a generic resume and cover
+letter, JoJo generates:
 
-- **Tailored Resume**: Customized from your generic resume to match specific job requirements
-- **Persuasive Cover Letter**: Written based on company research and role analysis
-- **Professional Website**: Landing page selling you as the perfect candidate
-- **Company Research**: AI-generated insights about the company and role
-- **Job Description Annotations**: Analysis of how your experience matches requirements
-
-Think of it as treating each job application like launching a product (you) to
-a specific customer (the employer).
-
-**[Read the technical blog post](https://tracyatteberry.com/posts/jojo)** about building this tool with Claude AI assistance.
+- **Tailored resume**: Customized from your generic resume data to match specific job requirements
+- **Persuasive cover Letter**: Written based on company research and role analysis
+- **Company research**: AI-generated insights about the company and role
+- **Professional website**: Landing page selling you as the perfect candidate
+  - **Job description annotations**: Analysis of how your experience matches requirements
+  - **Project portfolio**: Showcase relevant projects with descriptions and links
+  - **Recommendations carousel**: Display LinkedIn recommendations to build credibility
+  - **FAQ section**: Address common questions (again, a tailored component) proactively
+  - **Call-to-action**: Encourage employers to schedule calls or reach out
 
 ```mermaid
 flowchart LR
@@ -33,6 +32,11 @@ J --> D[Tailored cover letter]
 J --> E[Marketing website]
 J --> F[Compnay research]
 ```
+
+Think of it as treating each job application like launching a product (you) to
+a specific customer (the employer).
+
+**[Read the technical blog post](https://tracyatteberry.com/posts/jojo)** about building this tool with Claude AI assistance.
 
 ## Table of contents
 
@@ -53,6 +57,9 @@ J --> F[Compnay research]
 - **Bundler** - Install with `gem install bundler`
 - **AI Provider API Key** - Get one from your chosen provider
   - Jojo supports all providers supported by [ruby_llm](https://rubyllm.com/available-models/)
+- **Search API Key** - For web research capabilities via [DeepSeek](https://github.com/alexshagov/deepsearch-rb)
+  - Get a Serper API key from [serper.dev](https://serper.dev/), or
+  - Get a Tavily API key from [tavily.com](https://tavily.com/)
 - **Pandoc** (optional) - For PDF generation: `brew install pandoc` on macOS
 
 ### API Costs
@@ -61,25 +68,13 @@ JoJo uses AI providers to generate application materials. You can configure any
 provider supported by [ruby_llm](https://github.com/crmne/ruby_llm) (Anthropic,
 OpenAI, etc.) in your `config.yml`.
 
-**Example costs using Anthropic's Claude** (default configuration):
-
-- **Research generation**: ~$0.15-0.30 (Sonnet model, ~30K-60K tokens)
-- **Resume generation**: ~$0.10-0.20 (Haiku model, ~20K-40K tokens)
-- **Cover letter generation**: ~$0.05-0.10 (Haiku model, ~10K-20K tokens)
-- **Website generation**: ~$0.10-0.20 (Haiku model, ~20K-40K tokens)
-- **Job description annotations**: ~$0.10-0.15 (Sonnet model, ~20K-30K tokens)
-
-**Estimated total cost per application: $0.50-0.95** (with Anthropic Claude)
-
 Actual costs vary based on:
 - AI provider and model selection
 - Length of your resume and job description
 - Amount of research content generated
 - Number of projects in your portfolio
 
-See your provider's pricing page for current rates:
-- [Anthropic pricing](https://www.anthropic.com/pricing)
-- [OpenAI pricing](https://openai.com/api/pricing/)
+See your provider's pricing page for current rates.
 
 ## Installation
 
@@ -636,7 +631,7 @@ JoJo is built as a modular Ruby CLI application:
 - **CLI Layer** (`lib/jojo/cli.rb`) - Thor-based command interface
 - **Configuration** (`lib/jojo/config.rb`) - User settings management
 - **Employer** (`lib/jojo/employer.rb`) - Per-application workspace management
-- **AI Client** (`lib/jojo/ai_client.rb`) - Unified interface to AI services (Anthropic)
+- **AI Client** (`lib/jojo/ai_client.rb`) - Unified interface to AI services
 - **Job Description Processor** - Fetch from URL or file, convert to markdown
 - **Status Logger** - Track decisions and process flow
 
