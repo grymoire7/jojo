@@ -26,12 +26,12 @@ a specific customer (the employer).
 ```mermaid
 flowchart LR
 
-A[Resume data] --> B(Jojo)
-A[Job description] --> B
-B --> C[Tailored resume]
-B --> D[Tailored cover letter]
-B --> E[Marketing website]
-B --> F[Compnay research]
+A[Resume data] --> J(Jojo)
+B[Job description] --> J
+J --> C[Tailored resume]
+J --> D[Tailored cover letter]
+J --> E[Marketing website]
+J --> F[Compnay research]
 ```
 
 ## Table of contents
