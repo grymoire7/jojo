@@ -23,7 +23,16 @@ a specific customer (the employer).
 
 **[Read the technical blog post](https://tracyatteberry.com/posts/jojo)** about building this tool with Claude AI assistance.
 
-![screenshot](screenshot.png)
+```mermaid
+flowchart LR
+
+A[Resume data] --> B(Jojo)
+A[Job description] --> B
+B --> C[Tailored resume]
+B --> D[Tailored cover letter]
+B --> E[Marketing website]
+B --> F[Compnay research]
+```
 
 ## Table of contents
 
