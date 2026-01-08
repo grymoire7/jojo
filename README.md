@@ -1,4 +1,4 @@
-# JoJo - Job Search Management System
+# JoJo - Job Search Support System
 
 ✨ A new way to present yourself to a prospective employer, beyond the resume ✨
 
