@@ -50,6 +50,9 @@ module Jojo
         log "Copying branding image if available..."
         copy_branding_image
 
+        log "Copying template assets (CSS, JS, SVG)..."
+        copy_template_assets
+
         log "Saving website to #{employer.index_html_path}..."
         save_website(html)
 
@@ -217,6 +220,26 @@ module Jojo
 
         log "Copied branding image: #{image_info[:source_path]} -> #{dest_path}"
         true
+      end
+
+      def copy_template_assets
+        # Ensure website directory exists
+        FileUtils.mkdir_p(employer.website_path)
+
+        template_dir = File.join("templates", "website")
+        assets = ["styles.css", "script.js", "icons.svg"]
+
+        assets.each do |asset|
+          source = File.join(template_dir, asset)
+          dest = File.join(employer.website_path, asset)
+
+          if File.exist?(source)
+            FileUtils.cp(source, dest)
+            log "Copied #{asset} to #{employer.website_path}"
+          else
+            log "Warning: Asset not found: #{source}"
+          end
+        end
       end
 
       def save_website(html)
