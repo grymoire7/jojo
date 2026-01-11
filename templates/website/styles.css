@@ -475,15 +475,17 @@
       background: var(--gray-0);
       border: var(--border-size-1) solid var(--gray-4);
       transform: rotate(45deg);
+      left: 50%;
+      margin-left: calc(var(--size-2) / -2);
     }
 
-    .annotation-tooltip[data-position="above"]::before {
+    .annotation-tooltip.above::before {
       bottom: calc(var(--size-1) * -1);
       border-top: none;
       border-left: none;
     }
 
-    .annotation-tooltip[data-position="below"]::before {
+    .annotation-tooltip.below::before {
       top: calc(var(--size-1) * -1);
       border-bottom: none;
       border-right: none;
