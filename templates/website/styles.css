@@ -766,6 +766,9 @@
     }
 
     .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
       width: var(--size-9);
       height: var(--size-9);
       border-radius: var(--radius-round);
@@ -775,6 +778,7 @@
       font-size: var(--font-size-5);
       cursor: pointer;
       transition: all var(--ease-3) var(--duration-2);
+      z-index: 10;
       touch-action: manipulation;
       display: flex;
       align-items: center;
@@ -786,6 +790,14 @@
       color: var(--gray-0);
       border-color: var(--primary-color);
       box-shadow: var(--shadow-3);
+    }
+
+    .carousel-arrow.prev {
+      left: calc(var(--size-3) * -1);
+    }
+
+    .carousel-arrow.next {
+      right: calc(var(--size-3) * -1);
     }
 
     .carousel-arrow:disabled {
