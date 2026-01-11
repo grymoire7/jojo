@@ -108,15 +108,17 @@
           </div>
           <% end %>
         </div>
-        <button class="carousel-arrow prev" aria-label="Previous recommendation">‹</button>
-        <button class="carousel-arrow next" aria-label="Next recommendation">›</button>
       </div>
-      <div class="carousel-dots" role="tablist">
-        <% recommendations.each_with_index do |_, index| %>
-        <button class="carousel-dot<%= ' active' if index == 0 %>"
-                aria-label="Go to recommendation <%= index + 1 %>"
-                data-index="<%= index %>"></button>
-        <% end %>
+      <div class="carousel-navigation">
+        <button class="carousel-arrow prev" aria-label="Previous recommendation">‹</button>
+        <div class="carousel-dots" role="tablist">
+          <% recommendations.each_with_index do |_, index| %>
+          <button class="carousel-dot<%= ' active' if index == 0 %>"
+                  aria-label="Go to recommendation <%= index + 1 %>"
+                  data-index="<%= index %>"></button>
+          <% end %>
+        </div>
+        <button class="carousel-arrow next" aria-label="Next recommendation">›</button>
       </div>
       <div class="sr-only" aria-live="polite" aria-atomic="true" id="carousel-status">
         Showing recommendation <span id="carousel-current">1</span> of <%= recommendations.size %>
