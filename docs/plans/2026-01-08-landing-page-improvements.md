@@ -2,6 +2,10 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
+**Status:** ✅ COMPLETED
+
+**Completed:** 2026-01-11
+
 **Goal:** Modernize Jojo landing pages with Open Props design system, fix carousel overflow bug, redesign project cards with modern aesthetic, and replace FontAwesome with SVG sprite sheet.
 
 **Architecture:** Multi-file structure (HTML, CSS, JS, SVG) using Open Props via CDN for consistent design tokens. Iterate on generated HTML first (`employers/cybercoders/website/`) then migrate improvements back to ERB template.
@@ -1947,8 +1951,6 @@ to preserve when updating template."
 
 ```bash
 cp templates/website/default.html.erb templates/website/default.html.erb.backup
-git add templates/website/default.html.erb.backup
-git commit -m "chore: backup ERB template before improvements"
 ```
 
 **Step 2: Update head section**
