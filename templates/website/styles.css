@@ -463,7 +463,7 @@
       pointer-events: none;
     }
 
-    .annotation-tooltip.show {
+    .annotation-tooltip.visible {
       opacity: 1;
     }
 
