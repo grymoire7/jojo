@@ -86,6 +86,9 @@ module Jojo
           - NO headers, NO markdown formatting, NO commentary
           - DO NOT start with "Dear" or "To whom it may concern"
           - DO NOT include name/signature at end
+          - DO NOT ask for confirmation or permission to proceed
+          - DO NOT say "I've reviewed the context" or similar meta-commentary
+          - START IMMEDIATELY with the first paragraph of the branding statement
           - Focus on creating a genuine connection between candidate and opportunity
         PROMPT
       end
