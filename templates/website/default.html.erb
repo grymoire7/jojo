@@ -160,22 +160,50 @@
       <div class="project-list">
         <% projects.each do |project| %>
         <div class="project-card">
-          <% if project[:image_url] %>
-          <img src="<%= project[:image_url] %>" alt="<%= project[:name] %>" class="project-image">
+          <div class="project-header">
+            <% if project[:image_url] %>
+            <img src="<%= project[:image_url] %>" alt="" class="project-icon" loading="lazy">
+            <% end %>
+            <h3 class="project-title"><%= project[:name] %></h3>
+          </div>
+
+          <p class="project-headline"><%= project[:description] %></p>
+
+          <% if project[:skills] && !project[:skills].empty? %>
+          <div class="project-tech">
+            <% project[:skills].each do |skill| %>
+            <span class="tech-tag"><%= skill %></span>
+            <% end %>
+          </div>
           <% end %>
-          <h3><%= project[:name] %></h3>
-          <p><%= project[:description] %></p>
-          <% if project[:context] || project[:year] %>
-          <p class="project-meta">
-            <% if project[:year] %><span><%= project[:year] %></span><% end %>
-            <% if project[:context] %><span><%= project[:context] %></span><% end %>
-          </p>
+
+          <% if project[:blog_post_url] || project[:live_url] || project[:url] %>
+          <div class="project-actions">
+            <% if project[:blog_post_url] %>
+            <a href="<%= project[:blog_post_url] %>" class="btn btn-primary">
+              <svg class="icon"><use href="#icon-book"></use></svg>
+              Technical Deep Dive
+            </a>
+            <% end %>
+            <% if project[:live_url] %>
+            <a href="<%= project[:live_url] %>" class="btn btn-secondary">
+              <svg class="icon"><use href="#icon-external-link"></use></svg>
+              Live Demo
+            </a>
+            <% end %>
+            <% if project[:url] %>
+            <a href="<%= project[:url] %>" class="btn btn-tertiary">
+              <svg class="icon"><use href="#icon-github"></use></svg>
+              Source Code
+            </a>
+            <% end %>
+          </div>
           <% end %>
-          <% if project[:blog_post_url] || project[:github_url] || project[:live_url] %>
-          <div class="project-links">
-            <% if project[:blog_post_url] %><a href="<%= project[:blog_post_url] %>" class="project-link post-link">Blog Post</a><% end %>
-            <% if project[:github_url] %><a href="<%= project[:github_url] %>" class="project-link source-link">GitHub</a><% end %>
-            <% if project[:live_url] %><a href="<%= project[:live_url] %>" class="project-link demo-link">Live Demo</a><% end %>
+
+          <% if project[:year] || project[:context] %>
+          <div class="project-footer">
+            <% if project[:year] %><span class="project-date"><%= project[:year] %></span><% end %>
+            <% if project[:context] %><span class="project-context"><%= project[:context] %></span><% end %>
           </div>
           <% end %>
         </div>
