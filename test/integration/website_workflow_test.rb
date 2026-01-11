@@ -74,7 +74,9 @@ describe "Website Generation Workflow" do
     _(html).must_include "https://johndoe.com/cover-letter/test-company"
 
     # Verify responsive CSS
-    _(html).must_include "@media (max-width: 640px)"
+    styles_css = File.read(File.join(@employer.website_path, "styles.css"))
+    _(styles_css).must_include "@media (max-width: 640px)"
+    _(html).must_include '<link rel="stylesheet" href="styles.css">'
     _(html).must_include "viewport"
 
     @ai_client.verify

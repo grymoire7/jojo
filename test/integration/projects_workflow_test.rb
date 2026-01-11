@@ -41,7 +41,7 @@ describe "Projects Integration Workflow" do
           context: "at Previous Corp"
           role: "Lead Developer"
           blog_post_url: "https://example.com/blog/ecommerce"
-          github_url: "https://github.com/user/ecommerce"
+          url: "https://github.com/user/ecommerce"
           skills:
             - Ruby on Rails
             - PostgreSQL
