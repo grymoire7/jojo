@@ -765,14 +765,6 @@
       margin-top: var(--size-5);
     }
 
-    .carousel-navigation {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--size-4);
-      margin-top: var(--size-5);
-    }
-
     .carousel-arrow {
       width: var(--size-9);
       height: var(--size-9);
