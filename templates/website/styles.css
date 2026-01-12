@@ -196,8 +196,8 @@
     /* CTA Section */
     .cta-section {
       text-align: center;
-      padding: 3rem 0;
-      margin-bottom: 3rem;
+      padding: 3rem 0 1rem 0;
+      margin-bottom: 0;
     }
 
     .cta-button {
@@ -493,8 +493,8 @@
 
     /* Footer Section */
     .footer {
-      padding: var(--size-8) 0 var(--size-6);
-      margin-top: var(--size-10);
+      padding: var(--size-4) 0 var(--size-6);
+      margin-top: var(--size-2);
       border-top: var(--border-size-1) solid var(--border-color);
       text-align: center;
     }
