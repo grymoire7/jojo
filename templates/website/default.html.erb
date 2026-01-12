@@ -146,13 +146,6 @@
     </section>
     <% end %>
 
-    <!-- Call to Action -->
-    <% if cta_link && !cta_link.strip.empty? %>
-    <section class="cta-section">
-      <a href="<%= cta_link %>" class="cta-button"><%= cta_text %></a>
-    </section>
-    <% end %>
-
     <!-- Projects Section -->
     <% if projects && !projects.empty? %>
     <section class="projects" id="projects">
@@ -212,17 +205,24 @@
     </section>
     <% end %>
 
+    <!-- Call to Action -->
+    <% if cta_link && !cta_link.strip.empty? %>
+    <section class="cta-section">
+      <a href="<%= cta_link %>" class="cta-button"><%= cta_text %></a>
+    </section>
+    <% end %>
+
     <!-- Footer -->
     <footer class="footer">
       <p>Application materials for <%= company_name %></p>
       <div class="footer-links">
         <a href="resume.pdf">
           <svg class="icon"><use href="#icon-download"></use></svg>
-          View Resume
+          Resume (pdf)
         </a>
         <a href="cover-letter.pdf">
           <svg class="icon"><use href="#icon-download"></use></svg>
-          View Cover Letter
+          Cover Letter (pdf)
         </a>
       </div>
     </footer>

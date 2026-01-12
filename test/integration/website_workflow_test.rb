@@ -70,8 +70,8 @@ describe "Website Generation Workflow" do
     _(html).must_include "https://calendly.com/johndoe/30min"
 
     # Verify footer links
-    _(html).must_include "https://johndoe.com/resume/test-company"
-    _(html).must_include "https://johndoe.com/cover-letter/test-company"
+    _(html).must_include "resume.pdf"
+    _(html).must_include "cover-letter.pdf"
 
     # Verify responsive CSS
     styles_css = File.read(File.join(@employer.website_path, "styles.css"))

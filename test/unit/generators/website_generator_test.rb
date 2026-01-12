@@ -190,8 +190,8 @@ describe Jojo::Generators::WebsiteGenerator do
     _(result).must_include "Acme Corp"
     _(result).must_include "Schedule a Call"
     _(result).must_include "https://calendly.com/janedoe/30min"
-    _(result).must_include "https://janedoe.com/resume/acme-corp"
-    _(result).must_include "https://janedoe.com/cover-letter/acme-corp"
+    _(result).must_include "resume.pdf"
+    _(result).must_include "cover-letter.pdf"
 
     @ai_client.verify
   end
