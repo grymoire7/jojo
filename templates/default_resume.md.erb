@@ -1,14 +1,23 @@
-# <%= name %>
-
-**Email:** <%= email %> | **Phone:** <%= phone %> | **Location:** <%= location %>
-
-## Professional Summary
+---
+margin-left: 2cm
+margin-right: 2cm
+margin-top: 1cm
+margin-bottom: 2cm
+title: <%= name %>
+description-meta: 'Resume for <%= name %>'
+author:
+- <%= name %>
+subject: 'Resume'
+---
+###### [[tracyatteberry.com](https://tracyatteberry.com)] . [ <%= email %> ] . [ <%= phone %> ]
 
 <%= summary %>
 
 ## Skills
 
 <%= skills.join(" • ") %>
+
+###### [[linkedin.com/in/tracyatteberry](https:://linkedin.com/in/tracyatteberry/)] . [[github.com/grymoire7](https://github.com/grymoire7)]
 
 ## Experience
 
@@ -28,12 +37,6 @@
 <%= edu["description"] if edu["description"] %>
 <% end %>
 
-## Projects
-
-<% projects.each do |proj| %>
-- **<%= proj["name"] %>**: <%= proj["description"] %> (Skills: <%= proj["skills"].join(", ") %>)
-<% end %>
-
 <% if recommendations && !recommendations.empty? %>
 ## Recommendations
 
@@ -45,3 +48,24 @@
 
 <% end %>
 <% end %>
+
+<% if projects && !projects.empty? %>
+## Projects & Achievements
+
+<% projects.each do |proj| %>
+- **<%= proj["name"] %>**: <%= proj["description"] %> (Skills: <%= proj["skills"].join(", ") %>)
+
+<% end %>
+<% end %>
+
+<% if education && !education.empty? %>
+## Projects & Achievements
+
+<% education.each do |edu| %>
+### <%= edu["degree"] %>, <%= edu["institution"] %>
+<%= edu["description"] %>
+
+<% end %>
+<% end %>
+
+
