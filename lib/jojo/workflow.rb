@@ -83,5 +83,30 @@ module Jojo
 
       File.join(employer.base_path, step[:output_file])
     end
+
+    def self.status(step_key, employer)
+      step = STEPS.find { |s| s[:key] == step_key }
+      raise ArgumentError, "Unknown step: #{step_key}" unless step
+
+      output_path = file_path(step_key, employer)
+      output_exists = File.exist?(output_path)
+
+      # Check if all dependencies are met
+      deps_met = step[:dependencies].all? do |dep_key|
+        File.exist?(file_path(dep_key, employer))
+      end
+
+      return :blocked unless deps_met
+      return :ready unless output_exists
+
+      # Check for staleness
+      output_mtime = File.mtime(output_path)
+      stale = step[:dependencies].any? do |dep_key|
+        dep_path = file_path(dep_key, employer)
+        File.exist?(dep_path) && File.mtime(dep_path) > output_mtime
+      end
+
+      stale ? :stale : :generated
+    end
   end
 end

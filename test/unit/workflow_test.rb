@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative "../test_helper"
+require "tmpdir"
+require "fileutils"
 
 describe Jojo::Workflow do
   describe "STEPS" do
@@ -44,6 +46,79 @@ describe Jojo::Workflow do
 
     it "raises for unknown step" do
       _ { Jojo::Workflow.file_path(:unknown, @employer) }.must_raise ArgumentError
+    end
+  end
+
+  describe ".status" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employer = Minitest::Mock.new
+      @employer.expect :base_path, @temp_dir
+    end
+
+    after do
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "returns :blocked when dependencies missing" do
+      # No files exist
+      # file_path called for: output + first dependency (fails, returns early)
+      @employer.expect :base_path, @temp_dir
+
+      status = Jojo::Workflow.status(:resume, @employer)
+      _(status).must_equal :blocked
+    end
+
+    it "returns :ready when dependencies exist but output missing" do
+      # Create dependencies for resume: job_description and research
+      FileUtils.touch(File.join(@temp_dir, "job_description.md"))
+      FileUtils.touch(File.join(@temp_dir, "research.md"))
+
+      @employer.expect :base_path, @temp_dir
+      @employer.expect :base_path, @temp_dir
+      @employer.expect :base_path, @temp_dir
+
+      status = Jojo::Workflow.status(:resume, @employer)
+      _(status).must_equal :ready
+    end
+
+    it "returns :generated when output exists and up-to-date" do
+      # Create dependencies older than output
+      FileUtils.touch(File.join(@temp_dir, "job_description.md"))
+      FileUtils.touch(File.join(@temp_dir, "research.md"))
+      sleep 0.01
+      FileUtils.touch(File.join(@temp_dir, "resume.md"))
+
+      # file_path called for: output, 2 deps check, 2 deps staleness check = 5 total
+      @employer.expect :base_path, @temp_dir
+      @employer.expect :base_path, @temp_dir
+      @employer.expect :base_path, @temp_dir
+      @employer.expect :base_path, @temp_dir
+
+      status = Jojo::Workflow.status(:resume, @employer)
+      _(status).must_equal :generated
+    end
+
+    it "returns :stale when dependency is newer than output" do
+      # Create output first
+      FileUtils.touch(File.join(@temp_dir, "resume.md"))
+      sleep 0.01
+      # Then create newer dependencies
+      FileUtils.touch(File.join(@temp_dir, "job_description.md"))
+      FileUtils.touch(File.join(@temp_dir, "research.md"))
+
+      # file_path called for: output, 2 deps check, 1 dep staleness (stale found) = 4 total
+      @employer.expect :base_path, @temp_dir
+      @employer.expect :base_path, @temp_dir
+      @employer.expect :base_path, @temp_dir
+
+      status = Jojo::Workflow.status(:resume, @employer)
+      _(status).must_equal :stale
+    end
+
+    it "returns :ready for job_description (no dependencies)" do
+      status = Jojo::Workflow.status(:job_description, @employer)
+      _(status).must_equal :ready
     end
   end
 end
