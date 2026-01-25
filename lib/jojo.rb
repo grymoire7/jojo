@@ -6,6 +6,7 @@ module Jojo
 end
 
 require_relative "jojo/config"
+require_relative "jojo/workflow"
 require_relative "jojo/employer"
 require_relative "jojo/overwrite_helper"
 require_relative "jojo/ai_client"
