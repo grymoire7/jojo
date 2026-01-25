@@ -52,4 +52,24 @@ describe Jojo::UI::Dashboard do
       _(bar).must_equal "███████░░░"
     end
   end
+
+  describe ".workflow_line" do
+    it "renders a workflow line with number, label, paid icon, and status" do
+      step = {key: :resume, label: "Resume", paid: true}
+      line = Jojo::UI::Dashboard.workflow_line(3, step, :generated, width: 50)
+
+      _(line).must_include "3."
+      _(line).must_include "Resume"
+      _(line).must_include "💰"
+      _(line).must_include "✅"
+    end
+
+    it "pads label to align columns" do
+      step = {key: :faq, label: "FAQ", paid: true}
+      line = Jojo::UI::Dashboard.workflow_line(6, step, :ready, width: 50)
+
+      # Label should be padded
+      _(line).must_match(/FAQ\s+💰/)
+    end
+  end
 end
