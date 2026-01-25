@@ -30,4 +30,26 @@ describe Jojo::UI::Dashboard do
       _(Jojo::UI::Dashboard.paid_icon(false)).must_equal "  "
     end
   end
+
+  describe ".progress_bar" do
+    it "renders empty bar for 0%" do
+      bar = Jojo::UI::Dashboard.progress_bar(0, width: 10)
+      _(bar).must_equal "░░░░░░░░░░"
+    end
+
+    it "renders full bar for 100%" do
+      bar = Jojo::UI::Dashboard.progress_bar(100, width: 10)
+      _(bar).must_equal "██████████"
+    end
+
+    it "renders partial bar for 50%" do
+      bar = Jojo::UI::Dashboard.progress_bar(50, width: 10)
+      _(bar).must_equal "█████░░░░░"
+    end
+
+    it "renders partial bar for 70%" do
+      bar = Jojo::UI::Dashboard.progress_bar(70, width: 10)
+      _(bar).must_equal "███████░░░"
+    end
+  end
 end

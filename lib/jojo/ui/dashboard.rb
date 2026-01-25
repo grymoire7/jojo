@@ -10,6 +10,16 @@ module Jojo
         blocked: "🔒"
       }.freeze
 
+      FILLED_CHAR = "█"
+      EMPTY_CHAR = "░"
+
+      def self.progress_bar(percent, width: 10)
+        filled = (percent / 100.0 * width).round
+        empty = width - filled
+
+        FILLED_CHAR * filled + EMPTY_CHAR * empty
+      end
+
       def self.status_icon(status)
         STATUS_ICONS[status] || "?"
       end
