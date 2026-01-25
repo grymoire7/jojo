@@ -28,5 +28,11 @@ module Jojo
         .select { |f| File.directory?(File.join(employers_path, f)) }
         .sort
     end
+
+    def switch_application(new_slug)
+      @slug = new_slug
+      @employer = nil  # Clear cached employer
+      StatePersistence.save_slug(new_slug)
+    end
   end
 end

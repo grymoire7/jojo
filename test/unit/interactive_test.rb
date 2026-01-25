@@ -90,4 +90,35 @@ describe Jojo::Interactive do
       _(apps).must_equal ["acme-corp"]
     end
   end
+
+  describe "#switch_application" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employers_dir = File.join(@temp_dir, "employers")
+      FileUtils.mkdir_p(File.join(@employers_dir, "new-app"))
+      @original_dir = Dir.pwd
+      Dir.chdir(@temp_dir)
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "updates slug and saves to state" do
+      interactive = Jojo::Interactive.new(slug: "old-app")
+      interactive.switch_application("new-app")
+
+      _(interactive.slug).must_equal "new-app"
+      _(Jojo::StatePersistence.load_slug).must_equal "new-app"
+    end
+
+    it "clears cached employer" do
+      interactive = Jojo::Interactive.new(slug: "new-app")
+      _old_employer = interactive.employer  # Cache it
+
+      interactive.switch_application("new-app")
+      # employer should be re-instantiated on next access
+    end
+  end
 end
