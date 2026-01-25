@@ -29,6 +29,11 @@ describe Jojo::Employer do
     _(employer.faq_path).must_equal "employers/acme-corp/faq.json"
   end
 
+  it "returns branding_path" do
+    employer = Jojo::Employer.new("test-company")
+    _(employer.branding_path).must_equal "employers/test-company/branding.md"
+  end
+
   it "creates directory structure" do
     employer = Jojo::Employer.new("test-company")
 

@@ -35,6 +35,10 @@ module Jojo
       File.join(base_path, "resume.md")
     end
 
+    def branding_path
+      File.join(base_path, "branding.md")
+    end
+
     def cover_letter_path
       File.join(base_path, "cover_letter.md")
     end
