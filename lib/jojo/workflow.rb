@@ -114,5 +114,16 @@ module Jojo
         hash[step[:key]] = status(step[:key], employer)
       end
     end
+
+    def self.missing_dependencies(step_key, employer)
+      step = STEPS.find { |s| s[:key] == step_key }
+      raise ArgumentError, "Unknown step: #{step_key}" unless step
+
+      step[:dependencies].reject do |dep_key|
+        File.exist?(file_path(dep_key, employer))
+      end.map do |dep_key|
+        STEPS.find { |s| s[:key] == dep_key }[:label]
+      end
+    end
   end
 end

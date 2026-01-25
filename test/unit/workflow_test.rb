@@ -144,4 +144,34 @@ describe Jojo::Workflow do
       _(statuses[:resume]).must_equal :blocked
     end
   end
+
+  describe ".missing_dependencies" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employer = Minitest::Mock.new
+    end
+
+    after do
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "returns list of missing dependency labels" do
+      5.times { @employer.expect :base_path, @temp_dir }
+
+      missing = Jojo::Workflow.missing_dependencies(:resume, @employer)
+
+      _(missing).must_include "Job Description"
+      _(missing).must_include "Research"
+    end
+
+    it "returns empty array when all deps met" do
+      FileUtils.touch(File.join(@temp_dir, "job_description.md"))
+      FileUtils.touch(File.join(@temp_dir, "research.md"))
+
+      5.times { @employer.expect :base_path, @temp_dir }
+
+      missing = Jojo::Workflow.missing_dependencies(:resume, @employer)
+      _(missing).must_be_empty
+    end
+  end
 end
