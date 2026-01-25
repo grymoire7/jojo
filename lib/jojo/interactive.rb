@@ -14,5 +14,10 @@ module Jojo
       @cursor = TTY::Cursor
       @running = false
     end
+
+    def employer
+      return nil unless @slug
+      @employer ||= Employer.new(@slug)
+    end
   end
 end
