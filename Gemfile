@@ -9,6 +9,10 @@ gem "dotenv", "~> 3.1"
 gem "html-to-markdown", "~> 2.16"
 gem "reline"
 gem "tty-prompt", "~> 0.23"
+gem "tty-box", "~> 0.7"          # Box drawing for TUI
+gem "tty-cursor", "~> 0.7"       # Cursor movement
+gem "tty-reader", "~> 0.9"       # Key input handling
+gem "tty-screen", "~> 0.8"       # Terminal dimensions
 
 group :development, :test do
   gem "minitest", "~> 5.25"
