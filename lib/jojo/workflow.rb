@@ -108,5 +108,11 @@ module Jojo
 
       stale ? :stale : :generated
     end
+
+    def self.all_statuses(employer)
+      STEPS.each_with_object({}) do |step, hash|
+        hash[step[:key]] = status(step[:key], employer)
+      end
+    end
   end
 end

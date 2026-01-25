@@ -121,4 +121,27 @@ describe Jojo::Workflow do
       _(status).must_equal :ready
     end
   end
+
+  describe ".all_statuses" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employer = Minitest::Mock.new
+    end
+
+    after do
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "returns status for all steps" do
+      # Mock base_path for each status call (9 steps, each may call multiple times)
+      27.times { @employer.expect :base_path, @temp_dir }
+
+      statuses = Jojo::Workflow.all_statuses(@employer)
+
+      _(statuses).must_be_kind_of Hash
+      _(statuses.keys.length).must_equal 9
+      _(statuses[:job_description]).must_equal :ready
+      _(statuses[:resume]).must_equal :blocked
+    end
+  end
 end
