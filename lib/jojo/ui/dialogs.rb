@@ -64,6 +64,38 @@ module Jojo
           border: :thick
         )
       end
+
+      def self.error_dialog(label, error_message)
+        lines = []
+        lines << ""
+        lines << "  #{label} generation failed:"
+        lines << ""
+        lines << "  #{error_message}"
+        lines << ""
+        lines << "  [r] Retry    [v] View full error    [Esc] Back"
+
+        TTY::Box.frame(
+          lines.join("\n"),
+          title: {top_left: " Error "},
+          padding: [0, 1],
+          border: :thick
+        )
+      end
+
+      def self.input_dialog(title, prompt)
+        lines = []
+        lines << ""
+        lines << "  #{prompt}"
+        lines << "  > "
+        lines << ""
+
+        TTY::Box.frame(
+          lines.join("\n"),
+          title: {top_left: " #{title} "},
+          padding: [0, 1],
+          border: :thick
+        )
+      end
     end
   end
 end

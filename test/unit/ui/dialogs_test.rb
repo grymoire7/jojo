@@ -44,4 +44,26 @@ describe Jojo::UI::Dialogs do
       _(output).must_include "[v] View"
     end
   end
+
+  describe ".error_dialog" do
+    it "renders error dialog with message" do
+      output = Jojo::UI::Dialogs.error_dialog("Cover Letter", "API Error: Rate limit exceeded")
+
+      _(output).must_include "Error"
+      _(output).must_include "Cover Letter generation failed"
+      _(output).must_include "Rate limit exceeded"
+      _(output).must_include "[r] Retry"
+      _(output).must_include "[Esc] Back"
+    end
+  end
+
+  describe ".input_dialog" do
+    it "renders input dialog with prompt" do
+      output = Jojo::UI::Dialogs.input_dialog("New Application", "Slug (e.g., acme-corp-senior-dev):")
+
+      _(output).must_include "New Application"
+      _(output).must_include "Slug"
+      _(output).must_include "> "
+    end
+  end
 end
