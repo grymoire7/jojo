@@ -125,5 +125,13 @@ module Jojo
         STEPS.find { |s| s[:key] == dep_key }[:label]
       end
     end
+
+    def self.progress(employer)
+      statuses = all_statuses(employer)
+      generated_count = statuses.values.count(:generated)
+      total = STEPS.length
+
+      ((generated_count.to_f / total) * 100).round
+    end
   end
 end

@@ -174,4 +174,32 @@ describe Jojo::Workflow do
       _(missing).must_be_empty
     end
   end
+
+  describe ".progress" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employer = Minitest::Mock.new
+    end
+
+    after do
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "returns 0 when nothing generated" do
+      27.times { @employer.expect :base_path, @temp_dir }
+
+      progress = Jojo::Workflow.progress(@employer)
+      _(progress).must_equal 0
+    end
+
+    it "returns percentage of generated (non-stale) items" do
+      # Create job_description (1 of 9 = ~11%)
+      FileUtils.touch(File.join(@temp_dir, "job_description.md"))
+
+      27.times { @employer.expect :base_path, @temp_dir }
+
+      progress = Jojo::Workflow.progress(@employer)
+      _(progress).must_equal 11  # 1/9 rounded
+    end
+  end
 end
