@@ -46,4 +46,40 @@ describe Jojo::Generators::BrandingGenerator do
 
     @ai_client.verify
   end
+
+  it "raises error when job description missing" do
+    FileUtils.rm_f(@employer.job_description_path)
+
+    _ { @generator.generate }.must_raise RuntimeError
+  end
+
+  it "raises error when resume missing" do
+    FileUtils.rm_f(@employer.resume_path)
+
+    _ { @generator.generate }.must_raise RuntimeError
+  end
+
+  it "handles missing research gracefully" do
+    FileUtils.rm_f(@employer.research_path)
+
+    expected_branding = "Branding without research..."
+    @ai_client.expect(:generate_text, expected_branding, [String])
+
+    result = @generator.generate
+    _(result).must_equal expected_branding
+
+    @ai_client.verify
+  end
+
+  it "handles missing job_details gracefully" do
+    FileUtils.rm_f(@employer.job_details_path)
+
+    expected_branding = "Branding without job details..."
+    @ai_client.expect(:generate_text, expected_branding, [String])
+
+    result = @generator.generate
+    _(result).must_equal expected_branding
+
+    @ai_client.verify
+  end
 end
