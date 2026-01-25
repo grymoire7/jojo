@@ -281,6 +281,33 @@ module Jojo
         # Don't exit - FAQs are optional, continue with website generation
       end
 
+      # Generate branding statement
+      begin
+        require_relative "generators/branding_generator"
+
+        # Skip if branding exists and --overwrite not set
+        if File.exist?(employer.branding_path) && !options[:overwrite]
+          say "✓ Using existing branding statement", :green
+        else
+          generator = Jojo::Generators::BrandingGenerator.new(
+            employer,
+            ai_client,
+            config: config,
+            verbose: options[:verbose]
+          )
+          generator.generate
+
+          say "✓ Branding statement generated and saved", :green
+          status_logger.log_step("Branding Generation",
+            tokens: ai_client.total_tokens_used,
+            status: "complete")
+        end
+      rescue => e
+        say "✗ Error generating branding statement: #{e.message}", :red
+        status_logger.log_step("Branding Generation", status: "failed", error: e.message)
+        exit 1
+      end
+
       # Generate website
       begin
         if File.exist?(employer.resume_path)

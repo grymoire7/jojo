@@ -64,10 +64,10 @@ describe "WebsiteGenerator with Projects" do
     # Create minimal job description for full generation
     File.write(@employer.job_description_path, "Test job description")
     File.write(@employer.resume_path, "# Resume\n\nTest resume content")
+    File.write(@employer.branding_path, "Test branding statement")
 
-    # Mock AI client to avoid real API calls
+    # Mock AI client (not used since branding is read from file)
     mock_ai = Minitest::Mock.new
-    mock_ai.expect :generate_text, "Test branding statement", [String]
 
     generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
@@ -77,8 +77,6 @@ describe "WebsiteGenerator with Projects" do
 
     # Should mention the project
     _(html).must_include "Rails Project"
-
-    mock_ai.verify
   end
 
   it "copies local project images to website directory" do
@@ -111,9 +109,10 @@ describe "WebsiteGenerator with Projects" do
 
     File.write(@employer.job_description_path, "Test job")
     File.write(@employer.resume_path, "# Resume\n\nTest resume content")
+    File.write(@employer.branding_path, "Test branding")
 
+    # Mock AI client (not used since branding is read from file)
     mock_ai = Minitest::Mock.new
-    mock_ai.expect :generate_text, "Test branding", [String]
 
     generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
@@ -125,7 +124,5 @@ describe "WebsiteGenerator with Projects" do
     # Check HTML references image correctly
     html = File.read(@employer.index_html_path)
     _(html).must_include 'src="images/test.png"'
-
-    mock_ai.verify
   end
 end
