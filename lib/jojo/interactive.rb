@@ -34,5 +34,22 @@ module Jojo
       @employer = nil  # Clear cached employer
       StatePersistence.save_slug(new_slug)
     end
+
+    def handle_key(key)
+      case key
+      when "q", "Q"
+        :quit
+      when "s", "S"
+        :switch
+      when "o", "O"
+        :open
+      when "a", "A"
+        :all
+      when "n", "N"
+        :new
+      when "1".."9"
+        key.to_i - 1  # Convert to 0-indexed
+      end
+    end
   end
 end

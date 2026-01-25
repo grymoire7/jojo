@@ -121,4 +121,55 @@ describe Jojo::Interactive do
       # employer should be re-instantiated on next access
     end
   end
+
+  describe "#handle_key" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employers_dir = File.join(@temp_dir, "employers")
+      FileUtils.mkdir_p(File.join(@employers_dir, "test-app"))
+      @original_dir = Dir.pwd
+      Dir.chdir(@temp_dir)
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "returns :quit for 'q' key" do
+      interactive = Jojo::Interactive.new(slug: "test-app")
+      result = interactive.handle_key("q")
+      _(result).must_equal :quit
+    end
+
+    it "returns :switch for 's' key" do
+      interactive = Jojo::Interactive.new(slug: "test-app")
+      result = interactive.handle_key("s")
+      _(result).must_equal :switch
+    end
+
+    it "returns :open for 'o' key" do
+      interactive = Jojo::Interactive.new(slug: "test-app")
+      result = interactive.handle_key("o")
+      _(result).must_equal :open
+    end
+
+    it "returns :all for 'a' key" do
+      interactive = Jojo::Interactive.new(slug: "test-app")
+      result = interactive.handle_key("a")
+      _(result).must_equal :all
+    end
+
+    it "returns step index for number keys 1-9" do
+      interactive = Jojo::Interactive.new(slug: "test-app")
+      _(interactive.handle_key("1")).must_equal 0
+      _(interactive.handle_key("5")).must_equal 4
+      _(interactive.handle_key("9")).must_equal 8
+    end
+
+    it "returns nil for unrecognized keys" do
+      interactive = Jojo::Interactive.new(slug: "test-app")
+      _(interactive.handle_key("x")).must_be_nil
+    end
+  end
 end
