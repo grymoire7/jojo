@@ -2,7 +2,6 @@ require "yaml"
 require "erb"
 require "fileutils"
 require "json"
-require_relative "../prompts/website_prompt"
 require_relative "../resume_data_loader"
 
 module Jojo
@@ -25,8 +24,8 @@ module Jojo
         log "Gathering inputs for website generation..."
         inputs = gather_inputs
 
-        log "Generating personalized branding statement using AI..."
-        branding_statement = generate_branding_statement(inputs)
+        log "Loading branding statement from file..."
+        branding_statement = load_branding_statement
 
         log "Loading relevant projects..."
         projects = load_projects
@@ -111,18 +110,12 @@ module Jojo
         nil
       end
 
-      def generate_branding_statement(inputs)
-        prompt = Prompts::Website.generate_branding_statement(
-          job_description: inputs[:job_description],
-          resume: inputs[:resume],
-          company_name: inputs[:company_name],
-          seeker_name: config.seeker_name,
-          voice_and_tone: config.voice_and_tone,
-          research: inputs[:research],
-          job_details: inputs[:job_details]
-        )
+      def load_branding_statement
+        unless File.exist?(employer.branding_path) && !File.read(employer.branding_path).strip.empty?
+          raise "branding.md not found for '#{employer.slug}'\nRun 'jojo branding -s #{employer.slug}' first to generate branding statement."
+        end
 
-        ai_client.generate_text(prompt)
+        File.read(employer.branding_path)
       end
 
       def prepare_template_vars(branding_statement, inputs, projects = [], annotated_job_description = nil, recommendations = nil, faqs = nil)
