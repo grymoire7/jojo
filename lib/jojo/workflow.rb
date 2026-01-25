@@ -76,5 +76,12 @@ module Jojo
         output_file: "resume.pdf"
       }
     ].freeze
+
+    def self.file_path(step_key, employer)
+      step = STEPS.find { |s| s[:key] == step_key }
+      raise ArgumentError, "Unknown step: #{step_key}" unless step
+
+      File.join(employer.base_path, step[:output_file])
+    end
   end
 end

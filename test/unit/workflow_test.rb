@@ -24,4 +24,26 @@ describe Jojo::Workflow do
       end
     end
   end
+
+  describe ".file_path" do
+    before do
+      @employer = Minitest::Mock.new
+      @employer.expect :base_path, "/tmp/test-employer"
+    end
+
+    it "returns full path for a step" do
+      path = Jojo::Workflow.file_path(:resume, @employer)
+      _(path).must_equal "/tmp/test-employer/resume.md"
+    end
+
+    it "handles nested paths like website" do
+      @employer.expect :base_path, "/tmp/test-employer"
+      path = Jojo::Workflow.file_path(:website, @employer)
+      _(path).must_equal "/tmp/test-employer/website/index.html"
+    end
+
+    it "raises for unknown step" do
+      _ { Jojo::Workflow.file_path(:unknown, @employer) }.must_raise ArgumentError
+    end
+  end
 end
