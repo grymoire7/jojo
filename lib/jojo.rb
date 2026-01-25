@@ -5,6 +5,7 @@ module Jojo
   VERSION = "0.1.0"
 end
 
+require_relative "jojo/state_persistence"
 require_relative "jojo/config"
 require_relative "jojo/workflow"
 require_relative "jojo/employer"
