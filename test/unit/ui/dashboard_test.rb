@@ -72,4 +72,40 @@ describe Jojo::UI::Dashboard do
       _(line).must_match(/FAQ\s+💰/)
     end
   end
+
+  describe ".render" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employer = Minitest::Mock.new
+      @employer.expect :slug, "acme-corp-dev"
+      @employer.expect :company_name, "Acme Corp"
+
+      # Mock base_path calls for all_statuses (many calls due to status checks)
+      50.times { @employer.expect :base_path, @temp_dir }
+    end
+
+    after do
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "renders complete dashboard with header and workflow" do
+      output = Jojo::UI::Dashboard.render(@employer)
+
+      _(output).must_include "Jojo"
+      _(output).must_include "acme-corp-dev"
+      _(output).must_include "Acme Corp"
+      _(output).must_include "1."
+      _(output).must_include "Job Description"
+      _(output).must_include "[q] Quit"
+    end
+
+    it "includes status legend" do
+      output = Jojo::UI::Dashboard.render(@employer)
+
+      _(output).must_include "✅Generated"
+      _(output).must_include "🍞Stale"
+      _(output).must_include "⭕Ready"
+      _(output).must_include "🔒Blocked"
+    end
+  end
 end

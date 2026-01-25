@@ -40,6 +40,41 @@ module Jojo
 
         "  #{number}. #{padded_label}#{paid}   #{status_str} #{status_label}"
       end
+
+      def self.render(employer)
+        require "tty-box"
+
+        statuses = Jojo::Workflow.all_statuses(employer)
+        width = 56
+
+        lines = []
+
+        # Header
+        lines << "  Active: #{employer.slug}"
+        lines << "  Company: #{employer.company_name}"
+        lines << ""
+        lines << "  Workflow" + " " * 29 + "Status"
+        lines << "  " + "─" * 50
+
+        # Workflow items
+        Jojo::Workflow::STEPS.each_with_index do |step, idx|
+          status = statuses[step[:key]]
+          lines << workflow_line(idx + 1, step, status, width: width)
+        end
+
+        lines << ""
+        lines << "  Status:  ✅Generated  🍞Stale  ⭕Ready  🔒Blocked"
+        lines << ""
+        lines << "  [1-9] Generate item    [a] All ready    [q] Quit"
+        lines << "  [o] Open folder    [s] Switch application"
+
+        TTY::Box.frame(
+          lines.join("\n"),
+          title: {top_left: " Jojo "},
+          padding: [0, 1],
+          border: :thick
+        )
+      end
     end
   end
 end
