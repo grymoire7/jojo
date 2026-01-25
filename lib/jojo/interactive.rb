@@ -19,5 +19,14 @@ module Jojo
       return nil unless @slug
       @employer ||= Employer.new(@slug)
     end
+
+    def list_applications
+      employers_path = File.join(Dir.pwd, "employers")
+      return [] unless Dir.exist?(employers_path)
+
+      Dir.children(employers_path)
+        .select { |f| File.directory?(File.join(employers_path, f)) }
+        .sort
+    end
   end
 end

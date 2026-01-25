@@ -49,4 +49,45 @@ describe Jojo::Interactive do
       FileUtils.rm_rf(temp_dir)
     end
   end
+
+  describe "#list_applications" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employers_dir = File.join(@temp_dir, "employers")
+      FileUtils.mkdir_p(@employers_dir)
+      @original_dir = Dir.pwd
+      Dir.chdir(@temp_dir)
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "returns empty array when no employers exist" do
+      interactive = Jojo::Interactive.new
+      _(interactive.list_applications).must_equal []
+    end
+
+    it "returns list of employer slugs" do
+      FileUtils.mkdir_p(File.join(@employers_dir, "acme-corp"))
+      FileUtils.mkdir_p(File.join(@employers_dir, "globex-inc"))
+
+      interactive = Jojo::Interactive.new
+      apps = interactive.list_applications
+
+      _(apps).must_include "acme-corp"
+      _(apps).must_include "globex-inc"
+    end
+
+    it "excludes non-directories" do
+      FileUtils.mkdir_p(File.join(@employers_dir, "acme-corp"))
+      File.write(File.join(@employers_dir, "some-file.txt"), "test")
+
+      interactive = Jojo::Interactive.new
+      apps = interactive.list_applications
+
+      _(apps).must_equal ["acme-corp"]
+    end
+  end
 end
