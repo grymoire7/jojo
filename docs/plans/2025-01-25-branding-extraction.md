@@ -557,7 +557,7 @@ end
 
 **Step 2: Run tests**
 
-Run: `bundle exec ruby -Ilib:test test/unit/**/*_test.rb`
+Run: `./bin/jojo test --unit`
 Expected: PASS
 
 **Step 3: Commit**
@@ -573,12 +573,12 @@ git commit -m "feat(cli): generate branding as part of jojo generate"
 
 **Step 1: Run all tests**
 
-Run: `bundle exec ruby -Ilib:test -e 'Dir.glob("test/unit/**/*_test.rb").each { |f| require f.sub(/^test\//, "") }'`
+Run: `./bin/jojo test --unit`
 Expected: All tests PASS
 
 **Step 2: Run Standard Ruby**
 
-Run: `bundle exec standardrb`
+Run: `./bin/jojo test --standard`
 Expected: No offenses
 
 **Step 3: Manual verification**

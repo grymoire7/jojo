@@ -10,7 +10,9 @@ The current CLI has cognitive load issues:
 
 ## Solution
 
-Add an interactive mode (`jojo` with no args or `jojo i`) that provides a dashboard showing workflow state, guides users through the process, and tracks artifact staleness.
+Add an interactive mode (`jojo` with no args or `jojo i`) that provides a
+dashboard showing workflow state, guides users through the process, and tracks
+artifact staleness.
 
 ## Dashboard
 
@@ -19,20 +21,21 @@ Add an interactive mode (`jojo` with no args or `jojo i`) that provides a dashbo
 │  Active: acme-corp-senior-dev                        │
 │  Company: Acme Corp  •  Role: Senior Developer       │
 ├──────────────────────────────────────────────────────┤
-│  Workflow                              Status        │
+│  Workflow                             Status         │
 │  ─────────────────────────────────────────────────   │
-│  1. Job Description                    ✓ Ready       │
-│  2. Research                     💰    ✓ Generated   │
-│  3. Resume                       💰    🍞 Stale      │
-│  4. Cover Letter                 💰    ○ Ready       │
-│  5. Annotations                  💰    ○ Ready       │
-│  6. FAQ                          💰    ○ Ready       │
-│  7. Website                            🔒 Blocked    │
-│  8. PDF                                🔒 Blocked    │
+│  1. Job Description              💰   ✅ Generated   │
+│  2. Research                     💰   ✅ Generated   │
+│  3. Resume                       💰   🍞 Stale       │
+│  4. Cover Letter                 💰   ⭕ Ready       │
+│  5. Annotations                  💰   ⭕ Ready       │
+│  6. FAQ                          💰   ⭕ Ready       │
+│  7. Branding Statement           💰   ⭕ Ready       │
+│  8. Website                           🔒 Blocked     │
+│  9. PDF                               🔒 Blocked     │
 ├──────────────────────────────────────────────────────┤
-│  Status: ✓ Generated  🍞 Stale  ○ Ready  🔒 Blocked  │
+│  Status:  ✅Generated  🍞Stale  ⭕Ready  🔒Blocked   │
 ├──────────────────────────────────────────────────────┤
-│  [1-8] Generate/regenerate item    [a] All ready     │
+│  [1-7] Generate/regenerate item    [a] All ready     │
 │  [o] Open folder  [s] Switch application  [q] Quit   │
 └──────────────────────────────────────────────────────┘
 ```
@@ -41,9 +44,9 @@ Add an interactive mode (`jojo` with no args or `jojo i`) that provides a dashbo
 
 | Icon | Meaning |
 |------|---------|
-| ✓ | Generated and up-to-date |
+| ✅ | Generated and up-to-date |
 | 🍞 | Stale - generated but a dependency was regenerated since |
-| ○ | Ready - prerequisites met, can generate now |
+| ⭕ | Ready - prerequisites met, can generate now |
 | 🔒 | Blocked - missing prerequisites |
 | 💰 | Calls paid API (shown in workflow column) |
 
