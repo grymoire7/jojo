@@ -213,7 +213,7 @@ module Jojo
     def show_job_description_dialog
       clear_screen
       puts TTY::Box.frame(
-        "\n  Enter job description source (URL or file path):\n  > \n\n  [Esc] Cancel\n",
+        "\n  Enter job description source (URL or file path):\n  > \n\n  [Enter] to cancel\n",
         title: {top_left: " Job Description "},
         padding: [0, 1],
         border: :thick
