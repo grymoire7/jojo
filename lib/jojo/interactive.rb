@@ -219,5 +219,63 @@ module Jojo
       editor = ENV["EDITOR"] || "less"
       system(editor, path)
     end
+
+    def execute_step(step)
+      clear_screen
+
+      # Show generating indicator
+      puts "Generating #{step[:label].downcase}..."
+      puts "Press Ctrl+C to cancel"
+      puts
+
+      begin
+        # Build the Thor CLI instance and invoke the command
+        cli = CLI.new
+        cli.options = {slug: @slug, overwrite: true, quiet: false}
+
+        case step[:command]
+        when :new
+          puts "Use 'jojo new' command to create a new application"
+        when :research
+          cli.invoke(:research, [], slug: @slug, overwrite: true)
+        when :resume
+          cli.invoke(:resume, [], slug: @slug, overwrite: true)
+        when :cover_letter
+          cli.invoke(:cover_letter, [], slug: @slug, overwrite: true)
+        when :annotate
+          cli.invoke(:annotate, [], slug: @slug, overwrite: true)
+        when :faq
+          cli.invoke(:faq, [], slug: @slug, overwrite: true)
+        when :branding
+          cli.invoke(:branding, [], slug: @slug, overwrite: true)
+        when :website
+          cli.invoke(:website, [], slug: @slug, overwrite: true)
+        when :pdf
+          cli.invoke(:pdf, [], slug: @slug, overwrite: true)
+        end
+
+        puts
+        puts "Done! Press any key to continue..."
+        @reader.read_keypress
+      rescue => e
+        show_error_dialog(step, e.message)
+      end
+    end
+
+    def show_error_dialog(step, error_message)
+      clear_screen
+      puts UI::Dialogs.error_dialog(step[:label], error_message)
+
+      loop do
+        key = @reader.read_keypress
+        case key
+        when "r", "R"
+          execute_step(step)
+          return
+        when "\e"
+          return
+        end
+      end
+    end
   end
 end
