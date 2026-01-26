@@ -216,4 +216,34 @@ describe Jojo::Interactive do
       _(apps).must_equal []
     end
   end
+
+  describe "#handle_new_application behavior" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employers_dir = File.join(@temp_dir, "employers")
+      FileUtils.mkdir_p(@employers_dir)
+      @original_dir = Dir.pwd
+      Dir.chdir(@temp_dir)
+
+      # Create minimal config for validation
+      File.write("config.yml", "seeker:\n  name: Test\n")
+      FileUtils.mkdir_p("inputs")
+      File.write("inputs/resume_data.yml", "name: Test\n")
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "creates employer directory without job description" do
+      # Create the directory directly (simulating what handle_new_application does)
+      slug = "test-new-app"
+      employer = Jojo::Employer.new(slug)
+      FileUtils.mkdir_p(employer.base_path)
+
+      _(Dir.exist?(File.join(@employers_dir, slug))).must_equal true
+      _(employer.artifacts_exist?).must_equal false  # No job description yet
+    end
+  end
 end

@@ -368,62 +368,27 @@ module Jojo
       print @cursor.forward(5)
 
       slug = @reader.read_line.strip
-      return render_welcome if slug.empty?
-
-      clear_screen
-
-      # Prompt for job source
-      puts TTY::Box.frame(
-        "\n  Job description source:\n\n  [u] URL    [f] File path    [p] Paste text    [Esc] Cancel\n",
-        title: {top_left: " New Application "},
-        padding: [0, 1],
-        border: :thick
-      )
-
-      job_source = nil
-      loop do
-        key = @reader.read_keypress
-        case key
-        when "u", "U"
-          job_source = prompt_for_input("Enter URL:")
-          break if job_source
-        when "f", "F"
-          job_source = prompt_for_input("Enter file path:")
-          break if job_source
-        when "p", "P"
-          job_source = prompt_for_paste
-          break if job_source
-        when "\e"
-          if employer
-            render_dashboard
-          elsif list_applications.empty?
-            render_welcome
-          else
-            handle_switch
-          end
-          return
+      if slug.empty?
+        if employer
+          render_dashboard
+        elsif list_applications.empty?
+          render_welcome
+        else
+          handle_switch
         end
+        return
       end
 
-      return unless job_source
-
-      # Create the application
-      begin
+      # Check if already exists
+      new_employer = Employer.new(slug)
+      if File.exist?(new_employer.base_path)
         clear_screen
-        puts "Creating application #{slug}..."
-        puts
-
-        cli = CLI.new
-        cli.invoke(:new, [], slug: slug, job: job_source)
-
-        switch_application(slug)
-        puts
-        puts "Application created! Press any key to continue..."
-        @reader.read_keypress
-        render_dashboard
-      rescue => e
-        puts "Error: #{e.message}"
-        puts "Press any key to continue..."
+        puts TTY::Box.frame(
+          "\n  Application '#{slug}' already exists.\n\n  Press any key to continue...\n",
+          title: {top_left: " Error "},
+          padding: [0, 1],
+          border: :thick
+        )
         @reader.read_keypress
         if employer
           render_dashboard
@@ -432,7 +397,22 @@ module Jojo
         else
           handle_switch
         end
+        return
       end
+
+      # Create the directory
+      FileUtils.mkdir_p(new_employer.base_path)
+      switch_application(slug)
+
+      clear_screen
+      puts TTY::Box.frame(
+        "\n  Created application: #{slug}\n\n  Select 'Job Description' to add the job posting.\n\n  Press any key to continue...\n",
+        title: {top_left: " Success "},
+        padding: [0, 1],
+        border: :thick
+      )
+      @reader.read_keypress
+      render_dashboard
     end
 
     def prompt_for_input(prompt)
