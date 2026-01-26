@@ -3,6 +3,7 @@
 require "tty-reader"
 require "tty-cursor"
 require "tty-screen"
+require "tty-box"
 
 module Jojo
   class Interactive
@@ -50,6 +51,34 @@ module Jojo
       when "1".."9"
         key.to_i - 1  # Convert to 0-indexed
       end
+    end
+
+    def clear_screen
+      print @cursor.clear_screen
+      print @cursor.move_to(0, 0)
+    end
+
+    def render_dashboard
+      clear_screen
+      puts UI::Dashboard.render(employer)
+    end
+
+    def render_welcome
+      clear_screen
+      lines = []
+      lines << ""
+      lines << "  Welcome! No applications yet."
+      lines << ""
+      lines << "  To get started, create your first application:"
+      lines << ""
+      lines << "  [n] New application    [q] Quit"
+
+      puts TTY::Box.frame(
+        lines.join("\n"),
+        title: {top_left: " Jojo "},
+        padding: [0, 1],
+        border: :thick
+      )
     end
   end
 end
