@@ -25,7 +25,7 @@ describe Jojo::UI::Dialogs do
 
       _(output).must_include "Cover Letter"
       _(output).must_include "Generate"
-      _(output).must_include "💰"
+      _(output).must_include "$"
       _(output).must_include "resume.md"
       _(output).must_include "2 hours ago"
       _(output).must_include "cover_letter.md"
@@ -40,7 +40,7 @@ describe Jojo::UI::Dialogs do
       _(output).must_include "cover_letter.md already exists"
       _(output).must_include "1 hour ago"
       _(output).must_include "[r] Regenerate"
-      _(output).must_include "💰"
+      _(output).must_include "$"
       _(output).must_include "[v] View"
     end
   end

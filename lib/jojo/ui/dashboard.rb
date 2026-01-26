@@ -4,10 +4,10 @@ module Jojo
   module UI
     class Dashboard
       STATUS_ICONS = {
-        generated: "✅",
-        stale: "🍞",
-        ready: "⭕",
-        blocked: "🔒"
+        generated: "✓",
+        stale: "*",
+        ready: "○",
+        blocked: "×"
       }.freeze
 
       FILLED_CHAR = "█"
@@ -25,7 +25,7 @@ module Jojo
       end
 
       def self.paid_icon(is_paid)
-        is_paid ? "💰" : "  "
+        is_paid ? "$" : " "
       end
 
       def self.workflow_line(number, step, status, width: 54)
@@ -34,7 +34,7 @@ module Jojo
         status_str = status_icon(status)
         status_label = status.to_s.capitalize
 
-        # Format: "  N. Label                    💰   ✅ Generated"
+        # Format: "  N. Label                    $   ✓ Generated"
         label_width = 28
         padded_label = label.ljust(label_width)
 
@@ -63,7 +63,7 @@ module Jojo
         end
 
         lines << ""
-        lines << "  Status:  ✅Generated  🍞Stale  ⭕Ready  🔒Blocked"
+        lines << "  Status: ✓ Generated  * Stale  ○ Ready  × Blocked"
         lines << ""
         lines << "  [1-9] Generate item    [a] All ready    [q] Quit"
         lines << "  [o] Open folder    [s] Switch application"

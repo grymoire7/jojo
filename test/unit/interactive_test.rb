@@ -27,8 +27,15 @@ describe Jojo::Interactive do
 
   describe "#employer" do
     it "returns nil when no slug set" do
+      temp_dir = Dir.mktmpdir
+      original_dir = Dir.pwd
+      Dir.chdir(temp_dir)
+
       interactive = Jojo::Interactive.new
       _(interactive.employer).must_be_nil
+
+      Dir.chdir(original_dir)
+      FileUtils.rm_rf(temp_dir)
     end
 
     it "returns Employer instance when slug is set" do

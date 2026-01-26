@@ -5,29 +5,29 @@ require_relative "../../test_helper"
 describe Jojo::UI::Dashboard do
   describe ".status_icon" do
     it "returns checkmark for generated" do
-      _(Jojo::UI::Dashboard.status_icon(:generated)).must_equal "✅"
+      _(Jojo::UI::Dashboard.status_icon(:generated)).must_equal "✓"
     end
 
     it "returns bread for stale" do
-      _(Jojo::UI::Dashboard.status_icon(:stale)).must_equal "🍞"
+      _(Jojo::UI::Dashboard.status_icon(:stale)).must_equal "*"
     end
 
     it "returns circle for ready" do
-      _(Jojo::UI::Dashboard.status_icon(:ready)).must_equal "⭕"
+      _(Jojo::UI::Dashboard.status_icon(:ready)).must_equal "○"
     end
 
     it "returns lock for blocked" do
-      _(Jojo::UI::Dashboard.status_icon(:blocked)).must_equal "🔒"
+      _(Jojo::UI::Dashboard.status_icon(:blocked)).must_equal "×"
     end
   end
 
   describe ".paid_icon" do
     it "returns money bag for paid commands" do
-      _(Jojo::UI::Dashboard.paid_icon(true)).must_equal "💰"
+      _(Jojo::UI::Dashboard.paid_icon(true)).must_equal "$"
     end
 
     it "returns empty string for free commands" do
-      _(Jojo::UI::Dashboard.paid_icon(false)).must_equal "  "
+      _(Jojo::UI::Dashboard.paid_icon(false)).must_equal " "
     end
   end
 
@@ -60,8 +60,8 @@ describe Jojo::UI::Dashboard do
 
       _(line).must_include "3."
       _(line).must_include "Resume"
-      _(line).must_include "💰"
-      _(line).must_include "✅"
+      _(line).must_include "$"
+      _(line).must_include "✓"
     end
 
     it "pads label to align columns" do
@@ -69,7 +69,7 @@ describe Jojo::UI::Dashboard do
       line = Jojo::UI::Dashboard.workflow_line(6, step, :ready, width: 50)
 
       # Label should be padded
-      _(line).must_match(/FAQ\s+💰/)
+      _(line).must_match(/FAQ\s+\$/)
     end
   end
 
@@ -102,10 +102,10 @@ describe Jojo::UI::Dashboard do
     it "includes status legend" do
       output = Jojo::UI::Dashboard.render(@employer)
 
-      _(output).must_include "✅Generated"
-      _(output).must_include "🍞Stale"
-      _(output).must_include "⭕Ready"
-      _(output).must_include "🔒Blocked"
+      _(output).must_include "✓ Generated"
+      _(output).must_include "* Stale"
+      _(output).must_include "○ Ready"
+      _(output).must_include "× Blocked"
     end
   end
 end

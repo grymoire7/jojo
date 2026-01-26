@@ -24,7 +24,7 @@ module Jojo
       end
 
       def self.ready_dialog(label, inputs, output_file, paid: false)
-        paid_str = paid ? " 💰" : ""
+        paid_str = paid ? " $" : ""
 
         lines = []
         lines << "  Generate #{label.downcase}?#{paid_str}"
@@ -49,7 +49,7 @@ module Jojo
       end
 
       def self.generated_dialog(label, age, paid: false)
-        paid_str = paid ? " 💰" : ""
+        paid_str = paid ? " $" : ""
         output_file = label.downcase.tr(" ", "_") + ".md"
 
         lines = []
