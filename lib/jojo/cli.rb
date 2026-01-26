@@ -25,6 +25,8 @@ module Jojo
       true
     end
 
+    default_task :interactive
+
     desc "version", "Show version"
     def version
       say "Jojo #{Jojo::VERSION}", :green
@@ -808,6 +810,14 @@ module Jojo
       else
         exec test_cmd
       end
+    end
+
+    desc "interactive", "Launch interactive dashboard mode"
+    method_option :slug, type: :string, aliases: "-s", desc: "Application slug to start with"
+    map "i" => :interactive
+    def interactive
+      slug = options[:slug] || ENV["JOJO_EMPLOYER_SLUG"]
+      Jojo::Interactive.new(slug: slug).run
     end
 
     private
