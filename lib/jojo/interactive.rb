@@ -213,7 +213,7 @@ module Jojo
     def show_job_description_dialog
       clear_screen
       puts TTY::Box.frame(
-        "\n  Enter job description source (URL or file path):\n  > \n\n  [Enter] to cancel\n",
+        "\n  Enter job description source (URL or file path):\n  > \n\n  [Esc] Cancel\n",
         title: {top_left: " Job Description "},
         padding: [0, 1],
         border: :thick
@@ -222,8 +222,8 @@ module Jojo
       print @cursor.up(4)
       print @cursor.forward(5)
 
-      source = @reader.read_line.strip
-      if source.empty?
+      source = read_line_with_escape
+      if source.nil? || source.empty?
         render_dashboard
         return
       end
@@ -247,6 +247,29 @@ module Jojo
       end
 
       render_dashboard
+    end
+
+    def read_line_with_escape
+      input = ""
+      loop do
+        char = @reader.read_keypress
+        case char
+        when "\e" # Escape
+          return nil
+        when "\r", "\n" # Enter
+          return input
+        when "\u007F", "\b" # Backspace (DEL and BS)
+          if input.length > 0
+            input = input[0..-2]
+            print "\b \b" # Move back, overwrite with space, move back
+          end
+        else
+          if char.is_a?(String) && char.length == 1 && char.ord >= 32 # Printable
+            input += char
+            print char
+          end
+        end
+      end
     end
 
     def time_ago(time)
