@@ -46,18 +46,16 @@ module Jojo
       exit 1
     end
 
-    desc "new", "Create employer workspace with job description"
+    desc "new", "Create a new job application workspace"
     long_desc <<~DESC, wrap: false
-      Create a new employer workspace and process the job description.
-      This command initializes all artifacts needed for generating application materials.
+      Create a new employer workspace directory.
+      After creating, use 'jojo job_description' to process the job description.
 
       Examples:
-        jojo new -s acme-corp-senior-dev -j job_description.txt
-        jojo new -s bigco-principal -j https://careers.bigco.com/jobs/123
-        jojo new -s acme-corp-senior-dev -j job.txt --overwrite
+        jojo new -s acme-corp-senior-dev
+        jojo new -s bigco-principal
     DESC
     method_option :slug, type: :string, aliases: "-s", required: true, desc: "Unique employer identifier"
-    method_option :job, type: :string, aliases: "-j", required: true, desc: "Job description (file path or URL)"
     def new
       # Validate required inputs exist before creating employer
       begin
@@ -82,27 +80,17 @@ module Jojo
         exit 1
       end
 
-      config = Jojo::Config.new
       employer = Jojo::Employer.new(options[:slug])
-      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
 
-      say "Creating employer workspace: #{options[:slug]}", :green
-
-      # Create artifacts
-      begin
-        employer.create_artifacts(options[:job], ai_client, overwrite_flag: options[:overwrite], cli_instance: self, verbose: options[:verbose])
-
-        say "✓ Created employer directory: #{employer.base_path}", :green
-        say "✓ Job description processed and saved", :green
-        say "✓ Job details extracted and saved", :green
-        say "\nNext steps:", :cyan
-        say "  jojo research -s #{options[:slug]}", :white
-        say "  jojo resume -s #{options[:slug]}", :white
-        say "  jojo cover_letter -s #{options[:slug]}", :white
-      rescue => e
-        say "✗ Error creating employer workspace: #{e.message}", :red
+      if File.exist?(employer.base_path)
+        say "Application '#{options[:slug]}' already exists.", :yellow
         exit 1
       end
+
+      FileUtils.mkdir_p(employer.base_path)
+      say "Created application workspace: #{employer.base_path}", :green
+      say "\nNext step:", :cyan
+      say "  jojo job_description -s #{options[:slug]} -j <job_file_or_url>", :white
     end
 
     desc "job_description", "Process job description for an application"

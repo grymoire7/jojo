@@ -12,9 +12,9 @@ class CLINewTest < Minitest::Test
     File.write(".env", "ANTHROPIC_API_KEY=test_key\n")
     File.write("config.yml", "seeker:\n  name: Test User\n  base_url: https://example.com\n")
 
-    # Create test job description file
-    @job_file = File.join(@tmpdir, "job.txt")
-    File.write(@job_file, "Test job description\nSenior Engineer at Acme Corp\n")
+    # Create inputs directory with resume data
+    FileUtils.mkdir_p("inputs")
+    File.write("inputs/resume_data.yml", "name: Test User\nemail: test@example.com\n")
   end
 
   def teardown
@@ -24,20 +24,32 @@ class CLINewTest < Minitest::Test
 
   def test_new_command_requires_slug
     out, err = capture_subprocess_io do
-      system("#{File.join(@original_dir, "bin/jojo")} new -j #{@job_file} 2>&1 || true")
+      system("#{File.join(@original_dir, "bin/jojo")} new 2>&1 || true")
     end
 
     output = out + err
     assert_match(/required.*slug/i, output)
   end
 
-  def test_new_command_requires_job
+  def test_new_command_creates_employer_directory
     out, err = capture_subprocess_io do
-      system("#{File.join(@original_dir, "bin/jojo")} new -s test-employer 2>&1 || true")
+      system("#{File.join(@original_dir, "bin/jojo")} new -s test-employer 2>&1")
     end
 
     output = out + err
-    assert_match(/required.*job/i, output)
+    assert_match(/created/i, output)
+    assert Dir.exist?("employers/test-employer")
+  end
+
+  def test_new_command_fails_if_directory_already_exists
+    FileUtils.mkdir_p("employers/existing-employer")
+
+    out, err = capture_subprocess_io do
+      system("#{File.join(@original_dir, "bin/jojo")} new -s existing-employer 2>&1 || true")
+    end
+
+    output = out + err
+    assert_match(/already exists/i, output)
   end
 
   def test_employer_initialize_with_slug
