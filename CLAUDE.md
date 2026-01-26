@@ -43,9 +43,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-| Command | Description |
-| ------- | ----------- |
-|         |             |
+| Command                            | Description                                          |
+| ---------------------------------- | ---------------------------------------------------- |
+| ./bin/jojo help                    | Display help for using jojo from the CLI.            |
+| ./bin/jojo help [command]          | Display help for a particular jojo command.          |
+| ./bin/jojo test --all --no-service | Run all tests that don't cost money. Use this often. |
 
 ## Common Tasks
 
