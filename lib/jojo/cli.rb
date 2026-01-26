@@ -105,6 +105,47 @@ module Jojo
       end
     end
 
+    desc "job_description", "Process job description for an application"
+    long_desc <<~DESC, wrap: false
+      Process a job description for an existing employer workspace.
+      This extracts and saves the job description and key details.
+
+      Examples:
+        jojo job_description -s acme-corp-senior-dev -j job.txt
+        jojo job_description -s bigco-principal -j https://careers.bigco.com/jobs/123
+        jojo job_description -j job.txt  # Uses current application from state
+    DESC
+    method_option :slug, type: :string, aliases: "-s", desc: "Application slug (uses current if omitted)"
+    method_option :job, type: :string, aliases: "-j", required: true, desc: "Job description (file path or URL)"
+    def job_description
+      slug = options[:slug] || StatePersistence.load_slug
+      unless slug
+        say "No application specified. Use -s or select one in interactive mode.", :red
+        exit 1
+      end
+
+      employer = Jojo::Employer.new(slug)
+      unless File.exist?(employer.base_path)
+        say "Application '#{slug}' does not exist. Run 'jojo new -s #{slug}' first.", :red
+        exit 1
+      end
+
+      config = Jojo::Config.new
+      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
+
+      say "Processing job description for: #{slug}", :green
+
+      begin
+        employer.create_artifacts(options[:job], ai_client, overwrite_flag: options[:overwrite], cli_instance: self, verbose: options[:verbose])
+
+        say "-> Job description processed and saved", :green
+        say "-> Job details extracted and saved", :green
+      rescue => e
+        say "Error processing job description: #{e.message}", :red
+        exit 1
+      end
+    end
+
     desc "annotate", "Generate job description annotations"
     long_desc <<~DESC, wrap: false
       Generate annotations for the job description showing how your experience matches.
