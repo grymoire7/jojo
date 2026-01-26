@@ -277,5 +277,68 @@ module Jojo
         end
       end
     end
+
+    def handle_switch
+      apps = list_applications
+      return render_welcome if apps.empty?
+
+      clear_screen
+
+      lines = []
+      lines << ""
+      lines << "  Recent applications:"
+      lines << ""
+
+      apps.each_with_index do |app_slug, idx|
+        next if idx >= 9  # Only show first 9
+
+        # Get progress for this app
+        app_employer = Employer.new(app_slug)
+        if File.exist?(app_employer.base_path)
+          progress = Workflow.progress(app_employer)
+          progress_bar = UI::Dashboard.progress_bar(progress, width: 10)
+          progress_str = (progress == 100) ? "Done" : "#{progress}%"
+          company = app_employer.company_name
+
+          lines << "  #{idx + 1}. #{app_slug.ljust(25)} #{progress_bar}  #{progress_str}"
+          lines << "     #{company}"
+        else
+          lines << "  #{idx + 1}. #{app_slug}"
+        end
+        lines << ""
+      end
+
+      lines << "  [1-#{[apps.length, 9].min}] Select    [n] New application    [Esc] Back"
+
+      puts TTY::Box.frame(
+        lines.join("\n"),
+        title: {top_left: " Switch Application "},
+        padding: [0, 1],
+        border: :thick
+      )
+
+      loop do
+        key = @reader.read_keypress
+        case key
+        when "1".."9"
+          idx = key.to_i - 1
+          if idx < apps.length
+            switch_application(apps[idx])
+            render_dashboard
+            return
+          end
+        when "n", "N"
+          handle_new_application
+          return
+        when "\e"
+          if employer
+            render_dashboard
+          else
+            render_welcome
+          end
+          return
+        end
+      end
+    end
   end
 end
