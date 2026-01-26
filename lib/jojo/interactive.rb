@@ -444,5 +444,68 @@ module Jojo
     rescue Interrupt
       nil
     end
+
+    def handle_open
+      return unless employer
+
+      path = employer.base_path
+      if RUBY_PLATFORM.include?("darwin")
+        system("open", path)
+      elsif RUBY_PLATFORM.include?("linux")
+        system("xdg-open", path)
+      else
+        puts "Cannot open folder on this platform"
+        sleep 1
+      end
+    end
+
+    def handle_generate_all
+      return unless employer
+
+      statuses = Workflow.all_statuses(employer)
+      ready_steps = Workflow::STEPS.select { |s| [:ready, :stale].include?(statuses[s[:key]]) }
+
+      return if ready_steps.empty?
+
+      clear_screen
+      puts "Generating all ready items..."
+      puts
+
+      ready_steps.each do |step|
+        puts "-> #{step[:label]}..."
+        execute_step_quietly(step)
+      end
+
+      puts
+      puts "Done! Press any key to continue..."
+      @reader.read_keypress
+      render_dashboard
+    end
+
+    def execute_step_quietly(step)
+      cli = CLI.new
+      cli.options = {slug: @slug, overwrite: true, quiet: true}
+
+      case step[:command]
+      when :research
+        cli.invoke(:research, [], slug: @slug, overwrite: true, quiet: true)
+      when :resume
+        cli.invoke(:resume, [], slug: @slug, overwrite: true, quiet: true)
+      when :cover_letter
+        cli.invoke(:cover_letter, [], slug: @slug, overwrite: true, quiet: true)
+      when :annotate
+        cli.invoke(:annotate, [], slug: @slug, overwrite: true, quiet: true)
+      when :faq
+        cli.invoke(:faq, [], slug: @slug, overwrite: true, quiet: true)
+      when :branding
+        cli.invoke(:branding, [], slug: @slug, overwrite: true, quiet: true)
+      when :website
+        cli.invoke(:website, [], slug: @slug, overwrite: true, quiet: true)
+      when :pdf
+        cli.invoke(:pdf, [], slug: @slug, overwrite: true, quiet: true)
+      end
+    rescue => e
+      puts "  Error: #{e.message}"
+    end
   end
 end
