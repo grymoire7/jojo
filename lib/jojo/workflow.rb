@@ -7,7 +7,7 @@ module Jojo
         key: :job_description,
         label: "Job Description",
         dependencies: [],
-        command: :new,
+        command: :job_description,
         paid: false,
         output_file: "job_description.md"
       },
