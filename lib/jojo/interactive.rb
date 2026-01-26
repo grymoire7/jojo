@@ -156,6 +156,12 @@ module Jojo
     end
 
     def show_ready_dialog(step, status)
+      # Special handling for job_description step - needs to prompt for source
+      if step[:key] == :job_description
+        show_job_description_dialog
+        return
+      end
+
       inputs = step[:dependencies].map do |dep_key|
         dep_step = Workflow::STEPS.find { |s| s[:key] == dep_key }
         path = Workflow.file_path(dep_key, employer)
@@ -204,6 +210,45 @@ module Jojo
       render_dashboard
     end
 
+    def show_job_description_dialog
+      clear_screen
+      puts TTY::Box.frame(
+        "\n  Enter job description source (URL or file path):\n  > \n\n  [Esc] Cancel\n",
+        title: {top_left: " Job Description "},
+        padding: [0, 1],
+        border: :thick
+      )
+
+      print @cursor.up(4)
+      print @cursor.forward(5)
+
+      source = @reader.read_line.strip
+      if source.empty?
+        render_dashboard
+        return
+      end
+
+      clear_screen
+      puts "Processing job description..."
+      puts "Press Ctrl+C to cancel"
+      puts
+
+      begin
+        cli = CLI.new
+        cli.invoke(:job_description, [], slug: @slug, job: source, overwrite: true)
+
+        puts
+        puts "Done! Press any key to continue..."
+        @reader.read_keypress
+      rescue => e
+        puts "Error: #{e.message}"
+        puts "Press any key to continue..."
+        @reader.read_keypress
+      end
+
+      render_dashboard
+    end
+
     def time_ago(time)
       seconds = Time.now - time
       case seconds
@@ -237,8 +282,9 @@ module Jojo
         cli.options = {slug: @slug, overwrite: true, quiet: false}
 
         case step[:command]
-        when :new
-          puts "Use 'jojo new' command to create a new application"
+        when :job_description
+          # Should not reach here - handled by show_job_description_dialog
+          puts "Use step 1 to add job description"
         when :research
           cli.invoke(:research, [], slug: @slug, overwrite: true)
         when :resume

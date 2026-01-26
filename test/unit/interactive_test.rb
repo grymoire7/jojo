@@ -246,4 +246,35 @@ describe Jojo::Interactive do
       _(employer.artifacts_exist?).must_equal false  # No job description yet
     end
   end
+
+  describe "#handle_step_selection for job_description" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employers_dir = File.join(@temp_dir, "employers")
+      @original_dir = Dir.pwd
+      Dir.chdir(@temp_dir)
+
+      # Create employer without job description
+      @slug = "no-job-desc"
+      FileUtils.mkdir_p(File.join(@employers_dir, @slug))
+
+      # Create minimal config
+      File.write("config.yml", "seeker:\n  name: Test\n")
+      FileUtils.mkdir_p("inputs")
+      File.write("inputs/resume_data.yml", "name: Test\n")
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "shows ready status when job description is missing" do
+      interactive = Jojo::Interactive.new(slug: @slug)
+      status = Jojo::Workflow.status(:job_description, interactive.employer)
+
+      # Job description has no dependencies, so it's always ready when missing
+      _(status).must_equal :ready
+    end
+  end
 end
