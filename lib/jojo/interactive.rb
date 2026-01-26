@@ -80,5 +80,43 @@ module Jojo
         border: :thick
       )
     end
+
+    def run
+      @running = true
+
+      # Initial render
+      if employer && File.exist?(employer.base_path)
+        render_dashboard
+      else
+        render_welcome
+      end
+
+      while @running
+        key = @reader.read_keypress
+
+        action = handle_key(key)
+        case action
+        when :quit
+          @running = false
+          clear_screen
+          puts "Goodbye!"
+        when :switch
+          handle_switch
+        when :open
+          handle_open
+        when :all
+          handle_generate_all
+        when :new
+          handle_new_application
+        when Integer
+          handle_step_selection(action) if employer
+        end
+      end
+    rescue TTY::Reader::InputInterrupt
+      # Ctrl+C pressed
+      @running = false
+      clear_screen
+      puts "Interrupted. Goodbye!"
+    end
   end
 end
