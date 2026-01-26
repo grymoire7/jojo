@@ -85,10 +85,13 @@ module Jojo
       @running = true
 
       # Initial render
+      apps = list_applications
       if employer && File.exist?(employer.base_path)
         render_dashboard
-      else
+      elsif apps.empty?
         render_welcome
+      else
+        handle_switch
       end
 
       while @running
@@ -308,7 +311,7 @@ module Jojo
         lines << ""
       end
 
-      lines << "  [1-#{[apps.length, 9].min}] Select    [n] New application    [Esc] Back"
+      lines << "  [1-#{[apps.length, 9].min}] Select    [n] New application    [Esc] Back    [q] Quit"
 
       puts TTY::Box.frame(
         lines.join("\n"),
@@ -334,8 +337,16 @@ module Jojo
           if employer
             render_dashboard
           else
-            render_welcome
+            # No employer to go back to, treat as quit
+            @running = false
+            clear_screen
+            puts "Goodbye!"
           end
+          return
+        when "q", "Q"
+          @running = false
+          clear_screen
+          puts "Goodbye!"
           return
         end
       end
@@ -383,8 +394,13 @@ module Jojo
           job_source = prompt_for_paste
           break if job_source
         when "\e"
-          render_welcome if employer.nil?
-          render_dashboard if employer
+          if employer
+            render_dashboard
+          elsif list_applications.empty?
+            render_welcome
+          else
+            handle_switch
+          end
           return
         end
       end
@@ -409,7 +425,13 @@ module Jojo
         puts "Error: #{e.message}"
         puts "Press any key to continue..."
         @reader.read_keypress
-        render_welcome
+        if employer
+          render_dashboard
+        elsif list_applications.empty?
+          render_welcome
+        else
+          handle_switch
+        end
       end
     end
 

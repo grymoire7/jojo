@@ -33,6 +33,7 @@ describe "FAQ Workflow Integration" do
     File.write(@employer.job_description_path, "We need a senior Ruby developer with 5+ years experience.")
     File.write(@employer.resume_path, "# John Doe\n\nSenior Ruby developer with 7 years of experience.")
     File.write(@employer.research_path, "Integration Test Corp is a fast-growing startup.")
+    File.write(@employer.branding_path, "I am excited to apply because my Ruby experience matches your needs.")
   end
 
   after do
@@ -73,8 +74,6 @@ describe "FAQ Workflow Integration" do
       verbose: false
     )
 
-    @ai_client.expect(:generate_text, "I am excited to apply...", [String])
-
     html = website_generator.generate
 
     _(html).must_include "Your Questions, Answered"
@@ -97,8 +96,6 @@ describe "FAQ Workflow Integration" do
     # Don't create FAQ file
     FileUtils.rm_f(@employer.faq_path) if File.exist?(@employer.faq_path)
 
-    @ai_client.expect(:generate_text, "Branding statement", [String])
-
     html = website_generator.generate
 
     _(html).wont_include "Your Questions, Answered"
@@ -118,8 +115,6 @@ describe "FAQ Workflow Integration" do
       verbose: false
     )
 
-    @ai_client.expect(:generate_text, "Branding statement", [String])
-
     html = website_generator.generate
 
     _(html).wont_include "Your Questions, Answered"
@@ -138,8 +133,6 @@ describe "FAQ Workflow Integration" do
       config: @config,
       verbose: false
     )
-
-    @ai_client.expect(:generate_text, "Branding statement", [String])
 
     html = website_generator.generate
 

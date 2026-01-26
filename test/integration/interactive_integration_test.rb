@@ -88,4 +88,57 @@ describe "Interactive Mode Integration" do
       _(status).must_equal :stale
     end
   end
+
+  describe "with multiple applications but no employer selected" do
+    before do
+      # Create multiple applications
+      @app1 = "acme-corp"
+      @app2 = "globex-inc"
+
+      [@app1, @app2].each do |slug|
+        app_dir = File.join(@employers_dir, slug)
+        FileUtils.mkdir_p(app_dir)
+        File.write(File.join(app_dir, "job_description.md"), "Job for #{slug}")
+        File.write(File.join(app_dir, "job_details.yml"), "company_name: #{slug}\njob_title: Developer")
+      end
+    end
+
+    it "lists all available applications" do
+      interactive = Jojo::Interactive.new
+      apps = interactive.list_applications
+
+      _(apps.length).must_equal 2
+      _(apps).must_include @app1
+      _(apps).must_include @app2
+    end
+
+    it "has no current employer when slug not provided" do
+      interactive = Jojo::Interactive.new
+      _(interactive.employer).must_be_nil
+      _(interactive.slug).must_be_nil
+    end
+
+    it "can switch between applications" do
+      interactive = Jojo::Interactive.new
+
+      # Switch to first app
+      interactive.switch_application(@app1)
+      _(interactive.slug).must_equal @app1
+      _(interactive.employer.slug).must_equal @app1
+
+      # Switch to second app
+      interactive.switch_application(@app2)
+      _(interactive.slug).must_equal @app2
+      _(interactive.employer.slug).must_equal @app2
+    end
+
+    it "persists slug selection across Interactive instances" do
+      interactive1 = Jojo::Interactive.new
+      interactive1.switch_application(@app1)
+
+      # Create new instance - should load saved slug
+      interactive2 = Jojo::Interactive.new
+      _(interactive2.slug).must_equal @app1
+    end
+  end
 end

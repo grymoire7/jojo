@@ -32,6 +32,7 @@ describe "Website Generation Workflow" do
     File.write(@employer.job_details_path, "company_name: Test Company\nposition_title: Senior Ruby Developer\n")
     File.write(@employer.resume_path, "# John Doe\n\n## Professional Summary\n\nSenior Ruby developer with 10 years experience...")
     File.write(@employer.research_path, "# Company Profile\n\nTest Company is an innovative tech startup...")
+    File.write(@employer.branding_path, "I'm excited about Test Company because my background in Ruby development aligns perfectly with your needs.\n\nWith 10 years of experience, I've built scalable web applications.")
   end
 
   after do
@@ -39,10 +40,6 @@ describe "Website Generation Workflow" do
   end
 
   it "generates complete website from end to end" do
-    expected_branding = "I'm excited about Test Company because my background in Ruby development aligns perfectly with your needs.\n\nWith 10 years of experience, I've built scalable web applications."
-
-    @ai_client.expect(:generate_text, expected_branding, [String])
-
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
       @ai_client,
@@ -100,9 +97,6 @@ describe "Website Generation Workflow" do
     HTML
     File.write("templates/website/custom.html.erb", custom_template)
 
-    expected_branding = "Custom branding statement..."
-    @ai_client.expect(:generate_text, expected_branding, [String])
-
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
       @ai_client,
@@ -115,7 +109,7 @@ describe "Website Generation Workflow" do
 
     _(result).must_include "Custom Template"
     _(result).must_include "John Doe - Test Company"
-    _(result).must_include expected_branding
+    _(result).must_include "I'm excited about Test Company"
     _(result).must_include "https://calendly.com/johndoe/30min"
 
     FileUtils.rm_f("templates/website/custom.html.erb")
@@ -123,9 +117,6 @@ describe "Website Generation Workflow" do
   end
 
   it "handles branding image workflow" do
-    expected_branding = "Branding with image..."
-    @ai_client.expect(:generate_text, expected_branding, [String])
-
     # Use test/fixtures which has branding_image.jpg
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
@@ -152,9 +143,6 @@ describe "Website Generation Workflow" do
   it "generates website without CTA when not configured" do
     @config.website_cta_link = nil  # No CTA configured
 
-    expected_branding = "Branding without CTA..."
-    @ai_client.expect(:generate_text, expected_branding, [String])
-
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
       @ai_client,
@@ -172,7 +160,7 @@ describe "Website Generation Workflow" do
 
     # But rest of website should be intact
     _(html).must_include "Am I a good match for Test Company?"
-    _(html).must_include "Branding without CTA"
+    _(html).must_include "I'm excited about Test Company"
 
     @ai_client.verify
   end
@@ -180,9 +168,6 @@ describe "Website Generation Workflow" do
   it "gracefully handles missing optional inputs" do
     # Remove optional files
     FileUtils.rm_f(@employer.research_path)
-
-    expected_branding = "Branding without research..."
-    @ai_client.expect(:generate_text, expected_branding, [String])
 
     generator = Jojo::Generators::WebsiteGenerator.new(
       @employer,
@@ -195,7 +180,7 @@ describe "Website Generation Workflow" do
     result = generator.generate
 
     _(File.exist?(@employer.index_html_path)).must_equal true
-    _(result).must_include expected_branding
+    _(result).must_include "I'm excited about Test Company"
 
     @ai_client.verify
   end

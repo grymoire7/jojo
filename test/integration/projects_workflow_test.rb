@@ -21,6 +21,7 @@ describe "Projects Integration Workflow" do
     YAML
 
     File.write(@employer.resume_path, "# Generic Resume\n\nExperience with Ruby...")
+    File.write(@employer.branding_path, "I'm excited about this opportunity because of my Ruby experience.")
 
     # Create separate test directory to avoid conflicts
     @test_fixtures_dir = Dir.mktmpdir("jojo-test-fixtures-")
@@ -71,7 +72,6 @@ describe "Projects Integration Workflow" do
     config = Jojo::Config.new("test/fixtures/valid_config.yml")
 
     mock_ai = Minitest::Mock.new
-    mock_ai.expect :generate_text, "Branding statement", [String]
 
     generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: config, template: "default", inputs_path: @test_fixtures_dir)
     generator.generate

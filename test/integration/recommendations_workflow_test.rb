@@ -28,6 +28,7 @@ describe "Recommendations Workflow Integration" do
     FileUtils.mkdir_p(@employer.base_path)
     File.write(@employer.job_description_path, "Software Engineer position")
     File.write(@employer.resume_path, "My resume content")
+    File.write(@employer.branding_path, "I am the perfect fit for this opportunity.")
 
     # Create test inputs directory (NOT production inputs/)
     @inputs_path = "test/fixtures/tmp_recommendations"
@@ -35,7 +36,6 @@ describe "Recommendations Workflow Integration" do
 
     # Mock AI client
     @ai_client = Minitest::Mock.new
-    @ai_client.expect(:generate_text, "I am the perfect fit", [String])
 
     # Config stub
     @config = RecommendationsWorkflowTestConfigStub.new

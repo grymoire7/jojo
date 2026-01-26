@@ -33,6 +33,7 @@ describe "Annotated Job Description Integration" do
     File.write(@employer.job_description_path, @job_description)
     File.write(@employer.job_details_path, "company_name: TechCorp\nposition_title: Senior Ruby Developer\n")
     File.write(@employer.resume_path, @resume)
+    File.write(@employer.branding_path, "I'm a great fit for TechCorp...")
   end
 
   after do
@@ -61,8 +62,6 @@ describe "Annotated Job Description Integration" do
       verbose: false,
       inputs_path: "test/fixtures"
     )
-
-    @ai_client.expect(:generate_text, "I'm a great fit for TechCorp...", [String])
 
     html = website_generator.generate
 
@@ -97,8 +96,6 @@ describe "Annotated Job Description Integration" do
       verbose: false,
       inputs_path: "test/fixtures"
     )
-
-    @ai_client.expect(:generate_text, "I'm a great fit for TechCorp...", [String])
 
     html = website_generator.generate
 

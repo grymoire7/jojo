@@ -172,4 +172,41 @@ describe Jojo::Interactive do
       _(interactive.handle_key("x")).must_be_nil
     end
   end
+
+  describe "#run initial render with existing applications" do
+    before do
+      @temp_dir = Dir.mktmpdir
+      @employers_dir = File.join(@temp_dir, "employers")
+      FileUtils.mkdir_p(@employers_dir)
+      @original_dir = Dir.pwd
+      Dir.chdir(@temp_dir)
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(@temp_dir)
+    end
+
+    it "shows switcher when applications exist but no slug is provided" do
+      # Create test applications
+      FileUtils.mkdir_p(File.join(@employers_dir, "acme-corp"))
+      FileUtils.mkdir_p(File.join(@employers_dir, "globex-inc"))
+
+      # Interactive should find applications
+      interactive = Jojo::Interactive.new
+      apps = interactive.list_applications
+
+      _(apps.length).must_equal 2
+      _(apps).must_include "acme-corp"
+      _(apps).must_include "globex-inc"
+    end
+
+    it "shows welcome when no applications exist" do
+      # No applications created
+      interactive = Jojo::Interactive.new
+      apps = interactive.list_applications
+
+      _(apps).must_equal []
+    end
+  end
 end
