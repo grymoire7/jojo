@@ -213,16 +213,13 @@ module Jojo
     def show_job_description_dialog
       clear_screen
       puts TTY::Box.frame(
-        "\n  Enter job description source (URL or file path):\n  > \n\n  [Esc] Cancel\n",
+        "\n  Enter job description source (URL or file path)\n  at the prompt below.\n\n  [Esc] Cancel\n",
         title: {top_left: " Job Description "},
         padding: [0, 1],
         border: :thick
       )
 
-      print @cursor.up(4)
-      print @cursor.forward(5)
-
-      source = read_line_with_escape
+      source = read_line_with_escape("> ")
       if source.nil? || source.empty?
         render_dashboard
         return
@@ -249,7 +246,7 @@ module Jojo
       render_dashboard
     end
 
-    def read_line_with_escape
+    def read_line_with_escape(prompt = "")
       # Use a fresh reader to avoid accumulating handlers
       reader = TTY::Reader.new
 
@@ -257,7 +254,7 @@ module Jojo
         return nil  # Returns from read_line_with_escape method
       end
 
-      reader.read_line.strip
+      reader.read_line(prompt).strip
     end
 
     def time_ago(time)
@@ -414,17 +411,13 @@ module Jojo
 
       # Prompt for slug
       puts TTY::Box.frame(
-        "\n  Slug (e.g., acme-corp-senior-dev):\n  > \n",
+        "\n  Enter slug (e.g., acme-corp-senior-dev)\n  at the prompt below.\n",
         title: {top_left: " New Application "},
         padding: [0, 1],
         border: :thick
       )
 
-      # Move cursor into the input area
-      print @cursor.up(3)
-      print @cursor.forward(5)
-
-      slug = @reader.read_line.strip
+      slug = @reader.read_line("> ").strip
       if slug.empty?
         if employer
           render_dashboard
@@ -475,16 +468,13 @@ module Jojo
     def prompt_for_input(prompt)
       clear_screen
       puts TTY::Box.frame(
-        "\n  #{prompt}\n  > \n",
+        "\n  #{prompt}\n  Enter at the prompt below.\n",
         title: {top_left: " New Application "},
         padding: [0, 1],
         border: :thick
       )
 
-      print @cursor.up(3)
-      print @cursor.forward(5)
-
-      input = @reader.read_line.strip
+      input = @reader.read_line("> ").strip
       input.empty? ? nil : input
     end
 
