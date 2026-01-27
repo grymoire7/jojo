@@ -250,26 +250,14 @@ module Jojo
     end
 
     def read_line_with_escape
-      input = ""
-      loop do
-        char = @reader.read_keypress
-        case char
-        when "\e" # Escape
-          return nil
-        when "\r", "\n" # Enter
-          return input
-        when "\u007F", "\b" # Backspace (DEL and BS)
-          if input.length > 0
-            input = input[0..-2]
-            print "\b \b" # Move back, overwrite with space, move back
-          end
-        else
-          if char.is_a?(String) && char.length == 1 && char.ord >= 32 # Printable
-            input += char
-            print char
-          end
-        end
+      # Use a fresh reader to avoid accumulating handlers
+      reader = TTY::Reader.new
+
+      reader.on(:keyescape) do
+        return nil  # Returns from read_line_with_escape method
       end
+
+      reader.read_line.strip
     end
 
     def time_ago(time)
