@@ -1,5 +1,3 @@
-require "erb"
-require "fileutils"
 require_relative "commands/version/command"
 require_relative "commands/annotate/command"
 require_relative "commands/research/command"
@@ -14,8 +12,6 @@ require_relative "commands/new/command"
 require_relative "commands/job_description/command"
 require_relative "commands/test/command"
 require_relative "commands/interactive/command"
-require_relative "status_logger"
-require_relative "template_validator"
 
 module Jojo
   class CLI < Thor
