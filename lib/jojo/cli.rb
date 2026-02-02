@@ -1,6 +1,7 @@
 require "erb"
 require "fileutils"
 require_relative "commands/version/command"
+require_relative "commands/annotate/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -145,30 +146,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo annotate
     DESC
     def annotate
-      slug = resolve_slug
-      employer = Jojo::Employer.new(slug)
-
-      unless employer.artifacts_exist?
-        say "✗ Employer '#{slug}' not found.", :red
-        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
-        exit 1
-      end
-
-      config = Jojo::Config.new
-      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
-
-      say "Generating annotations for #{employer.company_name}...", :green
-
-      begin
-        generator = Jojo::Generators::AnnotationGenerator.new(employer, ai_client, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
-        annotations = generator.generate
-
-        say "✓ Generated #{annotations.length} annotations", :green
-        say "  Saved to: #{employer.job_description_annotations_path}", :green
-      rescue => e
-        say "✗ Error generating annotations: #{e.message}", :red
-        exit 1
-      end
+      Commands::Annotate::Command.new(self, command_options).execute
     end
 
     desc "generate", "Generate everything: research, resume, cover letter, and website"
