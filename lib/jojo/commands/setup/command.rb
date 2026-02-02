@@ -1,13 +1,13 @@
 # lib/jojo/commands/setup/command.rb
 require_relative "../base"
-require_relative "../../setup_service"
+require_relative "service"
 
 module Jojo
   module Commands
     module Setup
       class Command < Base
         def execute
-          SetupService.new(
+          Service.new(
             cli_instance: cli,
             overwrite: overwrite?
           ).run
