@@ -6,6 +6,7 @@ require_relative "commands/research/command"
 require_relative "commands/resume/command"
 require_relative "commands/cover_letter/command"
 require_relative "commands/faq/command"
+require_relative "commands/branding/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -440,56 +441,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo branding
     DESC
     def branding
-      slug = resolve_slug
-      employer = Jojo::Employer.new(slug)
-
-      unless employer.artifacts_exist?
-        say "✗ Employer '#{slug}' not found.", :red
-        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
-        exit 1
-      end
-
-      # Check for existing branding.md and --overwrite flag
-      if File.exist?(employer.branding_path) && !options[:overwrite]
-        say "✗ Branding statement already exists at #{employer.branding_path}", :red
-        say "  Use --overwrite to regenerate.", :yellow
-        exit 1
-      end
-
-      config = Jojo::Config.new
-      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
-      status_logger = Jojo::StatusLogger.new(employer)
-
-      say "Generating branding statement for #{employer.company_name}...", :green
-
-      # Check that resume has been generated (REQUIRED)
-      unless File.exist?(employer.resume_path)
-        say "✗ Resume not found. Run 'jojo resume' or 'jojo generate' first.", :red
-        exit 1
-      end
-
-      begin
-        require_relative "generators/branding_generator"
-        generator = Jojo::Generators::BrandingGenerator.new(
-          employer,
-          ai_client,
-          config: config,
-          verbose: options[:verbose]
-        )
-        generator.generate
-
-        say "✓ Branding statement generated and saved to #{employer.branding_path}", :green
-
-        status_logger.log_step("Branding Generation",
-          tokens: ai_client.total_tokens_used,
-          status: "complete")
-
-        say "\n✓ Branding complete!", :green
-      rescue => e
-        say "✗ Error generating branding statement: #{e.message}", :red
-        status_logger.log_step("Branding Generation", status: "failed", error: e.message)
-        exit 1
-      end
+      Commands::Branding::Command.new(self, command_options).execute
     end
 
     desc "website", "Generate website only"
