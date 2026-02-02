@@ -15,15 +15,7 @@ require_relative "commands/job_description/command"
 require_relative "commands/test/command"
 require_relative "commands/interactive/command"
 require_relative "status_logger"
-require_relative "setup_service"
 require_relative "template_validator"
-require_relative "generators/research_generator"
-require_relative "generators/resume_generator"
-require_relative "generators/cover_letter_generator"
-require_relative "generators/website_generator"
-require_relative "generators/annotation_generator"
-require_relative "generators/faq_generator"
-require_relative "pdf_converter"
 
 module Jojo
   class CLI < Thor
