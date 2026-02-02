@@ -11,6 +11,7 @@ require_relative "commands/website/command"
 require_relative "commands/pdf/command"
 require_relative "commands/setup/command"
 require_relative "commands/new/command"
+require_relative "commands/job_description/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -75,32 +76,7 @@ module Jojo
     method_option :slug, type: :string, aliases: "-s", desc: "Application slug (uses current if omitted)"
     method_option :job, type: :string, aliases: "-j", required: true, desc: "Job description (file path or URL)"
     def job_description
-      slug = options[:slug] || StatePersistence.load_slug
-      unless slug
-        say "No application specified. Use -s or select one in interactive mode.", :red
-        exit 1
-      end
-
-      employer = Jojo::Employer.new(slug)
-      unless File.exist?(employer.base_path)
-        say "Application '#{slug}' does not exist. Run 'jojo new -s #{slug}' first.", :red
-        exit 1
-      end
-
-      config = Jojo::Config.new
-      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
-
-      say "Processing job description for: #{slug}", :green
-
-      begin
-        employer.create_artifacts(options[:job], ai_client, overwrite_flag: options[:overwrite], cli_instance: self, verbose: options[:verbose])
-
-        say "-> Job description processed and saved", :green
-        say "-> Job details extracted and saved", :green
-      rescue => e
-        say "Error processing job description: #{e.message}", :red
-        exit 1
-      end
+      Commands::JobDescription::Command.new(self, command_options).execute
     end
 
     desc "annotate", "Generate job description annotations"
