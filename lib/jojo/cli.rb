@@ -1,5 +1,6 @@
 require "erb"
 require "fileutils"
+require_relative "commands/version/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -29,7 +30,7 @@ module Jojo
 
     desc "version", "Show version"
     def version
-      say "Jojo #{Jojo::VERSION}", :green
+      Commands::Version::Command.new(self, command_options).execute
     end
 
     desc "setup", "Setup configuration"
@@ -850,6 +851,15 @@ module Jojo
     end
 
     private
+
+    def command_options
+      {
+        slug: options[:slug] || ENV["JOJO_EMPLOYER_SLUG"],
+        verbose: options[:verbose],
+        overwrite: options[:overwrite],
+        quiet: options[:quiet]
+      }
+    end
 
     def resolve_slug
       slug = options[:slug] || ENV["JOJO_EMPLOYER_SLUG"]
