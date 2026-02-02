@@ -1,8 +1,8 @@
-# test/unit/resume_curation_service_test.rb
-require_relative "../test_helper"
-require_relative "../../lib/jojo/resume_curation_service"
+# test/unit/commands/resume/curation_service_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/commands/resume/curation_service"
 
-describe Jojo::ResumeCurationService do
+describe Jojo::Commands::Resume::CurationService do
   before do
     @ai_client = Minitest::Mock.new
     @config = {
@@ -17,7 +17,7 @@ describe Jojo::ResumeCurationService do
       job_description: "Looking for Ruby developer"
     }
 
-    @service = Jojo::ResumeCurationService.new(
+    @service = Jojo::Commands::Resume::CurationService.new(
       ai_client: @ai_client,
       config: @config,
       resume_data_path: "test/fixtures/resume_data.yml",
@@ -44,7 +44,7 @@ describe Jojo::ResumeCurationService do
     cache_file = "test/fixtures/cached_resume_data.yml"
     FileUtils.rm_f(cache_file)
 
-    service_with_cache = Jojo::ResumeCurationService.new(
+    service_with_cache = Jojo::Commands::Resume::CurationService.new(
       ai_client: @ai_client,
       config: @config,
       resume_data_path: "test/fixtures/resume_data.yml",

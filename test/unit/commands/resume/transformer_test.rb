@@ -1,8 +1,8 @@
-# test/unit/resume_transformer_test.rb
-require_relative "../test_helper"
-require_relative "../../lib/jojo/resume_transformer"
+# test/unit/commands/resume/transformer_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/commands/resume/transformer"
 
-describe Jojo::ResumeTransformer do
+describe Jojo::Commands::Resume::Transformer do
   before do
     @ai_client = Minitest::Mock.new
     @config = {
@@ -15,7 +15,7 @@ describe Jojo::ResumeTransformer do
     @job_context = {
       job_description: "Looking for Ruby developer with PostgreSQL experience"
     }
-    @transformer = Jojo::ResumeTransformer.new(
+    @transformer = Jojo::Commands::Resume::Transformer.new(
       ai_client: @ai_client,
       config: @config,
       job_context: @job_context
@@ -200,7 +200,7 @@ describe Jojo::ResumeTransformer do
           }
         }
       }
-      @full_transformer = Jojo::ResumeTransformer.new(
+      @full_transformer = Jojo::Commands::Resume::Transformer.new(
         ai_client: @ai_client,
         config: @full_config,
         job_context: @job_context
