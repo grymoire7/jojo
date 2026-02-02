@@ -17,22 +17,22 @@ module Jojo
         end
 
         def generate
-          log "Gathering inputs for annotation generation..."
+          say("Gathering inputs for annotation generation...")
           inputs = gather_inputs
 
-          log "Building annotation prompt..."
+          say("Building annotation prompt...")
           prompt = build_prompt(inputs)
 
-          log "Generating annotations using AI (reasoning model)..."
+          say("Generating annotations using AI (reasoning model)...")
           annotations_json = ai_client.reason(prompt)
 
-          log "Parsing JSON response..."
+          say("Parsing JSON response...")
           annotations = parse_annotations(annotations_json)
 
-          log "Saving annotations to #{employer.job_description_annotations_path}..."
+          say("Saving annotations to #{employer.job_description_annotations_path}...")
           save_annotations(annotations)
 
-          log "Annotation generation complete! Generated #{annotations.length} annotations."
+          logsay("Annotation generation complete! Generated #{annotations.length} annotations.")
           annotations
         end
 
@@ -45,7 +45,9 @@ module Jojo
           job_description = File.read(employer.job_description_path)
 
           unless File.exist?(employer.resume_path)
-            raise "Resume not found at #{employer.resume_path}"
+            message = "Error: Resume not found at #{employer.resume_path}"
+            log(message, step: :annotations, status: "failed")
+            raise message
           end
           resume = File.read(employer.resume_path)
 
@@ -60,7 +62,7 @@ module Jojo
 
         def read_research
           unless File.exist?(employer.research_path)
-            log "Warning: Research not found, annotations will be based on job description only"
+            logsay("Warning: Research not found, annotations will be based on job description only")
             return nil
           end
 
@@ -82,7 +84,7 @@ module Jojo
 
           JSON.parse(cleaned_json, symbolize_names: true)
         rescue JSON::ParserError => e
-          log "Error: Failed to parse AI response as JSON: #{e.message}"
+          log("Error: Failed to parse AI response as JSON: #{e.message}", status: "failed")
           raise "AI returned invalid JSON: #{e.message}"
         end
 
@@ -97,8 +99,17 @@ module Jojo
           end
         end
 
-        def log(message)
+        def log(message, **metadata)
+          employer.status_logger.log(message, step: :annotations, **metadata)
+        end
+
+        def say(message)
           puts "  [AnnotationGenerator] #{message}" if verbose
+        end
+
+        def logsay(message)
+          log message
+          say message
         end
       end
     end
