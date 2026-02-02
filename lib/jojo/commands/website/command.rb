@@ -33,13 +33,13 @@ module Jojo
           )
           generator.generate
 
-          status_logger.log_step(:website, tokens: ai_client.total_tokens_used, status: "complete", metadata: {template: template_name})
+          log(step: :website, tokens: ai_client.total_tokens_used, status: "complete", metadata: {template: template_name})
 
           say "Website generated and saved to #{employer.index_html_path}", :green
         rescue => e
           say "Error generating website: #{e.message}", :red
           begin
-            status_logger.log_step(:website, status: "failed", error: e.message)
+            log(step: :website, status: "failed", error: e.message)
           rescue
             # Ignore logging errors
           end

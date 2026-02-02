@@ -39,13 +39,13 @@ module Jojo
           )
           generator.generate
 
-          status_logger.log_step(:cover_letter, tokens: ai_client.total_tokens_used, status: "complete")
+          log(step: :cover_letter, tokens: ai_client.total_tokens_used, status: "complete")
 
           say "Cover letter generated and saved to #{employer.cover_letter_path}", :green
         rescue => e
           say "Error generating cover letter: #{e.message}", :red
           begin
-            status_logger.log_step(:cover_letter, status: "failed", error: e.message)
+            log(step: :cover_letter, status: "failed", error: e.message)
           rescue
             # Ignore logging errors
           end

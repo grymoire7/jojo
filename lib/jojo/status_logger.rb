@@ -2,30 +2,17 @@ require "json"
 
 module Jojo
   class StatusLogger
-    attr_reader :employer
+    attr_reader :log_path
 
-    def initialize(employer)
-      @employer = employer
+    def initialize(log_path)
+      @log_path = log_path
     end
 
-    def log(message)
-      entry = {
-        timestamp: timestamp,
-        message: message
-      }.to_json + "\n"
+    def log(message = nil, **metadata)
+      entry = {timestamp: timestamp}.merge(metadata)
+      entry[:message] = message if message
 
-      File.open(employer.status_log_path, "a") do |f|
-        f.write(entry)
-      end
-    end
-
-    def log_step(step_name, metadata = {})
-      entry = {
-        timestamp: timestamp,
-        step: step_name
-      }.merge(metadata)
-
-      File.open(employer.status_log_path, "a") do |f|
+      File.open(log_path, "a") do |f|
         f.write(entry.to_json + "\n")
       end
     end

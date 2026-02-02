@@ -26,7 +26,7 @@ module Jojo
           end
 
           if results[:generated].any?
-            status_logger.log_step(:pdf, status: "complete", generated: results[:generated].length)
+            log(step: :pdf, status: "complete", generated: results[:generated].length)
             say "PDF generation complete!", :green
           else
             say "No PDFs generated. Generate resume and cover letter first.", :yellow
@@ -35,7 +35,7 @@ module Jojo
         rescue PandocChecker::PandocNotFoundError => e
           say e.message, :red
           begin
-            status_logger.log_step(:pdf, status: "failed", error: "Pandoc not installed")
+            log(step: :pdf, status: "failed", error: "Pandoc not installed")
           rescue
             # Ignore logging errors
           end
@@ -43,7 +43,7 @@ module Jojo
         rescue => e
           say "Error generating PDFs: #{e.message}", :red
           begin
-            status_logger.log_step(:pdf, status: "failed", error: e.message)
+            log(step: :pdf, status: "failed", error: e.message)
           rescue
             # Ignore logging errors
           end

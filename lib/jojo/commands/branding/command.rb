@@ -32,13 +32,13 @@ module Jojo
           )
           generator.generate
 
-          status_logger.log_step(:branding, tokens: ai_client.total_tokens_used, status: "complete")
+          log(step: :branding, tokens: ai_client.total_tokens_used, status: "complete")
 
           say "Branding statement generated and saved to #{employer.branding_path}", :green
         rescue => e
           say "Error generating branding statement: #{e.message}", :red
           begin
-            status_logger.log_step(:branding, status: "failed", error: e.message)
+            log(step: :branding, status: "failed", error: e.message)
           rescue
             # Ignore logging errors
           end

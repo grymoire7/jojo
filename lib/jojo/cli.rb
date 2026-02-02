@@ -200,14 +200,7 @@ module Jojo
     method_option :standard, type: :boolean, desc: "Run Standard Ruby style checks"
     method_option :all, type: :boolean, desc: "Run all tests and checks"
     def test
-      test_options = {
-        unit: options[:unit],
-        integration: options[:integration],
-        service: options[:service],
-        standard: options[:standard],
-        all: options[:all],
-        quiet: options[:quiet]
-      }
+      test_options = options.slice(:unit, :integration, :service, :standard, :all, :quiet)
       Commands::Test::Command.new(self, test_options).execute
     end
 

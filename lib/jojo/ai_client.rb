@@ -2,6 +2,13 @@ require "ruby_llm"
 
 module Jojo
   class AIClient
+    # Map config shortnames to full model IDs
+    SHORT_NAME_TO_MODEL_ID = {
+      "sonnet" => "claude-sonnet-4",
+      "haiku" => "claude-3-5-haiku-20241022",
+      "opus" => "claude-opus-4"
+    }
+
     class AIError < StandardError; end
 
     attr_reader :config, :verbose
@@ -111,17 +118,8 @@ module Jojo
     end
 
     def resolve_model_name(model_shortname)
-      # Map config shortnames to full model IDs
-      case model_shortname.to_s.downcase
-      when "sonnet"
-        "claude-sonnet-4"
-      when "haiku"
-        "claude-3-5-haiku-20241022"
-      when "opus"
-        "claude-opus-4"
-      else
-        model_shortname # Return as-is if not a known shortname
-      end
+      model_id = SHORT_NAME_TO_MODEL_ID[model_shortname.to_s.downcase]
+      model_id || model_shortname
     end
 
     def estimate_tokens(prompt, response)

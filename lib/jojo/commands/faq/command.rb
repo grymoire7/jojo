@@ -25,13 +25,13 @@ module Jojo
           )
           faqs = generator.generate
 
-          status_logger.log_step(:faq, tokens: ai_client.total_tokens_used, status: "complete", faq_count: faqs.length)
+          log(step: :faq, tokens: ai_client.total_tokens_used, status: "complete", faq_count: faqs.length)
 
           say "Generated #{faqs.length} FAQs and saved to #{employer.faq_path}", :green
         rescue => e
           say "Error generating FAQs: #{e.message}", :red
           begin
-            status_logger.log_step(:faq, status: "failed", error: e.message)
+            log(step: :faq, status: "failed", error: e.message)
           rescue
             # Ignore logging errors
           end

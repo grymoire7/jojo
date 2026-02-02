@@ -55,13 +55,17 @@ module Jojo
         end
 
         def read_research
-          return nil unless File.exist?(employer.research_path)
-          log "Warning: Research not found, branding will be less targeted" unless File.exist?(employer.research_path)
+          unless File.exist?(employer.research_path)
+            log "Warning: Research not found, branding will be less targeted"
+            return nil
+          end
+
           File.read(employer.research_path)
         end
 
         def read_job_details
           return nil unless File.exist?(employer.job_details_path)
+
           YAML.load_file(employer.job_details_path)
         rescue => e
           log "Warning: Could not parse job details: #{e.message}"

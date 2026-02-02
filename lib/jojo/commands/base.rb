@@ -43,8 +43,8 @@ module Jojo
         @ai_client ||= Jojo::AIClient.new(config, verbose: verbose?)
       end
 
-      def status_logger
-        @status_logger ||= Jojo::StatusLogger.new(employer)
+      def log(**args)
+        status_logger.log(**args)
       end
 
       # Common validations
@@ -62,6 +62,12 @@ module Jojo
         say "#{description} not found at #{path}", :red
         say "  #{suggestion}", :yellow if suggestion
         exit 1
+      end
+
+      private
+
+      def status_logger
+        @status_logger ||= employer.status_logger
       end
     end
   end

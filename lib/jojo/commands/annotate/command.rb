@@ -20,14 +20,14 @@ module Jojo
           )
           annotations = generator.generate
 
-          status_logger.log_step(:annotate, tokens: ai_client.total_tokens_used, status: "complete")
+          log(step: :annotate, tokens: ai_client.total_tokens_used, status: "complete")
 
           say "Generated #{annotations.length} annotations", :green
           say "  Saved to: #{employer.job_description_annotations_path}", :green
         rescue => e
           say "Error generating annotations: #{e.message}", :red
           begin
-            status_logger.log_step(:annotate, status: "failed", error: e.message)
+            log(step: :annotate, status: "failed", error: e.message)
           rescue
             # Ignore logging errors
           end

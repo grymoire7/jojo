@@ -33,13 +33,13 @@ module Jojo
           )
           generator.generate
 
-          status_logger.log_step(:resume, tokens: ai_client.total_tokens_used, status: "complete")
+          log(step: :resume, tokens: ai_client.total_tokens_used, status: "complete")
 
           say "Resume generated and saved to #{employer.resume_path}", :green
         rescue => e
           say "Error generating resume: #{e.message}", :red
           begin
-            status_logger.log_step(:resume, status: "failed", error: e.message)
+            log(step: :resume, status: "failed", error: e.message)
           rescue
             # Ignore logging errors
           end

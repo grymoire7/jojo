@@ -29,10 +29,17 @@ module Jojo
             verbose: verbose?
           )
 
+          log(step: :job_description, tokens: ai_client.total_tokens_used, status: "complete")
+
           say "-> Job description processed and saved", :green
           say "-> Job details extracted and saved", :green
         rescue => e
           say "Error processing job description: #{e.message}", :red
+          begin
+            log(step: :job_description, status: "failed", error: e.message)
+          rescue
+            # Ignore logging errors
+          end
           exit 1
         end
 

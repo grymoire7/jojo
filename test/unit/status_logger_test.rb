@@ -5,7 +5,7 @@ require "json"
 describe Jojo::StatusLogger do
   before do
     @employer = Jojo::Employer.new("test-company")
-    @logger = Jojo::StatusLogger.new(@employer)
+    @logger = @employer.status_logger
 
     # Clean up before tests
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
@@ -56,7 +56,7 @@ describe Jojo::StatusLogger do
   end
 
   it "logs step with metadata" do
-    @logger.log_step("Job Description Processing", tokens: 1500, status: "complete")
+    @logger.log(step: "Job Description Processing", tokens: 1500, status: "complete")
 
     content = File.read(@employer.status_log_path)
     entry = JSON.parse(content.lines.first)
@@ -70,7 +70,7 @@ describe Jojo::StatusLogger do
   it "creates valid JSONL with multiple entries" do
     @logger.log("First message")
     @logger.log("Second message")
-    @logger.log_step("Step", status: "complete")
+    @logger.log(step: "Step", status: "complete")
 
     content = File.read(@employer.status_log_path)
     lines = content.lines

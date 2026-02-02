@@ -26,13 +26,13 @@ module Jojo
           )
           generator.generate
 
-          status_logger.log_step(:research, tokens: ai_client.total_tokens_used, status: "complete")
+          log(step: :research, tokens: ai_client.total_tokens_used, status: "complete")
 
           say "Research generated and saved to #{employer.research_path}", :green
         rescue => e
           say "Error generating research: #{e.message}", :red
           begin
-            status_logger.log_step(:research, status: "failed", error: e.message)
+            log(step: :research, status: "failed", error: e.message)
           rescue
             # Ignore logging errors
           end
