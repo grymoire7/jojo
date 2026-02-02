@@ -67,4 +67,65 @@ describe Jojo::Commands::Base do
       @mock_cli.verify
     end
   end
+
+  describe "shared setup (lazy-loaded)" do
+    before do
+      @tmpdir = Dir.mktmpdir
+      @original_dir = Dir.pwd
+      Dir.chdir(@tmpdir)
+
+      # Create minimal config
+      File.write("config.yml", <<~YAML)
+        seeker_name: "Test User"
+        base_url: "https://example.com"
+        reasoning_ai_service: openai
+        reasoning_ai_model: gpt-4
+        text_generation_ai_service: openai
+        text_generation_ai_model: gpt-4
+      YAML
+
+      # Create employer directory
+      FileUtils.mkdir_p("employers/acme-corp")
+      File.write("employers/acme-corp/job_description.md", "Test job")
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(@tmpdir)
+    end
+
+    it "creates employer from slug" do
+      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+      employer = base.send(:employer)
+
+      _(employer).must_be_kind_of Jojo::Employer
+      _(employer.slug).must_equal "acme-corp"
+    end
+
+    it "caches employer instance" do
+      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+      employer1 = base.send(:employer)
+      employer2 = base.send(:employer)
+
+      _(employer1.object_id).must_equal employer2.object_id
+    end
+
+    it "creates config" do
+      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+      config = base.send(:config)
+
+      _(config).must_be_kind_of Jojo::Config
+    end
+
+    it "creates status_logger for employer" do
+      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+      logger = base.send(:status_logger)
+
+      _(logger).must_be_kind_of Jojo::StatusLogger
+    end
+  end
 end
