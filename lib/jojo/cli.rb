@@ -2,6 +2,7 @@ require "erb"
 require "fileutils"
 require_relative "commands/version/command"
 require_relative "commands/annotate/command"
+require_relative "commands/research/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -384,37 +385,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo research
     DESC
     def research
-      slug = resolve_slug
-      employer = Jojo::Employer.new(slug)
-
-      unless employer.artifacts_exist?
-        say "✗ Employer '#{slug}' not found.", :red
-        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
-        exit 1
-      end
-
-      config = Jojo::Config.new
-      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
-      status_logger = Jojo::StatusLogger.new(employer)
-
-      say "Generating research for #{employer.company_name}...", :green
-
-      begin
-        generator = Jojo::Generators::ResearchGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
-        generator.generate
-
-        say "✓ Research generated and saved to #{employer.research_path}", :green
-
-        status_logger.log_step("Research Generation",
-          tokens: ai_client.total_tokens_used,
-          status: "complete")
-
-        say "\n✓ Research complete!", :green
-      rescue => e
-        say "✗ Error generating research: #{e.message}", :red
-        status_logger.log_step("Research Generation", status: "failed", error: e.message)
-        exit 1
-      end
+      Commands::Research::Command.new(self, command_options).execute
     end
 
     desc "resume", "Generate tailored resume only"
