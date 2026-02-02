@@ -1,7 +1,7 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo"
 require_relative "../../lib/jojo/employer"
-require_relative "../../lib/jojo/generators/website_generator"
+require_relative "../../lib/jojo/commands/website/generator"
 require_relative "../../lib/jojo/config"
 require "tmpdir"
 require "fileutils"
@@ -71,7 +71,7 @@ describe "Recommendations Workflow Integration" do
     }
     File.write(File.join(@inputs_path, "resume_data.yml"), resume_data.to_yaml)
 
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -103,7 +103,7 @@ describe "Recommendations Workflow Integration" do
   it "generates website without carousel when no recommendations" do
     # Don't create recommendations file
 
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -137,7 +137,7 @@ describe "Recommendations Workflow Integration" do
     }
     File.write(File.join(@inputs_path, "resume_data.yml"), resume_data.to_yaml)
 
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -174,7 +174,7 @@ describe "Recommendations Workflow Integration" do
     File.write(File.join(@inputs_path, "resume_data.yml"), resume_data.to_yaml)
     File.write(@employer.job_description_annotations_path, "[]")
 
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,

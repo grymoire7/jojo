@@ -2,7 +2,7 @@ require_relative "../test_helper"
 require_relative "../../lib/jojo/employer"
 require_relative "../../lib/jojo/config"
 require_relative "../../lib/jojo/ai_client"
-require_relative "../../lib/jojo/generators/website_generator"
+require_relative "../../lib/jojo/commands/website/generator"
 
 # Simple config stub
 class WebsiteWorkflowTestConfigStub
@@ -40,7 +40,7 @@ describe "Website Generation Workflow" do
   end
 
   it "generates complete website from end to end" do
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -97,7 +97,7 @@ describe "Website Generation Workflow" do
     HTML
     File.write("templates/website/custom.html.erb", custom_template)
 
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -118,7 +118,7 @@ describe "Website Generation Workflow" do
 
   it "handles branding image workflow" do
     # Use test/fixtures which has branding_image.jpg
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -143,7 +143,7 @@ describe "Website Generation Workflow" do
   it "generates website without CTA when not configured" do
     @config.website_cta_link = nil  # No CTA configured
 
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -169,7 +169,7 @@ describe "Website Generation Workflow" do
     # Remove optional files
     FileUtils.rm_f(@employer.research_path)
 
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,

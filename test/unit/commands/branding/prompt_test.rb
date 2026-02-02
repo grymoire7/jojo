@@ -1,7 +1,8 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/prompts/website_prompt"
+# test/unit/commands/branding/prompt_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/commands/branding/prompt"
 
-describe Jojo::Prompts::Website do
+describe Jojo::Commands::Branding::Prompt do
   it "generates branding statement prompt with all inputs" do
     job_description = "Senior Ruby Developer role at Acme Corp..."
     research = "# Company Profile\n\nAcme Corp is a leading tech company..."
@@ -11,7 +12,7 @@ describe Jojo::Prompts::Website do
     seeker_name = "Jane Doe"
     voice_and_tone = "professional and friendly"
 
-    prompt = Jojo::Prompts::Website.generate_branding_statement(
+    prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: job_description,
       research: research,
       resume: resume,
@@ -36,7 +37,7 @@ describe Jojo::Prompts::Website do
     seeker_name = "Jane Doe"
     voice_and_tone = "professional"
 
-    prompt = Jojo::Prompts::Website.generate_branding_statement(
+    prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: job_description,
       research: nil,
       resume: resume,
@@ -53,7 +54,7 @@ describe Jojo::Prompts::Website do
   end
 
   it "includes voice and tone in prompt" do
-    prompt = Jojo::Prompts::Website.generate_branding_statement(
+    prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: "Developer role",
       resume: "Resume content",
       company_name: "Company",
@@ -65,7 +66,7 @@ describe Jojo::Prompts::Website do
   end
 
   it "specifies output format requirements" do
-    prompt = Jojo::Prompts::Website.generate_branding_statement(
+    prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: "Job",
       resume: "Resume",
       company_name: "Company",
@@ -79,7 +80,7 @@ describe Jojo::Prompts::Website do
   end
 
   it "includes seeker name in question" do
-    prompt = Jojo::Prompts::Website.generate_branding_statement(
+    prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: "Job",
       resume: "Resume",
       company_name: "Awesome Company",
@@ -95,7 +96,7 @@ describe Jojo::Prompts::Website do
   it "includes job details when provided" do
     job_details = {"job_title" => "Lead Developer", "location" => "Remote"}
 
-    prompt = Jojo::Prompts::Website.generate_branding_statement(
+    prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: "Developer role",
       resume: "Resume",
       company_name: "Company",
@@ -110,7 +111,7 @@ describe Jojo::Prompts::Website do
   end
 
   it "excludes job details section when not provided" do
-    prompt = Jojo::Prompts::Website.generate_branding_statement(
+    prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: "Developer role",
       resume: "Resume",
       company_name: "Company",

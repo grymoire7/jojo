@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative "../test_helper"
+require_relative "../../../test_helper"
 
-describe Jojo::Interactive do
+describe Jojo::Commands::Interactive::Runner do
   describe "#initialize" do
     it "accepts optional slug parameter" do
-      interactive = Jojo::Interactive.new(slug: "test-slug")
-      _(interactive.slug).must_equal "test-slug"
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-slug")
+      _(runner.slug).must_equal "test-slug"
     end
 
     it "loads slug from state persistence when not provided" do
@@ -16,9 +16,9 @@ describe Jojo::Interactive do
       Dir.chdir(temp_dir)
 
       File.write(".jojo_state", "saved-slug")
-      interactive = Jojo::Interactive.new
+      runner = Jojo::Commands::Interactive::Runner.new
 
-      _(interactive.slug).must_equal "saved-slug"
+      _(runner.slug).must_equal "saved-slug"
 
       Dir.chdir(original_dir)
       FileUtils.rm_rf(temp_dir)
@@ -31,8 +31,8 @@ describe Jojo::Interactive do
       original_dir = Dir.pwd
       Dir.chdir(temp_dir)
 
-      interactive = Jojo::Interactive.new
-      _(interactive.employer).must_be_nil
+      runner = Jojo::Commands::Interactive::Runner.new
+      _(runner.employer).must_be_nil
 
       Dir.chdir(original_dir)
       FileUtils.rm_rf(temp_dir)
@@ -46,8 +46,8 @@ describe Jojo::Interactive do
       original_dir = Dir.pwd
       Dir.chdir(temp_dir)
 
-      interactive = Jojo::Interactive.new(slug: "test-slug")
-      employer = interactive.employer
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-slug")
+      employer = runner.employer
 
       _(employer).must_be_kind_of Jojo::Employer
       _(employer.slug).must_equal "test-slug"
@@ -72,16 +72,16 @@ describe Jojo::Interactive do
     end
 
     it "returns empty array when no employers exist" do
-      interactive = Jojo::Interactive.new
-      _(interactive.list_applications).must_equal []
+      runner = Jojo::Commands::Interactive::Runner.new
+      _(runner.list_applications).must_equal []
     end
 
     it "returns list of employer slugs" do
       FileUtils.mkdir_p(File.join(@employers_dir, "acme-corp"))
       FileUtils.mkdir_p(File.join(@employers_dir, "globex-inc"))
 
-      interactive = Jojo::Interactive.new
-      apps = interactive.list_applications
+      runner = Jojo::Commands::Interactive::Runner.new
+      apps = runner.list_applications
 
       _(apps).must_include "acme-corp"
       _(apps).must_include "globex-inc"
@@ -91,8 +91,8 @@ describe Jojo::Interactive do
       FileUtils.mkdir_p(File.join(@employers_dir, "acme-corp"))
       File.write(File.join(@employers_dir, "some-file.txt"), "test")
 
-      interactive = Jojo::Interactive.new
-      apps = interactive.list_applications
+      runner = Jojo::Commands::Interactive::Runner.new
+      apps = runner.list_applications
 
       _(apps).must_equal ["acme-corp"]
     end
@@ -113,18 +113,18 @@ describe Jojo::Interactive do
     end
 
     it "updates slug and saves to state" do
-      interactive = Jojo::Interactive.new(slug: "old-app")
-      interactive.switch_application("new-app")
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "old-app")
+      runner.switch_application("new-app")
 
-      _(interactive.slug).must_equal "new-app"
+      _(runner.slug).must_equal "new-app"
       _(Jojo::StatePersistence.load_slug).must_equal "new-app"
     end
 
     it "clears cached employer" do
-      interactive = Jojo::Interactive.new(slug: "new-app")
-      _old_employer = interactive.employer  # Cache it
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "new-app")
+      _old_employer = runner.employer  # Cache it
 
-      interactive.switch_application("new-app")
+      runner.switch_application("new-app")
       # employer should be re-instantiated on next access
     end
   end
@@ -144,39 +144,39 @@ describe Jojo::Interactive do
     end
 
     it "returns :quit for 'q' key" do
-      interactive = Jojo::Interactive.new(slug: "test-app")
-      result = interactive.handle_key("q")
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+      result = runner.handle_key("q")
       _(result).must_equal :quit
     end
 
     it "returns :switch for 's' key" do
-      interactive = Jojo::Interactive.new(slug: "test-app")
-      result = interactive.handle_key("s")
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+      result = runner.handle_key("s")
       _(result).must_equal :switch
     end
 
     it "returns :open for 'o' key" do
-      interactive = Jojo::Interactive.new(slug: "test-app")
-      result = interactive.handle_key("o")
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+      result = runner.handle_key("o")
       _(result).must_equal :open
     end
 
     it "returns :all for 'a' key" do
-      interactive = Jojo::Interactive.new(slug: "test-app")
-      result = interactive.handle_key("a")
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+      result = runner.handle_key("a")
       _(result).must_equal :all
     end
 
     it "returns step index for number keys 1-9" do
-      interactive = Jojo::Interactive.new(slug: "test-app")
-      _(interactive.handle_key("1")).must_equal 0
-      _(interactive.handle_key("5")).must_equal 4
-      _(interactive.handle_key("9")).must_equal 8
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+      _(runner.handle_key("1")).must_equal 0
+      _(runner.handle_key("5")).must_equal 4
+      _(runner.handle_key("9")).must_equal 8
     end
 
     it "returns nil for unrecognized keys" do
-      interactive = Jojo::Interactive.new(slug: "test-app")
-      _(interactive.handle_key("x")).must_be_nil
+      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+      _(runner.handle_key("x")).must_be_nil
     end
   end
 
@@ -199,9 +199,9 @@ describe Jojo::Interactive do
       FileUtils.mkdir_p(File.join(@employers_dir, "acme-corp"))
       FileUtils.mkdir_p(File.join(@employers_dir, "globex-inc"))
 
-      # Interactive should find applications
-      interactive = Jojo::Interactive.new
-      apps = interactive.list_applications
+      # Runner should find applications
+      runner = Jojo::Commands::Interactive::Runner.new
+      apps = runner.list_applications
 
       _(apps.length).must_equal 2
       _(apps).must_include "acme-corp"
@@ -210,8 +210,8 @@ describe Jojo::Interactive do
 
     it "shows welcome when no applications exist" do
       # No applications created
-      interactive = Jojo::Interactive.new
-      apps = interactive.list_applications
+      runner = Jojo::Commands::Interactive::Runner.new
+      apps = runner.list_applications
 
       _(apps).must_equal []
     end
@@ -270,8 +270,8 @@ describe Jojo::Interactive do
     end
 
     it "shows ready status when job description is missing" do
-      interactive = Jojo::Interactive.new(slug: @slug)
-      status = Jojo::Workflow.status(:job_description, interactive.employer)
+      runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
+      status = Jojo::Commands::Interactive::Workflow.status(:job_description, runner.employer)
 
       # Job description has no dependencies, so it's always ready when missing
       _(status).must_equal :ready

@@ -1,9 +1,9 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/generators/resume_generator"
+require_relative "../../lib/jojo/commands/resume/generator"
 require_relative "../../lib/jojo/employer"
 require_relative "../../lib/jojo/config"
 
-describe "ResumeGenerator with Projects" do
+describe "Jojo::Commands::Resume::Generator with Projects" do
   before do
     @employer = Jojo::Employer.new("test-corp")
     @employer.create_directory!
@@ -55,7 +55,7 @@ describe "ResumeGenerator with Projects" do
     mock_ai.expect(:generate_text, "[0]", [String]) # experience.tags: reorder
     mock_ai.expect(:generate_text, "Tailored education description", [String]) # education.description: rewrite
 
-    generator = Jojo::Generators::ResumeGenerator.new(@employer, mock_ai, config: @config, inputs_path: "test/fixtures")
+    generator = Jojo::Commands::Resume::Generator.new(@employer, mock_ai, config: @config, inputs_path: "test/fixtures")
     result = generator.generate
 
     # Verify resume was generated

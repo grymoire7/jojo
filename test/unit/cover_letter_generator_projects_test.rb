@@ -1,9 +1,9 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/generators/cover_letter_generator"
+require_relative "../../lib/jojo/commands/cover_letter/generator"
 require_relative "../../lib/jojo/employer"
 require_relative "../../lib/jojo/config"
 
-describe "CoverLetterGenerator with Projects" do
+describe "Jojo::Commands::CoverLetter::Generator with Projects" do
   before do
     @employer = Jojo::Employer.new("test-corp")
     @employer.create_directory!
@@ -51,7 +51,7 @@ describe "CoverLetterGenerator with Projects" do
       true
     end
 
-    generator = Jojo::Generators::CoverLetterGenerator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::CoverLetter::Generator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
     # Verify the prompt includes project information

@@ -1,13 +1,14 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/employer"
-require_relative "../../../lib/jojo/generators/resume_generator"
+# test/unit/commands/resume/generator_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/commands/resume/generator"
 
-describe Jojo::Generators::ResumeGenerator do
+describe Jojo::Commands::Resume::Generator do
   before do
     @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
-    @generator = Jojo::Generators::ResumeGenerator.new(
+    @generator = Jojo::Commands::Resume::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -63,7 +64,7 @@ describe Jojo::Generators::ResumeGenerator do
   end
 
   it "fails when resume_data.yml is missing" do
-    generator_no_data = Jojo::Generators::ResumeGenerator.new(
+    generator_no_data = Jojo::Commands::Resume::Generator.new(
       @employer,
       @ai_client,
       config: @config,

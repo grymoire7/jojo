@@ -1,6 +1,7 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/employer"
-require_relative "../../../lib/jojo/generators/website_generator"
+# test/unit/commands/website/generator_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/commands/website/generator"
 
 # Simple config stub to avoid complex mock expectations
 class WebsiteGeneratorTestConfigStub
@@ -15,12 +16,12 @@ class WebsiteGeneratorTestConfigStub
   end
 end
 
-describe Jojo::Generators::WebsiteGenerator do
+describe Jojo::Commands::Website::Generator do
   before do
     @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = WebsiteGeneratorTestConfigStub.new
-    @generator = Jojo::Generators::WebsiteGenerator.new(
+    @generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -78,7 +79,7 @@ describe Jojo::Generators::WebsiteGenerator do
     FileUtils.mkdir_p("templates/website")
     File.write("templates/website/modern.html.erb", "<html><body><h1><%= seeker_name %></h1></body></html>")
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, @ai_client, config: @config, template: "modern", verbose: false)
+    generator = Jojo::Commands::Website::Generator.new(@employer, @ai_client, config: @config, template: "modern", verbose: false)
 
     result = generator.generate
 
@@ -88,7 +89,7 @@ describe Jojo::Generators::WebsiteGenerator do
   end
 
   it "raises error when template is missing" do
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, @ai_client, config: @config, template: "nonexistent", verbose: false)
+    generator = Jojo::Commands::Website::Generator.new(@employer, @ai_client, config: @config, template: "nonexistent", verbose: false)
 
     error = assert_raises(RuntimeError) do
       generator.generate
@@ -133,7 +134,7 @@ describe Jojo::Generators::WebsiteGenerator do
 
   it "skips branding image when missing" do
     # Create a generator with nonexistent inputs path (no branding_image.jpg)
-    generator_no_image = Jojo::Generators::WebsiteGenerator.new(
+    generator_no_image = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,

@@ -1,7 +1,7 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/employer"
-require_relative "../../lib/jojo/generators/faq_generator"
-require_relative "../../lib/jojo/generators/website_generator"
+require_relative "../../lib/jojo/commands/faq/generator"
+require_relative "../../lib/jojo/commands/website/generator"
 require_relative "../../lib/jojo/config"
 require "yaml"
 require "json"
@@ -44,7 +44,7 @@ describe "FAQ Workflow Integration" do
 
   it "generates FAQs and includes them in website" do
     # Generate FAQs
-    faq_generator = Jojo::Generators::FaqGenerator.new(
+    faq_generator = Jojo::Commands::Faq::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -67,7 +67,7 @@ describe "FAQ Workflow Integration" do
     @ai_client.verify
 
     # Generate website with FAQs
-    website_generator = Jojo::Generators::WebsiteGenerator.new(
+    website_generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -86,7 +86,7 @@ describe "FAQ Workflow Integration" do
   end
 
   it "handles missing FAQ file gracefully in website generation" do
-    website_generator = Jojo::Generators::WebsiteGenerator.new(
+    website_generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -108,7 +108,7 @@ describe "FAQ Workflow Integration" do
     # Write malformed JSON
     File.write(@employer.faq_path, "This is not valid JSON")
 
-    website_generator = Jojo::Generators::WebsiteGenerator.new(
+    website_generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -127,7 +127,7 @@ describe "FAQ Workflow Integration" do
     faqs = [{question: "Test?", answer: "Answer"}]
     File.write(@employer.faq_path, JSON.generate(faqs))
 
-    website_generator = Jojo::Generators::WebsiteGenerator.new(
+    website_generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,

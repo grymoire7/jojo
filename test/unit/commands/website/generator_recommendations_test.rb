@@ -1,7 +1,8 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/employer"
-require_relative "../../../lib/jojo/generators/website_generator"
-require_relative "../../../lib/jojo/config"
+# test/unit/commands/website/generator_recommendations_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/commands/website/generator"
+require_relative "../../../../lib/jojo/config"
 require "tmpdir"
 require "fileutils"
 require "yaml"
@@ -19,7 +20,7 @@ class WebsiteGeneratorRecommendationsTestConfigStub
   end
 end
 
-describe "WebsiteGenerator with Recommendations" do
+describe "Jojo::Commands::Website::Generator with Recommendations" do
   before do
     @employer = Jojo::Employer.new("test-corp")
 
@@ -62,7 +63,7 @@ describe "WebsiteGenerator with Recommendations" do
     FileUtils.mkdir_p(inputs_path)
     File.write(File.join(inputs_path, "resume_data.yml"), resume_data_content)
 
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -81,7 +82,7 @@ describe "WebsiteGenerator with Recommendations" do
     FileUtils.mkdir_p(inputs_path)
     # No resume_data.yml file
 
-    generator = Jojo::Generators::WebsiteGenerator.new(
+    generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,

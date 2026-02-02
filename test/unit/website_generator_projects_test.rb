@@ -1,9 +1,9 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/generators/website_generator"
+require_relative "../../lib/jojo/commands/website/generator"
 require_relative "../../lib/jojo/employer"
 require_relative "../../lib/jojo/config"
 
-describe "WebsiteGenerator with Projects" do
+describe "Jojo::Commands::Website::Generator with Projects" do
   before do
     @employer = Jojo::Employer.new("test-corp")
     @employer.create_directory!
@@ -50,7 +50,7 @@ describe "WebsiteGenerator with Projects" do
     # Mock AI client (not used in this test)
     mock_ai = Minitest::Mock.new
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::Website::Generator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
 
     # Access private method for testing
     projects = generator.send(:load_projects)
@@ -69,7 +69,7 @@ describe "WebsiteGenerator with Projects" do
     # Mock AI client (not used since branding is read from file)
     mock_ai = Minitest::Mock.new
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::Website::Generator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
     # Read generated HTML
@@ -114,7 +114,7 @@ describe "WebsiteGenerator with Projects" do
     # Mock AI client (not used since branding is read from file)
     mock_ai = Minitest::Mock.new
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::Website::Generator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
     # Check image was copied

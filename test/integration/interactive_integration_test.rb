@@ -17,9 +17,9 @@ describe "Interactive Mode Integration" do
 
   describe "with no applications" do
     it "shows welcome screen" do
-      interactive = Jojo::Interactive.new
-      _(interactive.employer).must_be_nil
-      _(interactive.list_applications).must_be_empty
+      runner = Jojo::Commands::Interactive::Runner.new
+      _(runner.employer).must_be_nil
+      _(runner.list_applications).must_be_empty
     end
   end
 
@@ -35,17 +35,17 @@ describe "Interactive Mode Integration" do
     it "loads application state" do
       Jojo::StatePersistence.save_slug(@slug)
 
-      interactive = Jojo::Interactive.new
-      _(interactive.slug).must_equal @slug
-      _(interactive.employer).wont_be_nil
-      _(interactive.employer.company_name).must_equal "Test Company"
+      runner = Jojo::Commands::Interactive::Runner.new
+      _(runner.slug).must_equal @slug
+      _(runner.employer).wont_be_nil
+      _(runner.employer.company_name).must_equal "Test Company"
     end
 
     it "computes workflow status correctly" do
-      interactive = Jojo::Interactive.new(slug: @slug)
-      employer = interactive.employer
+      runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
+      employer = runner.employer
 
-      statuses = Jojo::Workflow.all_statuses(employer)
+      statuses = Jojo::Commands::Interactive::Workflow.all_statuses(employer)
 
       _(statuses[:job_description]).must_equal :generated
       _(statuses[:research]).must_equal :ready  # dependency met
@@ -72,8 +72,8 @@ describe "Interactive Mode Integration" do
     end
 
     it "detects when resume is up-to-date" do
-      interactive = Jojo::Interactive.new(slug: @slug)
-      status = Jojo::Workflow.status(:resume, interactive.employer)
+      runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, runner.employer)
       _(status).must_equal :generated
     end
 
@@ -83,8 +83,8 @@ describe "Interactive Mode Integration" do
       app_dir = File.join(@employers_dir, @slug)
       FileUtils.touch(File.join(app_dir, "job_description.md"))
 
-      interactive = Jojo::Interactive.new(slug: @slug)
-      status = Jojo::Workflow.status(:resume, interactive.employer)
+      runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, runner.employer)
       _(status).must_equal :stale
     end
   end
@@ -104,8 +104,8 @@ describe "Interactive Mode Integration" do
     end
 
     it "lists all available applications" do
-      interactive = Jojo::Interactive.new
-      apps = interactive.list_applications
+      runner = Jojo::Commands::Interactive::Runner.new
+      apps = runner.list_applications
 
       _(apps.length).must_equal 2
       _(apps).must_include @app1
@@ -113,32 +113,32 @@ describe "Interactive Mode Integration" do
     end
 
     it "has no current employer when slug not provided" do
-      interactive = Jojo::Interactive.new
-      _(interactive.employer).must_be_nil
-      _(interactive.slug).must_be_nil
+      runner = Jojo::Commands::Interactive::Runner.new
+      _(runner.employer).must_be_nil
+      _(runner.slug).must_be_nil
     end
 
     it "can switch between applications" do
-      interactive = Jojo::Interactive.new
+      runner = Jojo::Commands::Interactive::Runner.new
 
       # Switch to first app
-      interactive.switch_application(@app1)
-      _(interactive.slug).must_equal @app1
-      _(interactive.employer.slug).must_equal @app1
+      runner.switch_application(@app1)
+      _(runner.slug).must_equal @app1
+      _(runner.employer.slug).must_equal @app1
 
       # Switch to second app
-      interactive.switch_application(@app2)
-      _(interactive.slug).must_equal @app2
-      _(interactive.employer.slug).must_equal @app2
+      runner.switch_application(@app2)
+      _(runner.slug).must_equal @app2
+      _(runner.employer.slug).must_equal @app2
     end
 
-    it "persists slug selection across Interactive instances" do
-      interactive1 = Jojo::Interactive.new
-      interactive1.switch_application(@app1)
+    it "persists slug selection across Runner instances" do
+      runner1 = Jojo::Commands::Interactive::Runner.new
+      runner1.switch_application(@app1)
 
       # Create new instance - should load saved slug
-      interactive2 = Jojo::Interactive.new
-      _(interactive2.slug).must_equal @app1
+      runner2 = Jojo::Commands::Interactive::Runner.new
+      _(runner2.slug).must_equal @app1
     end
   end
 end

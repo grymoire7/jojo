@@ -1,14 +1,14 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/employer"
-require_relative "../../../lib/jojo/generators/cover_letter_generator"
-require_relative "../../../lib/jojo/prompts/cover_letter_prompt"
+# test/unit/commands/cover_letter/generator_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/commands/cover_letter/generator"
 
-describe Jojo::Generators::CoverLetterGenerator do
+describe Jojo::Commands::CoverLetter::Generator do
   before do
     @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
-    @generator = Jojo::Generators::CoverLetterGenerator.new(
+    @generator = Jojo::Commands::CoverLetter::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -77,7 +77,7 @@ describe Jojo::Generators::CoverLetterGenerator do
 
   it "fails when generic resume is missing" do
     # Create a generator with a nonexistent inputs path
-    generator_no_resume = Jojo::Generators::CoverLetterGenerator.new(
+    generator_no_resume = Jojo::Commands::CoverLetter::Generator.new(
       @employer,
       @ai_client,
       config: @config,

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative "../../test_helper"
+require_relative "../../../test_helper"
 
-describe Jojo::UI::Dialogs do
+describe Jojo::Commands::Interactive::Dialogs do
   describe ".blocked_dialog" do
     it "renders dialog showing missing prerequisites" do
-      output = Jojo::UI::Dialogs.blocked_dialog("Cover Letter", ["Resume"])
+      output = Jojo::Commands::Interactive::Dialogs.blocked_dialog("Cover Letter", ["Resume"])
 
       _(output).must_include "Cover Letter"
       _(output).must_include "Cannot generate yet"
@@ -21,7 +21,7 @@ describe Jojo::UI::Dialogs do
         {name: "job_description.md", age: nil}
       ]
 
-      output = Jojo::UI::Dialogs.ready_dialog("Cover Letter", inputs, "cover_letter.md", paid: true)
+      output = Jojo::Commands::Interactive::Dialogs.ready_dialog("Cover Letter", inputs, "cover_letter.md", paid: true)
 
       _(output).must_include "Cover Letter"
       _(output).must_include "Generate"
@@ -35,7 +35,7 @@ describe Jojo::UI::Dialogs do
 
   describe ".generated_dialog" do
     it "renders dialog for already generated item" do
-      output = Jojo::UI::Dialogs.generated_dialog("Cover Letter", "1 hour ago", paid: true)
+      output = Jojo::Commands::Interactive::Dialogs.generated_dialog("Cover Letter", "1 hour ago", paid: true)
 
       _(output).must_include "cover_letter.md already exists"
       _(output).must_include "1 hour ago"
@@ -47,7 +47,7 @@ describe Jojo::UI::Dialogs do
 
   describe ".error_dialog" do
     it "renders error dialog with message" do
-      output = Jojo::UI::Dialogs.error_dialog("Cover Letter", "API Error: Rate limit exceeded")
+      output = Jojo::Commands::Interactive::Dialogs.error_dialog("Cover Letter", "API Error: Rate limit exceeded")
 
       _(output).must_include "Error"
       _(output).must_include "Cover Letter generation failed"
@@ -59,7 +59,7 @@ describe Jojo::UI::Dialogs do
 
   describe ".input_dialog" do
     it "renders input dialog with prompt" do
-      output = Jojo::UI::Dialogs.input_dialog("New Application", "Slug (e.g., acme-corp-senior-dev):")
+      output = Jojo::Commands::Interactive::Dialogs.input_dialog("New Application", "Slug (e.g., acme-corp-senior-dev):")
 
       _(output).must_include "New Application"
       _(output).must_include "Slug"

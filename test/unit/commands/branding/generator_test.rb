@@ -1,6 +1,7 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/employer"
-require_relative "../../../lib/jojo/generators/branding_generator"
+# test/unit/commands/branding/generator_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/commands/branding/generator"
 
 class BrandingGeneratorTestConfigStub
   attr_accessor :seeker_name, :voice_and_tone
@@ -11,12 +12,12 @@ class BrandingGeneratorTestConfigStub
   end
 end
 
-describe Jojo::Generators::BrandingGenerator do
+describe Jojo::Commands::Branding::Generator do
   before do
     @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = BrandingGeneratorTestConfigStub.new
-    @generator = Jojo::Generators::BrandingGenerator.new(
+    @generator = Jojo::Commands::Branding::Generator.new(
       @employer,
       @ai_client,
       config: @config,

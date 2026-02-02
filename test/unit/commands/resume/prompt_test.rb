@@ -1,7 +1,8 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/prompts/resume_prompt"
+# test/unit/commands/resume/prompt_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/commands/resume/prompt"
 
-describe Jojo::Prompts::Resume do
+describe Jojo::Commands::Resume::Prompt do
   it "generates prompt with all inputs" do
     job_description = "Senior Ruby Developer role..."
     research = "# Company Profile\n\nAcme Corp..."
@@ -9,7 +10,7 @@ describe Jojo::Prompts::Resume do
     job_details = {"job_title" => "Senior Ruby Developer", "company_name" => "Acme Corp"}
     voice_and_tone = "professional and friendly"
 
-    prompt = Jojo::Prompts::Resume.generate_prompt(
+    prompt = Jojo::Commands::Resume::Prompt.generate_prompt(
       job_description: job_description,
       research: research,
       generic_resume: generic_resume,
@@ -29,7 +30,7 @@ describe Jojo::Prompts::Resume do
     job_description = "Ruby Developer role..."
     generic_resume = "# Jane Doe..."
 
-    prompt = Jojo::Prompts::Resume.generate_prompt(
+    prompt = Jojo::Commands::Resume::Prompt.generate_prompt(
       job_description: job_description,
       research: nil,
       generic_resume: generic_resume,

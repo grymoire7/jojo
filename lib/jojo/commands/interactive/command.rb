@@ -1,5 +1,5 @@
 # lib/jojo/commands/interactive/command.rb
-require_relative "../../interactive"
+require_relative "runner"
 
 module Jojo
   module Commands
@@ -13,7 +13,7 @@ module Jojo
 
         def execute
           slug = options[:slug] || ENV["JOJO_EMPLOYER_SLUG"]
-          Jojo::Interactive.new(slug: slug).run
+          Runner.new(slug: slug).run
         end
       end
     end

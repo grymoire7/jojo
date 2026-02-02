@@ -1,6 +1,6 @@
 # lib/jojo/commands/website/command.rb
 require_relative "../base"
-require_relative "../../generators/website_generator"
+require_relative "generator"
 
 module Jojo
   module Commands
@@ -22,7 +22,7 @@ module Jojo
             say "Warning: Research not found. Website will be less targeted.", :yellow
           end
 
-          generator = Generators::WebsiteGenerator.new(
+          generator = Generator.new(
             employer,
             ai_client,
             config: config,

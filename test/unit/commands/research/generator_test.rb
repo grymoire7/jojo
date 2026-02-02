@@ -1,14 +1,14 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/employer"
-require_relative "../../../lib/jojo/generators/research_generator"
-require_relative "../../../lib/jojo/prompts/research_prompt"
+# test/unit/commands/research/generator_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/commands/research/generator"
 
-describe Jojo::Generators::ResearchGenerator do
+describe Jojo::Commands::Research::Generator do
   before do
     @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
-    @generator = Jojo::Generators::ResearchGenerator.new(
+    @generator = Jojo::Commands::Research::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -87,7 +87,7 @@ describe Jojo::Generators::ResearchGenerator do
 
   it "continues when generic resume is missing" do
     # Create a generator with a nonexistent inputs path
-    generator_no_resume = Jojo::Generators::ResearchGenerator.new(
+    generator_no_resume = Jojo::Commands::Research::Generator.new(
       @employer,
       @ai_client,
       config: @config,

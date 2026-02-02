@@ -1,9 +1,10 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/prompts/faq_prompt"
+# test/unit/commands/faq/prompt_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/commands/faq/prompt"
 
-describe Jojo::Prompts::Faq do
+describe Jojo::Commands::Faq::Prompt do
   it "includes job description in prompt" do
-    prompt = Jojo::Prompts::Faq.generate_faq_prompt(
+    prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "We need a Python developer with 5+ years experience.",
       resume: "# John Doe\nPython developer...",
       research: nil,
@@ -17,7 +18,7 @@ describe Jojo::Prompts::Faq do
   end
 
   it "includes resume in prompt" do
-    prompt = Jojo::Prompts::Faq.generate_faq_prompt(
+    prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Python developer needed",
       resume: "# John Doe\nSenior developer with expertise...",
       research: nil,
@@ -32,7 +33,7 @@ describe Jojo::Prompts::Faq do
   end
 
   it "includes research when available" do
-    prompt = Jojo::Prompts::Faq.generate_faq_prompt(
+    prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Python developer",
       resume: "Resume content",
       research: "Acme Corp is a fintech startup...",
@@ -46,7 +47,7 @@ describe Jojo::Prompts::Faq do
   end
 
   it "includes base URL for PDF links" do
-    prompt = Jojo::Prompts::Faq.generate_faq_prompt(
+    prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Developer needed",
       resume: "Resume",
       research: nil,
@@ -60,7 +61,7 @@ describe Jojo::Prompts::Faq do
   end
 
   it "specifies required FAQ categories" do
-    prompt = Jojo::Prompts::Faq.generate_faq_prompt(
+    prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Developer needed",
       resume: "Resume",
       research: nil,
@@ -73,11 +74,11 @@ describe Jojo::Prompts::Faq do
     _(prompt).must_include "Tech stack"
     _(prompt).must_include "Remote work"
     _(prompt).must_include "AI philosophy"
-    _(prompt).must_include "why this company"
+    _(prompt).must_include "Why this company"
   end
 
   it "handles missing research gracefully" do
-    prompt = Jojo::Prompts::Faq.generate_faq_prompt(
+    prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Developer needed",
       resume: "Resume",
       research: nil,

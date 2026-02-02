@@ -1,14 +1,15 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/prompts/research_prompt"
+# test/unit/commands/research/prompt_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/commands/research/prompt"
 
-describe Jojo::Prompts::Research do
+describe Jojo::Commands::Research::Prompt do
   it "generates research prompt with all inputs" do
     job_description = "Senior Ruby Developer at Acme Corp..."
     company_name = "Acme Corp"
     web_results = "Acme Corp recently raised Series B funding..."
     resume = "## Experience\n\n### Software Engineer at Previous Co..."
 
-    prompt = Jojo::Prompts::Research.generate_prompt(
+    prompt = Jojo::Commands::Research::Prompt.generate_prompt(
       job_description: job_description,
       company_name: company_name,
       web_results: web_results,
@@ -30,7 +31,7 @@ describe Jojo::Prompts::Research do
     company_name = "Acme Corp"
     resume = "## Experience..."
 
-    prompt = Jojo::Prompts::Research.generate_prompt(
+    prompt = Jojo::Commands::Research::Prompt.generate_prompt(
       job_description: job_description,
       company_name: company_name,
       web_results: nil,
@@ -46,7 +47,7 @@ describe Jojo::Prompts::Research do
     company_name = "Acme Corp"
     web_results = "Acme Corp info..."
 
-    prompt = Jojo::Prompts::Research.generate_prompt(
+    prompt = Jojo::Commands::Research::Prompt.generate_prompt(
       job_description: job_description,
       company_name: company_name,
       web_results: web_results,

@@ -1,12 +1,13 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/employer"
-require_relative "../../../lib/jojo/generators/annotation_generator"
+# test/unit/commands/annotate/generator_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/commands/annotate/generator"
 
-describe Jojo::Generators::AnnotationGenerator do
+describe Jojo::Commands::Annotate::Generator do
   before do
     @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
-    @generator = Jojo::Generators::AnnotationGenerator.new(
+    @generator = Jojo::Commands::Annotate::Generator.new(
       @employer,
       @ai_client,
       verbose: false

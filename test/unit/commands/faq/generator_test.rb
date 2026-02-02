@@ -1,13 +1,14 @@
-require_relative "../../test_helper"
-require_relative "../../../lib/jojo/employer"
-require_relative "../../../lib/jojo/generators/faq_generator"
+# test/unit/commands/faq/generator_test.rb
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/commands/faq/generator"
 
-describe Jojo::Generators::FaqGenerator do
+describe Jojo::Commands::Faq::Generator do
   before do
     @employer = Jojo::Employer.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
-    @generator = Jojo::Generators::FaqGenerator.new(
+    @generator = Jojo::Commands::Faq::Generator.new(
       @employer,
       @ai_client,
       config: @config,

@@ -1,5 +1,5 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/generators/website_generator"
+require_relative "../../lib/jojo/commands/website/generator"
 require_relative "../../lib/jojo/employer"
 require_relative "../../lib/jojo/config"
 
@@ -73,7 +73,7 @@ describe "Projects Integration Workflow" do
 
     mock_ai = Minitest::Mock.new
 
-    generator = Jojo::Generators::WebsiteGenerator.new(@employer, mock_ai, config: config, template: "default", inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::Website::Generator.new(@employer, mock_ai, config: config, template: "default", inputs_path: @test_fixtures_dir)
     generator.generate
 
     html = File.read(@employer.index_html_path)

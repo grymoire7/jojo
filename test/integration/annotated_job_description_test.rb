@@ -1,7 +1,7 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/employer"
-require_relative "../../lib/jojo/generators/annotation_generator"
-require_relative "../../lib/jojo/generators/website_generator"
+require_relative "../../lib/jojo/commands/annotate/generator"
+require_relative "../../lib/jojo/commands/website/generator"
 
 # Simple config stub to avoid complex mock expectations
 class IntegrationTestConfigStub
@@ -42,7 +42,7 @@ describe "Annotated Job Description Integration" do
 
   it "generates annotated website from job description and resume" do
     # Generate annotations
-    annotation_generator = Jojo::Generators::AnnotationGenerator.new(@employer, @ai_client, verbose: false)
+    annotation_generator = Jojo::Commands::Annotate::Generator.new(@employer, @ai_client, verbose: false)
 
     annotations_json = JSON.generate([
       {text: "5+ years of Ruby", match: "Built Ruby apps for 7 years", tier: "strong"},
@@ -55,7 +55,7 @@ describe "Annotated Job Description Integration" do
     @ai_client.verify
 
     # Generate website with annotations
-    website_generator = Jojo::Generators::WebsiteGenerator.new(
+    website_generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
@@ -89,7 +89,7 @@ describe "Annotated Job Description Integration" do
   it "website works without annotations (graceful degradation)" do
     # Don't generate annotations
 
-    website_generator = Jojo::Generators::WebsiteGenerator.new(
+    website_generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,

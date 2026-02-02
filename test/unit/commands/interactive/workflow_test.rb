@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative "../test_helper"
+require_relative "../../../test_helper"
 require "tmpdir"
 require "fileutils"
 
-describe Jojo::Workflow do
+describe Jojo::Commands::Interactive::Workflow do
   describe "STEPS" do
     it "defines all workflow steps in order" do
-      steps = Jojo::Workflow::STEPS
+      steps = Jojo::Commands::Interactive::Workflow::STEPS
 
       _(steps).must_be_kind_of Array
       _(steps.length).must_equal 9
@@ -16,7 +16,7 @@ describe Jojo::Workflow do
     end
 
     it "includes required fields for each step" do
-      Jojo::Workflow::STEPS.each do |step|
+      Jojo::Commands::Interactive::Workflow::STEPS.each do |step|
         _(step).must_include :key
         _(step).must_include :label
         _(step).must_include :dependencies
@@ -34,18 +34,18 @@ describe Jojo::Workflow do
     end
 
     it "returns full path for a step" do
-      path = Jojo::Workflow.file_path(:resume, @employer)
+      path = Jojo::Commands::Interactive::Workflow.file_path(:resume, @employer)
       _(path).must_equal "/tmp/test-employer/resume.md"
     end
 
     it "handles nested paths like website" do
       @employer.expect :base_path, "/tmp/test-employer"
-      path = Jojo::Workflow.file_path(:website, @employer)
+      path = Jojo::Commands::Interactive::Workflow.file_path(:website, @employer)
       _(path).must_equal "/tmp/test-employer/website/index.html"
     end
 
     it "raises for unknown step" do
-      _ { Jojo::Workflow.file_path(:unknown, @employer) }.must_raise ArgumentError
+      _ { Jojo::Commands::Interactive::Workflow.file_path(:unknown, @employer) }.must_raise ArgumentError
     end
   end
 
@@ -65,7 +65,7 @@ describe Jojo::Workflow do
       # file_path called for: output + first dependency (fails, returns early)
       @employer.expect :base_path, @temp_dir
 
-      status = Jojo::Workflow.status(:resume, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, @employer)
       _(status).must_equal :blocked
     end
 
@@ -78,7 +78,7 @@ describe Jojo::Workflow do
       @employer.expect :base_path, @temp_dir
       @employer.expect :base_path, @temp_dir
 
-      status = Jojo::Workflow.status(:resume, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, @employer)
       _(status).must_equal :ready
     end
 
@@ -95,7 +95,7 @@ describe Jojo::Workflow do
       @employer.expect :base_path, @temp_dir
       @employer.expect :base_path, @temp_dir
 
-      status = Jojo::Workflow.status(:resume, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, @employer)
       _(status).must_equal :generated
     end
 
@@ -112,12 +112,12 @@ describe Jojo::Workflow do
       @employer.expect :base_path, @temp_dir
       @employer.expect :base_path, @temp_dir
 
-      status = Jojo::Workflow.status(:resume, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, @employer)
       _(status).must_equal :stale
     end
 
     it "returns :ready for job_description (no dependencies)" do
-      status = Jojo::Workflow.status(:job_description, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:job_description, @employer)
       _(status).must_equal :ready
     end
   end
@@ -136,7 +136,7 @@ describe Jojo::Workflow do
       # Mock base_path for each status call (9 steps, each may call multiple times)
       27.times { @employer.expect :base_path, @temp_dir }
 
-      statuses = Jojo::Workflow.all_statuses(@employer)
+      statuses = Jojo::Commands::Interactive::Workflow.all_statuses(@employer)
 
       _(statuses).must_be_kind_of Hash
       _(statuses.keys.length).must_equal 9
@@ -158,7 +158,7 @@ describe Jojo::Workflow do
     it "returns list of missing dependency labels" do
       5.times { @employer.expect :base_path, @temp_dir }
 
-      missing = Jojo::Workflow.missing_dependencies(:resume, @employer)
+      missing = Jojo::Commands::Interactive::Workflow.missing_dependencies(:resume, @employer)
 
       _(missing).must_include "Job Description"
       _(missing).must_include "Research"
@@ -170,7 +170,7 @@ describe Jojo::Workflow do
 
       5.times { @employer.expect :base_path, @temp_dir }
 
-      missing = Jojo::Workflow.missing_dependencies(:resume, @employer)
+      missing = Jojo::Commands::Interactive::Workflow.missing_dependencies(:resume, @employer)
       _(missing).must_be_empty
     end
   end
@@ -188,7 +188,7 @@ describe Jojo::Workflow do
     it "returns 0 when nothing generated" do
       27.times { @employer.expect :base_path, @temp_dir }
 
-      progress = Jojo::Workflow.progress(@employer)
+      progress = Jojo::Commands::Interactive::Workflow.progress(@employer)
       _(progress).must_equal 0
     end
 
@@ -198,7 +198,7 @@ describe Jojo::Workflow do
 
       27.times { @employer.expect :base_path, @temp_dir }
 
-      progress = Jojo::Workflow.progress(@employer)
+      progress = Jojo::Commands::Interactive::Workflow.progress(@employer)
       _(progress).must_equal 11  # 1/9 rounded
     end
   end
