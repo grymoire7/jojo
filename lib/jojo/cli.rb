@@ -9,6 +9,7 @@ require_relative "commands/faq/command"
 require_relative "commands/branding/command"
 require_relative "commands/website/command"
 require_relative "commands/pdf/command"
+require_relative "commands/setup/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -43,16 +44,7 @@ module Jojo
 
     desc "setup", "Setup configuration"
     def setup
-      Jojo::SetupService.new(
-        cli_instance: self,
-        overwrite: options[:overwrite]
-      ).run
-    rescue SystemExit
-      # Allow clean exit from service
-      raise
-    rescue => e
-      say "✗ Setup failed: #{e.message}", :red
-      exit 1
+      Commands::Setup::Command.new(self, command_options).execute
     end
 
     desc "new", "Create a new job application workspace"
