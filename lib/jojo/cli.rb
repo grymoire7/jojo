@@ -3,6 +3,7 @@ require "fileutils"
 require_relative "commands/version/command"
 require_relative "commands/annotate/command"
 require_relative "commands/research/command"
+require_relative "commands/resume/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -398,49 +399,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo resume
     DESC
     def resume
-      slug = resolve_slug
-      employer = Jojo::Employer.new(slug)
-
-      unless employer.artifacts_exist?
-        say "✗ Employer '#{slug}' not found.", :red
-        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
-        exit 1
-      end
-
-      config = Jojo::Config.new
-      ai_client = Jojo::AIClient.new(config, verbose: options[:verbose])
-      status_logger = Jojo::StatusLogger.new(employer)
-
-      say "Generating resume for #{employer.company_name}...", :green
-
-      # Check that research has been generated
-      unless File.exist?(employer.research_path)
-        say "⚠ Warning: Research not found. Resume will be less targeted.", :yellow
-      end
-
-      # Check that resume data exists
-      unless File.exist?("inputs/resume_data.yml")
-        say "✗ Resume data not found at inputs/resume_data.yml", :red
-        say "  Run 'jojo setup' or copy templates/resume_data.yml to inputs/ and customize it.", :yellow
-        exit 1
-      end
-
-      begin
-        generator = Jojo::Generators::ResumeGenerator.new(employer, ai_client, config: config, verbose: options[:verbose], overwrite_flag: options[:overwrite], cli_instance: self)
-        generator.generate
-
-        say "✓ Resume generated and saved to #{employer.resume_path}", :green
-
-        status_logger.log_step("Resume Generation",
-          tokens: ai_client.total_tokens_used,
-          status: "complete")
-
-        say "\n✓ Resume complete!", :green
-      rescue => e
-        say "✗ Error generating resume: #{e.message}", :red
-        status_logger.log_step("Resume Generation", status: "failed", error: e.message)
-        exit 1
-      end
+      Commands::Resume::Command.new(self, command_options).execute
     end
 
     desc "cover_letter", "Generate cover letter only"
