@@ -128,4 +128,71 @@ describe Jojo::Commands::Base do
       _(logger).must_be_kind_of Jojo::StatusLogger
     end
   end
+
+  describe "validation helpers" do
+    before do
+      @tmpdir = Dir.mktmpdir
+      @original_dir = Dir.pwd
+      Dir.chdir(@tmpdir)
+      FileUtils.mkdir_p("employers/acme-corp")
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(@tmpdir)
+    end
+
+    describe "#require_employer!" do
+      it "does not exit when employer artifacts exist" do
+        File.write("employers/acme-corp/job_description.md", "Test")
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+        # Should not raise
+        base.send(:require_employer!)
+      end
+
+      it "exits with message when employer not found" do
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "nonexistent")
+
+        @mock_cli.expect(:say, nil, ["Employer 'nonexistent' not found.", :red])
+        @mock_cli.expect(:say, nil, [String, :yellow])
+
+        assert_raises(SystemExit) { base.send(:require_employer!) }
+        @mock_cli.verify
+      end
+    end
+
+    describe "#require_file!" do
+      it "does not exit when file exists" do
+        File.write("employers/acme-corp/test.txt", "content")
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+        # Should not raise
+        base.send(:require_file!, "employers/acme-corp/test.txt", "Test file")
+      end
+
+      it "exits with message when file missing" do
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+        @mock_cli.expect(:say, nil, ["Test file not found at missing.txt", :red])
+
+        assert_raises(SystemExit) do
+          base.send(:require_file!, "missing.txt", "Test file")
+        end
+        @mock_cli.verify
+      end
+
+      it "shows suggestion when provided" do
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+        @mock_cli.expect(:say, nil, [String, :red])
+        @mock_cli.expect(:say, nil, ["  Run 'jojo setup' first", :yellow])
+
+        assert_raises(SystemExit) do
+          base.send(:require_file!, "missing.txt", "Config", suggestion: "Run 'jojo setup' first")
+        end
+        @mock_cli.verify
+      end
+    end
+  end
 end

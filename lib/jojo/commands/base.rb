@@ -46,6 +46,23 @@ module Jojo
       def status_logger
         @status_logger ||= Jojo::StatusLogger.new(employer)
       end
+
+      # Common validations
+      def require_employer!
+        return if employer.artifacts_exist?
+
+        say "Employer '#{slug}' not found.", :red
+        say "  Run 'jojo new -s #{slug}' to create it.", :yellow
+        exit 1
+      end
+
+      def require_file!(path, description, suggestion: nil)
+        return if File.exist?(path)
+
+        say "#{description} not found at #{path}", :red
+        say "  #{suggestion}", :yellow if suggestion
+        exit 1
+      end
     end
   end
 end
