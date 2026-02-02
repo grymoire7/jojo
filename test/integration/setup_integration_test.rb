@@ -1,5 +1,5 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/setup_service"
+require_relative "../../lib/jojo/commands/setup/service"
 
 describe "Setup Integration" do
   it "completes full setup flow with anthropic provider" do
@@ -87,7 +87,7 @@ describe "Setup Integration" do
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
-        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, overwrite: false)
+        service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
         service.run
 
         cli.verify
@@ -193,7 +193,7 @@ describe "Setup Integration" do
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
-        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, overwrite: false)
+        service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
         service.run
 
         cli.verify
@@ -286,7 +286,7 @@ describe "Setup Integration" do
         cli.expect :say, nil, [""]
         cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
-        service = Jojo::SetupService.new(cli_instance: cli, prompt: prompt, overwrite: false)
+        service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
         service.run
 
         cli.verify
