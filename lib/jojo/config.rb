@@ -7,6 +7,12 @@ module Jojo
       @config = nil
     end
 
+    def self.instance(config_path = "config.yml")
+      @instance ||= {}
+      @instance[config_path] ||= Config.new(config_path)
+      @instance[config_path]
+    end
+
     def seeker_name
       config["seeker_name"]
     end
