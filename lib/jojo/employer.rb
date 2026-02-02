@@ -89,8 +89,8 @@ module Jojo
       create_directory!
 
       # Process job description using existing processor
-      require_relative "job_description_processor"
-      processor = JobDescriptionProcessor.new(self, ai_client, overwrite_flag: overwrite_flag, cli_instance: cli_instance, verbose: verbose)
+      require_relative "commands/job_description/processor"
+      processor = Commands::JobDescription::Processor.new(self, ai_client, overwrite_flag: overwrite_flag, cli_instance: cli_instance, verbose: verbose)
       processor.process(job_source)
     end
 

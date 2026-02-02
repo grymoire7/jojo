@@ -1,15 +1,15 @@
-require_relative "../test_helper"
-require_relative "../../lib/jojo/employer"
-require_relative "../../lib/jojo/ai_client"
-require_relative "../../lib/jojo/job_description_processor"
-require_relative "../../lib/jojo/prompts/job_description_prompts"
+require_relative "../../../test_helper"
+require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/ai_client"
+require_relative "../../../../lib/jojo/commands/job_description/processor"
+require_relative "../../../../lib/jojo/commands/job_description/prompt"
 
-describe Jojo::JobDescriptionProcessor do
+describe Jojo::Commands::JobDescription::Processor do
   before do
     @employer = Jojo::Employer.new("test-company")
     @config = Minitest::Mock.new
     @ai_client = Minitest::Mock.new
-    @processor = Jojo::JobDescriptionProcessor.new(@employer, @ai_client, verbose: false)
+    @processor = Jojo::Commands::JobDescription::Processor.new(@employer, @ai_client, verbose: false)
 
     # Clean up before tests
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
@@ -43,7 +43,7 @@ describe Jojo::JobDescriptionProcessor do
   end
 
   it "handles file not found error" do
-    error = assert_raises(Jojo::JobDescriptionProcessor::ProcessingError) do
+    error = assert_raises(Jojo::Commands::JobDescription::Processor::ProcessingError) do
       @processor.process("nonexistent_file.txt")
     end
 
