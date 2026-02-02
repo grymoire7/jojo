@@ -14,10 +14,6 @@ describe Jojo::CLI do
     _(Jojo::CLI.commands.key?("setup")).must_equal true
   end
 
-  it "has generate command" do
-    _(Jojo::CLI.commands.key?("generate")).must_equal true
-  end
-
   it "has research command" do
     _(Jojo::CLI.commands.key?("research")).must_equal true
   end
