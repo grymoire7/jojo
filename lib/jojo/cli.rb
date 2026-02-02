@@ -8,6 +8,7 @@ require_relative "commands/cover_letter/command"
 require_relative "commands/faq/command"
 require_relative "commands/branding/command"
 require_relative "commands/website/command"
+require_relative "commands/pdf/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -469,51 +470,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo pdf
     DESC
     def pdf
-      slug = resolve_slug
-      employer = Jojo::Employer.new(slug)
-
-      unless employer.artifacts_exist?
-        say "✗ Employer '#{slug}' not found.", :red
-        say "  Run 'jojo new -s #{slug} -j JOB_DESCRIPTION' to create it.", :yellow
-        exit 1
-      end
-
-      status_logger = Jojo::StatusLogger.new(employer)
-
-      say "Generating PDFs for #{employer.company_name}...", :green
-
-      begin
-        generator = Jojo::PdfConverter.new(employer, verbose: options[:verbose])
-        results = generator.generate_all
-
-        # Report what was generated
-        results[:generated].each do |doc_type|
-          say "✓ #{doc_type.to_s.capitalize} PDF generated", :green
-        end
-
-        # Report what was skipped
-        results[:skipped].each do |doc_type|
-          say "⚠ Skipped #{doc_type}: markdown file not found", :yellow
-        end
-
-        if results[:generated].any?
-          status_logger.log_step("PDF Generation",
-            status: "complete",
-            generated: results[:generated].length)
-          say "\n✓ PDF generation complete!", :green
-        else
-          say "\n⚠ No PDFs generated. Generate resume and cover letter first.", :yellow
-          exit 1
-        end
-      rescue Jojo::PandocChecker::PandocNotFoundError => e
-        say "✗ #{e.message}", :red
-        status_logger.log_step("PDF Generation", status: "failed", error: "Pandoc not installed")
-        exit 1
-      rescue => e
-        say "✗ Error generating PDFs: #{e.message}", :red
-        status_logger.log_step("PDF Generation", status: "failed", error: e.message)
-        exit 1
-      end
+      Commands::Pdf::Command.new(self, command_options).execute
     end
 
     desc "test", "Run tests (default: --unit for fast feedback)"
