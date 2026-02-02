@@ -5,6 +5,7 @@ require_relative "commands/annotate/command"
 require_relative "commands/research/command"
 require_relative "commands/resume/command"
 require_relative "commands/cover_letter/command"
+require_relative "commands/faq/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -414,6 +415,19 @@ module Jojo
     DESC
     def cover_letter
       Commands::CoverLetter::Command.new(self, command_options).execute
+    end
+
+    desc "faq", "Generate FAQs only"
+    long_desc <<~DESC, wrap: false
+      Generate FAQs for a specific employer.
+      Requires that you've already run 'jojo new' and 'jojo resume' first.
+
+      Examples:
+        jojo faq -s acme-corp-senior-dev
+        JOJO_EMPLOYER_SLUG=acme-corp jojo faq
+    DESC
+    def faq
+      Commands::Faq::Command.new(self, command_options).execute
     end
 
     desc "branding", "Generate branding statement only"
