@@ -10,6 +10,7 @@ require_relative "commands/branding/command"
 require_relative "commands/website/command"
 require_relative "commands/pdf/command"
 require_relative "commands/setup/command"
+require_relative "commands/new/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -58,40 +59,7 @@ module Jojo
     DESC
     method_option :slug, type: :string, aliases: "-s", required: true, desc: "Unique employer identifier"
     def new
-      # Validate required inputs exist before creating employer
-      begin
-        Jojo::TemplateValidator.validate_required_file!(
-          "inputs/resume_data.yml",
-          "resume data"
-        )
-      rescue Jojo::TemplateValidator::MissingInputError => e
-        say e.message, :red
-        exit 1
-      end
-
-      # Warn if resume data hasn't been customized
-      result = Jojo::TemplateValidator.warn_if_unchanged(
-        "inputs/resume_data.yml",
-        "resume data",
-        cli_instance: self
-      )
-
-      if result == :abort
-        say "Setup your inputs first, then run this command again.", :yellow
-        exit 1
-      end
-
-      employer = Jojo::Employer.new(options[:slug])
-
-      if File.exist?(employer.base_path)
-        say "Application '#{options[:slug]}' already exists.", :yellow
-        exit 1
-      end
-
-      FileUtils.mkdir_p(employer.base_path)
-      say "Created application workspace: #{employer.base_path}", :green
-      say "\nNext step:", :cyan
-      say "  jojo job_description -s #{options[:slug]} -j <job_file_or_url>", :white
+      Commands::New::Command.new(self, command_options).execute
     end
 
     desc "job_description", "Process job description for an application"
