@@ -1,7 +1,7 @@
 # lib/jojo/commands/pdf/command.rb
 require_relative "../base"
-require_relative "../../pdf_converter"
-require_relative "../../pandoc_checker"
+require_relative "converter"
+require_relative "pandoc_checker"
 
 module Jojo
   module Commands
@@ -12,7 +12,7 @@ module Jojo
 
           say "Generating PDFs for #{employer.company_name}...", :green
 
-          converter = PdfConverter.new(employer, verbose: verbose?)
+          converter = Converter.new(employer, verbose: verbose?)
           results = converter.generate_all
 
           # Report what was generated
@@ -32,7 +32,7 @@ module Jojo
             say "No PDFs generated. Generate resume and cover letter first.", :yellow
             exit 1
           end
-        rescue Jojo::PandocChecker::PandocNotFoundError => e
+        rescue PandocChecker::PandocNotFoundError => e
           say e.message, :red
           begin
             status_logger.log_step(:pdf, status: "failed", error: "Pandoc not installed")
