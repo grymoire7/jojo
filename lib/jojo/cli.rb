@@ -13,6 +13,7 @@ require_relative "commands/setup/command"
 require_relative "commands/new/command"
 require_relative "commands/job_description/command"
 require_relative "commands/test/command"
+require_relative "commands/interactive/command"
 require_relative "status_logger"
 require_relative "setup_service"
 require_relative "template_validator"
@@ -451,8 +452,7 @@ module Jojo
     method_option :slug, type: :string, aliases: "-s", desc: "Application slug to start with"
     map "i" => :interactive
     def interactive
-      slug = options[:slug] || ENV["JOJO_EMPLOYER_SLUG"]
-      Jojo::Interactive.new(slug: slug).run
+      Commands::Interactive::Command.new(self, command_options).execute
     end
 
     private
