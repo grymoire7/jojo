@@ -6,6 +6,11 @@ module Jojo
   module Commands
     module Faq
       class Command < Base
+        def initialize(cli, generator: nil, **rest)
+          super(cli, **rest)
+          @generator = generator
+        end
+
         def execute
           require_employer!
 
@@ -17,12 +22,6 @@ module Jojo
             exit 1
           end
 
-          generator = Generator.new(
-            employer,
-            ai_client,
-            config: config,
-            verbose: verbose?
-          )
           faqs = generator.generate
 
           log(step: :faq, tokens: ai_client.total_tokens_used, status: "complete", faq_count: faqs.length)
@@ -36,6 +35,17 @@ module Jojo
             # Ignore logging errors
           end
           exit 1
+        end
+
+        private
+
+        def generator
+          @generator ||= Generator.new(
+            employer,
+            ai_client,
+            config: config,
+            verbose: verbose?
+          )
         end
       end
     end

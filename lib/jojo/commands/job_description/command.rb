@@ -13,7 +13,7 @@ module Jojo
             exit 1
           end
 
-          @employer = Jojo::Employer.new(resolved_slug)
+          @employer ||= Jojo::Employer.new(resolved_slug)
           unless File.exist?(employer.base_path)
             say "Application '#{resolved_slug}' does not exist. Run 'jojo new -s #{resolved_slug}' first.", :red
             exit 1

@@ -6,18 +6,16 @@ module Jojo
   module Commands
     module Annotate
       class Command < Base
+        def initialize(cli, generator: nil, **rest)
+          super(cli, **rest)
+          @generator = generator
+        end
+
         def execute
           require_employer!
 
           say "Generating annotations for #{employer.company_name}...", :green
 
-          generator = Generator.new(
-            employer,
-            ai_client,
-            verbose: verbose?,
-            overwrite_flag: overwrite?,
-            cli_instance: cli
-          )
           annotations = generator.generate
 
           log(step: :annotate, tokens: ai_client.total_tokens_used, status: "complete")
@@ -32,6 +30,18 @@ module Jojo
             # Ignore logging errors
           end
           exit 1
+        end
+
+        private
+
+        def generator
+          @generator ||= Generator.new(
+            employer,
+            ai_client,
+            verbose: verbose?,
+            overwrite_flag: overwrite?,
+            cli_instance: cli
+          )
         end
       end
     end

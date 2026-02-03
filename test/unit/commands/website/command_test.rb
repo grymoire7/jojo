@@ -3,71 +3,207 @@ require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/website/command"
 
 describe Jojo::Commands::Website::Command do
+  include CommandTestHelper
+
   before do
-    @tmpdir = Dir.mktmpdir
-    @original_dir = Dir.pwd
-    Dir.chdir(@tmpdir)
-
-    # Create config
-    File.write("config.yml", <<~YAML)
-      seeker_name: "Test User"
-      base_url: "https://example.com"
-      reasoning_ai_service: openai
-      reasoning_ai_model: gpt-4
-      text_generation_ai_service: openai
-      text_generation_ai_model: gpt-4
-    YAML
-
-    # Create employer with required files
-    FileUtils.mkdir_p("employers/acme-corp")
-    File.write("employers/acme-corp/job_description.md", "Senior Ruby Developer")
-
+    setup_temp_project
+    create_employer_fixture("acme-corp", files: {
+      "job_description.md" => "Senior Ruby Developer",
+      "resume.md" => "Tailored resume content",
+      "research.md" => "Company research"
+    })
     @mock_cli = Minitest::Mock.new
   end
 
-  after do
-    Dir.chdir(@original_dir)
-    FileUtils.rm_rf(@tmpdir)
-  end
+  after { teardown_temp_project }
 
   it "inherits from Base" do
     _(Jojo::Commands::Website::Command.ancestors).must_include Jojo::Commands::Base
   end
 
-  it "exits when employer not found" do
-    @mock_cli.expect(:say, nil, [/not found/, :red])
-    @mock_cli.expect(:say, nil, [String, :yellow])
+  describe "guard failures" do
+    it "exits when employer not found" do
+      @mock_cli.expect(:say, nil, [/not found/, :red])
+      @mock_cli.expect(:say, nil, [String, :yellow])
 
-    command = Jojo::Commands::Website::Command.new(@mock_cli, slug: "nonexistent")
+      command = Jojo::Commands::Website::Command.new(@mock_cli, slug: "nonexistent")
 
-    assert_raises(SystemExit) { command.execute }
-    @mock_cli.verify
+      assert_raises(SystemExit) { command.execute }
+      @mock_cli.verify
+    end
+
+    it "exits when resume not found" do
+      FileUtils.rm("employers/acme-corp/resume.md")
+
+      @mock_cli.expect(:say, nil, [/Generating website/, :green])
+      @mock_cli.expect(:say, nil, [/Resume not found/, :red])
+
+      command = Jojo::Commands::Website::Command.new(@mock_cli, slug: "acme-corp")
+
+      error = assert_raises(SystemExit) { command.execute }
+      _(error.status).must_equal 1
+      @mock_cli.verify
+    end
+
+    it "warns but continues when research not found" do
+      FileUtils.rm("employers/acme-corp/research.md")
+
+      @mock_status_logger = Minitest::Mock.new
+      @mock_employer = Minitest::Mock.new
+      @mock_ai_client = Minitest::Mock.new
+      @mock_generator = Minitest::Mock.new
+
+      @mock_employer.expect(:artifacts_exist?, true)
+      @mock_employer.expect(:company_name, "Acme Corp")
+      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
+      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
+      @mock_employer.expect(:index_html_path, "employers/acme-corp/index.html")
+      @mock_employer.expect(:status_logger, @mock_status_logger)
+
+      @mock_generator.expect(:generate, nil)
+      @mock_ai_client.expect(:total_tokens_used, 100)
+      @mock_status_logger.expect(:log, nil, [], step: :website, tokens: 100, status: "complete", metadata: {template: "default"})
+
+      @mock_cli.expect(:say, nil, ["Generating website for Acme Corp...", :green])
+      @mock_cli.expect(:say, nil, ["Warning: Research not found. Website will be less targeted.", :yellow])
+      @mock_cli.expect(:say, nil, [/Website generated/, :green])
+
+      command = Jojo::Commands::Website::Command.new(
+        @mock_cli,
+        slug: "acme-corp",
+        employer: @mock_employer,
+        ai_client: @mock_ai_client,
+        generator: @mock_generator
+      )
+      command.execute
+
+      @mock_cli.verify
+    end
   end
 
-  it "exits when resume not found" do
-    @mock_cli.expect(:say, nil, [/Generating website/, :green])
-    @mock_cli.expect(:say, nil, [/Resume not found/, :red])
+  describe "successful execution" do
+    before do
+      @mock_status_logger = Minitest::Mock.new
+      @mock_employer = Minitest::Mock.new
+      @mock_ai_client = Minitest::Mock.new
+      @mock_generator = Minitest::Mock.new
 
-    command = Jojo::Commands::Website::Command.new(@mock_cli, slug: "acme-corp")
+      @mock_employer.expect(:artifacts_exist?, true)
+      @mock_employer.expect(:company_name, "Acme Corp")
+      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
+      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
+      @mock_employer.expect(:index_html_path, "employers/acme-corp/index.html")
+      @mock_employer.expect(:status_logger, @mock_status_logger)
+    end
 
-    assert_raises(SystemExit) { command.execute }
-    @mock_cli.verify
+    it "calls generator.generate" do
+      @mock_generator.expect(:generate, nil)
+      @mock_ai_client.expect(:total_tokens_used, 200)
+      @mock_status_logger.expect(:log, nil, [], step: :website, tokens: 200, status: "complete", metadata: {template: "default"})
+
+      @mock_cli.expect(:say, nil, ["Generating website for Acme Corp...", :green])
+      @mock_cli.expect(:say, nil, ["Website generated and saved to employers/acme-corp/index.html", :green])
+
+      command = Jojo::Commands::Website::Command.new(
+        @mock_cli,
+        slug: "acme-corp",
+        employer: @mock_employer,
+        ai_client: @mock_ai_client,
+        generator: @mock_generator
+      )
+      command.execute
+
+      @mock_generator.verify
+    end
   end
 
-  it "warns when research not found" do
-    # Create resume file
-    File.write("employers/acme-corp/resume.md", "Test resume content")
+  describe "logging" do
+    before do
+      @mock_status_logger = Minitest::Mock.new
+      @mock_employer = Minitest::Mock.new
+      @mock_ai_client = Minitest::Mock.new
+      @mock_generator = Minitest::Mock.new
 
-    @mock_cli.expect(:say, nil, [/Generating website/, :green])
-    @mock_cli.expect(:say, nil, [/Research not found/, :yellow])
-    # Will fail later when branding.md is not found
+      @mock_employer.expect(:artifacts_exist?, true)
+      @mock_employer.expect(:company_name, "Acme Corp")
+      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
+      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
+      @mock_employer.expect(:index_html_path, "employers/acme-corp/index.html")
+      @mock_employer.expect(:status_logger, @mock_status_logger)
 
-    command = Jojo::Commands::Website::Command.new(@mock_cli, slug: "acme-corp")
+      @mock_generator.expect(:generate, nil)
 
-    # Expecting it to eventually fail since branding.md doesn't exist
-    # We just want to verify the warning is shown first
-    @mock_cli.expect(:say, nil, [/Error generating website/, :red])
+      @mock_cli.expect(:say, nil, [String, :green])
+      @mock_cli.expect(:say, nil, [String, :green])
+    end
 
-    assert_raises(SystemExit) { command.execute }
+    it "logs with template metadata on success" do
+      @mock_ai_client.expect(:total_tokens_used, 350)
+      @mock_status_logger.expect(:log, nil, [], step: :website, tokens: 350, status: "complete", metadata: {template: "default"})
+
+      command = Jojo::Commands::Website::Command.new(
+        @mock_cli,
+        slug: "acme-corp",
+        employer: @mock_employer,
+        ai_client: @mock_ai_client,
+        generator: @mock_generator
+      )
+      command.execute
+
+      @mock_status_logger.verify
+    end
+  end
+
+  describe "error recovery" do
+    before do
+      @mock_status_logger = Minitest::Mock.new
+      @mock_employer = Minitest::Mock.new
+      @mock_ai_client = Minitest::Mock.new
+      @mock_generator = Minitest::Mock.new
+
+      @mock_employer.expect(:artifacts_exist?, true)
+      @mock_employer.expect(:company_name, "Acme Corp")
+      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
+      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
+      @mock_employer.expect(:status_logger, @mock_status_logger)
+    end
+
+    it "displays error message when generator fails" do
+      @mock_generator.expect(:generate, nil) { raise StandardError, "AI service unavailable" }
+
+      @mock_cli.expect(:say, nil, [String, :green])
+      @mock_cli.expect(:say, nil, ["Error generating website: AI service unavailable", :red])
+      @mock_status_logger.expect(:log, nil, [], step: :website, status: "failed", error: "AI service unavailable")
+
+      command = Jojo::Commands::Website::Command.new(
+        @mock_cli,
+        slug: "acme-corp",
+        employer: @mock_employer,
+        ai_client: @mock_ai_client,
+        generator: @mock_generator
+      )
+
+      assert_raises(SystemExit) { command.execute }
+      @mock_cli.verify
+    end
+
+    it "exits with status 1 on error" do
+      @mock_generator.expect(:generate, nil) { raise StandardError, "Error" }
+
+      @mock_cli.expect(:say, nil, [String, :green])
+      @mock_cli.expect(:say, nil, [String, :red])
+      @mock_status_logger.expect(:log, nil, [], step: :website, status: "failed", error: "Error")
+
+      command = Jojo::Commands::Website::Command.new(
+        @mock_cli,
+        slug: "acme-corp",
+        employer: @mock_employer,
+        ai_client: @mock_ai_client,
+        generator: @mock_generator
+      )
+
+      error = assert_raises(SystemExit) { command.execute }
+      _(error.status).must_equal 1
+    end
   end
 end

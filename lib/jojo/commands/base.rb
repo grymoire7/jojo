@@ -9,9 +9,11 @@ module Jojo
     class Base
       attr_reader :cli, :options
 
-      def initialize(cli, options = {})
+      def initialize(cli, ai_client: nil, employer: nil, **options)
         @cli = cli
         @options = options
+        @ai_client = ai_client
+        @employer = employer
       end
 
       def execute

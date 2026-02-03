@@ -31,12 +31,12 @@ module Jojo
 
     desc "version", "Show version"
     def version
-      Commands::Version::Command.new(self, command_options).execute
+      Commands::Version::Command.new(self, **command_options).execute
     end
 
     desc "setup", "Setup configuration"
     def setup
-      Commands::Setup::Command.new(self, command_options).execute
+      Commands::Setup::Command.new(self, **command_options).execute
     end
 
     desc "new", "Create a new job application workspace"
@@ -50,7 +50,7 @@ module Jojo
     DESC
     method_option :slug, type: :string, aliases: "-s", required: true, desc: "Unique employer identifier"
     def new
-      Commands::New::Command.new(self, command_options).execute
+      Commands::New::Command.new(self, **command_options).execute
     end
 
     desc "job_description", "Process job description for an application"
@@ -66,7 +66,7 @@ module Jojo
     method_option :slug, type: :string, aliases: "-s", desc: "Application slug (uses current if omitted)"
     method_option :job, type: :string, aliases: "-j", required: true, desc: "Job description (file path or URL)"
     def job_description
-      Commands::JobDescription::Command.new(self, command_options).execute
+      Commands::JobDescription::Command.new(self, **command_options).execute
     end
 
     desc "annotate", "Generate job description annotations"
@@ -79,7 +79,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo annotate
     DESC
     def annotate
-      Commands::Annotate::Command.new(self, command_options).execute
+      Commands::Annotate::Command.new(self, **command_options).execute
     end
 
     desc "research", "Generate company/role research only"
@@ -92,7 +92,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo research
     DESC
     def research
-      Commands::Research::Command.new(self, command_options).execute
+      Commands::Research::Command.new(self, **command_options).execute
     end
 
     desc "resume", "Generate tailored resume only"
@@ -105,7 +105,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo resume
     DESC
     def resume
-      Commands::Resume::Command.new(self, command_options).execute
+      Commands::Resume::Command.new(self, **command_options).execute
     end
 
     desc "cover_letter", "Generate cover letter only"
@@ -118,7 +118,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo cover_letter
     DESC
     def cover_letter
-      Commands::CoverLetter::Command.new(self, command_options).execute
+      Commands::CoverLetter::Command.new(self, **command_options).execute
     end
 
     desc "faq", "Generate FAQs only"
@@ -131,7 +131,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo faq
     DESC
     def faq
-      Commands::Faq::Command.new(self, command_options).execute
+      Commands::Faq::Command.new(self, **command_options).execute
     end
 
     desc "branding", "Generate branding statement only"
@@ -144,7 +144,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo branding
     DESC
     def branding
-      Commands::Branding::Command.new(self, command_options).execute
+      Commands::Branding::Command.new(self, **command_options).execute
     end
 
     desc "website", "Generate website only"
@@ -158,7 +158,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo website
     DESC
     def website
-      Commands::Website::Command.new(self, command_options).execute
+      Commands::Website::Command.new(self, **command_options).execute
     end
 
     desc "pdf", "Generate PDF versions of resume and cover letter"
@@ -171,7 +171,7 @@ module Jojo
         JOJO_EMPLOYER_SLUG=acme-corp jojo pdf
     DESC
     def pdf
-      Commands::Pdf::Command.new(self, command_options).execute
+      Commands::Pdf::Command.new(self, **command_options).execute
     end
 
     desc "test", "Run tests (default: --unit for fast feedback)"
@@ -201,14 +201,14 @@ module Jojo
     method_option :all, type: :boolean, desc: "Run all tests and checks"
     def test
       test_options = options.slice(:unit, :integration, :service, :standard, :all, :quiet)
-      Commands::Test::Command.new(self, test_options).execute
+      Commands::Test::Command.new(self, **test_options).execute
     end
 
     desc "interactive", "Launch interactive dashboard mode"
     method_option :slug, type: :string, aliases: "-s", desc: "Application slug to start with"
     map "i" => :interactive
     def interactive
-      Commands::Interactive::Command.new(self, command_options).execute
+      Commands::Interactive::Command.new(self, **command_options).execute
     end
 
     private

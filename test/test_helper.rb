@@ -5,3 +5,4 @@ require "minitest/reporters"
 Minitest::Reporters.use!
 
 require_relative "../lib/jojo"
+require_relative "support/command_test_helper"

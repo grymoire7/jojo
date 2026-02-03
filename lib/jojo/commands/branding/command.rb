@@ -6,6 +6,11 @@ module Jojo
   module Commands
     module Branding
       class Command < Base
+        def initialize(cli, generator: nil, **rest)
+          super(cli, **rest)
+          @generator = generator
+        end
+
         def execute
           require_employer!
 
@@ -24,12 +29,6 @@ module Jojo
             exit 1
           end
 
-          generator = Generator.new(
-            employer,
-            ai_client,
-            config: config,
-            verbose: verbose?
-          )
           generator.generate
 
           log(step: :branding, tokens: ai_client.total_tokens_used, status: "complete")
@@ -43,6 +42,17 @@ module Jojo
             # Ignore logging errors
           end
           exit 1
+        end
+
+        private
+
+        def generator
+          @generator ||= Generator.new(
+            employer,
+            ai_client,
+            config: config,
+            verbose: verbose?
+          )
         end
       end
     end

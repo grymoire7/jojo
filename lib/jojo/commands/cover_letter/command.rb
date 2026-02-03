@@ -6,6 +6,11 @@ module Jojo
   module Commands
     module CoverLetter
       class Command < Base
+        def initialize(cli, generator: nil, **rest)
+          super(cli, **rest)
+          @generator = generator
+        end
+
         def execute
           require_employer!
 
@@ -29,14 +34,6 @@ module Jojo
             say "Warning: Research not found. Cover letter will be less targeted.", :yellow
           end
 
-          generator = Generator.new(
-            employer,
-            ai_client,
-            config: config,
-            verbose: verbose?,
-            overwrite_flag: overwrite?,
-            cli_instance: cli
-          )
           generator.generate
 
           log(step: :cover_letter, tokens: ai_client.total_tokens_used, status: "complete")
@@ -50,6 +47,19 @@ module Jojo
             # Ignore logging errors
           end
           exit 1
+        end
+
+        private
+
+        def generator
+          @generator ||= Generator.new(
+            employer,
+            ai_client,
+            config: config,
+            verbose: verbose?,
+            overwrite_flag: overwrite?,
+            cli_instance: cli
+          )
         end
       end
     end

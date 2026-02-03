@@ -7,12 +7,16 @@ module Jojo
   module Commands
     module Pdf
       class Command < Base
+        def initialize(cli, converter: nil, **rest)
+          super(cli, **rest)
+          @converter = converter
+        end
+
         def execute
           require_employer!
 
           say "Generating PDFs for #{employer.company_name}...", :green
 
-          converter = Converter.new(employer, verbose: verbose?)
           results = converter.generate_all
 
           # Report what was generated
@@ -48,6 +52,12 @@ module Jojo
             # Ignore logging errors
           end
           exit 1
+        end
+
+        private
+
+        def converter
+          @converter ||= Converter.new(employer, verbose: verbose?)
         end
       end
     end
