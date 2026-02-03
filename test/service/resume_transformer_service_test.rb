@@ -1,10 +1,10 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/resume_transformer"
+require_relative "../../lib/jojo/commands/resume/transformer"
 require_relative "../../lib/jojo/ai_client"
 require_relative "../../lib/jojo/config"
 require "yaml"
 
-describe "Jojo::ResumeTransformer Service Tests" do
+describe "Jojo::Commands::Resume::Transformer Service Tests" do
   before do
     # Skip these tests if no API key is available
     skip "ANTHROPIC_API_KEY not set" unless ENV["ANTHROPIC_API_KEY"]
@@ -15,7 +15,7 @@ describe "Jojo::ResumeTransformer Service Tests" do
     @job_context = {
       job_description: "Looking for a Senior Ruby on Rails developer with PostgreSQL and Docker experience. Must have strong backend skills and experience with microservices architecture."
     }
-    @transformer = Jojo::ResumeTransformer.new(
+    @transformer = Jojo::Commands::Resume::Transformer.new(
       ai_client: @ai_client,
       config: @config_hash,
       job_context: @job_context
@@ -104,7 +104,7 @@ describe "Jojo::ResumeTransformer Service Tests" do
   describe "error handling with real AI" do
     it "raises PermissionViolation if AI tries to remove items from reorder-only field" do
       # Use a job description that might tempt AI to filter
-      @transformer = Jojo::ResumeTransformer.new(
+      @transformer = Jojo::Commands::Resume::Transformer.new(
         ai_client: @ai_client,
         config: @config_hash,
         job_context: {
