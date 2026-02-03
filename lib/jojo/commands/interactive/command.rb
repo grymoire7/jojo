@@ -8,7 +8,7 @@ module Jojo
         attr_reader :options
 
         def initialize(_cli, options = {})
-          @options = options
+          @options = options.transform_keys(&:to_sym)
         end
 
         def execute

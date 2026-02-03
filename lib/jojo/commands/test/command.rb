@@ -7,7 +7,7 @@ module Jojo
 
         def initialize(cli, options = {})
           @cli = cli
-          @options = options
+          @options = options.transform_keys(&:to_sym)
         end
 
         def execute

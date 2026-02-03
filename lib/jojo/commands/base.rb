@@ -11,7 +11,7 @@ module Jojo
 
       def initialize(cli, ai_client: nil, employer: nil, **options)
         @cli = cli
-        @options = options
+        @options = options.transform_keys(&:to_sym)
         @ai_client = ai_client
         @employer = employer
       end
