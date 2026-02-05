@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "json"
+
+coverage_file = "coverage/coverage.json"
+
+unless File.exist?(coverage_file)
+  puts "No coverage data found. Run tests first:"
+  puts "  ./bin/jojo test --all --no-service"
+  exit 1
+end
+
+data = JSON.parse(File.read(coverage_file))
+project_root = File.expand_path("..", __dir__)
+
+files = data["coverage"].map do |path, info|
+  lines = info["lines"]
+  relevant = lines.compact
+  covered = relevant.count { |n| n > 0 }
+  missed = relevant.count { |n| n == 0 }
+  total = relevant.size
+  pct = total > 0 ? (covered.to_f / total * 100).round(1) : 100
+  short_path = path.sub("#{project_root}/", "")
+  {path: short_path, covered: covered, missed: missed, total: total, pct: pct}
+end
+
+# Group by directory
+groups = {
+  "Commands" => files.select { |f| f[:path].include?("lib/jojo/commands") },
+  "Generators" => files.select { |f| f[:path].include?("lib/jojo/generators") },
+  "Prompts" => files.select { |f| f[:path].include?("lib/jojo/prompts") },
+  "Core" => files.reject { |f| f[:path].include?("commands") || f[:path].include?("generators") || f[:path].include?("prompts") }
+}
+
+total_covered = files.sum { |f| f[:covered] }
+total_lines = files.sum { |f| f[:total] }
+overall_pct = (total_covered.to_f / total_lines * 100).round(1)
+
+puts "## Overall Coverage: #{overall_pct}% (#{total_covered}/#{total_lines} lines)\n\n"
+
+puts "## Coverage by Group\n\n"
+groups.each do |name, group_files|
+  next if group_files.empty?
+  group_covered = group_files.sum { |f| f[:covered] }
+  group_lines = group_files.sum { |f| f[:total] }
+  pct = group_lines > 0 ? (group_covered.to_f / group_lines * 100).round(1) : 0
+  puts "  #{name}: #{pct}% (#{group_covered}/#{group_lines} lines)"
+end
+
+puts "\n## Lowest Coverage Files (under 80%)\n\n"
+low = files.select { |f| f[:pct] < 80 && f[:total] > 5 }.sort_by { |f| f[:pct] }
+if low.empty?
+  puts "  All files above 80%!"
+else
+  low.first(15).each do |f|
+    puts "  #{f[:path]}: #{f[:pct]}% (#{f[:missed]} lines uncovered)"
+  end
+end
+
+puts "\n## Completely Untested Files\n\n"
+untested = files.select { |f| f[:pct] == 0 && f[:total] > 0 }
+if untested.empty?
+  puts "  None!"
+else
+  untested.each { |f| puts "  #{f[:path]} (#{f[:total]} lines)" }
+end
