@@ -1,5 +1,6 @@
 # lib/jojo/commands/base.rb
 require_relative "../employer"
+require_relative "../application"
 require_relative "../config"
 require_relative "../ai_client"
 require_relative "../status_logger"
@@ -9,10 +10,11 @@ module Jojo
     class Base
       attr_reader :cli, :options
 
-      def initialize(cli, ai_client: nil, employer: nil, **options)
+      def initialize(cli, ai_client: nil, application: nil, employer: nil, **options)
         @cli = cli
         @options = options.transform_keys(&:to_sym)
         @ai_client = ai_client
+        @application = application
         @employer = employer
       end
 
@@ -33,6 +35,10 @@ module Jojo
       def yes?(prompt) = cli.yes?(prompt)
 
       # Shared setup (lazy-loaded)
+      def application
+        @application ||= Jojo::Application.new(slug)
+      end
+
       def employer
         @employer ||= Jojo::Employer.new(slug)
       end
@@ -50,6 +56,14 @@ module Jojo
       end
 
       # Common validations
+      def require_application!
+        return if application.artifacts_exist?
+
+        say "Application '#{slug}' not found.", :red
+        say "  Run 'jojo new -s #{slug}' to create it.", :yellow
+        exit 1
+      end
+
       def require_employer!
         return if employer.artifacts_exist?
 

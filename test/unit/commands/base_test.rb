@@ -142,6 +142,58 @@ describe Jojo::Commands::Base do
       FileUtils.rm_rf(@tmpdir)
     end
 
+    describe "#application" do
+      before do
+        FileUtils.mkdir_p("applications/acme-corp")
+        File.write("applications/acme-corp/job_details.yml", "company_name: Acme")
+      end
+
+      after do
+        FileUtils.rm_rf("applications")
+      end
+
+      it "creates application from slug" do
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+        _(base.send(:application)).must_be_instance_of Jojo::Application
+        _(base.send(:application).slug).must_equal "acme-corp"
+      end
+
+      it "caches application instance" do
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+        first_call = base.send(:application)
+        second_call = base.send(:application)
+
+        _(first_call).must_be_same_as second_call
+      end
+    end
+
+    describe "#require_application!" do
+      it "passes when application artifacts exist" do
+        FileUtils.mkdir_p("applications/acme-corp")
+        File.write("applications/acme-corp/job_description.md", "# Job")
+
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+        # Should not raise
+        base.send(:require_application!)
+
+        FileUtils.rm_rf("applications")
+      end
+
+      it "exits when application does not exist" do
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "nonexistent")
+
+        @mock_cli.expect(:say, nil, ["Application 'nonexistent' not found.", :red])
+        @mock_cli.expect(:say, nil, [String, :yellow])
+
+        assert_raises(SystemExit) do
+          base.send(:require_application!)
+        end
+        @mock_cli.verify
+      end
+    end
+
     describe "#require_employer!" do
       it "does not exit when employer artifacts exist" do
         File.write("employers/acme-corp/job_description.md", "Test")
