@@ -6,9 +6,9 @@ describe "jojo branding command" do
     _(Jojo::CLI.commands.key?("branding")).must_equal true
   end
 
-  it "fails when employer does not exist" do
-    employer = Jojo::Employer.new("test-branding-nonexistent")
-    FileUtils.rm_rf(employer.base_path) if Dir.exist?(employer.base_path)
+  it "fails when application does not exist" do
+    app = Jojo::Application.new("test-branding-nonexistent")
+    FileUtils.rm_rf(app.base_path) if Dir.exist?(app.base_path)
 
     # Use Open3 to capture output and status properly
     require "open3"

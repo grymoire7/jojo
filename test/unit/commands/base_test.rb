@@ -85,8 +85,8 @@ describe Jojo::Commands::Base do
       YAML
 
       # Create employer directory
-      FileUtils.mkdir_p("employers/acme-corp")
-      File.write("employers/acme-corp/job_description.md", "Test job")
+      FileUtils.mkdir_p("applications/acme-corp")
+      File.write("applications/acme-corp/job_description.md", "Test job")
     end
 
     after do
@@ -134,7 +134,7 @@ describe Jojo::Commands::Base do
       @tmpdir = Dir.mktmpdir
       @original_dir = Dir.pwd
       Dir.chdir(@tmpdir)
-      FileUtils.mkdir_p("employers/acme-corp")
+      FileUtils.mkdir_p("applications/acme-corp")
     end
 
     after do
@@ -194,33 +194,33 @@ describe Jojo::Commands::Base do
       end
     end
 
-    describe "#require_employer!" do
+    describe "#require_application!" do
       it "does not exit when employer artifacts exist" do
-        File.write("employers/acme-corp/job_description.md", "Test")
+        File.write("applications/acme-corp/job_description.md", "Test")
         base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
 
         # Should not raise
-        base.send(:require_employer!)
+        base.send(:require_application!)
       end
 
       it "exits with message when employer not found" do
         base = Jojo::Commands::Base.new(@mock_cli, slug: "nonexistent")
 
-        @mock_cli.expect(:say, nil, ["Employer 'nonexistent' not found.", :red])
+        @mock_cli.expect(:say, nil, ["Application 'nonexistent' not found.", :red])
         @mock_cli.expect(:say, nil, [String, :yellow])
 
-        assert_raises(SystemExit) { base.send(:require_employer!) }
+        assert_raises(SystemExit) { base.send(:require_application!) }
         @mock_cli.verify
       end
     end
 
     describe "#require_file!" do
       it "does not exit when file exists" do
-        File.write("employers/acme-corp/test.txt", "content")
+        File.write("applications/acme-corp/test.txt", "content")
         base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
 
         # Should not raise
-        base.send(:require_file!, "employers/acme-corp/test.txt", "Test file")
+        base.send(:require_file!, "applications/acme-corp/test.txt", "Test file")
       end
 
       it "exits with message when file missing" do

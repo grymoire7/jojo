@@ -32,7 +32,7 @@ describe Jojo::Commands::Faq::Command do
     end
 
     it "exits when resume not found" do
-      FileUtils.rm("employers/acme-corp/resume.md")
+      FileUtils.rm("applications/acme-corp/resume.md")
 
       @mock_cli.expect(:say, nil, [/Generating FAQs/, :green])
       @mock_cli.expect(:say, nil, [/resume not found/, :red])
@@ -48,15 +48,15 @@ describe Jojo::Commands::Faq::Command do
   describe "successful execution" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
-      @mock_employer.expect(:faq_path, "employers/acme-corp/faq.md")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:resume_path, "applications/acme-corp/resume.md")
+      @mock_application.expect(:faq_path, "applications/acme-corp/faq.md")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "calls generator.generate and reports faq count" do
@@ -66,12 +66,12 @@ describe Jojo::Commands::Faq::Command do
       @mock_status_logger.expect(:log, nil, [], step: :faq, tokens: 200, status: "complete", faq_count: 3)
 
       @mock_cli.expect(:say, nil, ["Generating FAQs for Acme Corp...", :green])
-      @mock_cli.expect(:say, nil, ["Generated 3 FAQs and saved to employers/acme-corp/faq.md", :green])
+      @mock_cli.expect(:say, nil, ["Generated 3 FAQs and saved to applications/acme-corp/faq.md", :green])
 
       command = Jojo::Commands::Faq::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -85,15 +85,15 @@ describe Jojo::Commands::Faq::Command do
   describe "logging" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
-      @mock_employer.expect(:faq_path, "employers/acme-corp/faq.md")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:resume_path, "applications/acme-corp/resume.md")
+      @mock_application.expect(:faq_path, "applications/acme-corp/faq.md")
+      @mock_application.expect(:status_logger, @mock_status_logger)
 
       @mock_cli.expect(:say, nil, [String, :green])
       @mock_cli.expect(:say, nil, [String, :green])
@@ -108,7 +108,7 @@ describe Jojo::Commands::Faq::Command do
       command = Jojo::Commands::Faq::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -121,14 +121,14 @@ describe Jojo::Commands::Faq::Command do
   describe "error recovery" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:resume_path, "applications/acme-corp/resume.md")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "displays error message when generator fails" do
@@ -141,7 +141,7 @@ describe Jojo::Commands::Faq::Command do
       command = Jojo::Commands::Faq::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -160,7 +160,7 @@ describe Jojo::Commands::Faq::Command do
       command = Jojo::Commands::Faq::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )

@@ -5,11 +5,11 @@ require_relative "../../../../lib/jojo/commands/research/generator"
 
 describe Jojo::Commands::Research::Generator do
   before do
-    @employer = Jojo::Employer.new("acme-corp")
+    @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
     @generator = Jojo::Commands::Research::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       verbose: false,
@@ -17,16 +17,16 @@ describe Jojo::Commands::Research::Generator do
     )
 
     # Clean up and create directories
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    @employer.create_directory!
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    @application.create_directory!
 
     # Create job description and job details fixtures
-    File.write(@employer.job_description_path, "Senior Ruby Developer role at Acme Corp...")
-    File.write(@employer.job_details_path, "company_name: Acme Corp\njob_title: Senior Ruby Developer")
+    File.write(@application.job_description_path, "Senior Ruby Developer role at Acme Corp...")
+    File.write(@application.job_details_path, "company_name: Acme Corp\njob_title: Senior Ruby Developer")
   end
 
   after do
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
     @config&.verify
   end
 
@@ -56,14 +56,14 @@ describe Jojo::Commands::Research::Generator do
       @generator.generate
     end
 
-    _(File.exist?(@employer.research_path)).must_equal true
-    _(File.read(@employer.research_path)).must_equal expected_research
+    _(File.exist?(@application.research_path)).must_equal true
+    _(File.read(@application.research_path)).must_equal expected_research
 
     @ai_client.verify
   end
 
   it "handles missing job description" do
-    FileUtils.rm_f(@employer.job_description_path)
+    FileUtils.rm_f(@application.job_description_path)
 
     error = assert_raises(RuntimeError) do
       @generator.generate
@@ -88,7 +88,7 @@ describe Jojo::Commands::Research::Generator do
   it "continues when generic resume is missing" do
     # Create a generator with a nonexistent inputs path
     generator_no_resume = Jojo::Commands::Research::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       verbose: false,

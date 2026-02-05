@@ -5,14 +5,14 @@ require_relative "../../lib/jojo/config"
 
 describe "Jojo::Commands::Resume::Generator with Projects" do
   before do
-    @employer = Jojo::Employer.new("test-corp")
-    @employer.create_directory!
+    @application = Jojo::Application.new("test-corp")
+    @application.create_directory!
     @config = Jojo::Config.new("test/fixtures/valid_config.yml")
 
-    File.write(@employer.job_description_path, "Ruby developer needed")
+    File.write(@application.job_description_path, "Ruby developer needed")
     FileUtils.mkdir_p("test/fixtures")
 
-    File.write(@employer.job_details_path, <<~YAML)
+    File.write(@application.job_details_path, <<~YAML)
       company_name: Test Corp
       required_skills:
         - Ruby on Rails
@@ -22,7 +22,7 @@ describe "Jojo::Commands::Resume::Generator with Projects" do
   end
 
   after do
-    FileUtils.rm_rf("employers/test-corp")
+    FileUtils.rm_rf("applications/test-corp")
   end
 
   it "generates resume using config-based pipeline" do
@@ -55,7 +55,7 @@ describe "Jojo::Commands::Resume::Generator with Projects" do
     mock_ai.expect(:generate_text, "[0]", [String]) # experience.tags: reorder
     mock_ai.expect(:generate_text, "Tailored education description", [String]) # education.description: rewrite
 
-    generator = Jojo::Commands::Resume::Generator.new(@employer, mock_ai, config: @config, inputs_path: "test/fixtures")
+    generator = Jojo::Commands::Resume::Generator.new(@application, mock_ai, config: @config, inputs_path: "test/fixtures")
     result = generator.generate
 
     # Verify resume was generated

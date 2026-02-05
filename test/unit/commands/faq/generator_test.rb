@@ -5,27 +5,27 @@ require_relative "../../../../lib/jojo/commands/faq/generator"
 
 describe Jojo::Commands::Faq::Generator do
   before do
-    @employer = Jojo::Employer.new("acme-corp")
+    @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
     @generator = Jojo::Commands::Faq::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       verbose: false
     )
 
     # Clean up and create directories
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    @employer.create_directory!
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    @application.create_directory!
 
     # Create required fixtures
-    File.write(@employer.job_description_path, "We need 5+ years of Python experience.")
-    File.write(@employer.resume_path, "# John Doe\n\nSenior Python developer with 7 years experience.")
+    File.write(@application.job_description_path, "We need 5+ years of Python experience.")
+    File.write(@application.resume_path, "# John Doe\n\nSenior Python developer with 7 years experience.")
   end
 
   after do
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
   end
 
   it "generates FAQs from job description and resume" do
@@ -63,9 +63,9 @@ describe Jojo::Commands::Faq::Generator do
 
     @generator.generate
 
-    _(File.exist?(@employer.faq_path)).must_equal true
+    _(File.exist?(@application.faq_path)).must_equal true
 
-    saved_data = JSON.parse(File.read(@employer.faq_path), symbolize_names: true)
+    saved_data = JSON.parse(File.read(@application.faq_path), symbolize_names: true)
     _(saved_data.length).must_equal 1
     _(saved_data[0][:question]).must_equal "What's your experience?"
 
@@ -112,7 +112,7 @@ describe Jojo::Commands::Faq::Generator do
   end
 
   it "handles missing research gracefully" do
-    FileUtils.rm_f(@employer.research_path)
+    FileUtils.rm_f(@application.research_path)
 
     @config.expect(:seeker_name, "John Doe")
     @config.expect(:voice_and_tone, "professional")
@@ -133,13 +133,13 @@ describe Jojo::Commands::Faq::Generator do
   end
 
   it "raises error when job description missing" do
-    FileUtils.rm_f(@employer.job_description_path)
+    FileUtils.rm_f(@application.job_description_path)
 
     _ { @generator.generate }.must_raise RuntimeError
   end
 
   it "raises error when resume missing" do
-    FileUtils.rm_f(@employer.resume_path)
+    FileUtils.rm_f(@application.resume_path)
 
     _ { @generator.generate }.must_raise RuntimeError
   end

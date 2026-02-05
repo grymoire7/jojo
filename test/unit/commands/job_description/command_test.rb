@@ -40,15 +40,15 @@ describe Jojo::Commands::JobDescription::Command do
   describe "successful execution" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
 
-      @mock_employer.expect(:base_path, "employers/acme-corp")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:base_path, "applications/acme-corp")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "processes job description and creates artifacts" do
-      @mock_employer.expect(:create_artifacts, nil) do |job_source, ai_client, **kwargs|
+      @mock_application.expect(:create_artifacts, nil) do |job_source, ai_client, **kwargs|
         job_source == "job.txt" && kwargs[:overwrite_flag] == false && kwargs[:verbose] == false
       end
       @mock_ai_client.expect(:total_tokens_used, 150)
@@ -62,12 +62,12 @@ describe Jojo::Commands::JobDescription::Command do
         @mock_cli,
         slug: "acme-corp",
         job: "job.txt",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client
       )
       command.execute
 
-      @mock_employer.verify
+      @mock_application.verify
       @mock_cli.verify
     end
   end
@@ -75,12 +75,12 @@ describe Jojo::Commands::JobDescription::Command do
   describe "logging" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
 
-      @mock_employer.expect(:base_path, "employers/acme-corp")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
-      @mock_employer.expect(:create_artifacts, nil, [String, Object], overwrite_flag: false, cli_instance: Object, verbose: false)
+      @mock_application.expect(:base_path, "applications/acme-corp")
+      @mock_application.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:create_artifacts, nil, [String, Object], overwrite_flag: false, cli_instance: Object, verbose: false)
 
       @mock_cli.expect(:say, nil, [String, :green])
       @mock_cli.expect(:say, nil, [String, :green])
@@ -95,7 +95,7 @@ describe Jojo::Commands::JobDescription::Command do
         @mock_cli,
         slug: "acme-corp",
         job: "job.txt",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client
       )
       command.execute
@@ -107,15 +107,15 @@ describe Jojo::Commands::JobDescription::Command do
   describe "error recovery" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
 
-      @mock_employer.expect(:base_path, "employers/acme-corp")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:base_path, "applications/acme-corp")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "displays error message when create_artifacts fails" do
-      @mock_employer.expect(:create_artifacts, nil) { raise StandardError, "Failed to process job" }
+      @mock_application.expect(:create_artifacts, nil) { raise StandardError, "Failed to process job" }
       @mock_status_logger.expect(:log, nil, [], step: :job_description, status: "failed", error: "Failed to process job")
 
       @mock_cli.expect(:say, nil, [String, :green])
@@ -125,7 +125,7 @@ describe Jojo::Commands::JobDescription::Command do
         @mock_cli,
         slug: "acme-corp",
         job: "job.txt",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client
       )
 
@@ -134,7 +134,7 @@ describe Jojo::Commands::JobDescription::Command do
     end
 
     it "exits with status 1 on error" do
-      @mock_employer.expect(:create_artifacts, nil) { raise StandardError, "Error" }
+      @mock_application.expect(:create_artifacts, nil) { raise StandardError, "Error" }
       @mock_status_logger.expect(:log, nil, [], step: :job_description, status: "failed", error: "Error")
 
       @mock_cli.expect(:say, nil, [String, :green])
@@ -144,7 +144,7 @@ describe Jojo::Commands::JobDescription::Command do
         @mock_cli,
         slug: "acme-corp",
         job: "job.txt",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client
       )
 

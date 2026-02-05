@@ -4,31 +4,31 @@ require "json"
 
 describe Jojo::StatusLogger do
   before do
-    @employer = Jojo::Employer.new("test-company")
-    @logger = @employer.status_logger
+    @application = Jojo::Application.new("test-company")
+    @logger = @application.status_logger
 
     # Clean up before tests
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    @employer.create_directory!
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    @application.create_directory!
   end
 
   after do
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
   end
 
   it "creates status log file on first write" do
-    _(File.exist?(@employer.status_log_path)).wont_equal true
+    _(File.exist?(@application.status_log_path)).wont_equal true
 
     @logger.log("Test message")
 
-    _(File.exist?(@employer.status_log_path)).must_equal true
+    _(File.exist?(@application.status_log_path)).must_equal true
   end
 
   it "appends to existing status log" do
     @logger.log("First message")
     @logger.log("Second message")
 
-    content = File.read(@employer.status_log_path)
+    content = File.read(@application.status_log_path)
     entry1 = JSON.parse(content.lines[0])
     entry2 = JSON.parse(content.lines[1])
 
@@ -39,7 +39,7 @@ describe Jojo::StatusLogger do
   it "includes timestamp in log entry" do
     @logger.log("Test message")
 
-    content = File.read(@employer.status_log_path)
+    content = File.read(@application.status_log_path)
     entry = JSON.parse(content.lines.first)
 
     _(entry["timestamp"]).must_match(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)
@@ -48,7 +48,7 @@ describe Jojo::StatusLogger do
   it "formats log entry as JSON" do
     @logger.log("Test message")
 
-    content = File.read(@employer.status_log_path)
+    content = File.read(@application.status_log_path)
     entry = JSON.parse(content.lines.first)
 
     _(entry["message"]).must_equal "Test message"
@@ -58,7 +58,7 @@ describe Jojo::StatusLogger do
   it "logs step with metadata" do
     @logger.log(step: "Job Description Processing", tokens: 1500, status: "complete")
 
-    content = File.read(@employer.status_log_path)
+    content = File.read(@application.status_log_path)
     entry = JSON.parse(content.lines.first)
 
     _(entry["step"]).must_equal "Job Description Processing"
@@ -72,7 +72,7 @@ describe Jojo::StatusLogger do
     @logger.log("Second message")
     @logger.log(step: "Step", status: "complete")
 
-    content = File.read(@employer.status_log_path)
+    content = File.read(@application.status_log_path)
     lines = content.lines
 
     _(lines.length).must_equal 3

@@ -5,11 +5,11 @@ require_relative "../../../../lib/jojo/commands/resume/generator"
 
 describe Jojo::Commands::Resume::Generator do
   before do
-    @employer = Jojo::Employer.new("acme-corp")
+    @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
     @generator = Jojo::Commands::Resume::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       verbose: false,
@@ -17,16 +17,16 @@ describe Jojo::Commands::Resume::Generator do
     )
 
     # Clean up and create directories
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    @employer.create_directory!
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    @application.create_directory!
 
     # Create required fixtures
-    File.write(@employer.job_description_path, "Senior Ruby Developer role at Acme Corp...")
-    File.write(@employer.job_details_path, "company_name: Acme Corp\n")
+    File.write(@application.job_description_path, "Senior Ruby Developer role at Acme Corp...")
+    File.write(@application.job_details_path, "company_name: Acme Corp\n")
   end
 
   after do
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
   end
 
   it "generates resume using ResumeCurationService" do
@@ -58,14 +58,14 @@ describe Jojo::Commands::Resume::Generator do
 
     @generator.generate
 
-    _(File.exist?(@employer.resume_path)).must_equal true
-    content = File.read(@employer.resume_path)
+    _(File.exist?(@application.resume_path)).must_equal true
+    content = File.read(@application.resume_path)
     _(content).must_include "Specifically for Acme Corp"
   end
 
   it "fails when resume_data.yml is missing" do
     generator_no_data = Jojo::Commands::Resume::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       verbose: false,

@@ -6,14 +6,14 @@ require_relative "../../../../lib/jojo/commands/job_description/prompt"
 
 describe Jojo::Commands::JobDescription::Processor do
   before do
-    @employer = Jojo::Employer.new("test-company")
+    @application = Jojo::Application.new("test-company")
     @config = Minitest::Mock.new
     @ai_client = Minitest::Mock.new
-    @processor = Jojo::Commands::JobDescription::Processor.new(@employer, @ai_client, verbose: false)
+    @processor = Jojo::Commands::JobDescription::Processor.new(@application, @ai_client, verbose: false)
 
     # Clean up before tests
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    @employer.create_directory!
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    @application.create_directory!
 
     # Create test job description file
     @test_file = "test/fixtures/test_job.txt"
@@ -23,7 +23,7 @@ describe Jojo::Commands::JobDescription::Processor do
 
   after do
     # Clean up after tests
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
     File.delete(@test_file) if File.exist?(@test_file)
   end
 
@@ -36,8 +36,8 @@ describe Jojo::Commands::JobDescription::Processor do
 
     _(result[:job_description]).must_equal "Clean job description"
     _(result[:job_details]).must_include "Test Company"
-    _(File.exist?(@employer.job_description_path)).must_equal true
-    _(File.exist?(@employer.job_details_path)).must_equal true
+    _(File.exist?(@application.job_description_path)).must_equal true
+    _(File.exist?(@application.job_details_path)).must_equal true
 
     @ai_client.verify
   end

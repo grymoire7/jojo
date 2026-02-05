@@ -5,11 +5,11 @@ require_relative "../../../../lib/jojo/commands/cover_letter/generator"
 
 describe Jojo::Commands::CoverLetter::Generator do
   before do
-    @employer = Jojo::Employer.new("acme-corp")
+    @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
     @generator = Jojo::Commands::CoverLetter::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       verbose: false,
@@ -17,18 +17,18 @@ describe Jojo::Commands::CoverLetter::Generator do
     )
 
     # Clean up and create directories
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    @employer.create_directory!
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    @application.create_directory!
 
     # Create required fixtures
-    File.write(@employer.job_description_path, "Senior Ruby Developer role at Acme Corp...")
-    File.write(@employer.resume_path, "# Jane Doe\n\n## Professional Summary\n\nSenior Ruby developer...") # REQUIRED for cover letter
-    File.write(@employer.research_path, "# Company Profile\n\nAcme Corp is a leading tech company...")
-    File.write(@employer.job_details_path, "company_name: Acme Corp\nposition_title: Senior Developer\n")
+    File.write(@application.job_description_path, "Senior Ruby Developer role at Acme Corp...")
+    File.write(@application.resume_path, "# Jane Doe\n\n## Professional Summary\n\nSenior Ruby developer...") # REQUIRED for cover letter
+    File.write(@application.research_path, "# Company Profile\n\nAcme Corp is a leading tech company...")
+    File.write(@application.job_details_path, "company_name: Acme Corp\nposition_title: Senior Developer\n")
   end
 
   after do
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
     @config&.verify
   end
 
@@ -56,8 +56,8 @@ describe Jojo::Commands::CoverLetter::Generator do
 
     @generator.generate
 
-    _(File.exist?(@employer.cover_letter_path)).must_equal true
-    content = File.read(@employer.cover_letter_path)
+    _(File.exist?(@application.cover_letter_path)).must_equal true
+    content = File.read(@application.cover_letter_path)
     _(content).must_include "Specifically for Acme Corp"
     _(content).must_include expected_cover_letter
 
@@ -66,7 +66,7 @@ describe Jojo::Commands::CoverLetter::Generator do
   end
 
   it "fails when tailored resume is missing" do
-    FileUtils.rm_f(@employer.resume_path)
+    FileUtils.rm_f(@application.resume_path)
 
     error = assert_raises(RuntimeError) do
       @generator.generate
@@ -78,7 +78,7 @@ describe Jojo::Commands::CoverLetter::Generator do
   it "fails when generic resume is missing" do
     # Create a generator with a nonexistent inputs path
     generator_no_resume = Jojo::Commands::CoverLetter::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       verbose: false,
@@ -93,7 +93,7 @@ describe Jojo::Commands::CoverLetter::Generator do
   end
 
   it "fails when job description is missing" do
-    FileUtils.rm_f(@employer.job_description_path)
+    FileUtils.rm_f(@application.job_description_path)
 
     error = assert_raises(RuntimeError) do
       @generator.generate
@@ -103,7 +103,7 @@ describe Jojo::Commands::CoverLetter::Generator do
   end
 
   it "continues when research is missing with warning" do
-    FileUtils.rm_f(@employer.research_path)
+    FileUtils.rm_f(@application.research_path)
 
     expected_cover_letter = "Cover letter without research insights..."
     @config.expect(:voice_and_tone, "professional")

@@ -76,12 +76,12 @@ describe Jojo::Commands::Interactive::Dashboard do
   describe ".render" do
     before do
       @temp_dir = Dir.mktmpdir
-      @employer = Minitest::Mock.new
-      @employer.expect :slug, "acme-corp-dev"
-      @employer.expect :company_name, "Acme Corp"
+      @application = Minitest::Mock.new
+      @application.expect :slug, "acme-corp-dev"
+      @application.expect :company_name, "Acme Corp"
 
       # Mock base_path calls for all_statuses (many calls due to status checks)
-      50.times { @employer.expect :base_path, @temp_dir }
+      50.times { @application.expect :base_path, @temp_dir }
     end
 
     after do
@@ -89,7 +89,7 @@ describe Jojo::Commands::Interactive::Dashboard do
     end
 
     it "renders complete dashboard with header and workflow" do
-      output = Jojo::Commands::Interactive::Dashboard.render(@employer)
+      output = Jojo::Commands::Interactive::Dashboard.render(@application)
 
       _(output).must_include "Jojo"
       _(output).must_include "acme-corp-dev"
@@ -100,7 +100,7 @@ describe Jojo::Commands::Interactive::Dashboard do
     end
 
     it "includes status legend" do
-      output = Jojo::Commands::Interactive::Dashboard.render(@employer)
+      output = Jojo::Commands::Interactive::Dashboard.render(@application)
 
       _(output).must_include "✓ Generated"
       _(output).must_include "* Stale"

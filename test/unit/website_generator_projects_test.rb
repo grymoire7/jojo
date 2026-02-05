@@ -5,12 +5,12 @@ require_relative "../../lib/jojo/config"
 
 describe "Jojo::Commands::Website::Generator with Projects" do
   before do
-    @employer = Jojo::Employer.new("test-corp")
-    @employer.create_directory!
+    @application = Jojo::Application.new("test-corp")
+    @application.create_directory!
     @config = Jojo::Config.new("test/fixtures/valid_config.yml")
 
     # Create job_details.yml
-    File.write(@employer.job_details_path, <<~YAML)
+    File.write(@application.job_details_path, <<~YAML)
       required_skills:
         - Ruby on Rails
         - PostgreSQL
@@ -42,7 +42,7 @@ describe "Jojo::Commands::Website::Generator with Projects" do
   end
 
   after do
-    FileUtils.rm_rf("employers/test-corp")
+    FileUtils.rm_rf("applications/test-corp")
     FileUtils.rm_rf(@test_fixtures_dir) if @test_fixtures_dir && File.exist?(@test_fixtures_dir)
   end
 
@@ -50,7 +50,7 @@ describe "Jojo::Commands::Website::Generator with Projects" do
     # Mock AI client (not used in this test)
     mock_ai = Minitest::Mock.new
 
-    generator = Jojo::Commands::Website::Generator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::Website::Generator.new(@application, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
 
     # Access private method for testing
     projects = generator.send(:load_projects)
@@ -62,18 +62,18 @@ describe "Jojo::Commands::Website::Generator with Projects" do
 
   it "includes projects in template variables" do
     # Create minimal job description for full generation
-    File.write(@employer.job_description_path, "Test job description")
-    File.write(@employer.resume_path, "# Resume\n\nTest resume content")
-    File.write(@employer.branding_path, "Test branding statement")
+    File.write(@application.job_description_path, "Test job description")
+    File.write(@application.resume_path, "# Resume\n\nTest resume content")
+    File.write(@application.branding_path, "Test branding statement")
 
     # Mock AI client (not used since branding is read from file)
     mock_ai = Minitest::Mock.new
 
-    generator = Jojo::Commands::Website::Generator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::Website::Generator.new(@application, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
     # Read generated HTML
-    html = File.read(@employer.index_html_path)
+    html = File.read(@application.index_html_path)
 
     # Should mention the project
     _(html).must_include "Rails Project"
@@ -102,27 +102,27 @@ describe "Jojo::Commands::Website::Generator with Projects" do
           image: "images/test.png"
     YAML
 
-    File.write(@employer.job_details_path, <<~YAML)
+    File.write(@application.job_details_path, <<~YAML)
       required_skills:
         - Ruby on Rails
     YAML
 
-    File.write(@employer.job_description_path, "Test job")
-    File.write(@employer.resume_path, "# Resume\n\nTest resume content")
-    File.write(@employer.branding_path, "Test branding")
+    File.write(@application.job_description_path, "Test job")
+    File.write(@application.resume_path, "# Resume\n\nTest resume content")
+    File.write(@application.branding_path, "Test branding")
 
     # Mock AI client (not used since branding is read from file)
     mock_ai = Minitest::Mock.new
 
-    generator = Jojo::Commands::Website::Generator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::Website::Generator.new(@application, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
     # Check image was copied
-    copied_image = File.join(@employer.website_path, "images", "test.png")
+    copied_image = File.join(@application.website_path, "images", "test.png")
     _(File.exist?(copied_image)).must_equal true
 
     # Check HTML references image correctly
-    html = File.read(@employer.index_html_path)
+    html = File.read(@application.index_html_path)
     _(html).must_include 'src="images/test.png"'
   end
 end

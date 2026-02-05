@@ -34,14 +34,14 @@ describe Jojo::Commands::Research::Command do
   describe "successful execution" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:research_path, "applications/acme-corp/research.md")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "calls generator.generate" do
@@ -50,12 +50,12 @@ describe Jojo::Commands::Research::Command do
       @mock_status_logger.expect(:log, nil, [], step: :research, tokens: 300, status: "complete")
 
       @mock_cli.expect(:say, nil, ["Generating research for Acme Corp...", :green])
-      @mock_cli.expect(:say, nil, ["Research generated and saved to employers/acme-corp/research.md", :green])
+      @mock_cli.expect(:say, nil, ["Research generated and saved to applications/acme-corp/research.md", :green])
 
       command = Jojo::Commands::Research::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -70,12 +70,12 @@ describe Jojo::Commands::Research::Command do
       @mock_status_logger.expect(:log, nil, [], step: :research, tokens: 300, status: "complete")
 
       @mock_cli.expect(:say, nil, [String, :green])
-      @mock_cli.expect(:say, nil, ["Research generated and saved to employers/acme-corp/research.md", :green])
+      @mock_cli.expect(:say, nil, ["Research generated and saved to applications/acme-corp/research.md", :green])
 
       command = Jojo::Commands::Research::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -88,14 +88,14 @@ describe Jojo::Commands::Research::Command do
   describe "logging" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:research_path, "applications/acme-corp/research.md")
+      @mock_application.expect(:status_logger, @mock_status_logger)
 
       @mock_generator.expect(:generate, nil)
 
@@ -110,7 +110,7 @@ describe Jojo::Commands::Research::Command do
       command = Jojo::Commands::Research::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -123,13 +123,13 @@ describe Jojo::Commands::Research::Command do
   describe "error recovery" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "displays error message when generator fails" do
@@ -142,7 +142,7 @@ describe Jojo::Commands::Research::Command do
       command = Jojo::Commands::Research::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -161,7 +161,7 @@ describe Jojo::Commands::Research::Command do
       command = Jojo::Commands::Research::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -180,7 +180,7 @@ describe Jojo::Commands::Research::Command do
       command = Jojo::Commands::Research::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -199,12 +199,12 @@ describe Jojo::Commands::Research::Command do
       def failing_logger.log(**_args)
         raise StandardError, "Logging also failed"
       end
-      @mock_employer.expect(:status_logger, failing_logger)
+      @mock_application.expect(:status_logger, failing_logger)
 
       command = Jojo::Commands::Research::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -217,11 +217,11 @@ describe Jojo::Commands::Research::Command do
   describe "generator creation (when not injected)" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
     end
 
     it "creates generator with correct dependencies" do
@@ -230,13 +230,13 @@ describe Jojo::Commands::Research::Command do
 
       Jojo::Commands::Research::Generator.stub :new, ->(employer, ai_client, **opts) {
         generator_created = true
-        generator_args = {employer: employer, ai_client: ai_client, opts: opts}
+        generator_args = {application: employer, ai_client: ai_client, opts: opts}
         mock_gen = Minitest::Mock.new
         mock_gen.expect(:generate, nil)
         mock_gen
       } do
-        @mock_employer.expect(:status_logger, @mock_status_logger)
-        @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
+        @mock_application.expect(:status_logger, @mock_status_logger)
+        @mock_application.expect(:research_path, "applications/acme-corp/research.md")
         @mock_ai_client.expect(:total_tokens_used, 0)
         @mock_status_logger.expect(:log, nil, [], step: :research, tokens: 0, status: "complete")
 
@@ -248,14 +248,14 @@ describe Jojo::Commands::Research::Command do
           slug: "acme-corp",
           verbose: true,
           overwrite: true,
-          employer: @mock_employer,
+          application: @mock_application,
           ai_client: @mock_ai_client
         )
         command.execute
       end
 
       _(generator_created).must_equal true
-      _(generator_args[:employer].object_id).must_equal @mock_employer.object_id
+      _(generator_args[:employer].object_id).must_equal @mock_application.object_id
       _(generator_args[:ai_client].object_id).must_equal @mock_ai_client.object_id
       _(generator_args[:opts][:verbose]).must_equal true
       _(generator_args[:opts][:overwrite_flag]).must_equal true

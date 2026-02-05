@@ -49,7 +49,7 @@ class CLIJobDescriptionTest < Minitest::Test
 
   def test_job_description_command_uses_slug_from_state_when_not_provided
     # Create employer directory
-    FileUtils.mkdir_p("employers/state-test")
+    FileUtils.mkdir_p("applications/state-test")
 
     # Save slug to state
     File.write(".jojo_state", "state-test")
