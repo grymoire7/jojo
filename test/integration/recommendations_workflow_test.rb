@@ -1,6 +1,6 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/commands/website/generator"
 require_relative "../../lib/jojo/config"
 require "tmpdir"
@@ -22,7 +22,7 @@ end
 
 describe "Recommendations Workflow Integration" do
   before do
-    @employer = Jojo::Employer.new("integration-test-corp")
+    @employer = Jojo::Application.new("integration-test-corp")
 
     # Create required files
     FileUtils.mkdir_p(@employer.base_path)

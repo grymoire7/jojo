@@ -5,7 +5,7 @@ require_relative "../test_helper"
 describe "Interactive Mode Integration" do
   before do
     @temp_dir = Dir.mktmpdir
-    @employers_dir = File.join(@temp_dir, "employers")
+    @applications_dir = File.join(@temp_dir, "applications")
     @original_dir = Dir.pwd
     Dir.chdir(@temp_dir)
   end
@@ -18,7 +18,7 @@ describe "Interactive Mode Integration" do
   describe "with no applications" do
     it "shows welcome screen" do
       runner = Jojo::Commands::Interactive::Runner.new
-      _(runner.employer).must_be_nil
+      _(runner.application).must_be_nil
       _(runner.list_applications).must_be_empty
     end
   end
@@ -26,7 +26,7 @@ describe "Interactive Mode Integration" do
   describe "with existing application" do
     before do
       @slug = "test-company-dev"
-      app_dir = File.join(@employers_dir, @slug)
+      app_dir = File.join(@applications_dir, @slug)
       FileUtils.mkdir_p(app_dir)
       File.write(File.join(app_dir, "job_description.md"), "Test job")
       File.write(File.join(app_dir, "job_details.yml"), "company_name: Test Company\njob_title: Developer")
@@ -37,13 +37,13 @@ describe "Interactive Mode Integration" do
 
       runner = Jojo::Commands::Interactive::Runner.new
       _(runner.slug).must_equal @slug
-      _(runner.employer).wont_be_nil
-      _(runner.employer.company_name).must_equal "Test Company"
+      _(runner.application).wont_be_nil
+      _(runner.application.company_name).must_equal "Test Company"
     end
 
     it "computes workflow status correctly" do
       runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
-      employer = runner.employer
+      employer = runner.application
 
       statuses = Jojo::Commands::Interactive::Workflow.all_statuses(employer)
 
@@ -56,7 +56,7 @@ describe "Interactive Mode Integration" do
   describe "staleness detection" do
     before do
       @slug = "stale-test"
-      app_dir = File.join(@employers_dir, @slug)
+      app_dir = File.join(@applications_dir, @slug)
       FileUtils.mkdir_p(app_dir)
 
       # Create job_description first
@@ -73,18 +73,18 @@ describe "Interactive Mode Integration" do
 
     it "detects when resume is up-to-date" do
       runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
-      status = Jojo::Commands::Interactive::Workflow.status(:resume, runner.employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, runner.application)
       _(status).must_equal :generated
     end
 
     it "detects when resume becomes stale" do
       # Touch job_description to make it newer
       sleep 0.01
-      app_dir = File.join(@employers_dir, @slug)
+      app_dir = File.join(@applications_dir, @slug)
       FileUtils.touch(File.join(app_dir, "job_description.md"))
 
       runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
-      status = Jojo::Commands::Interactive::Workflow.status(:resume, runner.employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, runner.application)
       _(status).must_equal :stale
     end
   end
@@ -96,7 +96,7 @@ describe "Interactive Mode Integration" do
       @app2 = "globex-inc"
 
       [@app1, @app2].each do |slug|
-        app_dir = File.join(@employers_dir, slug)
+        app_dir = File.join(@applications_dir, slug)
         FileUtils.mkdir_p(app_dir)
         File.write(File.join(app_dir, "job_description.md"), "Job for #{slug}")
         File.write(File.join(app_dir, "job_details.yml"), "company_name: #{slug}\njob_title: Developer")
@@ -114,7 +114,7 @@ describe "Interactive Mode Integration" do
 
     it "has no current employer when slug not provided" do
       runner = Jojo::Commands::Interactive::Runner.new
-      _(runner.employer).must_be_nil
+      _(runner.application).must_be_nil
       _(runner.slug).must_be_nil
     end
 
@@ -124,12 +124,12 @@ describe "Interactive Mode Integration" do
       # Switch to first app
       runner.switch_application(@app1)
       _(runner.slug).must_equal @app1
-      _(runner.employer.slug).must_equal @app1
+      _(runner.application.slug).must_equal @app1
 
       # Switch to second app
       runner.switch_application(@app2)
       _(runner.slug).must_equal @app2
-      _(runner.employer.slug).must_equal @app2
+      _(runner.application.slug).must_equal @app2
     end
 
     it "persists slug selection across Runner instances" do
