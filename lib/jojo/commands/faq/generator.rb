@@ -7,10 +7,10 @@ module Jojo
   module Commands
     module Faq
       class Generator
-        attr_reader :employer, :ai_client, :config, :verbose
+        attr_reader :application, :ai_client, :config, :verbose
 
-        def initialize(employer, ai_client, config:, verbose: false)
-          @employer = employer
+        def initialize(application, ai_client, config:, verbose: false)
+          @application = application
           @ai_client = ai_client
           @config = config
           @verbose = verbose
@@ -29,7 +29,7 @@ module Jojo
           log "Parsing JSON response..."
           faqs = parse_faqs(faqs_json)
 
-          log "Saving FAQs to #{employer.faq_path}..."
+          log "Saving FAQs to #{application.faq_path}..."
           save_faqs(faqs)
 
           log "FAQ generation complete! Generated #{faqs.length} FAQs."
@@ -39,15 +39,15 @@ module Jojo
         private
 
         def gather_inputs
-          unless File.exist?(employer.job_description_path)
-            raise "Job description not found at #{employer.job_description_path}"
+          unless File.exist?(application.job_description_path)
+            raise "Job description not found at #{application.job_description_path}"
           end
-          job_description = File.read(employer.job_description_path)
+          job_description = File.read(application.job_description_path)
 
-          unless File.exist?(employer.resume_path)
-            raise "Resume not found at #{employer.resume_path}"
+          unless File.exist?(application.resume_path)
+            raise "Resume not found at #{application.resume_path}"
           end
-          resume = File.read(employer.resume_path)
+          resume = File.read(application.resume_path)
 
           research = read_research
           job_details = read_job_details
@@ -61,16 +61,16 @@ module Jojo
         end
 
         def read_research
-          return nil unless File.exist?(employer.research_path)
-          File.read(employer.research_path)
+          return nil unless File.exist?(application.research_path)
+          File.read(application.research_path)
         rescue => e
           log "Warning: Could not read research: #{e.message}"
           nil
         end
 
         def read_job_details
-          return nil unless File.exist?(employer.job_details_path)
-          YAML.load_file(employer.job_details_path)
+          return nil unless File.exist?(application.job_details_path)
+          YAML.load_file(application.job_details_path)
         rescue => e
           log "Warning: Could not read job details: #{e.message}"
           nil
@@ -111,7 +111,7 @@ module Jojo
 
         def save_faqs(faqs)
           json_output = JSON.pretty_generate(faqs)
-          File.write(employer.faq_path, json_output)
+          File.write(application.faq_path, json_output)
         end
 
         def log(message)

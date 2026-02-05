@@ -9,13 +9,13 @@ module Jojo
         def execute
           validate_inputs!
 
-          if File.exist?(employer.base_path)
+          if File.exist?(application.base_path)
             say "Application '#{slug}' already exists.", :yellow
             exit 1
           end
 
-          FileUtils.mkdir_p(employer.base_path)
-          say "Created application workspace: #{employer.base_path}", :green
+          FileUtils.mkdir_p(application.base_path)
+          say "Created application workspace: #{application.base_path}", :green
           say "\nNext step:", :cyan
           say "  jojo job_description -s #{slug} -j <job_file_or_url>", :white
         end

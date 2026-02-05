@@ -12,19 +12,19 @@ module Jojo
         end
 
         def execute
-          require_employer!
+          require_application!
 
           # Check for existing branding.md and --overwrite flag
-          if File.exist?(employer.branding_path) && !overwrite?
-            say "Branding statement already exists at #{employer.branding_path}", :red
+          if File.exist?(application.branding_path) && !overwrite?
+            say "Branding statement already exists at #{application.branding_path}", :red
             say "Use --overwrite to regenerate.", :yellow
             exit 1
           end
 
-          say "Generating branding statement for #{employer.company_name}...", :green
+          say "Generating branding statement for #{application.company_name}...", :green
 
           # Check that resume has been generated (REQUIRED)
-          unless File.exist?(employer.resume_path)
+          unless File.exist?(application.resume_path)
             say "Resume not found. Run 'jojo resume' or 'jojo generate' first.", :red
             exit 1
           end
@@ -33,7 +33,7 @@ module Jojo
 
           log(step: :branding, tokens: ai_client.total_tokens_used, status: "complete")
 
-          say "Branding statement generated and saved to #{employer.branding_path}", :green
+          say "Branding statement generated and saved to #{application.branding_path}", :green
         rescue => e
           say "Error generating branding statement: #{e.message}", :red
           begin
@@ -48,7 +48,7 @@ module Jojo
 
         def generator
           @generator ||= Generator.new(
-            employer,
+            application,
             ai_client,
             config: config,
             verbose: verbose?

@@ -8,10 +8,10 @@ module Jojo
         class SourceFileNotFoundError < StandardError; end
         class PandocExecutionError < StandardError; end
 
-        attr_reader :employer, :verbose, :output
+        attr_reader :application, :verbose, :output
 
-        def initialize(employer, verbose: false, output: $stdout)
-          @employer = employer
+        def initialize(application, verbose: false, output: $stdout)
+          @application = application
           @verbose = verbose
           @output = output
         end
@@ -22,7 +22,7 @@ module Jojo
           results = {generated: [], skipped: []}
 
           # Generate resume PDF
-          if File.exist?(employer.resume_path)
+          if File.exist?(application.resume_path)
             generate_resume_pdf
             results[:generated] << :resume
           else
@@ -30,7 +30,7 @@ module Jojo
           end
 
           # Generate cover letter PDF
-          if File.exist?(employer.cover_letter_path)
+          if File.exist?(application.cover_letter_path)
             generate_cover_letter_pdf
             results[:generated] << :cover_letter
           else
@@ -42,16 +42,16 @@ module Jojo
 
         def generate_resume_pdf
           generate_pdf(
-            source: employer.resume_path,
-            output: employer.resume_pdf_path,
+            source: application.resume_path,
+            output: application.resume_pdf_path,
             document_type: "resume"
           )
         end
 
         def generate_cover_letter_pdf
           generate_pdf(
-            source: employer.cover_letter_path,
-            output: employer.cover_letter_pdf_path,
+            source: application.cover_letter_path,
+            output: application.cover_letter_pdf_path,
             document_type: "cover letter"
           )
         end

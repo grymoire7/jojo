@@ -13,9 +13,9 @@ module Jojo
         end
 
         def execute
-          require_employer!
+          require_application!
 
-          say "Generating PDFs for #{employer.company_name}...", :green
+          say "Generating PDFs for #{application.company_name}...", :green
 
           results = converter.generate_all
 
@@ -57,7 +57,7 @@ module Jojo
         private
 
         def converter
-          @converter ||= Converter.new(employer, verbose: verbose?)
+          @converter ||= Converter.new(application, verbose: verbose?)
         end
       end
     end

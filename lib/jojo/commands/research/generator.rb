@@ -9,10 +9,10 @@ module Jojo
   module Commands
     module Research
       class Generator
-        attr_reader :employer, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
+        attr_reader :application, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
 
-        def initialize(employer, ai_client, config:, verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
-          @employer = employer
+        def initialize(application, ai_client, config:, verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
+          @application = application
           @ai_client = ai_client
           @config = config
           @verbose = verbose
@@ -34,7 +34,7 @@ module Jojo
           log "Generating research using AI..."
           research = call_ai(prompt)
 
-          log "Saving research to #{employer.research_path}..."
+          log "Saving research to #{application.research_path}..."
           save_research(research)
 
           log "Research generation complete!"
@@ -45,10 +45,10 @@ module Jojo
 
         def gather_inputs
           # Read job description
-          unless File.exist?(employer.job_description_path)
-            raise "Job description not found at #{employer.job_description_path}"
+          unless File.exist?(application.job_description_path)
+            raise "Job description not found at #{application.job_description_path}"
           end
-          job_description = File.read(employer.job_description_path)
+          job_description = File.read(application.job_description_path)
 
           # Extract company name from job details
           company_name = extract_company_name
@@ -64,15 +64,15 @@ module Jojo
         end
 
         def extract_company_name
-          unless File.exist?(employer.job_details_path)
-            return employer.name
+          unless File.exist?(application.job_details_path)
+            return application.name
           end
 
-          job_details = YAML.load_file(employer.job_details_path)
-          job_details["company_name"] || employer.name
+          job_details = YAML.load_file(application.job_details_path)
+          job_details["company_name"] || application.name
         rescue => e
           log "Warning: Could not parse job details, using employer name: #{e.message}"
-          employer.name
+          application.name
         end
 
         def read_generic_resume
@@ -149,11 +149,11 @@ module Jojo
 
         def save_research(content)
           if cli_instance
-            cli_instance.with_overwrite_check(employer.research_path, overwrite_flag) do
-              File.write(employer.research_path, content)
+            cli_instance.with_overwrite_check(application.research_path, overwrite_flag) do
+              File.write(application.research_path, content)
             end
           else
-            File.write(employer.research_path, content)
+            File.write(application.research_path, content)
           end
         end
 

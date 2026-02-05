@@ -12,18 +12,18 @@ module Jojo
         end
 
         def execute
-          require_employer!
+          require_application!
 
-          say "Generating website for #{employer.company_name}...", :green
+          say "Generating website for #{application.company_name}...", :green
 
           # Check that resume has been generated (REQUIRED)
-          unless File.exist?(employer.resume_path)
+          unless File.exist?(application.resume_path)
             say "Resume not found. Run 'jojo resume' or 'jojo generate' first.", :red
             exit 1
           end
 
           # Warn if research missing (optional)
-          unless File.exist?(employer.research_path)
+          unless File.exist?(application.research_path)
             say "Warning: Research not found. Website will be less targeted.", :yellow
           end
 
@@ -31,7 +31,7 @@ module Jojo
 
           log(step: :website, tokens: ai_client.total_tokens_used, status: "complete", metadata: {template: template_name})
 
-          say "Website generated and saved to #{employer.index_html_path}", :green
+          say "Website generated and saved to #{application.index_html_path}", :green
         rescue => e
           say "Error generating website: #{e.message}", :red
           begin
@@ -46,7 +46,7 @@ module Jojo
 
         def generator
           @generator ||= Generator.new(
-            employer,
+            application,
             ai_client,
             config: config,
             template: template_name,

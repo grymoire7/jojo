@@ -8,10 +8,10 @@ module Jojo
   module Commands
     module CoverLetter
       class Generator
-        attr_reader :employer, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
+        attr_reader :application, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
 
-        def initialize(employer, ai_client, config:, verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
-          @employer = employer
+        def initialize(application, ai_client, config:, verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
+          @application = application
           @ai_client = ai_client
           @config = config
           @verbose = verbose
@@ -36,7 +36,7 @@ module Jojo
           log "Adding landing page link..."
           cover_letter_with_link = add_landing_page_link(cover_letter, inputs)
 
-          log "Saving cover letter to #{employer.cover_letter_path}..."
+          log "Saving cover letter to #{application.cover_letter_path}..."
           save_cover_letter(cover_letter_with_link)
 
           log "Cover letter generation complete!"
@@ -47,16 +47,16 @@ module Jojo
 
         def gather_inputs
           # Read job description (REQUIRED)
-          unless File.exist?(employer.job_description_path)
-            raise "Job description not found at #{employer.job_description_path}"
+          unless File.exist?(application.job_description_path)
+            raise "Job description not found at #{application.job_description_path}"
           end
-          job_description = File.read(employer.job_description_path)
+          job_description = File.read(application.job_description_path)
 
           # Read tailored resume (REQUIRED - key difference from resume generator)
-          unless File.exist?(employer.resume_path)
-            raise "Tailored resume not found at #{employer.resume_path}. Run 'jojo resume' or 'jojo generate' first."
+          unless File.exist?(application.resume_path)
+            raise "Tailored resume not found at #{application.resume_path}. Run 'jojo resume' or 'jojo generate' first."
           end
-          tailored_resume = File.read(employer.resume_path)
+          tailored_resume = File.read(application.resume_path)
 
           # Read resume data (REQUIRED)
           resume_data_path = File.join(inputs_path, "resume_data.yml")
@@ -79,26 +79,26 @@ module Jojo
             generic_resume: generic_resume,
             research: research,
             job_details: job_details,
-            company_name: employer.company_name,
-            company_slug: employer.slug
+            company_name: application.company_name,
+            company_slug: application.slug
           }
         end
 
         def read_research
-          unless File.exist?(employer.research_path)
-            log "Warning: Research not found at #{employer.research_path}, cover letter will be less targeted"
+          unless File.exist?(application.research_path)
+            log "Warning: Research not found at #{application.research_path}, cover letter will be less targeted"
             return nil
           end
 
-          File.read(employer.research_path)
+          File.read(application.research_path)
         end
 
         def read_job_details
-          unless File.exist?(employer.job_details_path)
+          unless File.exist?(application.job_details_path)
             return nil
           end
 
-          YAML.load_file(employer.job_details_path)
+          YAML.load_file(application.job_details_path)
         rescue => e
           log "Warning: Could not parse job details: #{e.message}"
           nil
@@ -128,11 +128,11 @@ module Jojo
 
         def save_cover_letter(content)
           if cli_instance
-            cli_instance.with_overwrite_check(employer.cover_letter_path, overwrite_flag) do
-              File.write(employer.cover_letter_path, content)
+            cli_instance.with_overwrite_check(application.cover_letter_path, overwrite_flag) do
+              File.write(application.cover_letter_path, content)
             end
           else
-            File.write(employer.cover_letter_path, content)
+            File.write(application.cover_letter_path, content)
           end
         end
 

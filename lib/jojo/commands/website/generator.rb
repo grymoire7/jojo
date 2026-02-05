@@ -9,10 +9,10 @@ module Jojo
   module Commands
     module Website
       class Generator
-        attr_reader :employer, :ai_client, :config, :verbose, :template_name, :inputs_path, :overwrite_flag, :cli_instance
+        attr_reader :application, :ai_client, :config, :verbose, :template_name, :inputs_path, :overwrite_flag, :cli_instance
 
-        def initialize(employer, ai_client, config:, template: "default", verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
-          @employer = employer
+        def initialize(application, ai_client, config:, template: "default", verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
+          @application = application
           @ai_client = ai_client
           @config = config
           @template_name = template
@@ -54,7 +54,7 @@ module Jojo
           log "Copying template assets (CSS, JS, SVG)..."
           copy_template_assets
 
-          log "Saving website to #{employer.index_html_path}..."
+          log "Saving website to #{application.index_html_path}..."
           save_website(html)
 
           log "Website generation complete!"
@@ -65,16 +65,16 @@ module Jojo
 
         def gather_inputs
           # Read job description (REQUIRED)
-          unless File.exist?(employer.job_description_path)
-            raise "Job description not found at #{employer.job_description_path}"
+          unless File.exist?(application.job_description_path)
+            raise "Job description not found at #{application.job_description_path}"
           end
-          job_description = File.read(employer.job_description_path)
+          job_description = File.read(application.job_description_path)
 
           # Read tailored resume (REQUIRED)
-          unless File.exist?(employer.resume_path)
-            raise "Resume not found at #{employer.resume_path}. Run 'jojo resume' first."
+          unless File.exist?(application.resume_path)
+            raise "Resume not found at #{application.resume_path}. Run 'jojo resume' first."
           end
-          resume = File.read(employer.resume_path)
+          resume = File.read(application.resume_path)
 
           # Read research (OPTIONAL)
           research = read_research
@@ -87,37 +87,37 @@ module Jojo
             resume: resume,
             research: research,
             job_details: job_details,
-            company_name: employer.company_name,
-            company_slug: employer.slug
+            company_name: application.company_name,
+            company_slug: application.slug
           }
         end
 
         def read_research
-          unless File.exist?(employer.research_path)
-            log "Warning: Research not found at #{employer.research_path}, branding will be less targeted"
+          unless File.exist?(application.research_path)
+            log "Warning: Research not found at #{application.research_path}, branding will be less targeted"
             return nil
           end
 
-          File.read(employer.research_path)
+          File.read(application.research_path)
         end
 
         def read_job_details
-          unless File.exist?(employer.job_details_path)
+          unless File.exist?(application.job_details_path)
             return nil
           end
 
-          YAML.load_file(employer.job_details_path)
+          YAML.load_file(application.job_details_path)
         rescue => e
           log "Warning: Could not parse job details: #{e.message}"
           nil
         end
 
         def load_branding_statement
-          unless File.exist?(employer.branding_path) && !File.read(employer.branding_path).strip.empty?
-            raise "branding.md not found for '#{employer.slug}'\nRun 'jojo branding -s #{employer.slug}' first to generate branding statement."
+          unless File.exist?(application.branding_path) && !File.read(application.branding_path).strip.empty?
+            raise "branding.md not found for '#{application.slug}'\nRun 'jojo branding -s #{application.slug}' first to generate branding statement."
           end
 
-          File.read(employer.branding_path)
+          File.read(application.branding_path)
         end
 
         def prepare_template_vars(branding_statement, inputs, projects = [], annotated_job_description = nil, recommendations = nil, faqs = nil)
@@ -207,10 +207,10 @@ module Jojo
           end
 
           # Ensure website directory exists
-          FileUtils.mkdir_p(employer.website_path)
+          FileUtils.mkdir_p(application.website_path)
 
           # Copy image to website directory
-          dest_path = File.join(employer.website_path, image_info[:relative_path])
+          dest_path = File.join(application.website_path, image_info[:relative_path])
           FileUtils.cp(image_info[:source_path], dest_path)
 
           log "Copied branding image: #{image_info[:source_path]} -> #{dest_path}"
@@ -219,18 +219,18 @@ module Jojo
 
         def copy_template_assets
           # Ensure website directory exists
-          FileUtils.mkdir_p(employer.website_path)
+          FileUtils.mkdir_p(application.website_path)
 
           template_dir = File.join("templates", "website")
           assets = ["styles.css", "script.js", "icons.svg"]
 
           assets.each do |asset|
             source = File.join(template_dir, asset)
-            dest = File.join(employer.website_path, asset)
+            dest = File.join(application.website_path, asset)
 
             if File.exist?(source)
               FileUtils.cp(source, dest)
-              log "Copied #{asset} to #{employer.website_path}"
+              log "Copied #{asset} to #{application.website_path}"
             else
               log "Warning: Asset not found: #{source}"
             end
@@ -239,15 +239,15 @@ module Jojo
 
         def save_website(html)
           # Ensure website directory exists
-          FileUtils.mkdir_p(employer.website_path)
+          FileUtils.mkdir_p(application.website_path)
 
           # Write HTML file
           if cli_instance
-            cli_instance.with_overwrite_check(employer.index_html_path, overwrite_flag) do
-              File.write(employer.index_html_path, html)
+            cli_instance.with_overwrite_check(application.index_html_path, overwrite_flag) do
+              File.write(application.index_html_path, html)
             end
           else
-            File.write(employer.index_html_path, html)
+            File.write(application.index_html_path, html)
           end
         end
 
@@ -293,7 +293,7 @@ module Jojo
                 src = File.join(inputs_path, project[:image])
 
                 if File.exist?(src)
-                  dest_dir = File.join(employer.website_path, "images")
+                  dest_dir = File.join(application.website_path, "images")
                   FileUtils.mkdir_p(dest_dir)
 
                   filename = File.basename(project[:image])
@@ -313,8 +313,8 @@ module Jojo
 
         def annotate_job_description
           # Load annotations JSON
-          unless File.exist?(employer.job_description_annotations_path)
-            log "No annotations found at #{employer.job_description_annotations_path}"
+          unless File.exist?(application.job_description_annotations_path)
+            log "No annotations found at #{application.job_description_annotations_path}"
             return nil
           end
 
@@ -322,12 +322,12 @@ module Jojo
           return nil if annotations.nil? || annotations.empty?
 
           # Load job description
-          unless File.exist?(employer.job_description_path)
+          unless File.exist?(application.job_description_path)
             log "Warning: Job description not found, cannot annotate"
             return nil
           end
 
-          job_description_md = File.read(employer.job_description_path)
+          job_description_md = File.read(application.job_description_path)
 
           # Convert to HTML and inject annotations
           inject_annotations(job_description_md, annotations)
@@ -337,7 +337,7 @@ module Jojo
         end
 
         def load_annotations
-          json_content = File.read(employer.job_description_annotations_path)
+          json_content = File.read(application.job_description_annotations_path)
           JSON.parse(json_content, symbolize_names: true)
         rescue JSON::ParserError => e
           log "Error: Malformed annotations JSON: #{e.message}"
@@ -444,9 +444,9 @@ module Jojo
         end
 
         def load_faqs
-          return nil unless File.exist?(employer.faq_path)
+          return nil unless File.exist?(application.faq_path)
 
-          faq_data = File.read(employer.faq_path)
+          faq_data = File.read(application.faq_path)
           JSON.parse(faq_data, symbolize_names: true)
         rescue JSON::ParserError => e
           log "Error: Could not parse FAQ file: #{e.message}"

@@ -13,15 +13,15 @@ module Jojo
             exit 1
           end
 
-          @employer ||= Jojo::Employer.new(resolved_slug)
-          unless File.exist?(employer.base_path)
+          @application ||= Jojo::Application.new(resolved_slug)
+          unless File.exist?(application.base_path)
             say "Application '#{resolved_slug}' does not exist. Run 'jojo new -s #{resolved_slug}' first.", :red
             exit 1
           end
 
           say "Processing job description for: #{resolved_slug}", :green
 
-          employer.create_artifacts(
+          application.create_artifacts(
             job_source,
             ai_client,
             overwrite_flag: overwrite?,
