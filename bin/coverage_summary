@@ -25,12 +25,16 @@ files = data["coverage"].map do |path, info|
   {path: short_path, covered: covered, missed: missed, total: total, pct: pct}
 end
 
-# Group by directory
+# Group by component type
 groups = {
-  "Commands" => files.select { |f| f[:path].include?("lib/jojo/commands") },
-  "Generators" => files.select { |f| f[:path].include?("lib/jojo/generators") },
-  "Prompts" => files.select { |f| f[:path].include?("lib/jojo/prompts") },
-  "Core" => files.reject { |f| f[:path].include?("commands") || f[:path].include?("generators") || f[:path].include?("prompts") }
+  "Generators" => files.select { |f| f[:path].include?("lib/jojo/commands") && f[:path].end_with?("generator.rb") },
+  "Prompts" => files.select { |f| f[:path].include?("lib/jojo/commands") && f[:path].end_with?("prompt.rb") },
+  "Commands" => files.select { |f|
+    f[:path].include?("lib/jojo/commands") &&
+      !f[:path].end_with?("generator.rb") &&
+      !f[:path].end_with?("prompt.rb")
+  },
+  "Core" => files.select { |f| f[:path].include?("lib/jojo") && !f[:path].include?("lib/jojo/commands") }
 }
 
 total_covered = files.sum { |f| f[:covered] }

@@ -17,10 +17,20 @@ SimpleCov.start do
   add_filter "/vendor/"
 
   # Group by component for easier analysis
-  add_group "Commands", "lib/jojo/commands"
-  add_group "Generators", "lib/jojo/generators"
-  add_group "Prompts", "lib/jojo/prompts"
-  add_group "Core", "lib/jojo"
+  add_group "Generators" do |src|
+    src.filename.include?("lib/jojo/commands") && src.filename.end_with?("generator.rb")
+  end
+  add_group "Prompts" do |src|
+    src.filename.include?("lib/jojo/commands") && src.filename.end_with?("prompt.rb")
+  end
+  add_group "Commands" do |src|
+    src.filename.include?("lib/jojo/commands") &&
+      !src.filename.end_with?("generator.rb") &&
+      !src.filename.end_with?("prompt.rb")
+  end
+  add_group "Core" do |src|
+    src.filename.include?("lib/jojo") && !src.filename.include?("lib/jojo/commands")
+  end
 end
 
 require "dotenv/load"  # Load .env file for service tests
