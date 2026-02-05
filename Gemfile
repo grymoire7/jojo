@@ -19,3 +19,8 @@ group :development, :test do
   gem "minitest-reporters", "~> 1.7"
   gem "standard", "~> 1.0"
 end
+
+group :test do
+  gem "simplecov", require: false
+  gem "simplecov_json_formatter", require: false
+end
