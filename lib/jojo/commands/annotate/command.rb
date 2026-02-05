@@ -12,16 +12,16 @@ module Jojo
         end
 
         def execute
-          require_employer!
+          require_application!
 
-          say "Generating annotations for #{employer.company_name}...", :green
+          say "Generating annotations for #{application.company_name}...", :green
 
           annotations = generator.generate
 
           log(step: :annotate, tokens: ai_client.total_tokens_used, status: "complete")
 
           say "Generated #{annotations.length} annotations", :green
-          say "  Saved to: #{employer.job_description_annotations_path}", :green
+          say "  Saved to: #{application.job_description_annotations_path}", :green
         rescue => e
           say "Error generating annotations: #{e.message}", :red
           begin
@@ -36,7 +36,7 @@ module Jojo
 
         def generator
           @generator ||= Generator.new(
-            employer,
+            application,
             ai_client,
             verbose: verbose?,
             overwrite_flag: overwrite?,

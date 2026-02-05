@@ -84,9 +84,9 @@ describe Jojo::Commands::Base do
         text_generation_ai_model: gpt-4
       YAML
 
-      # Create employer directory
-      FileUtils.mkdir_p("employers/acme-corp")
-      File.write("employers/acme-corp/job_description.md", "Test job")
+      # Create application directory
+      FileUtils.mkdir_p("applications/acme-corp")
+      File.write("applications/acme-corp/job_description.md", "Test job")
     end
 
     after do
@@ -94,22 +94,22 @@ describe Jojo::Commands::Base do
       FileUtils.rm_rf(@tmpdir)
     end
 
-    it "creates employer from slug" do
+    it "creates application from slug" do
       base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
 
-      employer = base.send(:employer)
+      application = base.send(:application)
 
-      _(employer).must_be_kind_of Jojo::Employer
-      _(employer.slug).must_equal "acme-corp"
+      _(application).must_be_kind_of Jojo::Application
+      _(application.slug).must_equal "acme-corp"
     end
 
-    it "caches employer instance" do
+    it "caches application instance" do
       base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
 
-      employer1 = base.send(:employer)
-      employer2 = base.send(:employer)
+      app1 = base.send(:application)
+      app2 = base.send(:application)
 
-      _(employer1.object_id).must_equal employer2.object_id
+      _(app1.object_id).must_equal app2.object_id
     end
 
     it "creates config" do
@@ -120,7 +120,7 @@ describe Jojo::Commands::Base do
       _(config).must_be_kind_of Jojo::Config
     end
 
-    it "creates status_logger for employer" do
+    it "creates status_logger for application" do
       base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
 
       logger = base.send(:status_logger)
@@ -134,7 +134,7 @@ describe Jojo::Commands::Base do
       @tmpdir = Dir.mktmpdir
       @original_dir = Dir.pwd
       Dir.chdir(@tmpdir)
-      FileUtils.mkdir_p("employers/acme-corp")
+      FileUtils.mkdir_p("applications/acme-corp")
     end
 
     after do
@@ -142,33 +142,65 @@ describe Jojo::Commands::Base do
       FileUtils.rm_rf(@tmpdir)
     end
 
-    describe "#require_employer!" do
-      it "does not exit when employer artifacts exist" do
-        File.write("employers/acme-corp/job_description.md", "Test")
-        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-        # Should not raise
-        base.send(:require_employer!)
+    describe "#application" do
+      before do
+        FileUtils.mkdir_p("applications/acme-corp")
+        File.write("applications/acme-corp/job_details.yml", "company_name: Acme")
       end
 
-      it "exits with message when employer not found" do
+      after do
+        FileUtils.rm_rf("applications")
+      end
+
+      it "creates application from slug" do
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+        _(base.send(:application)).must_be_instance_of Jojo::Application
+        _(base.send(:application).slug).must_equal "acme-corp"
+      end
+
+      it "caches application instance" do
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+        first_call = base.send(:application)
+        second_call = base.send(:application)
+
+        _(first_call).must_be_same_as second_call
+      end
+    end
+
+    describe "#require_application!" do
+      it "passes when application artifacts exist" do
+        FileUtils.mkdir_p("applications/acme-corp")
+        File.write("applications/acme-corp/job_description.md", "# Job")
+
+        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+        # Should not raise
+        base.send(:require_application!)
+
+        FileUtils.rm_rf("applications")
+      end
+
+      it "exits when application does not exist" do
         base = Jojo::Commands::Base.new(@mock_cli, slug: "nonexistent")
 
-        @mock_cli.expect(:say, nil, ["Employer 'nonexistent' not found.", :red])
+        @mock_cli.expect(:say, nil, ["Application 'nonexistent' not found.", :red])
         @mock_cli.expect(:say, nil, [String, :yellow])
 
-        assert_raises(SystemExit) { base.send(:require_employer!) }
+        assert_raises(SystemExit) do
+          base.send(:require_application!)
+        end
         @mock_cli.verify
       end
     end
 
     describe "#require_file!" do
       it "does not exit when file exists" do
-        File.write("employers/acme-corp/test.txt", "content")
+        File.write("applications/acme-corp/test.txt", "content")
         base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
 
         # Should not raise
-        base.send(:require_file!, "employers/acme-corp/test.txt", "Test file")
+        base.send(:require_file!, "applications/acme-corp/test.txt", "Test file")
       end
 
       it "exits with message when file missing" do

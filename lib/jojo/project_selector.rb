@@ -2,10 +2,10 @@ require "yaml"
 
 module Jojo
   class ProjectSelector
-    attr_reader :employer, :projects
+    attr_reader :application, :projects
 
-    def initialize(employer, projects)
-      @employer = employer
+    def initialize(application, projects)
+      @application = application
       @projects = projects
     end
 
@@ -56,8 +56,8 @@ module Jojo
 
     def job_details
       @job_details ||= begin
-        return {} unless File.exist?(employer.job_details_path)
-        YAML.load_file(employer.job_details_path)
+        return {} unless File.exist?(application.job_details_path)
+        YAML.load_file(application.job_details_path)
       end
     end
 

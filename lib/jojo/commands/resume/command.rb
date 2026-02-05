@@ -12,12 +12,12 @@ module Jojo
         end
 
         def execute
-          require_employer!
+          require_application!
 
-          say "Generating resume for #{employer.company_name}...", :green
+          say "Generating resume for #{application.company_name}...", :green
 
           # Check that research has been generated (optional warning)
-          unless File.exist?(employer.research_path)
+          unless File.exist?(application.research_path)
             say "Warning: Research not found. Resume will be less targeted.", :yellow
           end
 
@@ -32,7 +32,7 @@ module Jojo
 
           log(step: :resume, tokens: ai_client.total_tokens_used, status: "complete")
 
-          say "Resume generated and saved to #{employer.resume_path}", :green
+          say "Resume generated and saved to #{application.resume_path}", :green
         rescue => e
           say "Error generating resume: #{e.message}", :red
           begin
@@ -47,7 +47,7 @@ module Jojo
 
         def generator
           @generator ||= Generator.new(
-            employer,
+            application,
             ai_client,
             config: config,
             verbose: verbose?,

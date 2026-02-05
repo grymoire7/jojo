@@ -12,12 +12,12 @@ module Jojo
         end
 
         def execute
-          require_employer!
+          require_application!
 
-          say "Generating FAQs for #{employer.company_name}...", :green
+          say "Generating FAQs for #{application.company_name}...", :green
 
           # Check tailored resume exists (REQUIRED)
-          unless File.exist?(employer.resume_path)
+          unless File.exist?(application.resume_path)
             say "Tailored resume not found. Run 'jojo resume' or 'jojo generate' first.", :red
             exit 1
           end
@@ -26,7 +26,7 @@ module Jojo
 
           log(step: :faq, tokens: ai_client.total_tokens_used, status: "complete", faq_count: faqs.length)
 
-          say "Generated #{faqs.length} FAQs and saved to #{employer.faq_path}", :green
+          say "Generated #{faqs.length} FAQs and saved to #{application.faq_path}", :green
         rescue => e
           say "Error generating FAQs: #{e.message}", :red
           begin
@@ -41,7 +41,7 @@ module Jojo
 
         def generator
           @generator ||= Generator.new(
-            employer,
+            application,
             ai_client,
             config: config,
             verbose: verbose?

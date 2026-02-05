@@ -20,8 +20,8 @@ class CLIJobDescriptionTest < Minitest::Test
     @job_file = File.join(@tmpdir, "job.txt")
     File.write(@job_file, "Test job description\nSenior Engineer at Acme Corp\n")
 
-    # Create employers directory
-    FileUtils.mkdir_p("employers")
+    # Create applications directory
+    FileUtils.mkdir_p("applications")
   end
 
   def teardown
@@ -49,7 +49,7 @@ class CLIJobDescriptionTest < Minitest::Test
 
   def test_job_description_command_uses_slug_from_state_when_not_provided
     # Create employer directory
-    FileUtils.mkdir_p("employers/state-test")
+    FileUtils.mkdir_p("applications/state-test")
 
     # Save slug to state
     File.write(".jojo_state", "state-test")

@@ -29,31 +29,31 @@ describe Jojo::Commands::Interactive::Workflow do
 
   describe ".file_path" do
     before do
-      @employer = Minitest::Mock.new
-      @employer.expect :base_path, "/tmp/test-employer"
+      @application = Minitest::Mock.new
+      @application.expect :base_path, "/tmp/test-employer"
     end
 
     it "returns full path for a step" do
-      path = Jojo::Commands::Interactive::Workflow.file_path(:resume, @employer)
+      path = Jojo::Commands::Interactive::Workflow.file_path(:resume, @application)
       _(path).must_equal "/tmp/test-employer/resume.md"
     end
 
     it "handles nested paths like website" do
-      @employer.expect :base_path, "/tmp/test-employer"
-      path = Jojo::Commands::Interactive::Workflow.file_path(:website, @employer)
+      @application.expect :base_path, "/tmp/test-employer"
+      path = Jojo::Commands::Interactive::Workflow.file_path(:website, @application)
       _(path).must_equal "/tmp/test-employer/website/index.html"
     end
 
     it "raises for unknown step" do
-      _ { Jojo::Commands::Interactive::Workflow.file_path(:unknown, @employer) }.must_raise ArgumentError
+      _ { Jojo::Commands::Interactive::Workflow.file_path(:unknown, @application) }.must_raise ArgumentError
     end
   end
 
   describe ".status" do
     before do
       @temp_dir = Dir.mktmpdir
-      @employer = Minitest::Mock.new
-      @employer.expect :base_path, @temp_dir
+      @application = Minitest::Mock.new
+      @application.expect :base_path, @temp_dir
     end
 
     after do
@@ -63,9 +63,9 @@ describe Jojo::Commands::Interactive::Workflow do
     it "returns :blocked when dependencies missing" do
       # No files exist
       # file_path called for: output + first dependency (fails, returns early)
-      @employer.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
 
-      status = Jojo::Commands::Interactive::Workflow.status(:resume, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, @application)
       _(status).must_equal :blocked
     end
 
@@ -74,11 +74,11 @@ describe Jojo::Commands::Interactive::Workflow do
       FileUtils.touch(File.join(@temp_dir, "job_description.md"))
       FileUtils.touch(File.join(@temp_dir, "research.md"))
 
-      @employer.expect :base_path, @temp_dir
-      @employer.expect :base_path, @temp_dir
-      @employer.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
 
-      status = Jojo::Commands::Interactive::Workflow.status(:resume, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, @application)
       _(status).must_equal :ready
     end
 
@@ -90,12 +90,12 @@ describe Jojo::Commands::Interactive::Workflow do
       FileUtils.touch(File.join(@temp_dir, "resume.md"))
 
       # file_path called for: output, 2 deps check, 2 deps staleness check = 5 total
-      @employer.expect :base_path, @temp_dir
-      @employer.expect :base_path, @temp_dir
-      @employer.expect :base_path, @temp_dir
-      @employer.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
 
-      status = Jojo::Commands::Interactive::Workflow.status(:resume, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, @application)
       _(status).must_equal :generated
     end
 
@@ -108,16 +108,16 @@ describe Jojo::Commands::Interactive::Workflow do
       FileUtils.touch(File.join(@temp_dir, "research.md"))
 
       # file_path called for: output, 2 deps check, 1 dep staleness (stale found) = 4 total
-      @employer.expect :base_path, @temp_dir
-      @employer.expect :base_path, @temp_dir
-      @employer.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
+      @application.expect :base_path, @temp_dir
 
-      status = Jojo::Commands::Interactive::Workflow.status(:resume, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:resume, @application)
       _(status).must_equal :stale
     end
 
     it "returns :ready for job_description (no dependencies)" do
-      status = Jojo::Commands::Interactive::Workflow.status(:job_description, @employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:job_description, @application)
       _(status).must_equal :ready
     end
   end
@@ -125,7 +125,7 @@ describe Jojo::Commands::Interactive::Workflow do
   describe ".all_statuses" do
     before do
       @temp_dir = Dir.mktmpdir
-      @employer = Minitest::Mock.new
+      @application = Minitest::Mock.new
     end
 
     after do
@@ -134,9 +134,9 @@ describe Jojo::Commands::Interactive::Workflow do
 
     it "returns status for all steps" do
       # Mock base_path for each status call (9 steps, each may call multiple times)
-      27.times { @employer.expect :base_path, @temp_dir }
+      27.times { @application.expect :base_path, @temp_dir }
 
-      statuses = Jojo::Commands::Interactive::Workflow.all_statuses(@employer)
+      statuses = Jojo::Commands::Interactive::Workflow.all_statuses(@application)
 
       _(statuses).must_be_kind_of Hash
       _(statuses.keys.length).must_equal 9
@@ -148,7 +148,7 @@ describe Jojo::Commands::Interactive::Workflow do
   describe ".missing_dependencies" do
     before do
       @temp_dir = Dir.mktmpdir
-      @employer = Minitest::Mock.new
+      @application = Minitest::Mock.new
     end
 
     after do
@@ -156,9 +156,9 @@ describe Jojo::Commands::Interactive::Workflow do
     end
 
     it "returns list of missing dependency labels" do
-      5.times { @employer.expect :base_path, @temp_dir }
+      5.times { @application.expect :base_path, @temp_dir }
 
-      missing = Jojo::Commands::Interactive::Workflow.missing_dependencies(:resume, @employer)
+      missing = Jojo::Commands::Interactive::Workflow.missing_dependencies(:resume, @application)
 
       _(missing).must_include "Job Description"
       _(missing).must_include "Research"
@@ -168,9 +168,9 @@ describe Jojo::Commands::Interactive::Workflow do
       FileUtils.touch(File.join(@temp_dir, "job_description.md"))
       FileUtils.touch(File.join(@temp_dir, "research.md"))
 
-      5.times { @employer.expect :base_path, @temp_dir }
+      5.times { @application.expect :base_path, @temp_dir }
 
-      missing = Jojo::Commands::Interactive::Workflow.missing_dependencies(:resume, @employer)
+      missing = Jojo::Commands::Interactive::Workflow.missing_dependencies(:resume, @application)
       _(missing).must_be_empty
     end
   end
@@ -178,7 +178,7 @@ describe Jojo::Commands::Interactive::Workflow do
   describe ".progress" do
     before do
       @temp_dir = Dir.mktmpdir
-      @employer = Minitest::Mock.new
+      @application = Minitest::Mock.new
     end
 
     after do
@@ -186,9 +186,9 @@ describe Jojo::Commands::Interactive::Workflow do
     end
 
     it "returns 0 when nothing generated" do
-      27.times { @employer.expect :base_path, @temp_dir }
+      27.times { @application.expect :base_path, @temp_dir }
 
-      progress = Jojo::Commands::Interactive::Workflow.progress(@employer)
+      progress = Jojo::Commands::Interactive::Workflow.progress(@application)
       _(progress).must_equal 0
     end
 
@@ -196,9 +196,9 @@ describe Jojo::Commands::Interactive::Workflow do
       # Create job_description (1 of 9 = ~11%)
       FileUtils.touch(File.join(@temp_dir, "job_description.md"))
 
-      27.times { @employer.expect :base_path, @temp_dir }
+      27.times { @application.expect :base_path, @temp_dir }
 
-      progress = Jojo::Commands::Interactive::Workflow.progress(@employer)
+      progress = Jojo::Commands::Interactive::Workflow.progress(@application)
       _(progress).must_equal 11  # 1/9 rounded
     end
   end

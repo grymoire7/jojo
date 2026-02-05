@@ -5,7 +5,7 @@ require_relative "../test_helper"
 describe "Job Description Command Integration" do
   before do
     @temp_dir = Dir.mktmpdir
-    @employers_dir = File.join(@temp_dir, "employers")
+    @applications_dir = File.join(@temp_dir, "applications")
     @original_dir = Dir.pwd
     Dir.chdir(@temp_dir)
 
@@ -39,10 +39,10 @@ describe "Job Description Command Integration" do
       slug = "acme-corp-senior"
 
       # Step 1: Create workspace with 'new'
-      employer = Jojo::Employer.new(slug)
+      employer = Jojo::Application.new(slug)
       FileUtils.mkdir_p(employer.base_path)
 
-      _(Dir.exist?(File.join(@employers_dir, slug))).must_equal true
+      _(Dir.exist?(File.join(@applications_dir, slug))).must_equal true
       _(employer.artifacts_exist?).must_equal false
 
       # Step 2: Verify job_description would work (without actual AI call)
@@ -56,7 +56,7 @@ describe "Job Description Command Integration" do
       slug = "state-based-app"
 
       # Create employer
-      employer = Jojo::Employer.new(slug)
+      employer = Jojo::Application.new(slug)
       FileUtils.mkdir_p(employer.base_path)
 
       # Save to state

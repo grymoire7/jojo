@@ -1,11 +1,11 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/commands/website/generator"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/config"
 
 describe "Projects Integration Workflow" do
   before do
-    @employer = Jojo::Employer.new("integration-test-corp")
+    @employer = Jojo::Application.new("integration-test-corp")
     @employer.create_directory!
 
     # Setup all required files
@@ -64,7 +64,7 @@ describe "Projects Integration Workflow" do
   end
 
   after do
-    FileUtils.rm_rf("employers/integration-test-corp")
+    FileUtils.rm_rf("applications/integration-test-corp")
     FileUtils.rm_rf(@test_fixtures_dir) if @test_fixtures_dir && File.exist?(@test_fixtures_dir)
   end
 

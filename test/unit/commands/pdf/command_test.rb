@@ -36,12 +36,12 @@ describe Jojo::Commands::Pdf::Command do
   describe "successful execution" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_converter = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "reports generated PDFs" do
@@ -57,7 +57,7 @@ describe Jojo::Commands::Pdf::Command do
       command = Jojo::Commands::Pdf::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         converter: @mock_converter
       )
       command.execute
@@ -79,7 +79,7 @@ describe Jojo::Commands::Pdf::Command do
       command = Jojo::Commands::Pdf::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         converter: @mock_converter
       )
       command.execute
@@ -99,7 +99,7 @@ describe Jojo::Commands::Pdf::Command do
       command = Jojo::Commands::Pdf::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         converter: @mock_converter
       )
 
@@ -112,12 +112,12 @@ describe Jojo::Commands::Pdf::Command do
   describe "logging" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_converter = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:status_logger, @mock_status_logger)
 
       @mock_cli.expect(:say, nil, [String, :green])
       @mock_cli.expect(:say, nil, [String, :green])
@@ -132,7 +132,7 @@ describe Jojo::Commands::Pdf::Command do
       command = Jojo::Commands::Pdf::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         converter: @mock_converter
       )
       command.execute
@@ -144,12 +144,12 @@ describe Jojo::Commands::Pdf::Command do
   describe "error recovery" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_converter = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "handles PandocNotFoundError" do
@@ -164,7 +164,7 @@ describe Jojo::Commands::Pdf::Command do
       command = Jojo::Commands::Pdf::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         converter: @mock_converter
       )
 
@@ -183,7 +183,7 @@ describe Jojo::Commands::Pdf::Command do
       command = Jojo::Commands::Pdf::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         converter: @mock_converter
       )
 
@@ -201,7 +201,7 @@ describe Jojo::Commands::Pdf::Command do
       command = Jojo::Commands::Pdf::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         converter: @mock_converter
       )
 

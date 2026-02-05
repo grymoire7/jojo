@@ -267,9 +267,9 @@ Then customize your input files:
 
 **Note**: The `inputs/` directory is gitignored, so your personal information stays private.
 
-### Step 1: Create employer workspace
+### Step 1: Create application workspace
 
-First, create a workspace for the employer by processing their job description.
+First, create a workspace for the application by processing their job description.
 
 #### Choosing a Slug
 
@@ -314,7 +314,7 @@ You can also provide a URL for the job description:
   --job "https://careers.acmecorp.com/jobs/123"
 ```
 
-This creates `employers/acme-corp-senior-dev/` with:
+This creates `applications/acme-corp-senior-dev/` with:
 - `job_description.md` - Processed job description
 - `job_details.yml` - Extracted metadata (company name, title, etc.)
 
@@ -327,7 +327,7 @@ This creates `employers/acme-corp-senior-dev/` with:
 Or set the environment variable to avoid repeating the slug:
 
 ```bash
-export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
+export JOJO_APPLICATION_SLUG=acme-corp-senior-dev
 ./bin/jojo generate
 ```
 
@@ -347,9 +347,9 @@ This generates:
 
 1. **Find a job** you want to apply for
 2. **Save job description** as a file or copy the URL
-3. **Create employer workspace** with `jojo new -s <slug> -j <job-description>`
-4. **Generate materials** with `jojo generate -s <slug>` (or set `JOJO_EMPLOYER_SLUG`)
-5. **Review generated materials** in `employers/<slug>/`
+3. **Create application workspace** with `jojo new -s <slug> -j <job-description>`
+4. **Generate materials** with `jojo generate -s <slug>` (or set `JOJO_APPLICATION_SLUG`)
+5. **Review generated materials** in `applications/<slug>/`
 6. **Customize as needed** - edit the markdown files
 7. **Deploy website** to your personal site
 8. **Apply** with tailored resume, cover letter, and website link
@@ -359,11 +359,11 @@ This generates:
 For more control, run individual steps:
 
 ```bash
-# 1. Create employer workspace (required first step)
+# 1. Create application workspace (required first step)
 ./bin/jojo new -s acme-corp-senior-dev -j job_desc.txt
 
 # Set environment variable to avoid repeating slug (optional)
-export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
+export JOJO_APPLICATION_SLUG=acme-corp-senior-dev
 
 # 2. Generate company research
 ./bin/jojo research
@@ -386,11 +386,11 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
 
 ### Using Environment Variables
 
-To avoid repeating the `--slug` flag for every command, set the `JOJO_EMPLOYER_SLUG` environment variable:
+To avoid repeating the `--slug` flag for every command, set the `JOJO_APPLICATION_SLUG` environment variable:
 
 ```bash
 # Set for the current shell session
-export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
+export JOJO_APPLICATION_SLUG=acme-corp-senior-dev
 
 # Now you can omit --slug from all commands
 ./bin/jojo research
@@ -401,19 +401,19 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
 ```
 
 **When to use environment variables:**
-- ✅ Working on multiple commands for the same employer
+- ✅ Working on multiple commands for the same application
 - ✅ Running the full generation workflow step-by-step
 - ✅ Iterating on materials (regenerating resume, website, etc.)
 
 **When to use the `--slug` flag:**
-- ✅ One-off commands for different employers
+- ✅ One-off commands for different applications
 - ✅ Switching between multiple applications
 - ✅ Scripts or automation where explicit is better
 
 **Tip**: Add the export to your shell's RC file (`.bashrc`, `.zshrc`) to persist across sessions:
 ```bash
 # In ~/.zshrc or ~/.bashrc
-export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
+export JOJO_APPLICATION_SLUG=acme-corp-senior-dev
 ```
 
 ## Commands
@@ -421,14 +421,14 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior-dev
 | Command | Description | Required Options |
 | ------- | ----------- | ---------------- |
 | `jojo setup` | Create configuration file | None |
-| `jojo new` | Create employer workspace and process job description | `-s`, `-j` |
-| `jojo generate` | Generate all materials (research, resume, cover letter, website) | `-s` or `JOJO_EMPLOYER_SLUG` |
-| `jojo research` | Generate company/role research only | `-s` or `JOJO_EMPLOYER_SLUG` |
-| `jojo resume` | Generate tailored resume only | `-s` or `JOJO_EMPLOYER_SLUG` |
-| `jojo cover_letter` | Generate cover letter only | `-s` or `JOJO_EMPLOYER_SLUG` |
-| `jojo annotate` | Generate annotated job description | `-s` or `JOJO_EMPLOYER_SLUG` |
-| `jojo website` | Generate website only | `-s` or `JOJO_EMPLOYER_SLUG` |
-| `jojo pdf` | Generate PDF versions of resume and cover letter | `-s` or `JOJO_EMPLOYER_SLUG` |
+| `jojo new` | Create application workspace and process job description | `-s`, `-j` |
+| `jojo generate` | Generate all materials (research, resume, cover letter, website) | `-s` or `JOJO_APPLICATION_SLUG` |
+| `jojo research` | Generate company/role research only | `-s` or `JOJO_APPLICATION_SLUG` |
+| `jojo resume` | Generate tailored resume only | `-s` or `JOJO_APPLICATION_SLUG` |
+| `jojo cover_letter` | Generate cover letter only | `-s` or `JOJO_APPLICATION_SLUG` |
+| `jojo annotate` | Generate annotated job description | `-s` or `JOJO_APPLICATION_SLUG` |
+| `jojo website` | Generate website only | `-s` or `JOJO_APPLICATION_SLUG` |
+| `jojo pdf` | Generate PDF versions of resume and cover letter | `-s` or `JOJO_APPLICATION_SLUG` |
 | `jojo test` | Run test suite | None |
 | `jojo version` | Show version | None |
 | `jojo help [COMMAND]` | Show help | None |
@@ -517,13 +517,13 @@ Templates are ERB files located in `templates/website/`. To create a custom temp
 
 ### Environment Variables
 
-- `JOJO_EMPLOYER_SLUG` - Set this to avoid repeating `--slug` flag for commands
+- `JOJO_APPLICATION_SLUG` - Set this to avoid repeating `--slug` flag for commands
 - `JOJO_ALWAYS_OVERWRITE` - Set to `true`, `1`, or `yes` to skip overwrite prompts
 
 ### Examples
 
 ```bash
-# Create a new employer workspace
+# Create a new application workspace
 ./bin/jojo new -s acme-corp-senior -j job_posting.txt
 
 # From URL
@@ -533,7 +533,7 @@ Templates are ERB files located in `templates/website/`. To create a custom temp
 ./bin/jojo generate -s acme-corp-senior
 
 # Using environment variable to avoid repeating slug
-export JOJO_EMPLOYER_SLUG=acme-corp-senior
+export JOJO_APPLICATION_SLUG=acme-corp-senior
 ./bin/jojo generate
 
 # Verbose mode for debugging
@@ -543,7 +543,7 @@ export JOJO_EMPLOYER_SLUG=acme-corp-senior
 ./bin/jojo website -s acme-corp-senior
 
 # Generate only research to decide if you want to apply
-export JOJO_EMPLOYER_SLUG=acme-corp-senior
+export JOJO_APPLICATION_SLUG=acme-corp-senior
 ./bin/jojo research
 ```
 
@@ -630,7 +630,7 @@ JoJo is built as a modular Ruby CLI application:
 
 - **CLI Layer** (`lib/jojo/cli.rb`) - Thor-based command interface
 - **Configuration** (`lib/jojo/config.rb`) - User settings management
-- **Employer** (`lib/jojo/employer.rb`) - Per-application workspace management
+- **Employer** (`lib/jojo/application.rb`) - Per-application workspace management
 - **AI Client** (`lib/jojo/ai_client.rb`) - Unified interface to AI services
 - **Job Description Processor** - Fetch from URL or file, convert to markdown
 - **Status Logger** - Track decisions and process flow
@@ -653,7 +653,7 @@ jojo/
 ├── lib/jojo/             # Main application code
 │   ├── cli.rb           # Thor command definitions
 │   ├── config.rb        # Configuration management
-│   ├── employer.rb      # Employer workspace
+│   ├── application.rb      # Employer workspace
 │   ├── ai_client.rb     # AI service integration
 │   └── prompts/         # AI prompt templates
 ├── test/                 # Test suite
@@ -662,7 +662,7 @@ jojo/
 │   └── service/         # Tests with real APIs
 ├── templates/           # Template files for users
 ├── inputs/              # User's actual data (gitignored)
-└── employers/           # Generated output (gitignored)
+└── applications/           # Generated output (gitignored)
     └── company-name/
         ├── job_description.md
         ├── job_description_annotations.json

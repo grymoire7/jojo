@@ -1,5 +1,5 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/commands/faq/generator"
 require_relative "../../lib/jojo/commands/website/generator"
 require_relative "../../lib/jojo/config"
@@ -9,7 +9,7 @@ require "tempfile"
 
 describe "FAQ Workflow Integration" do
   before do
-    @employer = Jojo::Employer.new("integration-test-corp")
+    @employer = Jojo::Application.new("integration-test-corp")
     @ai_client = Minitest::Mock.new
 
     # Create minimal config in a temp file

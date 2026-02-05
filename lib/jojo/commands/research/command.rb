@@ -12,15 +12,15 @@ module Jojo
         end
 
         def execute
-          require_employer!
+          require_application!
 
-          say "Generating research for #{employer.company_name}...", :green
+          say "Generating research for #{application.company_name}...", :green
 
           generator.generate
 
           log(step: :research, tokens: ai_client.total_tokens_used, status: "complete")
 
-          say "Research generated and saved to #{employer.research_path}", :green
+          say "Research generated and saved to #{application.research_path}", :green
         rescue => e
           say "Error generating research: #{e.message}", :red
           begin
@@ -35,7 +35,7 @@ module Jojo
 
         def generator
           @generator ||= Generator.new(
-            employer,
+            application,
             ai_client,
             config: config,
             verbose: verbose?,

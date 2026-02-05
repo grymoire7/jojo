@@ -1,18 +1,18 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/commands/cover_letter/generator"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/config"
 
 describe "Jojo::Commands::CoverLetter::Generator with Projects" do
   before do
-    @employer = Jojo::Employer.new("test-corp")
-    @employer.create_directory!
+    @application = Jojo::Application.new("test-corp")
+    @application.create_directory!
     @config = Jojo::Config.new("test/fixtures/valid_config.yml")
 
-    File.write(@employer.job_description_path, "Ruby developer needed")
-    File.write(@employer.resume_path, "# Resume\n\nTailored resume...")
+    File.write(@application.job_description_path, "Ruby developer needed")
+    File.write(@application.resume_path, "# Resume\n\nTailored resume...")
 
-    File.write(@employer.job_details_path, <<~YAML)
+    File.write(@application.job_details_path, <<~YAML)
       company_name: Test Corp
       required_skills:
         - Ruby on Rails
@@ -38,7 +38,7 @@ describe "Jojo::Commands::CoverLetter::Generator with Projects" do
   end
 
   after do
-    FileUtils.rm_rf("employers/test-corp")
+    FileUtils.rm_rf("applications/test-corp")
     FileUtils.rm_rf(@test_fixtures_dir) if @test_fixtures_dir && File.exist?(@test_fixtures_dir)
   end
 
@@ -51,7 +51,7 @@ describe "Jojo::Commands::CoverLetter::Generator with Projects" do
       true
     end
 
-    generator = Jojo::Commands::CoverLetter::Generator.new(@employer, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::CoverLetter::Generator.new(@application, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
     # Verify the prompt includes project information

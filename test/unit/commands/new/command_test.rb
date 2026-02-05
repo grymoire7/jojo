@@ -49,14 +49,14 @@ describe Jojo::Commands::New::Command do
 
   describe "successful execution" do
     it "creates employer directory" do
-      @mock_cli.expect(:say, nil, ["Created application workspace: employers/new-corp", :green])
+      @mock_cli.expect(:say, nil, ["Created application workspace: applications/new-corp", :green])
       @mock_cli.expect(:say, nil, ["\nNext step:", :cyan])
       @mock_cli.expect(:say, nil, ["  jojo job_description -s new-corp -j <job_file_or_url>", :white])
 
       command = Jojo::Commands::New::Command.new(@mock_cli, slug: "new-corp")
       command.execute
 
-      _(Dir.exist?("employers/new-corp")).must_equal true
+      _(Dir.exist?("applications/new-corp")).must_equal true
       @mock_cli.verify
     end
 

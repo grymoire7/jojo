@@ -6,10 +6,10 @@ module Jojo
   module Commands
     module Annotate
       class Generator
-        attr_reader :employer, :ai_client, :verbose, :overwrite_flag, :cli_instance
+        attr_reader :application, :ai_client, :verbose, :overwrite_flag, :cli_instance
 
-        def initialize(employer, ai_client, verbose: false, overwrite_flag: nil, cli_instance: nil)
-          @employer = employer
+        def initialize(application, ai_client, verbose: false, overwrite_flag: nil, cli_instance: nil)
+          @application = application
           @ai_client = ai_client
           @verbose = verbose
           @overwrite_flag = overwrite_flag
@@ -29,7 +29,7 @@ module Jojo
           say("Parsing JSON response...")
           annotations = parse_annotations(annotations_json)
 
-          say("Saving annotations to #{employer.job_description_annotations_path}...")
+          say("Saving annotations to #{application.job_description_annotations_path}...")
           save_annotations(annotations)
 
           logsay("Annotation generation complete! Generated #{annotations.length} annotations.")
@@ -39,17 +39,17 @@ module Jojo
         private
 
         def gather_inputs
-          unless File.exist?(employer.job_description_path)
-            raise "Job description not found at #{employer.job_description_path}"
+          unless File.exist?(application.job_description_path)
+            raise "Job description not found at #{application.job_description_path}"
           end
-          job_description = File.read(employer.job_description_path)
+          job_description = File.read(application.job_description_path)
 
-          unless File.exist?(employer.resume_path)
-            message = "Error: Resume not found at #{employer.resume_path}"
+          unless File.exist?(application.resume_path)
+            message = "Error: Resume not found at #{application.resume_path}"
             log(message, step: :annotations, status: "failed")
             raise message
           end
-          resume = File.read(employer.resume_path)
+          resume = File.read(application.resume_path)
 
           research = read_research
 
@@ -61,12 +61,12 @@ module Jojo
         end
 
         def read_research
-          unless File.exist?(employer.research_path)
+          unless File.exist?(application.research_path)
             logsay("Warning: Research not found, annotations will be based on job description only")
             return nil
           end
 
-          File.read(employer.research_path)
+          File.read(application.research_path)
         end
 
         def build_prompt(inputs)
@@ -91,16 +91,16 @@ module Jojo
         def save_annotations(annotations)
           json_output = JSON.pretty_generate(annotations)
           if cli_instance
-            cli_instance.with_overwrite_check(employer.job_description_annotations_path, overwrite_flag) do
-              File.write(employer.job_description_annotations_path, json_output)
+            cli_instance.with_overwrite_check(application.job_description_annotations_path, overwrite_flag) do
+              File.write(application.job_description_annotations_path, json_output)
             end
           else
-            File.write(employer.job_description_annotations_path, json_output)
+            File.write(application.job_description_annotations_path, json_output)
           end
         end
 
         def log(message, **metadata)
-          employer.status_logger.log(message, step: :annotations, **metadata)
+          application.status_logger.log(message, step: :annotations, **metadata)
         end
 
         def say(message)

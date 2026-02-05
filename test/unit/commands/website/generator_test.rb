@@ -1,6 +1,6 @@
 # test/unit/commands/website/generator_test.rb
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/website/generator"
 
 # Simple config stub to avoid complex mock expectations
@@ -18,11 +18,11 @@ end
 
 describe Jojo::Commands::Website::Generator do
   before do
-    @employer = Jojo::Employer.new("acme-corp")
+    @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = WebsiteGeneratorTestConfigStub.new
     @generator = Jojo::Commands::Website::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       verbose: false,
@@ -30,19 +30,19 @@ describe Jojo::Commands::Website::Generator do
     )
 
     # Clean up and create directories
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
-    @employer.create_directory!
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    @application.create_directory!
 
     # Create required fixtures
-    File.write(@employer.job_description_path, "Senior Ruby Developer role at Acme Corp...")
-    File.write(@employer.resume_path, "# Jane Doe\n\n## Professional Summary\n\nSenior Ruby developer...")
-    File.write(@employer.research_path, "# Company Profile\n\nAcme Corp is a leading tech company...")
-    File.write(@employer.job_details_path, "company_name: Acme Corp\nposition_title: Senior Developer\n")
-    File.write(@employer.branding_path, "I'm a perfect fit for Acme Corp...\n\nMy experience aligns perfectly...")
+    File.write(@application.job_description_path, "Senior Ruby Developer role at Acme Corp...")
+    File.write(@application.resume_path, "# Jane Doe\n\n## Professional Summary\n\nSenior Ruby developer...")
+    File.write(@application.research_path, "# Company Profile\n\nAcme Corp is a leading tech company...")
+    File.write(@application.job_details_path, "company_name: Acme Corp\nposition_title: Senior Developer\n")
+    File.write(@application.branding_path, "I'm a perfect fit for Acme Corp...\n\nMy experience aligns perfectly...")
   end
 
   after do
-    FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
   end
 
   it "generates website with all inputs" do
@@ -58,16 +58,16 @@ describe Jojo::Commands::Website::Generator do
   it "saves website to index.html" do
     @generator.generate
 
-    _(File.exist?(@employer.index_html_path)).must_equal true
-    content = File.read(@employer.index_html_path)
+    _(File.exist?(@application.index_html_path)).must_equal true
+    content = File.read(@application.index_html_path)
     _(content).must_include "I'm a perfect fit for Acme Corp..."
     _(content).must_include "<!DOCTYPE html>"
     _(content).must_include "</html>"
   end
 
   it "generates website with minimal inputs (no research, no job_details)" do
-    FileUtils.rm_f(@employer.research_path)
-    File.write(@employer.branding_path, "Branding statement without research...")
+    FileUtils.rm_f(@application.research_path)
+    File.write(@application.branding_path, "Branding statement without research...")
 
     # Should not raise error
     result = @generator.generate
@@ -79,7 +79,7 @@ describe Jojo::Commands::Website::Generator do
     FileUtils.mkdir_p("templates/website")
     File.write("templates/website/modern.html.erb", "<html><body><h1><%= seeker_name %></h1></body></html>")
 
-    generator = Jojo::Commands::Website::Generator.new(@employer, @ai_client, config: @config, template: "modern", verbose: false)
+    generator = Jojo::Commands::Website::Generator.new(@application, @ai_client, config: @config, template: "modern", verbose: false)
 
     result = generator.generate
 
@@ -89,7 +89,7 @@ describe Jojo::Commands::Website::Generator do
   end
 
   it "raises error when template is missing" do
-    generator = Jojo::Commands::Website::Generator.new(@employer, @ai_client, config: @config, template: "nonexistent", verbose: false)
+    generator = Jojo::Commands::Website::Generator.new(@application, @ai_client, config: @config, template: "nonexistent", verbose: false)
 
     error = assert_raises(RuntimeError) do
       generator.generate
@@ -100,7 +100,7 @@ describe Jojo::Commands::Website::Generator do
   end
 
   it "fails when resume is missing" do
-    FileUtils.rm_f(@employer.resume_path)
+    FileUtils.rm_f(@application.resume_path)
 
     error = assert_raises(RuntimeError) do
       @generator.generate
@@ -110,7 +110,7 @@ describe Jojo::Commands::Website::Generator do
   end
 
   it "fails when job description is missing" do
-    FileUtils.rm_f(@employer.job_description_path)
+    FileUtils.rm_f(@application.job_description_path)
 
     error = assert_raises(RuntimeError) do
       @generator.generate
@@ -124,18 +124,18 @@ describe Jojo::Commands::Website::Generator do
     @generator.generate
 
     # Check that image was copied
-    image_path = File.join(@employer.website_path, "branding_image.jpg")
+    image_path = File.join(@application.website_path, "branding_image.jpg")
     _(File.exist?(image_path)).must_equal true
 
     # Check that HTML references the image
-    html = File.read(@employer.index_html_path)
+    html = File.read(@application.index_html_path)
     _(html).must_include "branding_image.jpg"
   end
 
   it "skips branding image when missing" do
     # Create a generator with nonexistent inputs path (no branding_image.jpg)
     generator_no_image = Jojo::Commands::Website::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       verbose: false,
@@ -145,7 +145,7 @@ describe Jojo::Commands::Website::Generator do
     generator_no_image.generate
 
     # Image should not exist in website directory
-    image_path = File.join(@employer.website_path, "branding_image.jpg")
+    image_path = File.join(@application.website_path, "branding_image.jpg")
     _(File.exist?(image_path)).must_equal false
   end
 
@@ -183,14 +183,14 @@ describe Jojo::Commands::Website::Generator do
 
   it "loads and injects annotations into job description HTML" do
     # Update job description to include text being annotated
-    File.write(@employer.job_description_path, "We need Ruby and distributed systems experience.")
+    File.write(@application.job_description_path, "We need Ruby and distributed systems experience.")
 
     # Create annotations JSON
     annotations = [
       {text: "Ruby", match: "7 years Ruby experience", tier: "strong"},
       {text: "distributed systems", match: "Built message queue", tier: "moderate"}
     ]
-    File.write(@employer.job_description_annotations_path, JSON.generate(annotations))
+    File.write(@application.job_description_annotations_path, JSON.generate(annotations))
 
     result = @generator.generate
 
@@ -212,12 +212,12 @@ describe Jojo::Commands::Website::Generator do
 
   it "annotates all occurrences of same text" do
     # Job description with duplicate text
-    File.write(@employer.job_description_path, "We need Ruby skills. Ruby is our main language. Ruby developers wanted.")
+    File.write(@application.job_description_path, "We need Ruby skills. Ruby is our main language. Ruby developers wanted.")
 
     annotations = [
       {text: "Ruby", match: "7 years Ruby experience", tier: "strong"}
     ]
-    File.write(@employer.job_description_annotations_path, JSON.generate(annotations))
+    File.write(@application.job_description_annotations_path, JSON.generate(annotations))
 
     result = @generator.generate
 
@@ -229,14 +229,14 @@ describe Jojo::Commands::Website::Generator do
   it "prevents nested spans when annotation texts overlap" do
     # Job description with overlapping text patterns
     # "Ruby" appears alone and within "Ruby on Rails"
-    File.write(@employer.job_description_path, "We need Ruby developers who know Ruby on Rails.\n\nRuby is great. Ruby on Rails is a framework.")
+    File.write(@application.job_description_path, "We need Ruby developers who know Ruby on Rails.\n\nRuby is great. Ruby on Rails is a framework.")
 
     # Create overlapping annotations (shorter text appears within longer text)
     annotations = [
       {text: "Ruby", match: "7 years Ruby experience", tier: "strong"},
       {text: "Ruby on Rails", match: "Full-stack Ruby on Rails experience", tier: "strong"}
     ]
-    File.write(@employer.job_description_annotations_path, JSON.generate(annotations))
+    File.write(@application.job_description_annotations_path, JSON.generate(annotations))
 
     result = @generator.generate
 
@@ -264,7 +264,7 @@ describe Jojo::Commands::Website::Generator do
       {question: "What's your experience?", answer: "I have 7 years..."},
       {question: "Why this company?", answer: "I'm excited about..."}
     ]
-    File.write(@employer.faq_path, JSON.generate(faqs_data))
+    File.write(@application.faq_path, JSON.generate(faqs_data))
 
     html = @generator.generate
 
@@ -274,8 +274,8 @@ describe Jojo::Commands::Website::Generator do
   end
 
   it "handles missing FAQ file gracefully" do
-    FileUtils.rm_f(@employer.faq_path) if File.exist?(@employer.faq_path)
-    File.write(@employer.branding_path, "Branding statement")
+    FileUtils.rm_f(@application.faq_path) if File.exist?(@application.faq_path)
+    File.write(@application.branding_path, "Branding statement")
 
     html = @generator.generate
 
@@ -284,7 +284,7 @@ describe Jojo::Commands::Website::Generator do
   end
 
   it "fails when branding.md is missing" do
-    FileUtils.rm_f(@employer.branding_path)
+    FileUtils.rm_f(@application.branding_path)
 
     error = assert_raises(RuntimeError) do
       @generator.generate
@@ -295,7 +295,7 @@ describe Jojo::Commands::Website::Generator do
   end
 
   it "fails when branding.md is empty" do
-    File.write(@employer.branding_path, "")
+    File.write(@application.branding_path, "")
 
     error = assert_raises(RuntimeError) do
       @generator.generate

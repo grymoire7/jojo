@@ -1,14 +1,14 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/project_selector"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 
 describe Jojo::ProjectSelector do
   before do
-    @employer = Jojo::Employer.new("test-corp")
-    @employer.create_directory!
+    @application = Jojo::Application.new("test-corp")
+    @application.create_directory!
 
     # Create job_details.yml fixture
-    File.write(@employer.job_details_path, <<~YAML)
+    File.write(@application.job_details_path, <<~YAML)
       required_skills:
         - Ruby on Rails
         - PostgreSQL
@@ -36,11 +36,11 @@ describe Jojo::ProjectSelector do
   end
 
   after do
-    FileUtils.rm_rf("employers/test-corp")
+    FileUtils.rm_rf("applications/test-corp")
   end
 
   it "selects projects based on skill matching" do
-    selector = Jojo::ProjectSelector.new(@employer, @projects)
+    selector = Jojo::ProjectSelector.new(@application, @projects)
     selected = selector.select_for_landing_page(limit: 3)
 
     _(selected.size).must_equal 2  # Only 2 projects match
@@ -65,7 +65,7 @@ describe Jojo::ProjectSelector do
       }
     ]
 
-    selector = Jojo::ProjectSelector.new(@employer, projects)
+    selector = Jojo::ProjectSelector.new(@application, projects)
     selected = selector.select_for_landing_page(limit: 2)
 
     _(selected.first[:title]).must_equal "Recent Project"
@@ -81,7 +81,7 @@ describe Jojo::ProjectSelector do
       }
     ]
 
-    selector = Jojo::ProjectSelector.new(@employer, projects)
+    selector = Jojo::ProjectSelector.new(@application, projects)
     selected = selector.select_for_landing_page(limit: 3)
 
     _(selected).must_be_kind_of Array

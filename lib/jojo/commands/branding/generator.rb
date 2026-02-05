@@ -6,10 +6,10 @@ module Jojo
   module Commands
     module Branding
       class Generator
-        attr_reader :employer, :ai_client, :config, :verbose
+        attr_reader :application, :ai_client, :config, :verbose
 
-        def initialize(employer, ai_client, config:, verbose: false)
-          @employer = employer
+        def initialize(application, ai_client, config:, verbose: false)
+          @application = application
           @ai_client = ai_client
           @config = config
           @verbose = verbose
@@ -22,7 +22,7 @@ module Jojo
           log "Generating branding statement using AI..."
           branding_statement = generate_branding_statement(inputs)
 
-          log "Saving branding statement to #{employer.branding_path}..."
+          log "Saving branding statement to #{application.branding_path}..."
           save_branding(branding_statement)
 
           log "Branding statement generation complete!"
@@ -32,15 +32,15 @@ module Jojo
         private
 
         def gather_inputs
-          unless File.exist?(employer.job_description_path)
-            raise "Job description not found at #{employer.job_description_path}"
+          unless File.exist?(application.job_description_path)
+            raise "Job description not found at #{application.job_description_path}"
           end
-          job_description = File.read(employer.job_description_path)
+          job_description = File.read(application.job_description_path)
 
-          unless File.exist?(employer.resume_path)
-            raise "Resume not found at #{employer.resume_path}. Run 'jojo resume' first."
+          unless File.exist?(application.resume_path)
+            raise "Resume not found at #{application.resume_path}. Run 'jojo resume' first."
           end
-          resume = File.read(employer.resume_path)
+          resume = File.read(application.resume_path)
 
           research = read_research
           job_details = read_job_details
@@ -50,23 +50,23 @@ module Jojo
             resume: resume,
             research: research,
             job_details: job_details,
-            company_name: employer.company_name
+            company_name: application.company_name
           }
         end
 
         def read_research
-          unless File.exist?(employer.research_path)
+          unless File.exist?(application.research_path)
             log "Warning: Research not found, branding will be less targeted"
             return nil
           end
 
-          File.read(employer.research_path)
+          File.read(application.research_path)
         end
 
         def read_job_details
-          return nil unless File.exist?(employer.job_details_path)
+          return nil unless File.exist?(application.job_details_path)
 
-          YAML.load_file(employer.job_details_path)
+          YAML.load_file(application.job_details_path)
         rescue => e
           log "Warning: Could not parse job details: #{e.message}"
           nil
@@ -87,7 +87,7 @@ module Jojo
         end
 
         def save_branding(branding_statement)
-          File.write(employer.branding_path, branding_statement)
+          File.write(application.branding_path, branding_statement)
         end
 
         def log(message)

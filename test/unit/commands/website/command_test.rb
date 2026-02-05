@@ -33,7 +33,7 @@ describe Jojo::Commands::Website::Command do
     end
 
     it "exits when resume not found" do
-      FileUtils.rm("employers/acme-corp/resume.md")
+      FileUtils.rm("applications/acme-corp/resume.md")
 
       @mock_cli.expect(:say, nil, [/Generating website/, :green])
       @mock_cli.expect(:say, nil, [/Resume not found/, :red])
@@ -46,19 +46,19 @@ describe Jojo::Commands::Website::Command do
     end
 
     it "warns but continues when research not found" do
-      FileUtils.rm("employers/acme-corp/research.md")
+      FileUtils.rm("applications/acme-corp/research.md")
 
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
-      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
-      @mock_employer.expect(:index_html_path, "employers/acme-corp/index.html")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:resume_path, "applications/acme-corp/resume.md")
+      @mock_application.expect(:research_path, "applications/acme-corp/research.md")
+      @mock_application.expect(:index_html_path, "applications/acme-corp/index.html")
+      @mock_application.expect(:status_logger, @mock_status_logger)
 
       @mock_generator.expect(:generate, nil)
       @mock_ai_client.expect(:total_tokens_used, 100)
@@ -71,7 +71,7 @@ describe Jojo::Commands::Website::Command do
       command = Jojo::Commands::Website::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -84,16 +84,16 @@ describe Jojo::Commands::Website::Command do
   describe "successful execution" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
-      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
-      @mock_employer.expect(:index_html_path, "employers/acme-corp/index.html")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:resume_path, "applications/acme-corp/resume.md")
+      @mock_application.expect(:research_path, "applications/acme-corp/research.md")
+      @mock_application.expect(:index_html_path, "applications/acme-corp/index.html")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "calls generator.generate" do
@@ -102,12 +102,12 @@ describe Jojo::Commands::Website::Command do
       @mock_status_logger.expect(:log, nil, [], step: :website, tokens: 200, status: "complete", metadata: {template: "default"})
 
       @mock_cli.expect(:say, nil, ["Generating website for Acme Corp...", :green])
-      @mock_cli.expect(:say, nil, ["Website generated and saved to employers/acme-corp/index.html", :green])
+      @mock_cli.expect(:say, nil, ["Website generated and saved to applications/acme-corp/index.html", :green])
 
       command = Jojo::Commands::Website::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -120,16 +120,16 @@ describe Jojo::Commands::Website::Command do
   describe "logging" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
-      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
-      @mock_employer.expect(:index_html_path, "employers/acme-corp/index.html")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:resume_path, "applications/acme-corp/resume.md")
+      @mock_application.expect(:research_path, "applications/acme-corp/research.md")
+      @mock_application.expect(:index_html_path, "applications/acme-corp/index.html")
+      @mock_application.expect(:status_logger, @mock_status_logger)
 
       @mock_generator.expect(:generate, nil)
 
@@ -144,7 +144,7 @@ describe Jojo::Commands::Website::Command do
       command = Jojo::Commands::Website::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -157,15 +157,15 @@ describe Jojo::Commands::Website::Command do
   describe "error recovery" do
     before do
       @mock_status_logger = Minitest::Mock.new
-      @mock_employer = Minitest::Mock.new
+      @mock_application = Minitest::Mock.new
       @mock_ai_client = Minitest::Mock.new
       @mock_generator = Minitest::Mock.new
 
-      @mock_employer.expect(:artifacts_exist?, true)
-      @mock_employer.expect(:company_name, "Acme Corp")
-      @mock_employer.expect(:resume_path, "employers/acme-corp/resume.md")
-      @mock_employer.expect(:research_path, "employers/acme-corp/research.md")
-      @mock_employer.expect(:status_logger, @mock_status_logger)
+      @mock_application.expect(:artifacts_exist?, true)
+      @mock_application.expect(:company_name, "Acme Corp")
+      @mock_application.expect(:resume_path, "applications/acme-corp/resume.md")
+      @mock_application.expect(:research_path, "applications/acme-corp/research.md")
+      @mock_application.expect(:status_logger, @mock_status_logger)
     end
 
     it "displays error message when generator fails" do
@@ -178,7 +178,7 @@ describe Jojo::Commands::Website::Command do
       command = Jojo::Commands::Website::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )
@@ -197,7 +197,7 @@ describe Jojo::Commands::Website::Command do
       command = Jojo::Commands::Website::Command.new(
         @mock_cli,
         slug: "acme-corp",
-        employer: @mock_employer,
+        application: @mock_application,
         ai_client: @mock_ai_client,
         generator: @mock_generator
       )

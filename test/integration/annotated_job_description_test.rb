@@ -1,5 +1,5 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/commands/annotate/generator"
 require_relative "../../lib/jojo/commands/website/generator"
 
@@ -18,7 +18,7 @@ end
 
 describe "Annotated Job Description Integration" do
   before do
-    @employer = Jojo::Employer.new("techcorp")
+    @employer = Jojo::Application.new("techcorp")
     @ai_client = Minitest::Mock.new
     @config = IntegrationTestConfigStub.new
 

@@ -2,13 +2,13 @@ require "fileutils"
 require "yaml"
 
 module Jojo
-  class Employer
+  class Application
     attr_reader :name, :slug, :base_path
 
     def initialize(slug)
       @slug = slug
       @name = slug  # Will be updated from job_details.yml if it exists
-      @base_path = File.join("employers", @slug)
+      @base_path = File.join("applications", @slug)
     end
 
     def job_description_raw_path = File.join(base_path, "job_description_raw.md")
@@ -48,10 +48,8 @@ module Jojo
     end
 
     def create_artifacts(job_source, ai_client, overwrite_flag: nil, cli_instance: nil, verbose: false)
-      # Create directory structure
       create_directory!
 
-      # Process job description using existing processor
       require_relative "commands/job_description/processor"
       processor = Commands::JobDescription::Processor.new(self, ai_client, overwrite_flag: overwrite_flag, cli_instance: cli_instance, verbose: verbose)
       processor.process(job_source)
@@ -64,7 +62,6 @@ module Jojo
     private
 
     def remove_artifacts
-      # Remove all files except directories
       [
         job_description_raw_path,
         job_description_path,

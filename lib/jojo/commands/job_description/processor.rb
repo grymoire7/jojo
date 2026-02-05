@@ -10,10 +10,10 @@ module Jojo
       class Processor
         class ProcessingError < StandardError; end
 
-        attr_reader :employer, :ai_client, :verbose, :overwrite_flag, :cli_instance
+        attr_reader :application, :ai_client, :verbose, :overwrite_flag, :cli_instance
 
-        def initialize(employer, ai_client, overwrite_flag: nil, cli_instance: nil, verbose: false)
-          @employer = employer
+        def initialize(application, ai_client, overwrite_flag: nil, cli_instance: nil, verbose: false)
+          @application = application
           @ai_client = ai_client
           @overwrite_flag = overwrite_flag
           @cli_instance = cli_instance
@@ -110,7 +110,7 @@ module Jojo
         end
 
         def save_raw_content(content)
-          path = employer.job_description_raw_path
+          path = application.job_description_raw_path
           log "Saving raw content to: #{path}"
           if cli_instance
             cli_instance.with_overwrite_check(path, overwrite_flag) do
@@ -122,7 +122,7 @@ module Jojo
         end
 
         def save_job_description(content)
-          path = employer.job_description_path
+          path = application.job_description_path
           log "Saving job description to: #{path}"
           if cli_instance
             cli_instance.with_overwrite_check(path, overwrite_flag) do
@@ -134,7 +134,7 @@ module Jojo
         end
 
         def save_job_details(yaml_content)
-          path = employer.job_details_path
+          path = application.job_details_path
           log "Saving job details to: #{path}"
           if cli_instance
             cli_instance.with_overwrite_check(path, overwrite_flag) do

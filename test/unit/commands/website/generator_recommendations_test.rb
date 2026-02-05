@@ -1,6 +1,6 @@
 # test/unit/commands/website/generator_recommendations_test.rb
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/website/generator"
 require_relative "../../../../lib/jojo/config"
 require "tmpdir"
@@ -22,12 +22,12 @@ end
 
 describe "Jojo::Commands::Website::Generator with Recommendations" do
   before do
-    @employer = Jojo::Employer.new("test-corp")
+    @application = Jojo::Application.new("test-corp")
 
     # Create required files
-    FileUtils.mkdir_p(@employer.base_path)
-    File.write(@employer.job_description_path, "Job description")
-    File.write(@employer.resume_path, "Resume content")
+    FileUtils.mkdir_p(@application.base_path)
+    File.write(@application.job_description_path, "Job description")
+    File.write(@application.resume_path, "Resume content")
 
     # Mock AI client
     @ai_client = Minitest::Mock.new
@@ -38,7 +38,7 @@ describe "Jojo::Commands::Website::Generator with Recommendations" do
   end
 
   after do
-    FileUtils.rm_rf(@employer.base_path)
+    FileUtils.rm_rf(@application.base_path)
     FileUtils.rm_rf("test/fixtures/tmp_recommendations_unit") if File.exist?("test/fixtures/tmp_recommendations_unit")
   end
 
@@ -64,7 +64,7 @@ describe "Jojo::Commands::Website::Generator with Recommendations" do
     File.write(File.join(inputs_path, "resume_data.yml"), resume_data_content)
 
     generator = Jojo::Commands::Website::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       inputs_path: inputs_path
@@ -83,7 +83,7 @@ describe "Jojo::Commands::Website::Generator with Recommendations" do
     # No resume_data.yml file
 
     generator = Jojo::Commands::Website::Generator.new(
-      @employer,
+      @application,
       @ai_client,
       config: @config,
       inputs_path: inputs_path

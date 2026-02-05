@@ -31,7 +31,7 @@
 /.claude/settings.local.json
 
 # Jojo-specific
-employers/
+applications/
 inputs/
 config.yml
 .jojo_state

@@ -1,5 +1,5 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/config"
 require_relative "../../lib/jojo/ai_client"
 require_relative "../../lib/jojo/commands/website/generator"
@@ -19,7 +19,7 @@ end
 
 describe "Website Generation Workflow" do
   before do
-    @employer = Jojo::Employer.new("test-company")
+    @employer = Jojo::Application.new("test-company")
     @ai_client = Minitest::Mock.new
     @config = WebsiteWorkflowTestConfigStub.new
 
