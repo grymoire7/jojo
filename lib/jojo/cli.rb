@@ -19,7 +19,7 @@ module Jojo
 
     class_option :verbose, type: :boolean, aliases: "-v", desc: "Run verbosely"
     class_option :quiet, type: :boolean, aliases: "-q", desc: "Suppress output, rely on exit code"
-    class_option :slug, type: :string, aliases: "-s", desc: "Employer slug (unique identifier)"
+    class_option :slug, type: :string, aliases: "-s", desc: "Application slug (unique identifier)"
     class_option :template, type: :string, aliases: "-t", desc: "Website template name (default: default)", default: "default"
     class_option :overwrite, type: :boolean, banner: "Overwrite existing files without prompting"
 
@@ -41,21 +41,21 @@ module Jojo
 
     desc "new", "Create a new job application workspace"
     long_desc <<~DESC, wrap: false
-      Create a new employer workspace directory.
+      Create a new application workspace directory.
       After creating, use 'jojo job_description' to process the job description.
 
       Examples:
         jojo new -s acme-corp-senior-dev
         jojo new -s bigco-principal
     DESC
-    method_option :slug, type: :string, aliases: "-s", required: true, desc: "Unique employer identifier"
+    method_option :slug, type: :string, aliases: "-s", required: true, desc: "Unique application identifier"
     def new
       Commands::New::Command.new(self, **command_options).execute
     end
 
     desc "job_description", "Process job description for an application"
     long_desc <<~DESC, wrap: false
-      Process a job description for an existing employer workspace.
+      Process a job description for an existing application workspace.
       This extracts and saves the job description and key details.
 
       Examples:
@@ -72,11 +72,11 @@ module Jojo
     desc "annotate", "Generate job description annotations"
     long_desc <<~DESC, wrap: false
       Generate annotations for the job description showing how your experience matches.
-      Requires that you've already run 'jojo new' to create the employer workspace.
+      Requires that you've already run 'jojo new' to create the application workspace.
 
       Examples:
         jojo annotate -s acme-corp-senior-dev
-        JOJO_EMPLOYER_SLUG=acme-corp jojo annotate
+        JOJO_APPLICATION_SLUG=acme-corp jojo annotate
     DESC
     def annotate
       Commands::Annotate::Command.new(self, **command_options).execute
@@ -85,11 +85,11 @@ module Jojo
     desc "research", "Generate company/role research only"
     long_desc <<~DESC, wrap: false
       Generate company and role research.
-      Requires that you've already run 'jojo new' to create the employer workspace.
+      Requires that you've already run 'jojo new' to create the application workspace.
 
       Examples:
         jojo research -s acme-corp-senior-dev
-        JOJO_EMPLOYER_SLUG=acme-corp jojo research
+        JOJO_APPLICATION_SLUG=acme-corp jojo research
     DESC
     def research
       Commands::Research::Command.new(self, **command_options).execute
@@ -97,12 +97,12 @@ module Jojo
 
     desc "resume", "Generate tailored resume only"
     long_desc <<~DESC, wrap: false
-      Generate a tailored resume for a specific employer.
-      Requires that you've already run 'jojo new' to create the employer workspace.
+      Generate a tailored resume for a specific application.
+      Requires that you've already run 'jojo new' to create the application workspace.
 
       Examples:
         jojo resume -s acme-corp-senior-dev
-        JOJO_EMPLOYER_SLUG=acme-corp jojo resume
+        JOJO_APPLICATION_SLUG=acme-corp jojo resume
     DESC
     def resume
       Commands::Resume::Command.new(self, **command_options).execute
@@ -110,12 +110,12 @@ module Jojo
 
     desc "cover_letter", "Generate cover letter only"
     long_desc <<~DESC, wrap: false
-      Generate a cover letter for a specific employer.
+      Generate a cover letter for a specific application.
       Requires that you've already run 'jojo new' and 'jojo resume' first.
 
       Examples:
         jojo cover_letter -s acme-corp-senior-dev
-        JOJO_EMPLOYER_SLUG=acme-corp jojo cover_letter
+        JOJO_APPLICATION_SLUG=acme-corp jojo cover_letter
     DESC
     def cover_letter
       Commands::CoverLetter::Command.new(self, **command_options).execute
@@ -123,12 +123,12 @@ module Jojo
 
     desc "faq", "Generate FAQs only"
     long_desc <<~DESC, wrap: false
-      Generate FAQs for a specific employer.
+      Generate FAQs for a specific application.
       Requires that you've already run 'jojo new' and 'jojo resume' first.
 
       Examples:
         jojo faq -s acme-corp-senior-dev
-        JOJO_EMPLOYER_SLUG=acme-corp jojo faq
+        JOJO_APPLICATION_SLUG=acme-corp jojo faq
     DESC
     def faq
       Commands::Faq::Command.new(self, **command_options).execute
@@ -136,12 +136,12 @@ module Jojo
 
     desc "branding", "Generate branding statement only"
     long_desc <<~DESC, wrap: false
-      Generate a branding statement for a specific employer.
+      Generate a branding statement for a specific application.
       Requires that you've already run 'jojo new' and 'jojo resume' first.
 
       Examples:
         jojo branding -s acme-corp-senior-dev
-        JOJO_EMPLOYER_SLUG=acme-corp jojo branding
+        JOJO_APPLICATION_SLUG=acme-corp jojo branding
     DESC
     def branding
       Commands::Branding::Command.new(self, **command_options).execute
@@ -149,13 +149,13 @@ module Jojo
 
     desc "website", "Generate website only"
     long_desc <<~DESC, wrap: false
-      Generate a landing page website for a specific employer.
+      Generate a landing page website for a specific application.
       Requires that you've already run 'jojo new' and 'jojo resume' first.
 
       Examples:
         jojo website -s acme-corp-senior-dev
         jojo website -s acme-corp-senior-dev -t modern
-        JOJO_EMPLOYER_SLUG=acme-corp jojo website
+        JOJO_APPLICATION_SLUG=acme-corp jojo website
     DESC
     def website
       Commands::Website::Command.new(self, **command_options).execute
@@ -168,7 +168,7 @@ module Jojo
 
       Examples:
         jojo pdf -s acme-corp-senior-dev
-        JOJO_EMPLOYER_SLUG=acme-corp jojo pdf
+        JOJO_APPLICATION_SLUG=acme-corp jojo pdf
     DESC
     def pdf
       Commands::Pdf::Command.new(self, **command_options).execute
@@ -215,7 +215,7 @@ module Jojo
 
     def command_options
       {
-        slug: options[:slug] || ENV["JOJO_EMPLOYER_SLUG"],
+        slug: options[:slug] || ENV["JOJO_APPLICATION_SLUG"] || ENV["JOJO_EMPLOYER_SLUG"],
         verbose: options[:verbose],
         overwrite: options[:overwrite],
         quiet: options[:quiet]
@@ -223,14 +223,14 @@ module Jojo
     end
 
     def resolve_slug
-      slug = options[:slug] || ENV["JOJO_EMPLOYER_SLUG"]
+      slug = options[:slug] || ENV["JOJO_APPLICATION_SLUG"] || ENV["JOJO_EMPLOYER_SLUG"]
 
       unless slug
-        say "Error: No employer specified.", :red
-        say "Provide --slug or set JOJO_EMPLOYER_SLUG environment variable.", :yellow
+        say "Error: No application specified.", :red
+        say "Provide --slug or set JOJO_APPLICATION_SLUG environment variable.", :yellow
         say "\nExample:", :cyan
         say "  jojo #{invoked_command} --slug acme-corp-senior", :white
-        say "  export JOJO_EMPLOYER_SLUG=acme-corp-senior && jojo #{invoked_command}", :white
+        say "  export JOJO_APPLICATION_SLUG=acme-corp-senior && jojo #{invoked_command}", :white
         exit 1
       end
 
