@@ -81,23 +81,23 @@ module Jojo
           }
         ].freeze
 
-        def self.file_path(step_key, employer)
+        def self.file_path(step_key, application)
           step = STEPS.find { |s| s[:key] == step_key }
           raise ArgumentError, "Unknown step: #{step_key}" unless step
 
-          File.join(employer.base_path, step[:output_file])
+          File.join(application.base_path, step[:output_file])
         end
 
-        def self.status(step_key, employer)
+        def self.status(step_key, application)
           step = STEPS.find { |s| s[:key] == step_key }
           raise ArgumentError, "Unknown step: #{step_key}" unless step
 
-          output_path = file_path(step_key, employer)
+          output_path = file_path(step_key, application)
           output_exists = File.exist?(output_path)
 
           # Check if all dependencies are met
           deps_met = step[:dependencies].all? do |dep_key|
-            File.exist?(file_path(dep_key, employer))
+            File.exist?(file_path(dep_key, application))
           end
 
           return :blocked unless deps_met
@@ -106,32 +106,32 @@ module Jojo
           # Check for staleness
           output_mtime = File.mtime(output_path)
           stale = step[:dependencies].any? do |dep_key|
-            dep_path = file_path(dep_key, employer)
+            dep_path = file_path(dep_key, application)
             File.exist?(dep_path) && File.mtime(dep_path) > output_mtime
           end
 
           stale ? :stale : :generated
         end
 
-        def self.all_statuses(employer)
+        def self.all_statuses(application)
           STEPS.each_with_object({}) do |step, hash|
-            hash[step[:key]] = status(step[:key], employer)
+            hash[step[:key]] = status(step[:key], application)
           end
         end
 
-        def self.missing_dependencies(step_key, employer)
+        def self.missing_dependencies(step_key, application)
           step = STEPS.find { |s| s[:key] == step_key }
           raise ArgumentError, "Unknown step: #{step_key}" unless step
 
           step[:dependencies].reject do |dep_key|
-            File.exist?(file_path(dep_key, employer))
+            File.exist?(file_path(dep_key, application))
           end.map do |dep_key|
             STEPS.find { |s| s[:key] == dep_key }[:label]
           end
         end
 
-        def self.progress(employer)
-          statuses = all_statuses(employer)
+        def self.progress(application)
+          statuses = all_statuses(application)
           generated_count = statuses.values.count(:generated)
           total = STEPS.length
 

@@ -44,17 +44,17 @@ module Jojo
           "  #{number}. #{padded_label}#{paid}   #{status_str} #{status_label}"
         end
 
-        def self.render(employer)
+        def self.render(application)
           require "tty-box"
 
-          statuses = Workflow.all_statuses(employer)
+          statuses = Workflow.all_statuses(application)
           width = 56
 
           lines = []
 
           # Header
-          lines << "  Active: #{employer.slug}"
-          lines << "  Company: #{employer.company_name}"
+          lines << "  Active: #{application.slug}"
+          lines << "  Company: #{application.company_name}"
           lines << ""
           lines << "  Workflow" + " " * 29 + "Status"
           lines << "  " + "─" * 50

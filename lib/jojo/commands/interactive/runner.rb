@@ -24,23 +24,23 @@ module Jojo
           @running = false
         end
 
-        def employer
+        def application
           return nil unless @slug
-          @employer ||= Employer.new(@slug)
+          @application ||= Application.new(@slug)
         end
 
         def list_applications
-          employers_path = File.join(Dir.pwd, "employers")
-          return [] unless Dir.exist?(employers_path)
+          applications_path = File.join(Dir.pwd, "applications")
+          return [] unless Dir.exist?(applications_path)
 
-          Dir.children(employers_path)
-            .select { |f| File.directory?(File.join(employers_path, f)) }
+          Dir.children(applications_path)
+            .select { |f| File.directory?(File.join(applications_path, f)) }
             .sort
         end
 
         def switch_application(new_slug)
           @slug = new_slug
-          @employer = nil  # Clear cached employer
+          @application = nil  # Clear cached application
           StatePersistence.save_slug(new_slug)
         end
 
@@ -68,7 +68,7 @@ module Jojo
 
         def render_dashboard
           clear_screen
-          puts Dashboard.render(employer)
+          puts Dashboard.render(application)
         end
 
         def render_welcome
@@ -94,7 +94,7 @@ module Jojo
 
           # Initial render
           apps = list_applications
-          if employer && File.exist?(employer.base_path)
+          if application && File.exist?(application.base_path)
             render_dashboard
           elsif apps.empty?
             render_welcome
@@ -120,7 +120,7 @@ module Jojo
             when :new
               handle_new_application
             when Integer
-              handle_step_selection(action) if employer
+              handle_step_selection(action) if application
             end
           end
         rescue TTY::Reader::InputInterrupt
@@ -134,7 +134,7 @@ module Jojo
           return unless step_index >= 0 && step_index < Workflow::STEPS.length
 
           step = Workflow::STEPS[step_index]
-          status = Workflow.status(step[:key], employer)
+          status = Workflow.status(step[:key], application)
 
           case status
           when :blocked
@@ -149,7 +149,7 @@ module Jojo
         private
 
         def show_blocked_dialog(step)
-          missing = Workflow.missing_dependencies(step[:key], employer)
+          missing = Workflow.missing_dependencies(step[:key], application)
 
           clear_screen
           puts Dialogs.blocked_dialog(step[:label], missing)
@@ -172,7 +172,7 @@ module Jojo
 
           inputs = step[:dependencies].map do |dep_key|
             dep_step = Workflow::STEPS.find { |s| s[:key] == dep_key }
-            path = Workflow.file_path(dep_key, employer)
+            path = Workflow.file_path(dep_key, application)
             age = File.exist?(path) ? time_ago(File.mtime(path)) : nil
             {name: dep_step[:output_file], age: age}
           end
@@ -195,7 +195,7 @@ module Jojo
         end
 
         def show_generated_dialog(step)
-          path = Workflow.file_path(step[:key], employer)
+          path = Workflow.file_path(step[:key], application)
           age = time_ago(File.mtime(path))
 
           clear_screen
@@ -350,12 +350,12 @@ module Jojo
             next if idx >= 9  # Only show first 9
 
             # Get progress for this app
-            app_employer = Employer.new(app_slug)
-            if File.exist?(app_employer.base_path)
-              progress = Workflow.progress(app_employer)
+            app_application = Application.new(app_slug)
+            if File.exist?(app_application.base_path)
+              progress = Workflow.progress(app_application)
               progress_bar = Dashboard.progress_bar(progress, width: 10)
               progress_str = (progress == 100) ? "Done" : "#{progress}%"
-              company = app_employer.company_name
+              company = app_application.company_name
 
               lines << "  #{idx + 1}. #{app_slug.ljust(25)} #{progress_bar}  #{progress_str}"
               lines << "     #{company}"
@@ -388,10 +388,10 @@ module Jojo
               handle_new_application
               return
             when "\e"
-              if employer
+              if application
                 render_dashboard
               else
-                # No employer to go back to, treat as quit
+                # No application to go back to, treat as quit
                 @running = false
                 clear_screen
                 puts "Goodbye!"
@@ -419,7 +419,7 @@ module Jojo
 
           slug = @reader.read_line("> ").strip
           if slug.empty?
-            if employer
+            if application
               render_dashboard
             elsif list_applications.empty?
               render_welcome
@@ -430,8 +430,8 @@ module Jojo
           end
 
           # Check if already exists
-          new_employer = Employer.new(slug)
-          if File.exist?(new_employer.base_path)
+          new_application = Application.new(slug)
+          if File.exist?(new_application.base_path)
             clear_screen
             puts TTY::Box.frame(
               "\n  Application '#{slug}' already exists.\n\n  Press any key to continue...\n",
@@ -440,7 +440,7 @@ module Jojo
               border: :thick
             )
             @reader.read_keypress
-            if employer
+            if application
               render_dashboard
             elsif list_applications.empty?
               render_welcome
@@ -451,7 +451,7 @@ module Jojo
           end
 
           # Create the directory
-          FileUtils.mkdir_p(new_employer.base_path)
+          FileUtils.mkdir_p(new_application.base_path)
           switch_application(slug)
 
           clear_screen
@@ -495,9 +495,9 @@ module Jojo
         end
 
         def handle_open
-          return unless employer
+          return unless application
 
-          path = employer.base_path
+          path = application.base_path
           if RUBY_PLATFORM.include?("darwin")
             system("open", path)
           elsif RUBY_PLATFORM.include?("linux")
@@ -509,9 +509,9 @@ module Jojo
         end
 
         def handle_generate_all
-          return unless employer
+          return unless application
 
-          statuses = Workflow.all_statuses(employer)
+          statuses = Workflow.all_statuses(application)
           ready_steps = Workflow::STEPS.select { |s| [:ready, :stale].include?(statuses[s[:key]]) }
 
           return if ready_steps.empty?
