@@ -12,7 +12,7 @@ module Jojo
         end
 
         def execute
-          slug = options[:slug] || ENV["JOJO_EMPLOYER_SLUG"]
+          slug = options[:slug] || ENV["JOJO_APPLICATION_SLUG"] || ENV["JOJO_EMPLOYER_SLUG"]
           Runner.new(slug: slug).run
         end
       end

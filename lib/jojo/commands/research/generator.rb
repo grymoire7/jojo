@@ -71,7 +71,7 @@ module Jojo
           job_details = YAML.load_file(application.job_details_path)
           job_details["company_name"] || application.name
         rescue => e
-          log "Warning: Could not parse job details, using employer name: #{e.message}"
+          log "Warning: Could not parse job details, using application slug: #{e.message}"
           application.name
         end
 
