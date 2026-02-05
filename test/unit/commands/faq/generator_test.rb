@@ -1,6 +1,6 @@
 # test/unit/commands/faq/generator_test.rb
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/faq/generator"
 
 describe Jojo::Commands::Faq::Generator do

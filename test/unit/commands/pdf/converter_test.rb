@@ -1,6 +1,6 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/pdf/converter"
-require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/application"
 require "tmpdir"
 
 describe Jojo::Commands::Pdf::Converter do

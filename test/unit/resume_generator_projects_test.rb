@@ -1,6 +1,6 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/commands/resume/generator"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/config"
 
 describe "Jojo::Commands::Resume::Generator with Projects" do

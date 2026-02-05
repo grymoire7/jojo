@@ -1,6 +1,6 @@
 # test/unit/commands/research/generator_test.rb
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/research/generator"
 
 describe Jojo::Commands::Research::Generator do

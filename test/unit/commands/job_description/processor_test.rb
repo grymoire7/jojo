@@ -1,5 +1,5 @@
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/ai_client"
 require_relative "../../../../lib/jojo/commands/job_description/processor"
 require_relative "../../../../lib/jojo/commands/job_description/prompt"

@@ -340,7 +340,7 @@ describe Jojo::Commands::Annotate::Command do
       end
 
       _(generator_created).must_equal true
-      _(generator_args[:employer].object_id).must_equal @mock_application.object_id
+      _(generator_args[:application].object_id).must_equal @mock_application.object_id
       _(generator_args[:ai_client].object_id).must_equal @mock_ai_client.object_id
       _(generator_args[:opts][:verbose]).must_equal true
       _(generator_args[:opts][:overwrite_flag]).must_equal true

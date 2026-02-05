@@ -1,6 +1,6 @@
 # test/unit/commands/resume/generator_test.rb
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/resume/generator"
 
 describe Jojo::Commands::Resume::Generator do

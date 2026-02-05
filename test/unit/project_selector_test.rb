@@ -1,6 +1,6 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/project_selector"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 
 describe Jojo::ProjectSelector do
   before do

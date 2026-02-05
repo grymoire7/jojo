@@ -20,10 +20,13 @@ module CommandTestHelper
     FileUtils.rm_rf(@tmpdir)
   end
 
-  def create_employer_fixture(slug, files: {})
-    FileUtils.mkdir_p("employers/#{slug}")
-    files.each { |name, content| File.write("employers/#{slug}/#{name}", content) }
+  def create_application_fixture(slug, files: {})
+    FileUtils.mkdir_p("applications/#{slug}")
+    files.each { |name, content| File.write("applications/#{slug}/#{name}", content) }
   end
+
+  # Alias for backward compatibility during migration
+  alias_method :create_employer_fixture, :create_application_fixture
 
   def create_inputs_fixture(files: {})
     FileUtils.mkdir_p("inputs")

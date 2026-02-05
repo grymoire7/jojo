@@ -101,7 +101,7 @@ describe Jojo::Commands::Interactive::Runner do
   describe "#switch_application" do
     before do
       @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "employers")
+      @applications_dir = File.join(@temp_dir, "applications")
       FileUtils.mkdir_p(File.join(@applications_dir, "new-app"))
       @original_dir = Dir.pwd
       Dir.chdir(@temp_dir)
@@ -120,19 +120,19 @@ describe Jojo::Commands::Interactive::Runner do
       _(Jojo::StatePersistence.load_slug).must_equal "new-app"
     end
 
-    it "clears cached employer" do
+    it "clears cached application" do
       runner = Jojo::Commands::Interactive::Runner.new(slug: "new-app")
-      _old_employer = runner.employer  # Cache it
+      _old_application = runner.application  # Cache it
 
       runner.switch_application("new-app")
-      # employer should be re-instantiated on next access
+      # application should be re-instantiated on next access
     end
   end
 
   describe "#handle_key" do
     before do
       @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "employers")
+      @applications_dir = File.join(@temp_dir, "applications")
       FileUtils.mkdir_p(File.join(@applications_dir, "test-app"))
       @original_dir = Dir.pwd
       Dir.chdir(@temp_dir)
@@ -183,7 +183,7 @@ describe Jojo::Commands::Interactive::Runner do
   describe "#run initial render with existing applications" do
     before do
       @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "employers")
+      @applications_dir = File.join(@temp_dir, "applications")
       FileUtils.mkdir_p(@applications_dir)
       @original_dir = Dir.pwd
       Dir.chdir(@temp_dir)
@@ -220,7 +220,7 @@ describe Jojo::Commands::Interactive::Runner do
   describe "#handle_new_application behavior" do
     before do
       @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "employers")
+      @applications_dir = File.join(@temp_dir, "applications")
       FileUtils.mkdir_p(@applications_dir)
       @original_dir = Dir.pwd
       Dir.chdir(@temp_dir)
@@ -236,25 +236,25 @@ describe Jojo::Commands::Interactive::Runner do
       FileUtils.rm_rf(@temp_dir)
     end
 
-    it "creates employer directory without job description" do
+    it "creates application directory without job description" do
       # Create the directory directly (simulating what handle_new_application does)
       slug = "test-new-app"
-      Jojo::Application.new(slug)
-      FileUtils.mkdir_p(application.base_path)
+      app = Jojo::Application.new(slug)
+      FileUtils.mkdir_p(app.base_path)
 
       _(Dir.exist?(File.join(@applications_dir, slug))).must_equal true
-      _(application.artifacts_exist?).must_equal false  # No job description yet
+      _(app.artifacts_exist?).must_equal false  # No job description yet
     end
   end
 
   describe "#handle_step_selection for job_description" do
     before do
       @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "employers")
+      @applications_dir = File.join(@temp_dir, "applications")
       @original_dir = Dir.pwd
       Dir.chdir(@temp_dir)
 
-      # Create employer without job description
+      # Create application without job description
       @slug = "no-job-desc"
       FileUtils.mkdir_p(File.join(@applications_dir, @slug))
 
@@ -271,7 +271,7 @@ describe Jojo::Commands::Interactive::Runner do
 
     it "shows ready status when job description is missing" do
       runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
-      status = Jojo::Commands::Interactive::Workflow.status(:job_description, runner.employer)
+      status = Jojo::Commands::Interactive::Workflow.status(:job_description, runner.application)
 
       # Job description has no dependencies, so it's always ready when missing
       _(status).must_equal :ready

@@ -1,6 +1,6 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/commands/cover_letter/generator"
-require_relative "../../lib/jojo/employer"
+require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/config"
 
 describe "Jojo::Commands::CoverLetter::Generator with Projects" do

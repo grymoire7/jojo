@@ -1,6 +1,6 @@
 # test/unit/commands/website/generator_test.rb
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/website/generator"
 
 # Simple config stub to avoid complex mock expectations

@@ -1,6 +1,6 @@
 # test/unit/commands/cover_letter/generator_test.rb
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/employer"
+require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/cover_letter/generator"
 
 describe Jojo::Commands::CoverLetter::Generator do
