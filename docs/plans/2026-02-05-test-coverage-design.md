@@ -130,9 +130,38 @@ Based on data, prioritize by:
 
 ## Implementation Tasks
 
-1. [ ] Add SimpleCov gems to Gemfile
-2. [ ] Run `bundle install`
-3. [ ] Add SimpleCov configuration to test/test_helper.rb
-4. [ ] Add coverage/ to .gitignore
-5. [ ] Run tests to generate baseline coverage report
-6. [ ] Analyze coverage data and identify gaps
+1. [x] Add SimpleCov gems to Gemfile
+2. [x] Run `bundle install`
+3. [x] Add SimpleCov configuration to test/test_helper.rb
+4. [x] Add coverage/ to .gitignore (already present)
+5. [x] Run tests to generate baseline coverage report
+6. [x] Analyze coverage data and identify gaps
+
+## Baseline Results (2026-02-05)
+
+**Overall Coverage: 81.67%** (1956/2395 lines)
+
+### Coverage by Group
+
+| Group | Coverage |
+|-------|----------|
+| Commands | 81.3% (1569/1931 lines) |
+| Core | 83.4% (387/464 lines) |
+
+### Lowest Coverage Files
+
+| File | Coverage | Uncovered Lines |
+|------|----------|-----------------|
+| `commands/interactive/runner.rb` | 19.5% | 247 lines |
+| `ai_client.rb` | 54.5% | 25 lines |
+| `template_validator.rb` | 66.7% | 7 lines |
+| `commands/job_description/processor.rb` | 69.8% | 26 lines |
+| `cli.rb` | 73.3% | 28 lines |
+| `commands/research/generator.rb` | 75.3% | 20 lines |
+
+### Priority Recommendations
+
+1. **ai_client.rb** - Core infrastructure, relatively small (25 uncovered lines)
+2. **template_validator.rb** - Easy win, only 7 lines to cover
+3. **job_description/processor.rb** - Important business logic
+4. **interactive/runner.rb** - Largest gap but complex (REPL mode), defer to later
