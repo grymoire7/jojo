@@ -18,6 +18,7 @@ group :development, :test do
   gem "minitest", "~> 5.25"
   gem "minitest-reporters", "~> 1.7"
   gem "standard", "~> 1.0"
+  gem "rake", "~> 13.0"
 end
 
 group :test do

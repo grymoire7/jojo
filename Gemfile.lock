@@ -68,6 +68,7 @@ GEM
     prism (1.7.0)
     racc (1.8.1)
     rainbow (3.1.1)
+    rake (13.3.1)
     rake-compiler-dock (1.10.0)
     rb_sys (0.9.123)
       rake-compiler-dock (= 1.10.0)
@@ -159,6 +160,7 @@ DEPENDENCIES
   html-to-markdown (~> 2.16)
   minitest (~> 5.25)
   minitest-reporters (~> 1.7)
+  rake (~> 13.0)
   reline
   ruby_llm (~> 1.9)
   simplecov

@@ -582,14 +582,13 @@ If you encounter API-related errors:
 
 ```bash
 # Run different test categories to isolate issues
-./bin/jojo test --unit           # Fast unit tests
-./bin/jojo test --integration    # Integration tests
-./bin/jojo test --service        # Service tests (real API calls that cost money)
-./bin/jojo test --standard       # Code style checks
-./bin/jojo test --all            # All tests (includes service tests)
-
-# Run with verbose output
-./bin/jojo test --all -v
+./bin/test # Runs `bundle exec rake test:usual` for all but service tests
+bundle exec rake test:usual        # All but service tests - default, run frequently
+bundle exec rake test:unit         # Unit tests - fast, no external dependencies
+bundle exec rake test:integration  # Integration tests - tests with mocked external services
+bundle exec rake test:service      # Service tests - real API calls that cost money
+bundle exec rake test:standard     # Code style checks with standardrb
+bundle exec rake test:all          # All tests - includes service tests
 ```
 
 ## Testing
@@ -598,7 +597,7 @@ Jojo includes comprehensive testing to ensure reliability and performance.
 
 ### Test Categories
 
-- **Unit tests** - Fast tests with no external dependencies (default)
+- **Unit tests** - Fast tests with no external dependencies
 - **Integration tests** - Tests with mocked external services
 - **Service tests** - Tests that make real API calls (may incur costs)
 - **Standard tests** - Code style checks using Standard Ruby
