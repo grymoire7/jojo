@@ -26,15 +26,5 @@ jobs:
     - name: Install dependencies
       run: bundle install
 
-    - name: Check code style with Standard
-      run: bundle exec standardrb
-
-    - name: Run unit tests
-      run: ./bin/jojo test --unit
-      env:
-        SKIP_SERVICE_CONFIRMATION: true
-
-    - name: Run integration tests
-      run: ./bin/jojo test --integration
-      env:
-        SKIP_SERVICE_CONFIRMATION: true
+    - name: Run tests
+      run: ./bin/test

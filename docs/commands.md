@@ -13,7 +13,6 @@
 | `jojo annotate`       | Generate annotated job description                               | `-s` or `JOJO_APPLICATION_SLUG` |
 | `jojo website`        | Generate website only                                            | `-s` or `JOJO_APPLICATION_SLUG` |
 | `jojo pdf`            | Generate PDF versions of resume and cover letter                 | `-s` or `JOJO_APPLICATION_SLUG` |
-| `jojo test`           | Run test suite                                                   | None                         |
 | `jojo version`        | Show version                                                     | None                         |
 | `jojo help [COMMAND]` | Show help                                                        | None                         |
 
@@ -62,7 +61,6 @@
 |                     | `templates/*`                            |                                                     |
 | `jojo pdf`          | `applications/<slug>/resume.md`             | `applications/<slug>/resume.pdf`                       |
 |                     | `applications/<slug>/cover_letter.md`       | `applications/<slug>/cover_letter.pdf`                 |
-| `jojo test`         | None (test fixtures in `test/fixtures/`) | None (results to stdout)                            |
 | `jojo version`      | None                                     | None (version to stdout)                            |
 | `jojo help [CMD]`   | None                                     | None (help to stdout)                               |
 

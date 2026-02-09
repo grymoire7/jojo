@@ -33,8 +33,4 @@ describe Jojo::CLI do
   it "has version command" do
     _(Jojo::CLI.commands.key?("version")).must_equal true
   end
-
-  it "has test command" do
-    _(Jojo::CLI.commands.key?("test")).must_equal true
-  end
 end

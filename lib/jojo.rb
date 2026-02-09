@@ -1,3 +1,11 @@
+# Pre-load unicode_utils with deprecation warnings suppressed.
+# The gem is unmaintained and triggers Ruby 3.4 frozen string literal warnings.
+# (transitive dependency: tty-box -> strings -> unicode_utils)
+original_deprecated = Warning[:deprecated]
+Warning[:deprecated] = false
+require "unicode_utils"
+Warning[:deprecated] = original_deprecated
+
 require "thor"
 require "dotenv/load"
 

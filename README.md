@@ -429,7 +429,6 @@ export JOJO_APPLICATION_SLUG=acme-corp-senior-dev
 | `jojo annotate` | Generate annotated job description | `-s` or `JOJO_APPLICATION_SLUG` |
 | `jojo website` | Generate website only | `-s` or `JOJO_APPLICATION_SLUG` |
 | `jojo pdf` | Generate PDF versions of resume and cover letter | `-s` or `JOJO_APPLICATION_SLUG` |
-| `jojo test` | Run test suite | None |
 | `jojo version` | Show version | None |
 | `jojo help [COMMAND]` | Show help | None |
 
@@ -605,21 +604,22 @@ Jojo includes comprehensive testing to ensure reliability and performance.
 ### Running Tests
 
 ```bash
-# Run unit tests (fast, default)
-./bin/jojo test
+# Run standard checks + unit + integration tests (default)
+./bin/test
 
-# Run all tests (including service tests)
-./bin/jojo test --all
+# Run individual test categories
+bundle exec rake test:unit         # Unit tests only
+bundle exec rake test:integration  # Integration tests only
+bundle exec rake test:service      # Service tests (with confirmation)
+bundle exec rake test:standard     # Standard Ruby style checks
 
-# Run specific categories
-./bin/jojo test --unit --integration
-./bin/jojo test --service  # Requires confirmation
-
-# Quiet mode (CI-friendly)
-./bin/jojo test --unit --integration --standard -q
+# Composite tasks
+bundle exec rake test:free         # Unit + integration (no service)
+bundle exec rake test:usual        # Standard + unit + integration (same as ./bin/test)
+bundle exec rake test:all          # Standard + all tests including service
 ```
 
-Service tests require real API keys and may cost money. You'll be prompted for confirmation unless `SKIP_SERVICE_CONFIRMATION=true` is set in your environment.
+Service tests require real API keys and may cost money. You'll be prompted for confirmation.
 
 ## Architecture
 
@@ -683,8 +683,8 @@ jojo/
 | Command | Description |
 | ------- | ----------- |
 | `bundle install` | Install dependencies |
-| `./bin/jojo test` | Run unit tests |
-| `./bin/jojo test --all` | Run full test suite |
+| `./bin/test` | Run standard checks + unit + integration tests |
+| `bundle exec rake test:all` | Run full test suite including service tests |
 | `./bin/jojo --help` | View all commands |
 | `EDITOR=nvim ./bin/jojo generate ...` | Set preferred editor for interactive prompts |
 
@@ -695,7 +695,7 @@ This is a personal project, but if you'd like to contribute:
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes with tests
-4. Run `./bin/jojo test --all` to verify
+4. Run `bundle exec rake test:all` to verify
 5. Submit a pull request
 
 ### Code Style
@@ -709,8 +709,8 @@ bundle exec standardrb
 # Auto-fix issues
 bundle exec standardrb --fix
 
-# Or use the test command
-./bin/jojo test --standard
+# Or use the rake task
+bundle exec rake test:standard
 ```
 
 ### Commit Convention
