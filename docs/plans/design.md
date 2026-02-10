@@ -6,7 +6,7 @@ Jojo is a Job Search Management System (JSMS) - a Ruby CLI that transforms gener
 
 Instead of sending a generic resume and cover letter, Jojo uses AI to generate:
 
-- **Tailored Resume** - Customized from your generic resume to match specific job requirements
+- **Tailored Resume** - Customized from your structured resume data to match specific job requirements
 - **Persuasive Cover Letter** - Written based on company research and role analysis
 - **Professional Website** - Complete landing page with:
   - AI-generated branding statement
@@ -15,24 +15,27 @@ Instead of sending a generic resume and cover letter, Jojo uses AI to generate:
   - FAQ accordion answering common interview questions
   - Annotated job description showing how your experience matches requirements
   - Call-to-action (Calendly or email)
-- **Company Research** - AI-generated insights about the company and role
-- **Status Logs** - Complete audit trail of decisions and token usage
+- **Company Research** - AI-generated insights about the company and role (with optional web search)
+- **PDF Export** - Convert resume and cover letter to PDF via Pandoc
+- **Status Logs** - Complete audit trail of decisions and token usage (JSON format)
 
-Think of it as treating each job application like launching a product (you) to a specific customer (the employer).
+Think of it as treating each job application like launching a product (you) to a specific customer (the company).
 
 ## Key Features
 
 - **Slug-based workspaces** - Organize multiple applications with unique identifiers
-- **AI-powered project selection** - Automatically chooses relevant portfolio projects
-- **Template system** - Customizable website templates via ERB
+- **Interactive dashboard** - TUI-based workflow for managing applications
+- **AI-powered project selection** - Automatically chooses and scores relevant portfolio projects
+- **Template system** - Customizable resume and website templates via ERB
 - **Overwrite management** - Smart prompting for file overwrites with global preferences
 - **Comprehensive testing** - Unit, integration, and service test categories
 - **Token tracking** - Monitor AI usage costs per generation step
-- **Environment variable support** - Convenient JOJO_EMPLOYER_SLUG for multi-command workflows
+- **Environment variable support** - Convenient JOJO_APPLICATION_SLUG for multi-command workflows
+- **State persistence** - Remember current application across commands
 
 ## Directory structure
 
-The directory structure will look something like this:
+The directory structure looks like this:
 
 ```
 CLAUDE.md
@@ -42,75 +45,129 @@ README.md
 .ruby-version
 Gemfile
 Gemfile.lock
+Rakefile                             # Test runner tasks
 lib/
   jojo/
-    cli.rb                       # Thor-based CLI
-    config.rb                    # Configuration management
-    employer.rb                  # Employer workspace management
-    ai_client.rb                 # AI service integration
-    job_description_processor.rb # Fetch and process job descriptions
-    status_logger.rb             # Status logging
-    overwrite_helper.rb          # File overwrite handling
-    project_loader.rb            # Load projects.yml
-    project_selector.rb          # AI-powered project selection
-    recommendation_parser.rb     # Parse recommendations
-    generators/
-      research_generator.rb
-      resume_generator.rb
-      cover_letter_generator.rb
-      website_generator.rb
-      annotation_generator.rb
-      faq_generator.rb
-    prompts/
-      research_prompt.rb
-      resume_prompt.rb
-      cover_letter_prompt.rb
-      website_prompt.rb
-      annotation_prompt.rb
-      faq_prompt.rb
-      job_description_prompts.rb
-  jojo.rb                        # Main module
+    cli.rb                           # Thor-based CLI
+    config.rb                        # Configuration management (singleton)
+    application.rb                   # Application workspace management
+    ai_client.rb                     # AI service integration
+    status_logger.rb                 # JSON-based status logging
+    overwrite_helper.rb              # File overwrite handling (mixin)
+    project_selector.rb              # AI-powered project selection with scoring
+    resume_data_loader.rb            # Load and validate resume_data.yml
+    resume_data_formatter.rb         # Convert structured data to text
+    state_persistence.rb             # Current application slug persistence
+    erb_renderer.rb                  # Template rendering support
+    template_validator.rb            # Validate template structure
+    provider_helper.rb               # AI provider configuration
+    commands/                        # Command-based organization
+      annotate/
+        command.rb                   # Command orchestration
+        generator.rb                 # Content generation
+        prompt.rb                    # AI prompt templates
+      branding/
+        command.rb
+        generator.rb
+        prompt.rb
+      cover_letter/
+        command.rb
+        generator.rb
+        prompt.rb
+      faq/
+        command.rb
+        generator.rb
+        prompt.rb
+      interactive/
+        command.rb                   # Entry point
+        runner.rb                    # Main loop
+        workflow.rb                  # Workflow management
+        dashboard.rb                 # TUI display
+        dialogs.rb                   # User prompts
+      job_description/
+        command.rb
+        processor.rb                 # Fetch and process job descriptions
+        prompt.rb
+      new/
+        command.rb
+      pdf/
+        command.rb
+        converter.rb                 # Markdown to PDF conversion
+        pandoc_checker.rb            # Pandoc availability check
+      research/
+        command.rb
+        generator.rb
+        prompt.rb
+      resume/
+        command.rb
+        generator.rb
+        prompt.rb
+        curation_service.rb          # Resume data transformation
+        transformer.rb               # Resume processing
+      setup/
+        command.rb
+      version/
+        command.rb
+      website/
+        generator.rb                 # Landing page generation
+  jojo.rb                            # Main module
 test/
-  unit/                          # Fast unit tests, no external dependencies
-  integration/                   # Integration tests with mocked services
-  service/                       # Tests with real API calls
-  fixtures/                      # Test data
+  unit/                              # Fast unit tests, no external dependencies
+    commands/                        # Tests organized by command
+  integration/                       # Integration tests with mocked services
+  service/                           # Tests with real API calls (costs money)
+  fixtures/                          # Test data (NEVER use inputs/ in tests)
+  support/                           # Test helpers
 templates/
-  config.yml.erb                 # Template for user configuration file
-  generic_resume.md              # Example generic resume in markdown format
-  recommendations.md             # Example LinkedIn recommendations
-  projects.yml                   # Example portfolio projects
+  config.yml.erb                     # Template for user configuration file
+  .env.erb                           # Template for environment variables
+  default_resume.md.erb              # Default resume template
+  resume_data.yml                    # Example resume data schema
   website/
-    default.html.erb             # Default website template
-employers/                       # NOT tracked in git (in .gitignore)
-  #{employer_slug}/              # Jojo-generated workspace (e.g., acme-corp-senior-dev)
-    job_description.md           # HTML processed to markdown if pulled from URL
-    job_details.yml              # Extracted metadata (company name, title, location, etc.)
-    research.md                  # Generated research on company/role to guide tailoring
-    status_log.md                # Log of steps taken, decisions made, etc.
-    resume.md                    # Tailored resume
-    cover_letter.md              # Tailored cover letter
-    job_description_annotated.md # Annotated job description with match analysis
+    default.html.erb                 # Default website template
+    styles.css                       # Website stylesheet
+    script.js                        # Website JavaScript
+    icons.svg                        # SVG icon definitions
+applications/                        # NOT tracked in git (in .gitignore)
+  #{slug}/                           # Jojo-generated workspace (e.g., acme-corp-senior-dev)
+    job_description_raw.md           # Original job description
+    job_description.md               # Processed job description
+    job_details.yml                  # Extracted metadata (company name, title, location, etc.)
+    research.md                      # Generated research on company/role
+    resume.md                        # Tailored resume
+    branding.md                      # AI-generated branding statement
+    cover_letter.md                  # Tailored cover letter
+    job_description_annotations.json # Annotations data (JSON)
+    faq.json                         # FAQ data (JSON)
+    status.log                       # JSON log entries
+    resume.pdf                       # Generated PDF (optional, requires Pandoc)
+    cover_letter.pdf                 # Generated PDF (optional)
     website/
-      index.html                 # Complete landing page with all sections
-      branding_image.jpg         # Optional branding image (if provided)
-inputs/                          # User-provided input files (NOT tracked in git, in .gitignore)
-  generic_resume.md              # User's actual generic resume with full work history
-  recommendations.md             # User's actual LinkedIn recommendations (optional)
-  projects.yml                   # User's portfolio projects (optional)
-  branding_image.jpg             # User's branding image (optional, e.g., "I ❤️ CompanyName" shirt)
+      index.html                     # Complete landing page
+      styles.css                     # Website styles
+      script.js                      # Website scripts
+      icons.svg                      # Website icons
+      branding_image.jpg             # Optional branding image (if provided)
+inputs/                              # User-provided input files (NOT tracked in git)
+  resume_data.yml                    # User's structured resume data
+  templates/
+    default_resume.md.erb            # User's resume template (optional)
+  recommendations.md                 # User's LinkedIn recommendations (optional)
+  branding_image.jpg                 # User's branding image (optional)
 docs/
   plans/
-    design.md                    # Design document (this file)
-    implementation_plan.md       # Implementation plan document
-    *.md                         # Various design and implementation documents
+    design.md                        # Design document (this file)
+    implementation_plan.md           # Implementation plan document
+    *.md                             # Various design and implementation documents
 bin/
-  jojo                           # Main CLI wrapper
-config.yml                       # User configuration (created by setup, NOT tracked in git)
-.env                             # API keys (NOT tracked in git)
+  jojo                               # Main CLI wrapper
+  test                               # Test runner script
+config.yml                           # User configuration (created by setup, NOT tracked in git)
+.env                                 # API keys (NOT tracked in git)
+.jojo_state                          # Current application slug (NOT tracked in git)
 ```
 
-The `.gitignore` file excludes the `employers/`, `inputs/`, `config.yml`, `.env`, and temporary directories.
+The `.gitignore` file excludes `applications/`, `inputs/`, `config.yml`, `.env`, `.jojo_state`, and temporary directories.
 
 
 ## Landing page content
@@ -118,9 +175,10 @@ The `.gitignore` file excludes the `employers/`, `inputs/`, `config.yml`, `.env`
 The generated `website/index.html` includes:
 
 - **Personal branding statement** - AI-generated, tailored to company and role
-- **Portfolio highlights** - AI-selected projects from `inputs/projects.yml` that are relevant to the job
+- **Portfolio highlights** - AI-selected projects from resume data that are relevant to the job
   - Each project includes: name, description, technologies, role, impact metrics, and link
-  - Projects are selected using AI analysis of job requirements
+  - Projects are selected and scored using AI analysis of job requirements
+  - Configurable limits: 5 for landing page, 3 for resume, 2 for cover letter
 - **LinkedIn recommendations carousel** - Professional testimonials from `inputs/recommendations.md`
   - Rotating carousel with recommendations from colleagues
   - Each includes recommender's name, title, company, and quote
@@ -129,12 +187,12 @@ The generated `website/index.html` includes:
   - Expandable/collapsible sections
 - **Annotated job description** - Shows how your experience matches requirements
   - Each requirement linked to specific experience from your resume
-  - Generated from `job_description_annotated.md`
+  - Generated from `job_description_annotations.json`
 - **Call to Action (CTA)** - Configured in `config.yml`
   - Calendly link for scheduling a call
   - Or direct email link
 - **Branding image** (optional) - User-provided image from `inputs/branding_image.jpg`
-  - Example: Photo with "I ❤️ #{employer_name}" T-shirt
+  - Example: Photo with "I ❤️ #{company_name}" T-shirt
 
 ## Architecture
 
@@ -145,52 +203,90 @@ Jojo is a Ruby CLI that uses Thor for command line interface management.
 - **Ruby 3.4.5** - Modern Ruby with PRISM parser
 - **Thor** (~1.3) - Command-line interface framework
 - **ruby_llm** (~1.9) - Unified interface for AI services (Anthropic, OpenAI, etc.)
-- **deepsearch-rb** (~0.1) - Web search integration via Serper API (optional)
+- **deepsearch-rb** (~0.1) - Web search integration via Serper or Tavily API (optional)
 - **html-to-markdown** (~2.16) - Convert job postings from URLs to markdown
 - **dotenv** (~3.1) - Environment variable management (.env file)
 - **reline** - Enhanced line editing for interactive prompts
 - **Minitest** (~5.25) - Testing framework with minitest-reporters
 
+**TUI Dependencies (Interactive Dashboard):**
+- **tty-prompt** (~0.23) - Interactive prompts
+- **tty-box** (~0.7) - Box drawing
+- **tty-cursor** (~0.7) - Cursor movement
+- **tty-reader** (~0.9) - Key input
+- **tty-screen** (~0.8) - Terminal dimensions
+
+**Development/Testing:**
+- **standard** (~1.0) - Ruby code style
+- **rake** (~13.0) - Task runner
+- **simplecov** - Code coverage
+
 ### Core Components
 
 - **CLI** (`lib/jojo/cli.rb`) - Thor-based command definitions and orchestration
-- **Config** (`lib/jojo/config.rb`) - User configuration management (config.yml)
-- **Employer** (`lib/jojo/employer.rb`) - Per-application workspace management
+- **Config** (`lib/jojo/config.rb`) - User configuration management (singleton pattern)
+- **Application** (`lib/jojo/application.rb`) - Per-application workspace management
 - **AIClient** (`lib/jojo/ai_client.rb`) - Unified interface to AI services with token tracking
-- **JobDescriptionProcessor** - Fetch from URL or file, convert HTML to markdown
-- **StatusLogger** - Track all steps, decisions, and token usage in status_log.md
-- **OverwriteHelper** - Handle file overwrite prompts and preferences
-- **ProjectLoader** - Load and validate projects.yml
-- **ProjectSelector** - AI-powered selection of relevant portfolio projects
-- **RecommendationParser** - Parse LinkedIn recommendations from markdown
-- **Generators** - Modular generators for each artifact type:
-  - ResearchGenerator - Company and role research
-  - ResumeGenerator - Tailored resume
-  - CoverLetterGenerator - Personalized cover letter
-  - AnnotationGenerator - Job description annotations
-  - WebsiteGenerator - Landing page with all sections
-  - FAQGenerator - Frequently asked questions
-- **Prompts** - Encapsulated AI prompts for each generation task
+- **StatusLogger** (`lib/jojo/status_logger.rb`) - Track all steps, decisions, and token usage in status.log (JSON format)
+- **OverwriteHelper** (`lib/jojo/overwrite_helper.rb`) - Handle file overwrite prompts and preferences (mixin)
+- **ProjectSelector** (`lib/jojo/project_selector.rb`) - AI-powered selection and scoring of relevant portfolio projects
+- **ResumeDataLoader** (`lib/jojo/resume_data_loader.rb`) - Load and validate resume_data.yml
+- **ResumeDataFormatter** (`lib/jojo/resume_data_formatter.rb`) - Convert structured resume data to text
+- **StatePersistence** (`lib/jojo/state_persistence.rb`) - Persist current application slug
+- **ErbRenderer** (`lib/jojo/erb_renderer.rb`) - Template rendering support
+- **TemplateValidator** (`lib/jojo/template_validator.rb`) - Validate template structure
+- **ProviderHelper** (`lib/jojo/provider_helper.rb`) - AI provider configuration
+
+### Command-Based Organization
+
+Each command is organized in its own directory under `lib/jojo/commands/` with a consistent structure:
+
+```
+lib/jojo/commands/{command_name}/
+├── command.rb    # Command orchestration (extends Base)
+├── generator.rb  # Content generation logic
+├── prompt.rb     # AI prompt templates
+```
+
+**Commands:**
+- **annotate** - Generate job description annotations
+- **branding** - Generate branding statement
+- **cover_letter** - Generate personalized cover letter
+- **faq** - Generate FAQ content
+- **interactive** - TUI dashboard (default command)
+- **job_description** - Process/extract job description
+- **new** - Create new application workspace
+- **pdf** - Generate PDF from markdown files
+- **research** - Generate company/role research
+- **resume** - Generate tailored resume
+- **setup** - Interactive setup wizard
+- **version** - Show version
+- **website** - Generate landing page HTML
 
 ### Templating
 
-- **ERB** - Used for configuration file template and website template
+- **ERB** - Used for configuration file template, resume template, and website template
+- **Default resume template** - `templates/default_resume.md.erb`
 - **Default website template** - `templates/website/default.html.erb`
-- **Custom templates** - Users can create additional templates in `templates/website/`
+- **Custom templates** - Users can create additional templates in `inputs/templates/`
 
 ### API Keys
 
 API keys are managed via `.env` file (NOT tracked in git):
 - `ANTHROPIC_API_KEY` - Required for Claude AI
-- `SERPER_API_KEY` - Optional for web search integration
+- `SERPER_API_KEY` or `TAVILY_API_KEY` - Optional for web search integration
 
 ### Website Deployment
 
-The generated website (`employers/#{slug}/website/index.html`) is a self-contained HTML file with inline CSS and JavaScript.
+The generated website (`applications/#{slug}/website/`) includes:
+- `index.html` - Main landing page
+- `styles.css` - Stylesheet
+- `script.js` - JavaScript
+- `icons.svg` - SVG icons
 
 **Deployment options:**
-1. **Manual copy** - Copy the generated `index.html` to your personal website's static directory
-   - For Hugo sites: `cp employers/acme-corp/website/index.html ~/my-site/static/applications/acme-corp/index.html`
+1. **Manual copy** - Copy the generated `website/` directory to your personal website's static directory
+   - For Hugo sites: `cp -r applications/acme-corp/website/* ~/my-site/static/applications/acme-corp/`
 2. **Future versions** - Direct generation into Hugo layouts/partials for seamless integration
 
 ## Configuration
@@ -208,6 +304,11 @@ text_generation_ai:
   model: haiku
 voice_and_tone: professional and friendly
 
+# Web search configuration (optional)
+web_search:
+  provider: serper  # or tavily
+  # API key in .env file
+
 # Website configuration
 website:
   cta_text: "Schedule a Call"
@@ -216,15 +317,29 @@ website:
 
 ### Environment Variables
 
-- `JOJO_EMPLOYER_SLUG` - Set to avoid repeating `--slug` flag on commands
+- `JOJO_APPLICATION_SLUG` - Set to avoid repeating `--slug` flag on commands (backward compatible: `JOJO_EMPLOYER_SLUG`)
 - `JOJO_ALWAYS_OVERWRITE` - Set to `true`, `1`, or `yes` to skip overwrite prompts
 - `ANTHROPIC_API_KEY` - Required for Claude AI (stored in `.env`)
-- `SERPER_API_KEY` - Optional for web search (stored in `.env`)
+- `SERPER_API_KEY` or `TAVILY_API_KEY` - Optional for web search (stored in `.env`)
 - `SKIP_SERVICE_CONFIRMATION` - Set to `true` to skip confirmation prompt for service tests
 
 ## Workflow
 
-### Step 1: Create Employer Workspace
+### Interactive Mode (Default)
+
+```bash
+jojo
+# or
+jojo interactive
+```
+
+Launches the TUI dashboard for managing applications with:
+- Application selection/creation
+- Step-by-step generation workflow
+- Status tracking
+- Keyboard navigation
+
+### Step 1: Create Application Workspace
 
 ```bash
 jojo new -s company-slug -j job_description.txt
@@ -232,7 +347,8 @@ jojo new -s company-slug -j job_description.txt
 jojo new -s company-slug -j "https://careers.company.com/job/123"
 ```
 
-This creates `employers/company-slug/` with:
+This creates `applications/company-slug/` with:
+- `job_description_raw.md` - Original job description
 - `job_description.md` - Processed job description (HTML converted to markdown if from URL)
 - `job_details.yml` - Extracted metadata (company name, job title, location, etc.)
 
@@ -241,30 +357,26 @@ This creates `employers/company-slug/` with:
 ```bash
 jojo generate -s company-slug
 # or set environment variable
-export JOJO_EMPLOYER_SLUG=company-slug
+export JOJO_APPLICATION_SLUG=company-slug
 jojo generate
 ```
 
 This runs all steps in sequence:
 
-1. **Research**: Generate `research.md` with company/role research to guide tailoring
-2. **Resume**: Generate tailored `resume.md` from `inputs/generic_resume.md` + job description + research
-3. **Cover Letter**: Generate `cover_letter.md` based on research and tailored resume
-4. **Annotations**: Generate annotated job description showing how experience matches requirements
-5. **Website**: Generate `website/index.html` landing page with:
-   - Branding statement
-   - Selected portfolio projects (from `inputs/projects.yml`)
-   - LinkedIn recommendations carousel (from `inputs/recommendations.md`)
-   - FAQ accordion
-   - Annotated job description
-   - Call-to-action
-6. **Status Log**: Record all decisions and steps in `status_log.md`
+1. **Research**: Generate `research.md` with company/role research (optional web search)
+2. **Resume**: Generate tailored `resume.md` from `inputs/resume_data.yml` + job description + research
+3. **Branding**: Generate `branding.md` with AI-generated branding statement
+4. **Cover Letter**: Generate `cover_letter.md` based on research and tailored resume
+5. **Annotations**: Generate `job_description_annotations.json` showing how experience matches requirements
+6. **FAQ**: Generate `faq.json` with frequently asked questions
+7. **Website**: Generate `website/index.html` landing page with all sections
+8. **Status Log**: Record all decisions and steps in `status.log` (JSON format)
 
-Individual commands (`research`, `resume`, `cover_letter`, `annotate`, `website`) execute only their specific step.
+Individual commands (`research`, `resume`, `branding`, `cover_letter`, `annotate`, `faq`, `website`) execute only their specific step.
 
 ### Slug-based Workflow
 
-Most commands require a slug to identify the employer workspace:
+Most commands require a slug to identify the application workspace:
 
 ```bash
 # Option 1: Use --slug flag
@@ -272,11 +384,14 @@ jojo research --slug company-slug
 jojo resume --slug company-slug
 
 # Option 2: Set environment variable (convenient for multiple commands)
-export JOJO_EMPLOYER_SLUG=company-slug
+export JOJO_APPLICATION_SLUG=company-slug
 jojo research
 jojo resume
 jojo cover_letter
 jojo website
+
+# Option 3: Use interactive mode (remembers current application)
+jojo
 ```
 
 ### File Overwrite Behavior
@@ -307,36 +422,48 @@ jojo generate -s company-slug  # Skips all prompts
 - **`jojo setup`** - Interactive setup wizard
   - Creates `config.yml` from template
   - Creates `.env` file with API keys
-  - Creates `inputs/` directory
+  - Creates `inputs/` directory with example files
   - No options required
 
-- **`jojo new`** - Create employer workspace
+- **`jojo new`** - Create application workspace
   - Required: `-s, --slug SLUG` - Unique identifier for this application
   - Required: `-j, --job JOB` - Job description file path or URL
   - Optional: `--overwrite` - Skip overwrite prompts
-  - Creates `employers/#{slug}/` directory with job artifacts
+  - Creates `applications/#{slug}/` directory with job artifacts
 
 ### Generation Commands
 
-All generation commands require a slug (via `-s` flag or `JOJO_EMPLOYER_SLUG` env var):
+All generation commands require a slug (via `-s` flag or `JOJO_APPLICATION_SLUG` env var):
 
-- **`jojo generate`** - Generate all materials (research → resume → cover letter → annotations → website)
-- **`jojo research`** - Generate company and role research only
+- **`jojo generate`** - Generate all materials (research → resume → branding → cover letter → annotations → faq → website)
+- **`jojo research`** - Generate company and role research only (with optional web search)
 - **`jojo resume`** - Generate tailored resume only (requires research)
+- **`jojo branding`** - Generate branding statement only
 - **`jojo cover_letter`** - Generate cover letter only (requires resume)
 - **`jojo annotate`** - Generate job description annotations only
+- **`jojo faq`** - Generate FAQ content only
 - **`jojo website`** - Generate landing page only (requires resume)
   - Optional: `-t, --template TEMPLATE` - Website template name (default: "default")
+- **`jojo pdf`** - Generate PDF from resume and/or cover letter (requires Pandoc)
+
+### Interactive Mode
+
+- **`jojo`** or **`jojo interactive`** - Launch TUI dashboard
+  - Application selection and creation
+  - Step-by-step generation workflow
+  - Keyboard-driven navigation
 
 ### Testing
 
-- **`jojo test`** - Run test suite
-  - `--unit` - Run unit tests only (default, fast)
-  - `--integration` - Run integration tests
-  - `--service` - Run service tests (requires API keys, costs money)
-  - `--all` - Run all test categories
-  - `--no-service` - Exclude service tests from `--all`
-  - `-q, --quiet` - Quiet mode for CI/CD
+Tests are run via Rake or the bin/test script:
+
+```bash
+./bin/test              # Run all tests that don't cost money (unit + integration)
+rake test:unit          # Run unit tests only
+rake test:integration   # Run integration tests only
+rake test:service       # Run service tests (requires API keys, costs money)
+rake test:all           # Run all test categories
+```
 
 ### Utility Commands
 
@@ -349,8 +476,56 @@ Available on all commands:
 
 - `-v, --verbose` - Show detailed output including AI prompts and responses
 - `-q, --quiet` - Suppress all output except errors, rely on exit codes
-- `-s, --slug SLUG` - Employer slug (or set `JOJO_EMPLOYER_SLUG` env var)
+- `-s, --slug SLUG` - Application slug (or set `JOJO_APPLICATION_SLUG` env var)
 - `-t, --template TEMPLATE` - Website template name (default: "default")
 - `--overwrite` - Always overwrite files without prompting
 - `--no-overwrite` - Always prompt before overwriting (even if `JOJO_ALWAYS_OVERWRITE` is set)
 
+## Resume Data Structure
+
+Instead of a generic markdown resume, Jojo uses structured YAML data in `inputs/resume_data.yml`:
+
+```yaml
+name: Your Name
+email: you@example.com
+phone: (555) 123-4567
+location: City, State
+linkedin: linkedin.com/in/yourname
+github: github.com/yourname
+website: yourwebsite.com
+
+summary: |
+  Brief professional summary...
+
+experience:
+  - company: Company Name
+    title: Job Title
+    location: City, State
+    dates: Jan 2020 - Present
+    highlights:
+      - Achievement or responsibility
+      - Another achievement
+
+education:
+  - school: University Name
+    degree: Degree Type
+    field: Field of Study
+    dates: 2016 - 2020
+
+skills:
+  - category: Programming Languages
+    items: [Python, Ruby, JavaScript]
+  - category: Frameworks
+    items: [Rails, React, FastAPI]
+
+projects:
+  - name: Project Name
+    description: Brief description
+    technologies: [Tech1, Tech2]
+    role: Your role
+    impact: Impact metrics
+    link: https://project.url
+    image: project-screenshot.png  # Optional
+```
+
+The `ResumeDataLoader` validates this structure, and `ResumeDataFormatter` converts it to text for AI processing. The `CurationService` transforms the data for specific job applications.
