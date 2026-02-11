@@ -2,59 +2,59 @@
 require_relative "../../test_helper"
 require_relative "../../../lib/jojo/commands/console_output"
 
-describe Jojo::Commands::ConsoleOutput do
-  describe "#say" do
-    it "outputs message to stdout" do
-      output = Jojo::Commands::ConsoleOutput.new
+class Jojo::Commands::ConsoleOutputTest < JojoTest
+  # --- #say ---
 
-      assert_output("Hello\n") { output.say("Hello") }
-    end
+  def test_say_outputs_message_to_stdout
+    output = Jojo::Commands::ConsoleOutput.new
 
-    it "ignores color parameter" do
-      output = Jojo::Commands::ConsoleOutput.new
-
-      assert_output("Hello\n") { output.say("Hello", :green) }
-    end
-
-    it "suppresses output when quiet" do
-      output = Jojo::Commands::ConsoleOutput.new(quiet: true)
-
-      assert_output("") { output.say("Hello") }
-    end
+    assert_output("Hello\n") { output.say("Hello") }
   end
 
-  describe "#yes?" do
-    it "returns true for 'y' input" do
-      output = Jojo::Commands::ConsoleOutput.new
+  def test_say_ignores_color_parameter
+    output = Jojo::Commands::ConsoleOutput.new
 
-      $stdin = StringIO.new("y\n")
-      result = nil
-      assert_output(/Continue\?/) { result = output.yes?("Continue?") }
-      $stdin = STDIN
+    assert_output("Hello\n") { output.say("Hello", :green) }
+  end
 
-      _(result).must_equal true
-    end
+  def test_say_suppresses_output_when_quiet
+    output = Jojo::Commands::ConsoleOutput.new(quiet: true)
 
-    it "returns true for 'yes' input" do
-      output = Jojo::Commands::ConsoleOutput.new
+    assert_output("") { output.say("Hello") }
+  end
 
-      $stdin = StringIO.new("yes\n")
-      result = nil
-      assert_output(/Continue\?/) { result = output.yes?("Continue?") }
-      $stdin = STDIN
+  # --- #yes? ---
 
-      _(result).must_equal true
-    end
+  def test_yes_returns_true_for_y_input
+    output = Jojo::Commands::ConsoleOutput.new
 
-    it "returns false for 'n' input" do
-      output = Jojo::Commands::ConsoleOutput.new
+    $stdin = StringIO.new("y\n")
+    result = nil
+    assert_output(/Continue\?/) { result = output.yes?("Continue?") }
+    $stdin = STDIN
 
-      $stdin = StringIO.new("n\n")
-      result = nil
-      assert_output(/Continue\?/) { result = output.yes?("Continue?") }
-      $stdin = STDIN
+    assert_equal true, result
+  end
 
-      _(result).must_equal false
-    end
+  def test_yes_returns_true_for_yes_input
+    output = Jojo::Commands::ConsoleOutput.new
+
+    $stdin = StringIO.new("yes\n")
+    result = nil
+    assert_output(/Continue\?/) { result = output.yes?("Continue?") }
+    $stdin = STDIN
+
+    assert_equal true, result
+  end
+
+  def test_yes_returns_false_for_n_input
+    output = Jojo::Commands::ConsoleOutput.new
+
+    $stdin = StringIO.new("n\n")
+    result = nil
+    assert_output(/Continue\?/) { result = output.yes?("Continue?") }
+    $stdin = STDIN
+
+    assert_equal false, result
   end
 end

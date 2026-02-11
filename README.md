@@ -581,8 +581,8 @@ If you encounter API-related errors:
 
 ```bash
 # Run different test categories to isolate issues
-./bin/test # Runs `bundle exec rake test:usual` for all but service tests
-bundle exec rake test:usual        # All but service tests - default, run frequently
+./bin/test # Runs `bundle exec rake test:all` for all tests
+bundle exec rake test:all          # All tests - default, run frequently
 bundle exec rake test:unit         # Unit tests - fast, no external dependencies
 bundle exec rake test:integration  # Integration tests - tests with mocked external services
 bundle exec rake test:service      # Service tests - real API calls that cost money
@@ -598,7 +598,6 @@ Jojo includes comprehensive testing to ensure reliability and performance.
 
 - **Unit tests** - Fast tests with no external dependencies
 - **Integration tests** - Tests with mocked external services
-- **Service tests** - Tests that make real API calls (may incur costs)
 - **Standard tests** - Code style checks using Standard Ruby
 
 ### Running Tests
@@ -610,16 +609,12 @@ Jojo includes comprehensive testing to ensure reliability and performance.
 # Run individual test categories
 bundle exec rake test:unit         # Unit tests only
 bundle exec rake test:integration  # Integration tests only
-bundle exec rake test:service      # Service tests (with confirmation)
 bundle exec rake test:standard     # Standard Ruby style checks
 
 # Composite tasks
-bundle exec rake test:free         # Unit + integration (no service)
-bundle exec rake test:usual        # Standard + unit + integration (same as ./bin/test)
-bundle exec rake test:all          # Standard + all tests including service
+bundle exec rake test:minitest     # Unit + integration (no standard)
+bundle exec rake test:all          # Standard + unit + integration (same as ./bin/test)
 ```
-
-Service tests require real API keys and may cost money. You'll be prompted for confirmation.
 
 ## Architecture
 
@@ -644,38 +639,6 @@ JoJo is built as a modular Ruby CLI application:
 - **dotenv** - Environment variable management
 - **Minitest** - Testing framework
 
-### Directory Structure
-
-```
-jojo/
-├── bin/jojo              # CLI entry point
-├── lib/jojo/             # Main application code
-│   ├── cli.rb           # Thor command definitions
-│   ├── config.rb        # Configuration management
-│   ├── application.rb      # Employer workspace
-│   ├── ai_client.rb     # AI service integration
-│   └── prompts/         # AI prompt templates
-├── test/                 # Test suite
-│   ├── unit/            # Fast unit tests
-│   ├── integration/     # Integration tests
-│   └── service/         # Tests with real APIs
-├── templates/           # Template files for users
-├── inputs/              # User's actual data (gitignored)
-└── applications/           # Generated output (gitignored)
-    └── company-name/
-        ├── job_description.md
-        ├── job_description_annotations.json
-        ├── job_details.yml
-        ├── research.md
-        ├── resume.md
-        ├── resume.pdf
-        ├── cover_letter.md
-        ├── cover_letter.pdf
-        ├── status_log.md  # JSON Lines format
-        └── website/
-            └── index.html
-```
-
 ## Development workflow
 
 ### Available Commands
@@ -684,7 +647,7 @@ jojo/
 | ------- | ----------- |
 | `bundle install` | Install dependencies |
 | `./bin/test` | Run standard checks + unit + integration tests |
-| `bundle exec rake test:all` | Run full test suite including service tests |
+| `bundle exec rake test:all` | Run full test suite |
 | `./bin/jojo --help` | View all commands |
 | `EDITOR=nvim ./bin/jojo generate ...` | Set preferred editor for interactive prompts |
 

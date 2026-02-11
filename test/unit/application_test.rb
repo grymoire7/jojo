@@ -3,109 +3,85 @@
 require "test_helper"
 require "jojo/application"
 
-describe Jojo::Application do
-  describe "#initialize" do
-    it "sets slug and base_path" do
-      app = Jojo::Application.new("acme-corp")
+class ApplicationTest < JojoTest
+  def test_sets_slug_and_base_path
+    app = Jojo::Application.new("acme-corp")
 
-      _(app.slug).must_equal "acme-corp"
-      _(app.base_path).must_equal "applications/acme-corp"
-    end
+    assert_equal "acme-corp", app.slug
+    assert_equal "applications/acme-corp", app.base_path
   end
 
-  describe "path accessors" do
-    let(:app) { Jojo::Application.new("test-app") }
-
-    it "returns job_description_raw_path" do
-      _(app.job_description_raw_path).must_equal "applications/test-app/job_description_raw.md"
-    end
-
-    it "returns job_description_path" do
-      _(app.job_description_path).must_equal "applications/test-app/job_description.md"
-    end
-
-    it "returns job_details_path" do
-      _(app.job_details_path).must_equal "applications/test-app/job_details.yml"
-    end
-
-    it "returns resume_path" do
-      _(app.resume_path).must_equal "applications/test-app/resume.md"
-    end
-
-    it "returns cover_letter_path" do
-      _(app.cover_letter_path).must_equal "applications/test-app/cover_letter.md"
-    end
-
-    it "returns research_path" do
-      _(app.research_path).must_equal "applications/test-app/research.md"
-    end
-
-    it "returns website_path" do
-      _(app.website_path).must_equal "applications/test-app/website"
-    end
-
-    it "returns faq_path" do
-      _(app.faq_path).must_equal "applications/test-app/faq.json"
-    end
+  def test_returns_job_description_raw_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/job_description_raw.md", app.job_description_raw_path
   end
 
-  describe "#company_name" do
-    it "returns slug when job_details.yml does not exist" do
-      Dir.mktmpdir do |dir|
-        Dir.chdir(dir) do
-          app = Jojo::Application.new("acme-corp")
-          _(app.company_name).must_equal "acme-corp"
-        end
-      end
-    end
-
-    it "returns company_name from job_details.yml when it exists" do
-      Dir.mktmpdir do |dir|
-        Dir.chdir(dir) do
-          FileUtils.mkdir_p("applications/acme-corp")
-          File.write("applications/acme-corp/job_details.yml", "company_name: Acme Corporation")
-
-          app = Jojo::Application.new("acme-corp")
-          _(app.company_name).must_equal "Acme Corporation"
-        end
-      end
-    end
+  def test_returns_job_description_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/job_description.md", app.job_description_path
   end
 
-  describe "#artifacts_exist?" do
-    it "returns false when no artifacts exist" do
-      Dir.mktmpdir do |dir|
-        Dir.chdir(dir) do
-          app = Jojo::Application.new("new-app")
-          _(app.artifacts_exist?).must_equal false
-        end
-      end
-    end
-
-    it "returns true when job_description.md exists" do
-      Dir.mktmpdir do |dir|
-        Dir.chdir(dir) do
-          FileUtils.mkdir_p("applications/existing-app")
-          File.write("applications/existing-app/job_description.md", "# Job")
-
-          app = Jojo::Application.new("existing-app")
-          _(app.artifacts_exist?).must_equal true
-        end
-      end
-    end
+  def test_returns_job_details_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/job_details.yml", app.job_details_path
   end
 
-  describe "#create_directory!" do
-    it "creates base_path and website_path directories" do
-      Dir.mktmpdir do |dir|
-        Dir.chdir(dir) do
-          app = Jojo::Application.new("new-app")
-          app.create_directory!
+  def test_returns_resume_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/resume.md", app.resume_path
+  end
 
-          _(File.directory?("applications/new-app")).must_equal true
-          _(File.directory?("applications/new-app/website")).must_equal true
-        end
-      end
-    end
+  def test_returns_cover_letter_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/cover_letter.md", app.cover_letter_path
+  end
+
+  def test_returns_research_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/research.md", app.research_path
+  end
+
+  def test_returns_website_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/website", app.website_path
+  end
+
+  def test_returns_faq_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/faq.json", app.faq_path
+  end
+
+  def test_returns_slug_when_job_details_yml_does_not_exist
+    app = Jojo::Application.new("acme-corp")
+    assert_equal "acme-corp", app.company_name
+  end
+
+  def test_returns_company_name_from_job_details_yml_when_it_exists
+    FileUtils.mkdir_p("applications/acme-corp")
+    File.write("applications/acme-corp/job_details.yml", "company_name: Acme Corporation")
+
+    app = Jojo::Application.new("acme-corp")
+    assert_equal "Acme Corporation", app.company_name
+  end
+
+  def test_artifacts_exist_returns_false_when_no_artifacts_exist
+    app = Jojo::Application.new("new-app")
+    assert_equal false, app.artifacts_exist?
+  end
+
+  def test_artifacts_exist_returns_true_when_job_description_exists
+    FileUtils.mkdir_p("applications/existing-app")
+    File.write("applications/existing-app/job_description.md", "# Job")
+
+    app = Jojo::Application.new("existing-app")
+    assert_equal true, app.artifacts_exist?
+  end
+
+  def test_creates_base_path_and_website_path_directories
+    app = Jojo::Application.new("new-app")
+    app.create_directory!
+
+    assert_equal true, File.directory?("applications/new-app")
+    assert_equal true, File.directory?("applications/new-app/website")
   end
 end

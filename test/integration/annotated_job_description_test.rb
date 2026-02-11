@@ -16,8 +16,10 @@ class IntegrationTestConfigStub
   end
 end
 
-describe "Annotated Job Description Integration" do
-  before do
+class AnnotatedJobDescriptionIntegrationTest < JojoTest
+  def setup
+    super
+    copy_templates
     @employer = Jojo::Application.new("techcorp")
     @ai_client = Minitest::Mock.new
     @config = IntegrationTestConfigStub.new
@@ -36,11 +38,12 @@ describe "Annotated Job Description Integration" do
     File.write(@employer.branding_path, "I'm a great fit for TechCorp...")
   end
 
-  after do
+  def teardown
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    super
   end
 
-  it "generates annotated website from job description and resume" do
+  def test_generates_annotated_website_from_job_description_and_resume
     # Generate annotations
     annotation_generator = Jojo::Commands::Annotate::Generator.new(@employer, @ai_client, verbose: false)
 
@@ -60,33 +63,33 @@ describe "Annotated Job Description Integration" do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
     html = website_generator.generate
 
     # Verify annotation section exists
-    _(html).must_include "Compare Me to the Job Description"
-    _(html).must_include '<div id="annotation-tooltip"'
+    assert_includes html, "Compare Me to the Job Description"
+    assert_includes html, '<div id="annotation-tooltip"'
 
     # Verify annotations are injected
-    _(html).must_include '<span class="annotated" data-tier="strong" data-match="Built Ruby apps for 7 years">5+ years of Ruby</span>'
-    _(html).must_include '<span class="annotated" data-tier="strong" data-match="Built distributed message queue system">distributed systems</span>'
-    _(html).must_include '<span class="annotated" data-tier="moderate" data-match="Experience with PostgreSQL and Redis">PostgreSQL</span>'
+    assert_includes html, '<span class="annotated" data-tier="strong" data-match="Built Ruby apps for 7 years">5+ years of Ruby</span>'
+    assert_includes html, '<span class="annotated" data-tier="strong" data-match="Built distributed message queue system">distributed systems</span>'
+    assert_includes html, '<span class="annotated" data-tier="moderate" data-match="Experience with PostgreSQL and Redis">PostgreSQL</span>'
 
     # Verify legend
-    _(html).must_include "Strong match"
-    _(html).must_include "Moderate match"
-    _(html).must_include "Worth a mention"
+    assert_includes html, "Strong match"
+    assert_includes html, "Moderate match"
+    assert_includes html, "Worth a mention"
 
     # Verify JavaScript present
-    _(html).must_include "function showTooltip"
-    _(html).must_include "annotation.dataset.match"
+    assert_includes html, "function showTooltip"
+    assert_includes html, "annotation.dataset.match"
 
     @ai_client.verify
   end
 
-  it "website works without annotations (graceful degradation)" do
+  def test_website_works_without_annotations_graceful_degradation
     # Don't generate annotations
 
     website_generator = Jojo::Commands::Website::Generator.new(
@@ -94,18 +97,18 @@ describe "Annotated Job Description Integration" do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
     html = website_generator.generate
 
     # Verify annotation section NOT present
-    _(html).wont_include "Compare Me to the Job Description"
-    _(html).wont_include '<div id="annotation-tooltip"'
+    refute_includes html, "Compare Me to the Job Description"
+    refute_includes html, '<div id="annotation-tooltip"'
 
     # But website still works
-    _(html).must_include "Am I a good match for TechCorp?"
-    _(html).must_include "I'm a great fit for TechCorp..."
+    assert_includes html, "Am I a good match for TechCorp?"
+    assert_includes html, "I'm a great fit for TechCorp..."
 
     @ai_client.verify
   end

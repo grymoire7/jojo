@@ -3,8 +3,9 @@ require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/resume/generator"
 
-describe Jojo::Commands::Resume::Generator do
-  before do
+class Jojo::Commands::Resume::GeneratorTest < JojoTest
+  def setup
+    super
     @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
@@ -13,11 +14,9 @@ describe Jojo::Commands::Resume::Generator do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
-    # Clean up and create directories
-    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
     @application.create_directory!
 
     # Create required fixtures
@@ -25,11 +24,7 @@ describe Jojo::Commands::Resume::Generator do
     File.write(@application.job_details_path, "company_name: Acme Corp\n")
   end
 
-  after do
-    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
-  end
-
-  it "generates resume using ResumeCurationService" do
+  def test_generates_resume_using_resume_curation_service
     # Mock config for permissions and base_url
     @config.expect(:dig, {"skills" => ["remove", "reorder"]}, ["resume_data", "permissions"])
     @config.expect(:resume_template, nil)
@@ -41,14 +36,14 @@ describe Jojo::Commands::Resume::Generator do
 
     result = @generator.generate
 
-    _(result).must_include "# Jane Doe"
-    _(result).must_include "Specifically for Acme Corp"
-    _(result).must_include "https://example.com/resume/acme-corp"
+    assert_includes result, "# Jane Doe"
+    assert_includes result, "Specifically for Acme Corp"
+    assert_includes result, "https://example.com/resume/acme-corp"
 
     @ai_client.verify
   end
 
-  it "saves resume to file" do
+  def test_saves_resume_to_file
     @config.expect(:dig, {"skills" => ["remove", "reorder"]}, ["resume_data", "permissions"])
     @config.expect(:resume_template, nil)
     @config.expect(:base_url, "https://example.com")
@@ -58,18 +53,18 @@ describe Jojo::Commands::Resume::Generator do
 
     @generator.generate
 
-    _(File.exist?(@application.resume_path)).must_equal true
+    assert_equal true, File.exist?(@application.resume_path)
     content = File.read(@application.resume_path)
-    _(content).must_include "Specifically for Acme Corp"
+    assert_includes content, "Specifically for Acme Corp"
   end
 
-  it "fails when resume_data.yml is missing" do
+  def test_fails_when_resume_data_yml_is_missing
     generator_no_data = Jojo::Commands::Resume::Generator.new(
       @application,
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures/nonexistent"
+      inputs_path: fixture_path("nonexistent")
     )
 
     @config.expect(:resume_template, nil)
@@ -78,6 +73,6 @@ describe Jojo::Commands::Resume::Generator do
       generator_no_data.generate
     end
 
-    _(error.message).must_include "not found"
+    assert_includes error.message, "not found"
   end
 end

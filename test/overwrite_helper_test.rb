@@ -2,7 +2,7 @@ require "test_helper"
 require "tmpdir"
 require "stringio"
 
-class OverwriteHelperTest < Minitest::Test
+class OverwriteHelperTest < JojoTest
   # Create a test class that includes the module
   class TestCLI
     include Jojo::OverwriteHelper
@@ -13,6 +13,7 @@ class OverwriteHelperTest < Minitest::Test
   end
 
   def setup
+    super
     @cli = TestCLI.new
   end
 
@@ -103,113 +104,98 @@ class OverwriteHelperTest < Minitest::Test
   end
 
   def test_with_overwrite_check_yields_when_file_does_not_exist
-    Dir.mktmpdir do |dir|
-      path = File.join(dir, "nonexistent.txt")
-      yielded = false
+    path = File.join(@tmpdir, "nonexistent.txt")
+    yielded = false
 
-      @cli.with_overwrite_check(path, nil) do
-        yielded = true
-      end
-
-      assert yielded, "Expected block to be yielded when file doesn't exist"
+    @cli.with_overwrite_check(path, nil) do
+      yielded = true
     end
+
+    assert yielded, "Expected block to be yielded when file doesn't exist"
   end
 
   def test_with_overwrite_check_yields_when_file_exists_and_flag_is_true
-    Dir.mktmpdir do |dir|
-      path = File.join(dir, "existing.txt")
-      File.write(path, "original")
-      yielded = false
+    path = File.join(@tmpdir, "existing.txt")
+    File.write(path, "original")
+    yielded = false
 
-      @cli.with_overwrite_check(path, true) do
-        yielded = true
-      end
-
-      assert yielded, "Expected block to be yielded when --overwrite is set"
+    @cli.with_overwrite_check(path, true) do
+      yielded = true
     end
+
+    assert yielded, "Expected block to be yielded when --overwrite is set"
   end
 
   def test_with_overwrite_check_raises_error_in_non_tty_environment
-    Dir.mktmpdir do |dir|
-      path = File.join(dir, "existing.txt")
-      File.write(path, "original")
+    path = File.join(@tmpdir, "existing.txt")
+    File.write(path, "original")
 
-      # Mock $stdout.isatty to return false
-      stdout_was = $stdout
-      $stdout = StringIO.new
-      def $stdout.isatty
-        false
-      end
-
-      error = assert_raises(Thor::Error) do
-        @cli.with_overwrite_check(path, nil) {}
-      end
-
-      assert_match(/Cannot prompt in non-interactive mode/, error.message)
-      assert_match(/--overwrite/, error.message)
-      assert_match(/JOJO_ALWAYS_OVERWRITE/, error.message)
-    ensure
-      $stdout = stdout_was
+    stdout_was = $stdout
+    $stdout = StringIO.new
+    def $stdout.isatty
+      false
     end
+
+    error = assert_raises(Thor::Error) do
+      @cli.with_overwrite_check(path, nil) {}
+    end
+
+    assert_match(/Cannot prompt in non-interactive mode/, error.message)
+    assert_match(/--overwrite/, error.message)
+    assert_match(/JOJO_ALWAYS_OVERWRITE/, error.message)
+  ensure
+    $stdout = stdout_was
   end
 
   def test_with_overwrite_check_yields_when_user_says_yes
-    Dir.mktmpdir do |dir|
-      path = File.join(dir, "existing.txt")
-      File.write(path, "original")
-      yielded = false
+    path = File.join(@tmpdir, "existing.txt")
+    File.write(path, "original")
+    yielded = false
 
-      # Mock $stdout.isatty to return true
-      stdout_was = $stdout
-      $stdout = StringIO.new
-      def $stdout.isatty
-        true
-      end
-
-      # Mock yes? to return true
-      def @cli.yes?(message)
-        @last_prompt = message
-        true
-      end
-
-      @cli.with_overwrite_check(path, nil) do
-        yielded = true
-      end
-
-      assert yielded, "Expected block to be yielded when user says yes"
-      assert_match(/existing.txt/, @cli.instance_variable_get(:@last_prompt))
-      assert_match(/Overwrite/, @cli.instance_variable_get(:@last_prompt))
-    ensure
-      $stdout = stdout_was
+    stdout_was = $stdout
+    $stdout = StringIO.new
+    def $stdout.isatty
+      true
     end
+
+    def @cli.yes?(message)
+      @last_prompt = message
+      true
+    end
+
+    @cli.with_overwrite_check(path, nil) do
+      yielded = true
+    end
+
+    assert yielded, "Expected block to be yielded when user says yes"
+    assert_match(/existing.txt/, @cli.instance_variable_get(:@last_prompt))
+    assert_match(/Overwrite/, @cli.instance_variable_get(:@last_prompt))
+  ensure
+    $stdout = stdout_was
   end
 
   def test_with_overwrite_check_does_not_yield_when_user_says_no
-    Dir.mktmpdir do |dir|
-      path = File.join(dir, "existing.txt")
-      File.write(path, "original")
-      yielded = false
+    path = File.join(@tmpdir, "existing.txt")
+    File.write(path, "original")
+    yielded = false
 
-      # Mock $stdout.isatty to return true
-      stdout_was = $stdout
-      $stdout = StringIO.new
-      def $stdout.isatty
-        true
-      end
-
-      # Mock yes? to return false
-      def @cli.yes?(message)
-        false
-      end
-
-      @cli.with_overwrite_check(path, nil) do
-        yielded = true
-      end
-
-      refute yielded, "Expected block NOT to be yielded when user says no"
-    ensure
-      $stdout = stdout_was
+    stdout_was = $stdout
+    $stdout = StringIO.new
+    def $stdout.isatty
+      true
     end
+
+    def @cli.yes?(message)
+      false
+    end
+
+    @cli.with_overwrite_check(path, nil) do
+      yielded = true
+    end
+
+    refute yielded, "Expected block NOT to be yielded when user says no"
+  ensure
+    $stdout = stdout_was
   end
 
   private

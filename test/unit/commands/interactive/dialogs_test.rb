@@ -2,68 +2,68 @@
 
 require_relative "../../../test_helper"
 
-describe Jojo::Commands::Interactive::Dialogs do
-  describe ".blocked_dialog" do
-    it "renders dialog showing missing prerequisites" do
-      output = Jojo::Commands::Interactive::Dialogs.blocked_dialog("Cover Letter", ["Resume"])
+class Jojo::Commands::Interactive::DialogsTest < JojoTest
+  # .blocked_dialog
 
-      _(output).must_include "Cover Letter"
-      _(output).must_include "Cannot generate yet"
-      _(output).must_include "Resume"
-      _(output).must_include "[Esc] Back"
-    end
+  def test_blocked_dialog_renders_dialog_showing_missing_prerequisites
+    output = Jojo::Commands::Interactive::Dialogs.blocked_dialog("Cover Letter", ["Resume"])
+
+    assert_includes output, "Cover Letter"
+    assert_includes output, "Cannot generate yet"
+    assert_includes output, "Resume"
+    assert_includes output, "[Esc] Back"
   end
 
-  describe ".ready_dialog" do
-    it "renders dialog for ready item with inputs and output" do
-      inputs = [
-        {name: "resume.md", age: "2 hours ago"},
-        {name: "job_description.md", age: nil}
-      ]
+  # .ready_dialog
 
-      output = Jojo::Commands::Interactive::Dialogs.ready_dialog("Cover Letter", inputs, "cover_letter.md", paid: true)
+  def test_ready_dialog_renders_dialog_for_ready_item_with_inputs_and_output
+    inputs = [
+      {name: "resume.md", age: "2 hours ago"},
+      {name: "job_description.md", age: nil}
+    ]
 
-      _(output).must_include "Cover Letter"
-      _(output).must_include "Generate"
-      _(output).must_include "$"
-      _(output).must_include "resume.md"
-      _(output).must_include "2 hours ago"
-      _(output).must_include "cover_letter.md"
-      _(output).must_include "[Enter] Generate"
-    end
+    output = Jojo::Commands::Interactive::Dialogs.ready_dialog("Cover Letter", inputs, "cover_letter.md", paid: true)
+
+    assert_includes output, "Cover Letter"
+    assert_includes output, "Generate"
+    assert_includes output, "$"
+    assert_includes output, "resume.md"
+    assert_includes output, "2 hours ago"
+    assert_includes output, "cover_letter.md"
+    assert_includes output, "[Enter] Generate"
   end
 
-  describe ".generated_dialog" do
-    it "renders dialog for already generated item" do
-      output = Jojo::Commands::Interactive::Dialogs.generated_dialog("Cover Letter", "1 hour ago", paid: true)
+  # .generated_dialog
 
-      _(output).must_include "cover_letter.md already exists"
-      _(output).must_include "1 hour ago"
-      _(output).must_include "[r] Regenerate"
-      _(output).must_include "$"
-      _(output).must_include "[v] View"
-    end
+  def test_generated_dialog_renders_dialog_for_already_generated_item
+    output = Jojo::Commands::Interactive::Dialogs.generated_dialog("Cover Letter", "1 hour ago", paid: true)
+
+    assert_includes output, "cover_letter.md already exists"
+    assert_includes output, "1 hour ago"
+    assert_includes output, "[r] Regenerate"
+    assert_includes output, "$"
+    assert_includes output, "[v] View"
   end
 
-  describe ".error_dialog" do
-    it "renders error dialog with message" do
-      output = Jojo::Commands::Interactive::Dialogs.error_dialog("Cover Letter", "API Error: Rate limit exceeded")
+  # .error_dialog
 
-      _(output).must_include "Error"
-      _(output).must_include "Cover Letter generation failed"
-      _(output).must_include "Rate limit exceeded"
-      _(output).must_include "[r] Retry"
-      _(output).must_include "[Esc] Back"
-    end
+  def test_error_dialog_renders_error_dialog_with_message
+    output = Jojo::Commands::Interactive::Dialogs.error_dialog("Cover Letter", "API Error: Rate limit exceeded")
+
+    assert_includes output, "Error"
+    assert_includes output, "Cover Letter generation failed"
+    assert_includes output, "Rate limit exceeded"
+    assert_includes output, "[r] Retry"
+    assert_includes output, "[Esc] Back"
   end
 
-  describe ".input_dialog" do
-    it "renders input dialog with prompt" do
-      output = Jojo::Commands::Interactive::Dialogs.input_dialog("New Application", "Slug (e.g., acme-corp-senior-dev):")
+  # .input_dialog
 
-      _(output).must_include "New Application"
-      _(output).must_include "Slug"
-      _(output).must_include "> "
-    end
+  def test_input_dialog_renders_input_dialog_with_prompt
+    output = Jojo::Commands::Interactive::Dialogs.input_dialog("New Application", "Slug (e.g., acme-corp-senior-dev):")
+
+    assert_includes output, "New Application"
+    assert_includes output, "Slug"
+    assert_includes output, "> "
   end
 end

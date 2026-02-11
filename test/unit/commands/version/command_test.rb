@@ -2,16 +2,17 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/version/command"
 
-describe Jojo::Commands::Version::Command do
-  before do
+class Jojo::Commands::Version::CommandTest < JojoTest
+  def setup
+    super
     @mock_cli = Minitest::Mock.new
   end
 
-  it "inherits from Base" do
-    _(Jojo::Commands::Version::Command.ancestors).must_include Jojo::Commands::Base
+  def test_inherits_from_base
+    assert_includes Jojo::Commands::Version::Command.ancestors, Jojo::Commands::Base
   end
 
-  it "outputs version string" do
+  def test_outputs_version_string
     @mock_cli.expect(:say, nil, ["Jojo #{Jojo::VERSION}", :green])
 
     command = Jojo::Commands::Version::Command.new(@mock_cli)

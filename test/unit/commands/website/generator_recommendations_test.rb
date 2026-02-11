@@ -3,8 +3,6 @@ require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/website/generator"
 require_relative "../../../../lib/jojo/config"
-require "tmpdir"
-require "fileutils"
 require "yaml"
 
 # Simple config stub to avoid complex mock expectations
@@ -20,8 +18,10 @@ class WebsiteGeneratorRecommendationsTestConfigStub
   end
 end
 
-describe "Jojo::Commands::Website::Generator with Recommendations" do
-  before do
+class Jojo::Commands::Website::GeneratorRecommendationsTest < JojoTest
+  def setup
+    super
+    copy_templates
     @application = Jojo::Application.new("test-corp")
 
     # Create required files
@@ -37,12 +37,14 @@ describe "Jojo::Commands::Website::Generator with Recommendations" do
     @config = WebsiteGeneratorRecommendationsTestConfigStub.new
   end
 
-  after do
-    FileUtils.rm_rf(@application.base_path)
-    FileUtils.rm_rf("test/fixtures/tmp_recommendations_unit") if File.exist?("test/fixtures/tmp_recommendations_unit")
+  def teardown
+    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    tmp_recs_path = fixture_path("tmp_recommendations_unit")
+    FileUtils.rm_rf(tmp_recs_path) if File.exist?(tmp_recs_path)
+    super
   end
 
-  it "loads recommendations from resume_data_yml" do
+  def test_loads_recommendations_from_resume_data_yml
     resume_data_content = {
       "name" => "Test User",
       "email" => "test@example.com",
@@ -59,7 +61,7 @@ describe "Jojo::Commands::Website::Generator with Recommendations" do
       ]
     }.to_yaml
 
-    inputs_path = "test/fixtures/tmp_recommendations_unit"
+    inputs_path = fixture_path("tmp_recommendations_unit")
     FileUtils.mkdir_p(inputs_path)
     File.write(File.join(inputs_path, "resume_data.yml"), resume_data_content)
 
@@ -72,13 +74,13 @@ describe "Jojo::Commands::Website::Generator with Recommendations" do
 
     recommendations = generator.send(:load_recommendations)
 
-    _(recommendations.length).must_equal 1
-    _(recommendations[0][:name]).must_equal "Jane Smith"
-    _(recommendations[0][:quote]).must_equal "Great engineer"
+    assert_equal 1, recommendations.length
+    assert_equal "Jane Smith", recommendations[0][:name]
+    assert_equal "Great engineer", recommendations[0][:quote]
   end
 
-  it "handles missing resume_data_yml gracefully" do
-    inputs_path = "test/fixtures/tmp_recommendations_unit"
+  def test_handles_missing_resume_data_yml_gracefully
+    inputs_path = fixture_path("tmp_recommendations_unit")
     FileUtils.mkdir_p(inputs_path)
     # No resume_data.yml file
 
@@ -90,6 +92,6 @@ describe "Jojo::Commands::Website::Generator with Recommendations" do
     )
 
     recommendations = generator.send(:load_recommendations)
-    _(recommendations).must_be_nil
+    assert_nil recommendations
   end
 end

@@ -2,8 +2,8 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/branding/prompt"
 
-describe Jojo::Commands::Branding::Prompt do
-  it "generates branding statement prompt with all inputs" do
+class Jojo::Commands::Branding::PromptTest < JojoTest
+  def test_generates_branding_statement_prompt_with_all_inputs
     job_description = "Senior Ruby Developer role at Acme Corp..."
     research = "# Company Profile\n\nAcme Corp is a leading tech company..."
     resume = "# Jane Doe\n\n## Professional Summary\n\nSenior Ruby developer..."
@@ -22,15 +22,15 @@ describe Jojo::Commands::Branding::Prompt do
       voice_and_tone: voice_and_tone
     )
 
-    _(prompt).must_include "Acme Corp"
-    _(prompt).must_include "Jane Doe"
-    _(prompt).must_include "professional and friendly"
-    _(prompt).must_include "Senior Ruby Developer"
-    _(prompt).must_include "150-250 words"
-    _(prompt).must_include "2-3 paragraphs"
+    assert_includes prompt, "Acme Corp"
+    assert_includes prompt, "Jane Doe"
+    assert_includes prompt, "professional and friendly"
+    assert_includes prompt, "Senior Ruby Developer"
+    assert_includes prompt, "150-250 words"
+    assert_includes prompt, "2-3 paragraphs"
   end
 
-  it "generates prompt without research (graceful degradation)" do
+  def test_generates_prompt_without_research
     job_description = "Ruby Developer role..."
     resume = "# Jane Doe\n\nExperienced developer..."
     company_name = "Tech Corp"
@@ -47,13 +47,13 @@ describe Jojo::Commands::Branding::Prompt do
       voice_and_tone: voice_and_tone
     )
 
-    _(prompt).must_include "Jane Doe"
-    _(prompt).must_include "Ruby Developer"
-    _(prompt).must_include "No company research available"
-    _(prompt).wont_include "## Company Research"
+    assert_includes prompt, "Jane Doe"
+    assert_includes prompt, "Ruby Developer"
+    assert_includes prompt, "No company research available"
+    refute_includes prompt, "## Company Research"
   end
 
-  it "includes voice and tone in prompt" do
+  def test_includes_voice_and_tone_in_prompt
     prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: "Developer role",
       resume: "Resume content",
@@ -62,10 +62,10 @@ describe Jojo::Commands::Branding::Prompt do
       voice_and_tone: "casual and enthusiastic"
     )
 
-    _(prompt).must_include "casual and enthusiastic"
+    assert_includes prompt, "casual and enthusiastic"
   end
 
-  it "specifies output format requirements" do
+  def test_specifies_output_format_requirements
     prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: "Job",
       resume: "Resume",
@@ -74,12 +74,12 @@ describe Jojo::Commands::Branding::Prompt do
       voice_and_tone: "professional"
     )
 
-    _(prompt).must_include "Plain text paragraphs"
-    _(prompt).must_include "NO markdown headers"
-    _(prompt).must_include "First person perspective"
+    assert_includes prompt, "Plain text paragraphs"
+    assert_includes prompt, "NO markdown headers"
+    assert_includes prompt, "First person perspective"
   end
 
-  it "includes seeker name in question" do
+  def test_includes_seeker_name_in_question
     prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: "Job",
       resume: "Resume",
@@ -88,12 +88,12 @@ describe Jojo::Commands::Branding::Prompt do
       voice_and_tone: "professional"
     )
 
-    _(prompt).must_include "John Smith"
-    _(prompt).must_include "Why is"
-    _(prompt).must_include "perfect for THIS company"
+    assert_includes prompt, "John Smith"
+    assert_includes prompt, "Why is"
+    assert_includes prompt, "perfect for THIS company"
   end
 
-  it "includes job details when provided" do
+  def test_includes_job_details_when_provided
     job_details = {"job_title" => "Lead Developer", "location" => "Remote"}
 
     prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
@@ -105,12 +105,12 @@ describe Jojo::Commands::Branding::Prompt do
       job_details: job_details
     )
 
-    _(prompt).must_include "Lead Developer"
-    _(prompt).must_include "Remote"
-    _(prompt).must_include "Structured Job Details"
+    assert_includes prompt, "Lead Developer"
+    assert_includes prompt, "Remote"
+    assert_includes prompt, "Structured Job Details"
   end
 
-  it "excludes job details section when not provided" do
+  def test_excludes_job_details_section_when_not_provided
     prompt = Jojo::Commands::Branding::Prompt.generate_prompt(
       job_description: "Developer role",
       resume: "Resume",
@@ -120,6 +120,6 @@ describe Jojo::Commands::Branding::Prompt do
       job_details: nil
     )
 
-    _(prompt).wont_include "Structured Job Details"
+    refute_includes prompt, "Structured Job Details"
   end
 end

@@ -2,279 +2,191 @@
 
 require_relative "../../../test_helper"
 
-describe Jojo::Commands::Interactive::Runner do
-  describe "#initialize" do
-    it "accepts optional slug parameter" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-slug")
-      _(runner.slug).must_equal "test-slug"
-    end
+class Jojo::Commands::Interactive::RunnerTest < JojoTest
+  # #initialize
 
-    it "loads slug from state persistence when not provided" do
-      # This tests integration with StatePersistence
-      original_dir = Dir.pwd
-      temp_dir = Dir.mktmpdir
-      Dir.chdir(temp_dir)
-
-      File.write(".jojo_state", "saved-slug")
-      runner = Jojo::Commands::Interactive::Runner.new
-
-      _(runner.slug).must_equal "saved-slug"
-
-      Dir.chdir(original_dir)
-      FileUtils.rm_rf(temp_dir)
-    end
+  def test_accepts_optional_slug_parameter
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-slug")
+    assert_equal "test-slug", runner.slug
   end
 
-  describe "#application" do
-    it "returns nil when no slug set" do
-      temp_dir = Dir.mktmpdir
-      original_dir = Dir.pwd
-      Dir.chdir(temp_dir)
+  def test_loads_slug_from_state_persistence_when_not_provided
+    File.write(".jojo_state", "saved-slug")
+    runner = Jojo::Commands::Interactive::Runner.new
 
-      runner = Jojo::Commands::Interactive::Runner.new
-      _(runner.application).must_be_nil
-
-      Dir.chdir(original_dir)
-      FileUtils.rm_rf(temp_dir)
-    end
-
-    it "returns Application instance when slug is set" do
-      temp_dir = Dir.mktmpdir
-      applications_dir = File.join(temp_dir, "applications", "test-slug")
-      FileUtils.mkdir_p(applications_dir)
-
-      original_dir = Dir.pwd
-      Dir.chdir(temp_dir)
-
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-slug")
-      application = runner.application
-
-      _(application).must_be_kind_of Jojo::Application
-      _(application.slug).must_equal "test-slug"
-
-      Dir.chdir(original_dir)
-      FileUtils.rm_rf(temp_dir)
-    end
+    assert_equal "saved-slug", runner.slug
   end
 
-  describe "#list_applications" do
-    before do
-      @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "applications")
-      FileUtils.mkdir_p(@applications_dir)
-      @original_dir = Dir.pwd
-      Dir.chdir(@temp_dir)
-    end
+  # #application
 
-    after do
-      Dir.chdir(@original_dir)
-      FileUtils.rm_rf(@temp_dir)
-    end
-
-    it "returns empty array when no applications exist" do
-      runner = Jojo::Commands::Interactive::Runner.new
-      _(runner.list_applications).must_equal []
-    end
-
-    it "returns list of application slugs" do
-      FileUtils.mkdir_p(File.join(@applications_dir, "acme-corp"))
-      FileUtils.mkdir_p(File.join(@applications_dir, "globex-inc"))
-
-      runner = Jojo::Commands::Interactive::Runner.new
-      apps = runner.list_applications
-
-      _(apps).must_include "acme-corp"
-      _(apps).must_include "globex-inc"
-    end
-
-    it "excludes non-directories" do
-      FileUtils.mkdir_p(File.join(@applications_dir, "acme-corp"))
-      File.write(File.join(@applications_dir, "some-file.txt"), "test")
-
-      runner = Jojo::Commands::Interactive::Runner.new
-      apps = runner.list_applications
-
-      _(apps).must_equal ["acme-corp"]
-    end
+  def test_application_returns_nil_when_no_slug_set
+    runner = Jojo::Commands::Interactive::Runner.new
+    assert_nil runner.application
   end
 
-  describe "#switch_application" do
-    before do
-      @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "applications")
-      FileUtils.mkdir_p(File.join(@applications_dir, "new-app"))
-      @original_dir = Dir.pwd
-      Dir.chdir(@temp_dir)
-    end
+  def test_application_returns_application_instance_when_slug_is_set
+    FileUtils.mkdir_p("applications/test-slug")
 
-    after do
-      Dir.chdir(@original_dir)
-      FileUtils.rm_rf(@temp_dir)
-    end
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-slug")
+    application = runner.application
 
-    it "updates slug and saves to state" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "old-app")
-      runner.switch_application("new-app")
-
-      _(runner.slug).must_equal "new-app"
-      _(Jojo::StatePersistence.load_slug).must_equal "new-app"
-    end
-
-    it "clears cached application" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "new-app")
-      _old_application = runner.application  # Cache it
-
-      runner.switch_application("new-app")
-      # application should be re-instantiated on next access
-    end
+    assert_kind_of Jojo::Application, application
+    assert_equal "test-slug", application.slug
   end
 
-  describe "#handle_key" do
-    before do
-      @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "applications")
-      FileUtils.mkdir_p(File.join(@applications_dir, "test-app"))
-      @original_dir = Dir.pwd
-      Dir.chdir(@temp_dir)
-    end
+  # #list_applications
 
-    after do
-      Dir.chdir(@original_dir)
-      FileUtils.rm_rf(@temp_dir)
-    end
+  def test_list_applications_returns_empty_array_when_no_applications_exist
+    FileUtils.mkdir_p("applications")
 
-    it "returns :quit for 'q' key" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
-      result = runner.handle_key("q")
-      _(result).must_equal :quit
-    end
-
-    it "returns :switch for 's' key" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
-      result = runner.handle_key("s")
-      _(result).must_equal :switch
-    end
-
-    it "returns :open for 'o' key" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
-      result = runner.handle_key("o")
-      _(result).must_equal :open
-    end
-
-    it "returns :all for 'a' key" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
-      result = runner.handle_key("a")
-      _(result).must_equal :all
-    end
-
-    it "returns step index for number keys 1-9" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
-      _(runner.handle_key("1")).must_equal 0
-      _(runner.handle_key("5")).must_equal 4
-      _(runner.handle_key("9")).must_equal 8
-    end
-
-    it "returns nil for unrecognized keys" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
-      _(runner.handle_key("x")).must_be_nil
-    end
+    runner = Jojo::Commands::Interactive::Runner.new
+    assert_equal [], runner.list_applications
   end
 
-  describe "#run initial render with existing applications" do
-    before do
-      @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "applications")
-      FileUtils.mkdir_p(@applications_dir)
-      @original_dir = Dir.pwd
-      Dir.chdir(@temp_dir)
-    end
+  def test_list_applications_returns_list_of_application_slugs
+    FileUtils.mkdir_p("applications/acme-corp")
+    FileUtils.mkdir_p("applications/globex-inc")
 
-    after do
-      Dir.chdir(@original_dir)
-      FileUtils.rm_rf(@temp_dir)
-    end
+    runner = Jojo::Commands::Interactive::Runner.new
+    apps = runner.list_applications
 
-    it "shows switcher when applications exist but no slug is provided" do
-      # Create test applications
-      FileUtils.mkdir_p(File.join(@applications_dir, "acme-corp"))
-      FileUtils.mkdir_p(File.join(@applications_dir, "globex-inc"))
-
-      # Runner should find applications
-      runner = Jojo::Commands::Interactive::Runner.new
-      apps = runner.list_applications
-
-      _(apps.length).must_equal 2
-      _(apps).must_include "acme-corp"
-      _(apps).must_include "globex-inc"
-    end
-
-    it "shows welcome when no applications exist" do
-      # No applications created
-      runner = Jojo::Commands::Interactive::Runner.new
-      apps = runner.list_applications
-
-      _(apps).must_equal []
-    end
+    assert_includes apps, "acme-corp"
+    assert_includes apps, "globex-inc"
   end
 
-  describe "#handle_new_application behavior" do
-    before do
-      @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "applications")
-      FileUtils.mkdir_p(@applications_dir)
-      @original_dir = Dir.pwd
-      Dir.chdir(@temp_dir)
+  def test_list_applications_excludes_non_directories
+    FileUtils.mkdir_p("applications/acme-corp")
+    File.write("applications/some-file.txt", "test")
 
-      # Create minimal config for validation
-      File.write("config.yml", "seeker:\n  name: Test\n")
-      FileUtils.mkdir_p("inputs")
-      File.write("inputs/resume_data.yml", "name: Test\n")
-    end
+    runner = Jojo::Commands::Interactive::Runner.new
+    apps = runner.list_applications
 
-    after do
-      Dir.chdir(@original_dir)
-      FileUtils.rm_rf(@temp_dir)
-    end
-
-    it "creates application directory without job description" do
-      # Create the directory directly (simulating what handle_new_application does)
-      slug = "test-new-app"
-      app = Jojo::Application.new(slug)
-      FileUtils.mkdir_p(app.base_path)
-
-      _(Dir.exist?(File.join(@applications_dir, slug))).must_equal true
-      _(app.artifacts_exist?).must_equal false  # No job description yet
-    end
+    assert_equal ["acme-corp"], apps
   end
 
-  describe "#handle_step_selection for job_description" do
-    before do
-      @temp_dir = Dir.mktmpdir
-      @applications_dir = File.join(@temp_dir, "applications")
-      @original_dir = Dir.pwd
-      Dir.chdir(@temp_dir)
+  # #switch_application
 
-      # Create application without job description
-      @slug = "no-job-desc"
-      FileUtils.mkdir_p(File.join(@applications_dir, @slug))
+  def test_switch_application_updates_slug_and_saves_to_state
+    FileUtils.mkdir_p("applications/new-app")
 
-      # Create minimal config
-      File.write("config.yml", "seeker:\n  name: Test\n")
-      FileUtils.mkdir_p("inputs")
-      File.write("inputs/resume_data.yml", "name: Test\n")
-    end
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "old-app")
+    runner.switch_application("new-app")
 
-    after do
-      Dir.chdir(@original_dir)
-      FileUtils.rm_rf(@temp_dir)
-    end
+    assert_equal "new-app", runner.slug
+    assert_equal "new-app", Jojo::StatePersistence.load_slug
+  end
 
-    it "shows ready status when job description is missing" do
-      runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
-      status = Jojo::Commands::Interactive::Workflow.status(:job_description, runner.application)
+  def test_switch_application_clears_cached_application
+    FileUtils.mkdir_p("applications/new-app")
 
-      # Job description has no dependencies, so it's always ready when missing
-      _(status).must_equal :ready
-    end
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "new-app")
+    _old_application = runner.application  # Cache it
+
+    runner.switch_application("new-app")
+    # application should be re-instantiated on next access
+  end
+
+  # #handle_key
+
+  def test_handle_key_returns_quit_for_q_key
+    setup_test_app
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+    result = runner.handle_key("q")
+    assert_equal :quit, result
+  end
+
+  def test_handle_key_returns_switch_for_s_key
+    setup_test_app
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+    result = runner.handle_key("s")
+    assert_equal :switch, result
+  end
+
+  def test_handle_key_returns_open_for_o_key
+    setup_test_app
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+    result = runner.handle_key("o")
+    assert_equal :open, result
+  end
+
+  def test_handle_key_returns_all_for_a_key
+    setup_test_app
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+    result = runner.handle_key("a")
+    assert_equal :all, result
+  end
+
+  def test_handle_key_returns_step_index_for_number_keys
+    setup_test_app
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+    assert_equal 0, runner.handle_key("1")
+    assert_equal 4, runner.handle_key("5")
+    assert_equal 8, runner.handle_key("9")
+  end
+
+  def test_handle_key_returns_nil_for_unrecognized_keys
+    setup_test_app
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+    assert_nil runner.handle_key("x")
+  end
+
+  # #run initial render with existing applications
+
+  def test_shows_switcher_when_applications_exist_but_no_slug_provided
+    FileUtils.mkdir_p("applications/acme-corp")
+    FileUtils.mkdir_p("applications/globex-inc")
+
+    runner = Jojo::Commands::Interactive::Runner.new
+    apps = runner.list_applications
+
+    assert_equal 2, apps.length
+    assert_includes apps, "acme-corp"
+    assert_includes apps, "globex-inc"
+  end
+
+  def test_shows_welcome_when_no_applications_exist
+    FileUtils.mkdir_p("applications")
+
+    runner = Jojo::Commands::Interactive::Runner.new
+    apps = runner.list_applications
+
+    assert_equal [], apps
+  end
+
+  # #handle_new_application behavior
+
+  def test_creates_application_directory_without_job_description
+    FileUtils.mkdir_p("applications")
+    File.write("config.yml", "seeker:\n  name: Test\n")
+    FileUtils.mkdir_p("inputs")
+    File.write("inputs/resume_data.yml", "name: Test\n")
+
+    slug = "test-new-app"
+    app = Jojo::Application.new(slug)
+    FileUtils.mkdir_p(app.base_path)
+
+    assert_equal true, Dir.exist?(File.join("applications", slug))
+    assert_equal false, app.artifacts_exist?
+  end
+
+  # #handle_step_selection for job_description
+
+  def test_shows_ready_status_when_job_description_is_missing
+    slug = "no-job-desc"
+    FileUtils.mkdir_p("applications/#{slug}")
+    File.write("config.yml", "seeker:\n  name: Test\n")
+    FileUtils.mkdir_p("inputs")
+    File.write("inputs/resume_data.yml", "name: Test\n")
+
+    runner = Jojo::Commands::Interactive::Runner.new(slug: slug)
+    status = Jojo::Commands::Interactive::Workflow.status(:job_description, runner.application)
+
+    assert_equal :ready, status
+  end
+
+  private
+
+  def setup_test_app
+    FileUtils.mkdir_p("applications/test-app")
   end
 end

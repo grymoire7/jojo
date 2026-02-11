@@ -1,0 +1,91 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-3-5-haiku-20241022","messages":[{"role":"user","content":[{"type":"text","text":"Tailor
+        this content for the specific job opportunity.\nUse the original as factual
+        baseline - no new claims.\n\nJob Description:\nLooking for a Senior Ruby on
+        Rails developer with PostgreSQL and Docker experience. Must have strong backend
+        skills and experience with microservices architecture.\n\nOriginal Content:\nExperienced
+        software engineer with broad technical background across multiple domains\n\nReturn
+        only the tailored content, no explanations.\n"}]}],"stream":false,"max_tokens":8000}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 11 Feb 2026 04:30:06 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '100000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '100000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2026-02-11T04:30:05Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '20000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '20000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2026-02-11T04:30:06Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '1000'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '999'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2026-02-11T04:30:05Z'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '120000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '120000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2026-02-11T04:30:05Z'
+      Request-Id:
+      - req_011CY1epEK9BuEsi4w99SnFa
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - 582381db-8092-4b7d-b6e6-8fd907a3b5c5
+      Server:
+      - cloudflare
+      X-Envoy-Upstream-Service-Time:
+      - '1504'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Ray:
+      - 9cc11be13fb9054e-OMA
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-3-5-haiku-20241022","id":"msg_01Lxs8xyUjscx6iBryQRvDin","type":"message","role":"assistant","content":[{"type":"text","text":"Experienced
+        Ruby on Rails engineer specializing in backend development, with expertise
+        in PostgreSQL database management and containerization using Docker. Proven
+        track record designing and implementing scalable microservices architectures
+        with robust technical solutions."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":92,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":47,"service_tier":"standard","inference_geo":"not_available"}}'
+  recorded_at: Wed, 11 Feb 2026 04:30:06 GMT
+recorded_with: VCR 6.4.0

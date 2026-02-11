@@ -39,5 +39,68 @@ require "minitest/spec"
 require "minitest/reporters"
 Minitest::Reporters.use!
 
+require "vcr"
+require "webmock"
+
+VCR.configure do |config|
+  config.cassette_library_dir = File.expand_path("cassettes", __dir__)
+  config.hook_into :webmock
+  config.default_cassette_options = {
+    record: :once,
+    match_requests_on: [:method, :uri, :body]
+  }
+  config.filter_sensitive_data("<ANTHROPIC_API_KEY>") { ENV["ANTHROPIC_API_KEY"] }
+  config.filter_sensitive_data("<OPENAI_API_KEY>") { ENV["OPENAI_API_KEY"] }
+  config.ignore_localhost = true
+end
+
 require_relative "../lib/jojo"
-require_relative "support/command_test_helper"
+
+class JojoTest < Minitest::Test
+  def setup
+    @original_dir = Dir.pwd
+    @tmpdir = Dir.mktmpdir
+    Dir.chdir(@tmpdir)
+  end
+
+  def teardown
+    Dir.chdir(@original_dir) if @original_dir
+    FileUtils.rm_rf(@tmpdir) if @tmpdir && File.exist?(@tmpdir)
+  end
+
+  def fixture_path(relative = "")
+    if relative.empty?
+      File.join(@original_dir, "test", "fixtures")
+    else
+      File.join(@original_dir, "test", "fixtures", relative)
+    end
+  end
+
+  def copy_templates
+    FileUtils.cp_r(File.join(@original_dir, "templates"), "templates")
+  end
+
+  def with_vcr(cassette_name, &block)
+    VCR.use_cassette(cassette_name, &block)
+  end
+
+  def write_test_config(overrides = {})
+    defaults = {
+      "seeker_name" => "Test User",
+      "base_url" => "https://example.com",
+      "reasoning_ai" => {"service" => "openai", "model" => "gpt-4"},
+      "text_generation_ai" => {"service" => "openai", "model" => "gpt-4"}
+    }
+    File.write("config.yml", defaults.merge(overrides).to_yaml)
+  end
+
+  def create_application_fixture(slug, files: {})
+    FileUtils.mkdir_p("applications/#{slug}")
+    files.each { |name, content| File.write("applications/#{slug}/#{name}", content) }
+  end
+
+  def create_inputs_fixture(files: {})
+    FileUtils.mkdir_p("inputs")
+    files.each { |name, content| File.write("inputs/#{name}", content) }
+  end
+end

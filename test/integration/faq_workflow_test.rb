@@ -7,8 +7,10 @@ require "yaml"
 require "json"
 require "tempfile"
 
-describe "FAQ Workflow Integration" do
-  before do
+class FaqWorkflowIntegrationTest < JojoTest
+  def setup
+    super
+    copy_templates
     @employer = Jojo::Application.new("integration-test-corp")
     @ai_client = Minitest::Mock.new
 
@@ -36,13 +38,14 @@ describe "FAQ Workflow Integration" do
     File.write(@employer.branding_path, "I am excited to apply because my Ruby experience matches your needs.")
   end
 
-  after do
+  def teardown
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
     @config_file.close!
     @config_file.unlink if @config_file.path && File.exist?(@config_file.path)
+    super
   end
 
-  it "generates FAQs and includes them in website" do
+  def test_generates_faqs_and_includes_them_in_website
     # Generate FAQs
     faq_generator = Jojo::Commands::Faq::Generator.new(
       @employer,
@@ -61,8 +64,8 @@ describe "FAQ Workflow Integration" do
 
     faqs = faq_generator.generate
 
-    _(faqs.length).must_equal 3
-    _(File.exist?(@employer.faq_path)).must_equal true
+    assert_equal 3, faqs.length
+    assert_equal true, File.exist?(@employer.faq_path)
 
     @ai_client.verify
 
@@ -76,16 +79,16 @@ describe "FAQ Workflow Integration" do
 
     html = website_generator.generate
 
-    _(html).must_include "Your Questions, Answered"
-    _(html).must_include "What's your Ruby experience?"
-    _(html).must_include "Why this company?"
-    _(html).must_include "faq-accordion"
-    _(html).must_include "toggleFaq" # JavaScript function
+    assert_includes html, "Your Questions, Answered"
+    assert_includes html, "What's your Ruby experience?"
+    assert_includes html, "Why this company?"
+    assert_includes html, "faq-accordion"
+    assert_includes html, "toggleFaq" # JavaScript function
 
     @ai_client.verify
   end
 
-  it "handles missing FAQ file gracefully in website generation" do
+  def test_handles_missing_faq_file_gracefully_in_website_generation
     website_generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
@@ -98,13 +101,13 @@ describe "FAQ Workflow Integration" do
 
     html = website_generator.generate
 
-    _(html).wont_include "Your Questions, Answered"
-    _(html).wont_include '<div class="faq-accordion"'
+    refute_includes html, "Your Questions, Answered"
+    refute_includes html, '<div class="faq-accordion"'
 
     @ai_client.verify
   end
 
-  it "handles malformed FAQ JSON gracefully" do
+  def test_handles_malformed_faq_json_gracefully
     # Write malformed JSON
     File.write(@employer.faq_path, "This is not valid JSON")
 
@@ -117,12 +120,12 @@ describe "FAQ Workflow Integration" do
 
     html = website_generator.generate
 
-    _(html).wont_include "Your Questions, Answered"
+    refute_includes html, "Your Questions, Answered"
 
     @ai_client.verify
   end
 
-  it "renders FAQ section in correct position" do
+  def test_renders_faq_section_in_correct_position
     # Create FAQ file
     faqs = [{question: "Test?", answer: "Answer"}]
     File.write(@employer.faq_path, JSON.generate(faqs))
@@ -140,9 +143,9 @@ describe "FAQ Workflow Integration" do
     faq_position = html.index("Your Questions, Answered")
     footer_position = html.index('<footer class="footer">')
 
-    _(faq_position).wont_be_nil
-    _(footer_position).wont_be_nil
-    _(faq_position).must_be :<, footer_position
+    refute_nil faq_position
+    refute_nil footer_position
+    assert_operator faq_position, :<, footer_position
 
     @ai_client.verify
   end

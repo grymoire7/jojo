@@ -2,11 +2,9 @@ require "test_helper"
 require "fileutils"
 require "tmpdir"
 
-class CLIJobDescriptionTest < Minitest::Test
+class CLIJobDescriptionTest < JojoTest
   def setup
-    @original_dir = Dir.pwd
-    @tmpdir = Dir.mktmpdir
-    Dir.chdir(@tmpdir)
+    super
 
     # Create minimal config files
     File.write(".env", "ANTHROPIC_API_KEY=test_key\n")
@@ -22,11 +20,6 @@ class CLIJobDescriptionTest < Minitest::Test
 
     # Create applications directory
     FileUtils.mkdir_p("applications")
-  end
-
-  def teardown
-    Dir.chdir(@original_dir)
-    FileUtils.rm_rf(@tmpdir)
   end
 
   def test_job_description_command_requires_job_parameter
@@ -48,25 +41,19 @@ class CLIJobDescriptionTest < Minitest::Test
   end
 
   def test_job_description_command_uses_slug_from_state_when_not_provided
-    # Create employer directory
     FileUtils.mkdir_p("applications/state-test")
-
-    # Save slug to state
     File.write(".jojo_state", "state-test")
 
     out, err = capture_subprocess_io do
-      # Run without -s flag - should use state
       system("#{File.join(@original_dir, "bin/jojo")} job_description -j #{@job_file} 2>&1 || true")
     end
 
     output = out + err
-    # Should not complain about missing slug
     refute_match(/no application specified/i, output)
   end
 
   def test_job_description_command_fails_when_no_slug_available
     out, err = capture_subprocess_io do
-      # No -s flag and no state file
       system("#{File.join(@original_dir, "bin/jojo")} job_description -j #{@job_file} 2>&1 || true")
     end
 

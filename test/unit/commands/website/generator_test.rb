@@ -16,8 +16,10 @@ class WebsiteGeneratorTestConfigStub
   end
 end
 
-describe Jojo::Commands::Website::Generator do
-  before do
+class Jojo::Commands::Website::GeneratorTest < JojoTest
+  def setup
+    super
+    copy_templates
     @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = WebsiteGeneratorTestConfigStub.new
@@ -26,7 +28,7 @@ describe Jojo::Commands::Website::Generator do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
     # Clean up and create directories
@@ -41,40 +43,41 @@ describe Jojo::Commands::Website::Generator do
     File.write(@application.branding_path, "I'm a perfect fit for Acme Corp...\n\nMy experience aligns perfectly...")
   end
 
-  after do
+  def teardown
     FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    super
   end
 
-  it "generates website with all inputs" do
+  def test_generates_website_with_all_inputs
     result = @generator.generate
 
-    _(result).must_include "Am I a good match for Acme Corp?"
-    _(result).must_include "I'm a perfect fit for Acme Corp..."
-    _(result).must_include "My experience aligns perfectly..."
-    _(result).must_include "Schedule a Call"
-    _(result).must_include "https://calendly.com/janedoe/30min"
+    assert_includes result, "Am I a good match for Acme Corp?"
+    assert_includes result, "I'm a perfect fit for Acme Corp..."
+    assert_includes result, "My experience aligns perfectly..."
+    assert_includes result, "Schedule a Call"
+    assert_includes result, "https://calendly.com/janedoe/30min"
   end
 
-  it "saves website to index.html" do
+  def test_saves_website_to_index_html
     @generator.generate
 
-    _(File.exist?(@application.index_html_path)).must_equal true
+    assert_equal true, File.exist?(@application.index_html_path)
     content = File.read(@application.index_html_path)
-    _(content).must_include "I'm a perfect fit for Acme Corp..."
-    _(content).must_include "<!DOCTYPE html>"
-    _(content).must_include "</html>"
+    assert_includes content, "I'm a perfect fit for Acme Corp..."
+    assert_includes content, "<!DOCTYPE html>"
+    assert_includes content, "</html>"
   end
 
-  it "generates website with minimal inputs (no research, no job_details)" do
+  def test_generates_website_with_minimal_inputs
     FileUtils.rm_f(@application.research_path)
     File.write(@application.branding_path, "Branding statement without research...")
 
     # Should not raise error
     result = @generator.generate
-    _(result).must_include "Branding statement without research"
+    assert_includes result, "Branding statement without research"
   end
 
-  it "generates website with custom template" do
+  def test_generates_website_with_custom_template
     # Create test template
     FileUtils.mkdir_p("templates/website")
     File.write("templates/website/modern.html.erb", "<html><body><h1><%= seeker_name %></h1></body></html>")
@@ -83,105 +86,105 @@ describe Jojo::Commands::Website::Generator do
 
     result = generator.generate
 
-    _(result).must_include "<h1>Jane Doe</h1>"
+    assert_includes result, "<h1>Jane Doe</h1>"
 
     FileUtils.rm_f("templates/website/modern.html.erb")
   end
 
-  it "raises error when template is missing" do
+  def test_raises_error_when_template_is_missing
     generator = Jojo::Commands::Website::Generator.new(@application, @ai_client, config: @config, template: "nonexistent", verbose: false)
 
     error = assert_raises(RuntimeError) do
       generator.generate
     end
 
-    _(error.message).must_include "Template not found"
-    _(error.message).must_include "nonexistent"
+    assert_includes error.message, "Template not found"
+    assert_includes error.message, "nonexistent"
   end
 
-  it "fails when resume is missing" do
+  def test_fails_when_resume_is_missing
     FileUtils.rm_f(@application.resume_path)
 
     error = assert_raises(RuntimeError) do
       @generator.generate
     end
 
-    _(error.message).must_include "Resume not found"
+    assert_includes error.message, "Resume not found"
   end
 
-  it "fails when job description is missing" do
+  def test_fails_when_job_description_is_missing
     FileUtils.rm_f(@application.job_description_path)
 
     error = assert_raises(RuntimeError) do
       @generator.generate
     end
 
-    _(error.message).must_include "Job description not found"
+    assert_includes error.message, "Job description not found"
   end
 
-  it "copies branding image when it exists" do
-    # test/fixtures already has branding_image.jpg, and @generator uses inputs_path: 'test/fixtures'
+  def test_copies_branding_image_when_it_exists
+    # fixture_path already has branding_image.jpg, and @generator uses inputs_path: fixture_path
     @generator.generate
 
     # Check that image was copied
     image_path = File.join(@application.website_path, "branding_image.jpg")
-    _(File.exist?(image_path)).must_equal true
+    assert_equal true, File.exist?(image_path)
 
     # Check that HTML references the image
     html = File.read(@application.index_html_path)
-    _(html).must_include "branding_image.jpg"
+    assert_includes html, "branding_image.jpg"
   end
 
-  it "skips branding image when missing" do
+  def test_skips_branding_image_when_missing
     # Create a generator with nonexistent inputs path (no branding_image.jpg)
     generator_no_image = Jojo::Commands::Website::Generator.new(
       @application,
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures/nonexistent"
+      inputs_path: fixture_path("nonexistent")
     )
 
     generator_no_image.generate
 
     # Image should not exist in website directory
     image_path = File.join(@application.website_path, "branding_image.jpg")
-    _(File.exist?(image_path)).must_equal false
+    assert_equal false, File.exist?(image_path)
   end
 
-  it "renders template with all variables" do
+  def test_renders_template_with_all_variables
     result = @generator.generate
 
     # Check all template variables rendered
-    _(result).must_include "Jane Doe"
-    _(result).must_include "Acme Corp"
-    _(result).must_include "Schedule a Call"
-    _(result).must_include "https://calendly.com/janedoe/30min"
-    _(result).must_include "resume.pdf"
-    _(result).must_include "cover-letter.pdf"
+    assert_includes result, "Jane Doe"
+    assert_includes result, "Acme Corp"
+    assert_includes result, "Schedule a Call"
+    assert_includes result, "https://calendly.com/janedoe/30min"
+    assert_includes result, "resume.pdf"
+    assert_includes result, "cover-letter.pdf"
   end
 
-  it "handles missing CTA link gracefully" do
+  def test_handles_missing_cta_link_gracefully
     @config.website_cta_link = nil  # No CTA link configured
 
     result = @generator.generate
 
     # CTA section should not be rendered (check for actual section tag, not CSS class)
-    _(result).wont_include '<section class="cta-section">'
-    _(result).wont_include 'class="cta-button"'
+    refute_includes result, '<section class="cta-section">'
+    refute_includes result, 'class="cta-button"'
   end
 
-  it "handles empty CTA link gracefully" do
+  def test_handles_empty_cta_link_gracefully
     @config.website_cta_link = "   "  # Empty/whitespace CTA link
 
     result = @generator.generate
 
     # CTA section should not be rendered (check for actual section tag, not CSS class)
-    _(result).wont_include '<section class="cta-section">'
-    _(result).wont_include 'class="cta-button"'
+    refute_includes result, '<section class="cta-section">'
+    refute_includes result, 'class="cta-button"'
   end
 
-  it "loads and injects annotations into job description HTML" do
+  def test_loads_and_injects_annotations_into_job_description_html
     # Update job description to include text being annotated
     File.write(@application.job_description_path, "We need Ruby and distributed systems experience.")
 
@@ -195,22 +198,22 @@ describe Jojo::Commands::Website::Generator do
     result = @generator.generate
 
     # Should include annotated job description section
-    _(result).must_include "Compare Me to the Job Description"
-    _(result).must_include '<span class="annotated" data-tier="strong" data-match="7 years Ruby experience">Ruby</span>'
-    _(result).must_include '<span class="annotated" data-tier="moderate" data-match="Built message queue">distributed systems</span>'
+    assert_includes result, "Compare Me to the Job Description"
+    assert_includes result, '<span class="annotated" data-tier="strong" data-match="7 years Ruby experience">Ruby</span>'
+    assert_includes result, '<span class="annotated" data-tier="moderate" data-match="Built message queue">distributed systems</span>'
   end
 
-  it "omits annotation section when annotations.json missing" do
+  def test_omits_annotation_section_when_annotations_json_missing
     # Don't create annotations file
 
     result = @generator.generate
 
     # Should NOT include annotation section
-    _(result).wont_include "Compare Me to the Job Description"
-    _(result).wont_include '<div id="annotation-tooltip"'
+    refute_includes result, "Compare Me to the Job Description"
+    refute_includes result, '<div id="annotation-tooltip"'
   end
 
-  it "annotates all occurrences of same text" do
+  def test_annotates_all_occurrences_of_same_text
     # Job description with duplicate text
     File.write(@application.job_description_path, "We need Ruby skills. Ruby is our main language. Ruby developers wanted.")
 
@@ -223,10 +226,10 @@ describe Jojo::Commands::Website::Generator do
 
     # Count occurrences of annotated "Ruby"
     annotation_count = result.scan(/<span class="annotated"[^>]*>Ruby<\/span>/).length
-    _(annotation_count).must_equal 3
+    assert_equal 3, annotation_count
   end
 
-  it "prevents nested spans when annotation texts overlap" do
+  def test_prevents_nested_spans_when_annotation_texts_overlap
     # Job description with overlapping text patterns
     # "Ruby" appears alone and within "Ruby on Rails"
     File.write(@application.job_description_path, "We need Ruby developers who know Ruby on Rails.\n\nRuby is great. Ruby on Rails is a framework.")
@@ -241,24 +244,24 @@ describe Jojo::Commands::Website::Generator do
     result = @generator.generate
 
     # Check that standalone "Ruby" is annotated
-    _(result).must_match(/<span class="annotated"[^>]*>Ruby<\/span> developers who know/)
+    assert_match(/<span class="annotated"[^>]*>Ruby<\/span> developers who know/, result)
 
     # Check that "Ruby on Rails" is annotated as a whole phrase
-    _(result).must_match(/know <span class="annotated"[^>]*>Ruby on Rails<\/span>\./)
+    assert_match(/know <span class="annotated"[^>]*>Ruby on Rails<\/span>\./, result)
 
     # Check that "Ruby" WITHIN "Ruby on Rails" is NOT separately annotated (no nested spans)
     # This regex looks for a span containing another span - which would indicate nesting
     nested_spans = result.scan(/<span class="annotated"[^>]*>(.*?)<\/span>/m).any? do |match|
       match[0].include?("<span class=\"annotated\"")
     end
-    _(nested_spans).must_equal false
+    assert_equal false, nested_spans
 
     # Check that data-match attributes don't contain span tags (malformed HTML)
     data_match_with_spans = result.scan(/data-match="([^"]*<span[^"]*)"/)
-    _(data_match_with_spans.empty?).must_equal true
+    assert_equal true, data_match_with_spans.empty?
   end
 
-  it "loads and passes FAQs to template" do
+  def test_loads_and_passes_faqs_to_template
     # Create mock FAQs file
     faqs_data = [
       {question: "What's your experience?", answer: "I have 7 years..."},
@@ -268,39 +271,39 @@ describe Jojo::Commands::Website::Generator do
 
     html = @generator.generate
 
-    _(html).must_include "What's your experience?"
-    _(html).must_include "Why this company?"
-    _(html).must_include "Your Questions, Answered"
+    assert_includes html, "What's your experience?"
+    assert_includes html, "Why this company?"
+    assert_includes html, "Your Questions, Answered"
   end
 
-  it "handles missing FAQ file gracefully" do
+  def test_handles_missing_faq_file_gracefully
     FileUtils.rm_f(@application.faq_path) if File.exist?(@application.faq_path)
     File.write(@application.branding_path, "Branding statement")
 
     html = @generator.generate
 
-    _(html).wont_include "Your Questions, Answered"
-    _(html).wont_include '<div class="faq-accordion"'
+    refute_includes html, "Your Questions, Answered"
+    refute_includes html, '<div class="faq-accordion"'
   end
 
-  it "fails when branding.md is missing" do
+  def test_fails_when_branding_md_is_missing
     FileUtils.rm_f(@application.branding_path)
 
     error = assert_raises(RuntimeError) do
       @generator.generate
     end
 
-    _(error.message).must_include "branding.md not found"
-    _(error.message).must_include "jojo branding"
+    assert_includes error.message, "branding.md not found"
+    assert_includes error.message, "jojo branding"
   end
 
-  it "fails when branding.md is empty" do
+  def test_fails_when_branding_md_is_empty
     File.write(@application.branding_path, "")
 
     error = assert_raises(RuntimeError) do
       @generator.generate
     end
 
-    _(error.message).must_include "branding.md not found"
+    assert_includes error.message, "branding.md not found"
   end
 end

@@ -2,11 +2,9 @@ require "test_helper"
 require "fileutils"
 require "tmpdir"
 
-class CLINewTest < Minitest::Test
+class CLINewTest < JojoTest
   def setup
-    @original_dir = Dir.pwd
-    @tmpdir = Dir.mktmpdir
-    Dir.chdir(@tmpdir)
+    super
 
     # Create minimal config files
     File.write(".env", "ANTHROPIC_API_KEY=test_key\n")
@@ -15,11 +13,6 @@ class CLINewTest < Minitest::Test
     # Create inputs directory with resume data
     FileUtils.mkdir_p("inputs")
     File.write("inputs/resume_data.yml", "name: Test User\nemail: test@example.com\n")
-  end
-
-  def teardown
-    Dir.chdir(@original_dir)
-    FileUtils.rm_rf(@tmpdir)
   end
 
   def test_new_command_requires_slug

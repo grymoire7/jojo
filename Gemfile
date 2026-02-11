@@ -24,4 +24,6 @@ end
 group :test do
   gem "simplecov", require: false
   gem "simplecov_json_formatter", require: false
+  gem "vcr"
+  gem "webmock"
 end

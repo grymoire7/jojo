@@ -2,8 +2,8 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/research/prompt"
 
-describe Jojo::Commands::Research::Prompt do
-  it "generates research prompt with all inputs" do
+class Jojo::Commands::Research::PromptTest < JojoTest
+  def test_generates_research_prompt_with_all_inputs
     job_description = "Senior Ruby Developer at Acme Corp..."
     company_name = "Acme Corp"
     web_results = "Acme Corp recently raised Series B funding..."
@@ -16,17 +16,17 @@ describe Jojo::Commands::Research::Prompt do
       resume: resume
     )
 
-    _(prompt).must_include "Acme Corp"
-    _(prompt).must_include "Senior Ruby Developer"
-    _(prompt).must_include "Series B funding"
-    _(prompt).must_include "Software Engineer at Previous Co"
-    _(prompt).must_include "Company Profile"
-    _(prompt).must_include "Role Analysis"
-    _(prompt).must_include "Strategic Positioning"
-    _(prompt).must_include "Tailoring Recommendations"
+    assert_includes prompt, "Acme Corp"
+    assert_includes prompt, "Senior Ruby Developer"
+    assert_includes prompt, "Series B funding"
+    assert_includes prompt, "Software Engineer at Previous Co"
+    assert_includes prompt, "Company Profile"
+    assert_includes prompt, "Role Analysis"
+    assert_includes prompt, "Strategic Positioning"
+    assert_includes prompt, "Tailoring Recommendations"
   end
 
-  it "generates prompt without web results" do
+  def test_generates_prompt_without_web_results
     job_description = "Senior Ruby Developer..."
     company_name = "Acme Corp"
     resume = "## Experience..."
@@ -38,11 +38,11 @@ describe Jojo::Commands::Research::Prompt do
       resume: resume
     )
 
-    _(prompt).must_include "Acme Corp"
-    _(prompt).must_include "no additional web research available"
+    assert_includes prompt, "Acme Corp"
+    assert_includes prompt, "no additional web research available"
   end
 
-  it "generates prompt without resume" do
+  def test_generates_prompt_without_resume
     job_description = "Senior Ruby Developer..."
     company_name = "Acme Corp"
     web_results = "Acme Corp info..."
@@ -54,8 +54,8 @@ describe Jojo::Commands::Research::Prompt do
       resume: nil
     )
 
-    _(prompt).must_include "Acme Corp"
-    _(prompt).wont_include "Strategic Positioning"
-    _(prompt).must_include "generic recommendations"
+    assert_includes prompt, "Acme Corp"
+    refute_includes prompt, "Strategic Positioning"
+    assert_includes prompt, "generic recommendations"
   end
 end

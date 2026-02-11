@@ -2,229 +2,212 @@
 require_relative "../../test_helper"
 require_relative "../../../lib/jojo/commands/base"
 
-describe Jojo::Commands::Base do
-  before do
+class Jojo::Commands::BaseTest < JojoTest
+  def setup
+    super
     @mock_cli = Minitest::Mock.new
   end
 
-  describe "#initialize" do
-    it "stores cli and options" do
-      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme", verbose: true)
+  # --- #initialize ---
 
-      _(base.cli.object_id).must_equal @mock_cli.object_id
-      _(base.options[:slug]).must_equal "acme"
-      _(base.options[:verbose]).must_equal true
-    end
+  def test_stores_cli_and_options
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme", verbose: true)
+
+    assert_equal @mock_cli.object_id, base.cli.object_id
+    assert_equal "acme", base.options[:slug]
+    assert_equal true, base.options[:verbose]
   end
 
-  describe "#execute" do
-    it "raises NotImplementedError" do
-      base = Jojo::Commands::Base.new(@mock_cli)
+  # --- #execute ---
 
-      _ { base.execute }.must_raise NotImplementedError
-    end
+  def test_execute_raises_not_implemented_error
+    base = Jojo::Commands::Base.new(@mock_cli)
+
+    assert_raises(NotImplementedError) { base.execute }
   end
 
-  describe "option accessors" do
-    it "returns slug from options" do
-      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-      _(base.send(:slug)).must_equal "acme-corp"
-    end
+  # --- option accessors ---
 
-    it "returns verbose? from options with default false" do
-      base = Jojo::Commands::Base.new(@mock_cli)
-      _(base.send(:verbose?)).must_equal false
-    end
-
-    it "returns overwrite? from options with default false" do
-      base = Jojo::Commands::Base.new(@mock_cli)
-      _(base.send(:overwrite?)).must_equal false
-    end
-
-    it "returns quiet? from options with default false" do
-      base = Jojo::Commands::Base.new(@mock_cli)
-      _(base.send(:quiet?)).must_equal false
-    end
+  def test_returns_slug_from_options
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+    assert_equal "acme-corp", base.send(:slug)
   end
 
-  describe "output helpers" do
-    it "delegates say to cli" do
-      @mock_cli.expect(:say, nil, ["Hello", :green])
-      base = Jojo::Commands::Base.new(@mock_cli)
-
-      base.send(:say, "Hello", :green)
-
-      @mock_cli.verify
-    end
-
-    it "delegates yes? to cli" do
-      @mock_cli.expect(:yes?, true, ["Continue?"])
-      base = Jojo::Commands::Base.new(@mock_cli)
-
-      result = base.send(:yes?, "Continue?")
-
-      _(result).must_equal true
-      @mock_cli.verify
-    end
+  def test_returns_verbose_from_options_with_default_false
+    base = Jojo::Commands::Base.new(@mock_cli)
+    assert_equal false, base.send(:verbose?)
   end
 
-  describe "shared setup (lazy-loaded)" do
-    before do
-      @tmpdir = Dir.mktmpdir
-      @original_dir = Dir.pwd
-      Dir.chdir(@tmpdir)
-
-      # Create minimal config
-      File.write("config.yml", <<~YAML)
-        seeker_name: "Test User"
-        base_url: "https://example.com"
-        reasoning_ai_service: openai
-        reasoning_ai_model: gpt-4
-        text_generation_ai_service: openai
-        text_generation_ai_model: gpt-4
-      YAML
-
-      # Create application directory
-      FileUtils.mkdir_p("applications/acme-corp")
-      File.write("applications/acme-corp/job_description.md", "Test job")
-    end
-
-    after do
-      Dir.chdir(@original_dir)
-      FileUtils.rm_rf(@tmpdir)
-    end
-
-    it "creates application from slug" do
-      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-      application = base.send(:application)
-
-      _(application).must_be_kind_of Jojo::Application
-      _(application.slug).must_equal "acme-corp"
-    end
-
-    it "caches application instance" do
-      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-      app1 = base.send(:application)
-      app2 = base.send(:application)
-
-      _(app1.object_id).must_equal app2.object_id
-    end
-
-    it "creates config" do
-      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-      config = base.send(:config)
-
-      _(config).must_be_kind_of Jojo::Config
-    end
-
-    it "creates status_logger for application" do
-      base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-      logger = base.send(:status_logger)
-
-      _(logger).must_be_kind_of Jojo::StatusLogger
-    end
+  def test_returns_overwrite_from_options_with_default_false
+    base = Jojo::Commands::Base.new(@mock_cli)
+    assert_equal false, base.send(:overwrite?)
   end
 
-  describe "validation helpers" do
-    before do
-      @tmpdir = Dir.mktmpdir
-      @original_dir = Dir.pwd
-      Dir.chdir(@tmpdir)
-      FileUtils.mkdir_p("applications/acme-corp")
+  def test_returns_quiet_from_options_with_default_false
+    base = Jojo::Commands::Base.new(@mock_cli)
+    assert_equal false, base.send(:quiet?)
+  end
+
+  # --- output helpers ---
+
+  def test_delegates_say_to_cli
+    @mock_cli.expect(:say, nil, ["Hello", :green])
+    base = Jojo::Commands::Base.new(@mock_cli)
+
+    base.send(:say, "Hello", :green)
+
+    @mock_cli.verify
+  end
+
+  def test_delegates_yes_to_cli
+    @mock_cli.expect(:yes?, true, ["Continue?"])
+    base = Jojo::Commands::Base.new(@mock_cli)
+
+    result = base.send(:yes?, "Continue?")
+
+    assert_equal true, result
+    @mock_cli.verify
+  end
+
+  # --- shared setup (lazy-loaded) ---
+
+  def test_creates_application_from_slug
+    setup_shared_lazy_loaded
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+    application = base.send(:application)
+
+    assert_kind_of Jojo::Application, application
+    assert_equal "acme-corp", application.slug
+  end
+
+  def test_caches_application_instance
+    setup_shared_lazy_loaded
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+    app1 = base.send(:application)
+    app2 = base.send(:application)
+
+    assert_equal app2.object_id, app1.object_id
+  end
+
+  def test_creates_config
+    setup_shared_lazy_loaded
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+    config = base.send(:config)
+
+    assert_kind_of Jojo::Config, config
+  end
+
+  def test_creates_status_logger_for_application
+    setup_shared_lazy_loaded
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+    logger = base.send(:status_logger)
+
+    assert_kind_of Jojo::StatusLogger, logger
+  end
+
+  # --- validation helpers: #application ---
+
+  def test_validation_creates_application_from_slug
+    setup_validation
+    FileUtils.mkdir_p("applications/acme-corp")
+    File.write("applications/acme-corp/job_details.yml", "company_name: Acme")
+
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+    assert_instance_of Jojo::Application, base.send(:application)
+    assert_equal "acme-corp", base.send(:application).slug
+  end
+
+  def test_validation_caches_application_instance
+    setup_validation
+    FileUtils.mkdir_p("applications/acme-corp")
+    File.write("applications/acme-corp/job_details.yml", "company_name: Acme")
+
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+    first_call = base.send(:application)
+    second_call = base.send(:application)
+
+    assert_same second_call, first_call
+  end
+
+  # --- validation helpers: #require_application! ---
+
+  def test_require_application_passes_when_artifacts_exist
+    setup_validation
+    FileUtils.mkdir_p("applications/acme-corp")
+    File.write("applications/acme-corp/job_description.md", "# Job")
+
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+    # Should not raise
+    base.send(:require_application!)
+  end
+
+  def test_require_application_exits_when_application_does_not_exist
+    setup_validation
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "nonexistent")
+
+    @mock_cli.expect(:say, nil, ["Application 'nonexistent' not found.", :red])
+    @mock_cli.expect(:say, nil, [String, :yellow])
+
+    assert_raises(SystemExit) do
+      base.send(:require_application!)
     end
+    @mock_cli.verify
+  end
 
-    after do
-      Dir.chdir(@original_dir)
-      FileUtils.rm_rf(@tmpdir)
+  # --- validation helpers: #require_file! ---
+
+  def test_require_file_does_not_exit_when_file_exists
+    setup_validation
+    FileUtils.mkdir_p("applications/acme-corp")
+    File.write("applications/acme-corp/test.txt", "content")
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+    # Should not raise
+    base.send(:require_file!, "applications/acme-corp/test.txt", "Test file")
+  end
+
+  def test_require_file_exits_with_message_when_file_missing
+    setup_validation
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
+
+    @mock_cli.expect(:say, nil, ["Test file not found at missing.txt", :red])
+
+    assert_raises(SystemExit) do
+      base.send(:require_file!, "missing.txt", "Test file")
     end
+    @mock_cli.verify
+  end
 
-    describe "#application" do
-      before do
-        FileUtils.mkdir_p("applications/acme-corp")
-        File.write("applications/acme-corp/job_details.yml", "company_name: Acme")
-      end
+  def test_require_file_shows_suggestion_when_provided
+    setup_validation
+    base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
 
-      after do
-        FileUtils.rm_rf("applications")
-      end
+    @mock_cli.expect(:say, nil, [String, :red])
+    @mock_cli.expect(:say, nil, ["  Run 'jojo setup' first", :yellow])
 
-      it "creates application from slug" do
-        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-        _(base.send(:application)).must_be_instance_of Jojo::Application
-        _(base.send(:application).slug).must_equal "acme-corp"
-      end
-
-      it "caches application instance" do
-        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-        first_call = base.send(:application)
-        second_call = base.send(:application)
-
-        _(first_call).must_be_same_as second_call
-      end
+    assert_raises(SystemExit) do
+      base.send(:require_file!, "missing.txt", "Config", suggestion: "Run 'jojo setup' first")
     end
+    @mock_cli.verify
+  end
 
-    describe "#require_application!" do
-      it "passes when application artifacts exist" do
-        FileUtils.mkdir_p("applications/acme-corp")
-        File.write("applications/acme-corp/job_description.md", "# Job")
+  private
 
-        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-        # Should not raise
-        base.send(:require_application!)
+  def setup_shared_lazy_loaded
+    write_test_config
 
-        FileUtils.rm_rf("applications")
-      end
+    # Create application directory
+    FileUtils.mkdir_p("applications/acme-corp")
+    File.write("applications/acme-corp/job_description.md", "Test job")
+  end
 
-      it "exits when application does not exist" do
-        base = Jojo::Commands::Base.new(@mock_cli, slug: "nonexistent")
-
-        @mock_cli.expect(:say, nil, ["Application 'nonexistent' not found.", :red])
-        @mock_cli.expect(:say, nil, [String, :yellow])
-
-        assert_raises(SystemExit) do
-          base.send(:require_application!)
-        end
-        @mock_cli.verify
-      end
-    end
-
-    describe "#require_file!" do
-      it "does not exit when file exists" do
-        File.write("applications/acme-corp/test.txt", "content")
-        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-        # Should not raise
-        base.send(:require_file!, "applications/acme-corp/test.txt", "Test file")
-      end
-
-      it "exits with message when file missing" do
-        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-        @mock_cli.expect(:say, nil, ["Test file not found at missing.txt", :red])
-
-        assert_raises(SystemExit) do
-          base.send(:require_file!, "missing.txt", "Test file")
-        end
-        @mock_cli.verify
-      end
-
-      it "shows suggestion when provided" do
-        base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-
-        @mock_cli.expect(:say, nil, [String, :red])
-        @mock_cli.expect(:say, nil, ["  Run 'jojo setup' first", :yellow])
-
-        assert_raises(SystemExit) do
-          base.send(:require_file!, "missing.txt", "Config", suggestion: "Run 'jojo setup' first")
-        end
-        @mock_cli.verify
-      end
-    end
+  def setup_validation
+    FileUtils.mkdir_p("applications/acme-corp")
   end
 end

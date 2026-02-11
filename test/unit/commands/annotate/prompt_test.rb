@@ -2,8 +2,8 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/annotate/prompt"
 
-describe Jojo::Commands::Annotate::Prompt do
-  it "generates prompt with all required context" do
+class Jojo::Commands::Annotate::PromptTest < JojoTest
+  def test_generates_prompt_with_all_required_context
     job_description = "We need 5+ years of Python experience and knowledge of distributed systems."
     resume = "# John Doe\n\nSenior Python developer with 7 years experience..."
     research = "Acme Corp values technical expertise..."
@@ -14,17 +14,17 @@ describe Jojo::Commands::Annotate::Prompt do
       research: research
     )
 
-    _(prompt).must_include job_description
-    _(prompt).must_include resume
-    _(prompt).must_include research
-    _(prompt).must_include "strong"
-    _(prompt).must_include "moderate"
-    _(prompt).must_include "mention"
-    _(prompt).must_include "JSON"
-    _(prompt).must_include "EXACTLY as it appears"
+    assert_includes prompt, job_description
+    assert_includes prompt, resume
+    assert_includes prompt, research
+    assert_includes prompt, "strong"
+    assert_includes prompt, "moderate"
+    assert_includes prompt, "mention"
+    assert_includes prompt, "JSON"
+    assert_includes prompt, "EXACTLY as it appears"
   end
 
-  it "generates prompt without research (graceful degradation)" do
+  def test_generates_prompt_without_research
     job_description = "We need 5+ years of Python experience."
     resume = "# John Doe\n\nSenior Python developer..."
 
@@ -34,8 +34,8 @@ describe Jojo::Commands::Annotate::Prompt do
       research: nil
     )
 
-    _(prompt).must_include job_description
-    _(prompt).must_include resume
-    _(prompt).wont_include "## Company Research"
+    assert_includes prompt, job_description
+    assert_includes prompt, resume
+    refute_includes prompt, "## Company Research"
   end
 end
