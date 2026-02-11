@@ -3,8 +3,9 @@ require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/faq/generator"
 
-describe Jojo::Commands::Faq::Generator do
-  before do
+class Jojo::Commands::Faq::GeneratorTest < JojoTest
+  def setup
+    super
     @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
@@ -15,8 +16,6 @@ describe Jojo::Commands::Faq::Generator do
       verbose: false
     )
 
-    # Clean up and create directories
-    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
     @application.create_directory!
 
     # Create required fixtures
@@ -24,11 +23,7 @@ describe Jojo::Commands::Faq::Generator do
     File.write(@application.resume_path, "# John Doe\n\nSenior Python developer with 7 years experience.")
   end
 
-  after do
-    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
-  end
-
-  it "generates FAQs from job description and resume" do
+  def test_generates_faqs_from_job_description_and_resume
     @config.expect(:seeker_name, "John Doe")
     @config.expect(:voice_and_tone, "professional")
     @config.expect(:base_url, "https://example.com")
@@ -50,7 +45,7 @@ describe Jojo::Commands::Faq::Generator do
     @config.verify
   end
 
-  it "saves FAQs to JSON file" do
+  def test_saves_faqs_to_json_file
     @config.expect(:seeker_name, "John Doe")
     @config.expect(:voice_and_tone, "professional")
     @config.expect(:base_url, "https://example.com")
@@ -73,7 +68,7 @@ describe Jojo::Commands::Faq::Generator do
     @config.verify
   end
 
-  it "handles malformed JSON from AI" do
+  def test_handles_malformed_json_from_ai
     @config.expect(:seeker_name, "John Doe")
     @config.expect(:voice_and_tone, "professional")
     @config.expect(:base_url, "https://example.com")
@@ -88,7 +83,7 @@ describe Jojo::Commands::Faq::Generator do
     @config.verify
   end
 
-  it "filters out invalid FAQ items" do
+  def test_filters_out_invalid_faq_items
     @config.expect(:seeker_name, "John Doe")
     @config.expect(:voice_and_tone, "professional")
     @config.expect(:base_url, "https://example.com")
@@ -111,7 +106,7 @@ describe Jojo::Commands::Faq::Generator do
     @config.verify
   end
 
-  it "handles missing research gracefully" do
+  def test_handles_missing_research_gracefully
     FileUtils.rm_f(@application.research_path)
 
     @config.expect(:seeker_name, "John Doe")
@@ -132,13 +127,13 @@ describe Jojo::Commands::Faq::Generator do
     @config.verify
   end
 
-  it "raises error when job description missing" do
+  def test_raises_error_when_job_description_missing
     FileUtils.rm_f(@application.job_description_path)
 
     _ { @generator.generate }.must_raise RuntimeError
   end
 
-  it "raises error when resume missing" do
+  def test_raises_error_when_resume_missing
     FileUtils.rm_f(@application.resume_path)
 
     _ { @generator.generate }.must_raise RuntimeError

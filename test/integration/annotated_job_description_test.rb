@@ -16,8 +16,10 @@ class IntegrationTestConfigStub
   end
 end
 
-describe "Annotated Job Description Integration" do
-  before do
+class AnnotatedJobDescriptionIntegrationTest < JojoTest
+  def setup
+    super
+    copy_templates
     @employer = Jojo::Application.new("techcorp")
     @ai_client = Minitest::Mock.new
     @config = IntegrationTestConfigStub.new
@@ -36,11 +38,12 @@ describe "Annotated Job Description Integration" do
     File.write(@employer.branding_path, "I'm a great fit for TechCorp...")
   end
 
-  after do
+  def teardown
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    super
   end
 
-  it "generates annotated website from job description and resume" do
+  def test_generates_annotated_website_from_job_description_and_resume
     # Generate annotations
     annotation_generator = Jojo::Commands::Annotate::Generator.new(@employer, @ai_client, verbose: false)
 
@@ -60,7 +63,7 @@ describe "Annotated Job Description Integration" do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
     html = website_generator.generate
@@ -86,7 +89,7 @@ describe "Annotated Job Description Integration" do
     @ai_client.verify
   end
 
-  it "website works without annotations (graceful degradation)" do
+  def test_website_works_without_annotations_graceful_degradation
     # Don't generate annotations
 
     website_generator = Jojo::Commands::Website::Generator.new(
@@ -94,7 +97,7 @@ describe "Annotated Job Description Integration" do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
     html = website_generator.generate

@@ -17,8 +17,10 @@ class WebsiteWorkflowTestConfigStub
   end
 end
 
-describe "Website Generation Workflow" do
-  before do
+class WebsiteWorkflowTest < JojoTest
+  def setup
+    super
+    copy_templates
     @employer = Jojo::Application.new("test-company")
     @ai_client = Minitest::Mock.new
     @config = WebsiteWorkflowTestConfigStub.new
@@ -35,11 +37,12 @@ describe "Website Generation Workflow" do
     File.write(@employer.branding_path, "I'm excited about Test Company because my background in Ruby development aligns perfectly with your needs.\n\nWith 10 years of experience, I've built scalable web applications.")
   end
 
-  after do
+  def teardown
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
+    super
   end
 
-  it "generates complete website from end to end" do
+  def test_generates_complete_website_from_end_to_end
     generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
@@ -79,7 +82,7 @@ describe "Website Generation Workflow" do
     @ai_client.verify
   end
 
-  it "works with custom template" do
+  def test_works_with_custom_template
     # Create custom template
     FileUtils.mkdir_p("templates/website")
     custom_template = <<~HTML
@@ -116,14 +119,14 @@ describe "Website Generation Workflow" do
     @ai_client.verify
   end
 
-  it "handles branding image workflow" do
+  def test_handles_branding_image_workflow
     # Use test/fixtures which has branding_image.jpg
     generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
     generator.generate
@@ -140,7 +143,7 @@ describe "Website Generation Workflow" do
     @ai_client.verify
   end
 
-  it "generates website without CTA when not configured" do
+  def test_generates_website_without_cta_when_not_configured
     @config.website_cta_link = nil  # No CTA configured
 
     generator = Jojo::Commands::Website::Generator.new(
@@ -165,7 +168,7 @@ describe "Website Generation Workflow" do
     @ai_client.verify
   end
 
-  it "gracefully handles missing optional inputs" do
+  def test_gracefully_handles_missing_optional_inputs
     # Remove optional files
     FileUtils.rm_f(@employer.research_path)
 

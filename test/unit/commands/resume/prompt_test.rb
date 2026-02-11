@@ -2,8 +2,8 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/resume/prompt"
 
-describe Jojo::Commands::Resume::Prompt do
-  it "generates prompt with all inputs" do
+class Jojo::Commands::Resume::PromptTest < JojoTest
+  def test_generates_prompt_with_all_inputs
     job_description = "Senior Ruby Developer role..."
     research = "# Company Profile\n\nAcme Corp..."
     generic_resume = "# Jane Doe\n\n## Experience..."
@@ -26,7 +26,7 @@ describe Jojo::Commands::Resume::Prompt do
     _(prompt).must_include "PRUNE"
   end
 
-  it "generates prompt without optional inputs" do
+  def test_generates_prompt_without_optional_inputs
     job_description = "Ruby Developer role..."
     generic_resume = "# Jane Doe..."
 

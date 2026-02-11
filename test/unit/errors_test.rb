@@ -1,13 +1,13 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/errors"
 
-describe Jojo::PermissionViolation do
-  it "creates error with message" do
+class PermissionViolationTest < JojoTest
+  def test_creates_error_with_message
     error = Jojo::PermissionViolation.new("Cannot remove items")
     _(error.message).must_equal "Cannot remove items"
   end
 
-  it "is a StandardError" do
+  def test_is_a_standard_error
     error = Jojo::PermissionViolation.new("test")
     _(error).must_be_kind_of StandardError
   end

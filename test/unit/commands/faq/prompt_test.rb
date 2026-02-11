@@ -2,8 +2,8 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/faq/prompt"
 
-describe Jojo::Commands::Faq::Prompt do
-  it "includes job description in prompt" do
+class Jojo::Commands::Faq::PromptTest < JojoTest
+  def test_includes_job_description_in_prompt
     prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "We need a Python developer with 5+ years experience.",
       resume: "# John Doe\nPython developer...",
@@ -17,7 +17,7 @@ describe Jojo::Commands::Faq::Prompt do
     _(prompt).must_include "We need a Python developer with 5+ years experience."
   end
 
-  it "includes resume in prompt" do
+  def test_includes_resume_in_prompt
     prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Python developer needed",
       resume: "# John Doe\nSenior developer with expertise...",
@@ -32,7 +32,7 @@ describe Jojo::Commands::Faq::Prompt do
     _(prompt).must_include "Senior developer with expertise"
   end
 
-  it "includes research when available" do
+  def test_includes_research_when_available
     prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Python developer",
       resume: "Resume content",
@@ -46,7 +46,7 @@ describe Jojo::Commands::Faq::Prompt do
     _(prompt).must_include "Acme Corp is a fintech startup"
   end
 
-  it "includes base URL for PDF links" do
+  def test_includes_base_url_for_pdf_links
     prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Developer needed",
       resume: "Resume",
@@ -60,7 +60,7 @@ describe Jojo::Commands::Faq::Prompt do
     _(prompt).must_include "https://johndoe.com"
   end
 
-  it "specifies required FAQ categories" do
+  def test_specifies_required_faq_categories
     prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Developer needed",
       resume: "Resume",
@@ -77,7 +77,7 @@ describe Jojo::Commands::Faq::Prompt do
     _(prompt).must_include "Why this company"
   end
 
-  it "handles missing research gracefully" do
+  def test_handles_missing_research_gracefully
     prompt = Jojo::Commands::Faq::Prompt.generate_prompt(
       job_description: "Developer needed",
       resume: "Resume",

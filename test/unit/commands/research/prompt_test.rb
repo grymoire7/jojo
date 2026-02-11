@@ -2,8 +2,8 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/research/prompt"
 
-describe Jojo::Commands::Research::Prompt do
-  it "generates research prompt with all inputs" do
+class Jojo::Commands::Research::PromptTest < JojoTest
+  def test_generates_research_prompt_with_all_inputs
     job_description = "Senior Ruby Developer at Acme Corp..."
     company_name = "Acme Corp"
     web_results = "Acme Corp recently raised Series B funding..."
@@ -26,7 +26,7 @@ describe Jojo::Commands::Research::Prompt do
     _(prompt).must_include "Tailoring Recommendations"
   end
 
-  it "generates prompt without web results" do
+  def test_generates_prompt_without_web_results
     job_description = "Senior Ruby Developer..."
     company_name = "Acme Corp"
     resume = "## Experience..."
@@ -42,7 +42,7 @@ describe Jojo::Commands::Research::Prompt do
     _(prompt).must_include "no additional web research available"
   end
 
-  it "generates prompt without resume" do
+  def test_generates_prompt_without_resume
     job_description = "Senior Ruby Developer..."
     company_name = "Acme Corp"
     web_results = "Acme Corp info..."

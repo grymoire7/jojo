@@ -7,8 +7,10 @@ require "yaml"
 require "json"
 require "tempfile"
 
-describe "FAQ Workflow Integration" do
-  before do
+class FaqWorkflowIntegrationTest < JojoTest
+  def setup
+    super
+    copy_templates
     @employer = Jojo::Application.new("integration-test-corp")
     @ai_client = Minitest::Mock.new
 
@@ -36,13 +38,14 @@ describe "FAQ Workflow Integration" do
     File.write(@employer.branding_path, "I am excited to apply because my Ruby experience matches your needs.")
   end
 
-  after do
+  def teardown
     FileUtils.rm_rf(@employer.base_path) if Dir.exist?(@employer.base_path)
     @config_file.close!
     @config_file.unlink if @config_file.path && File.exist?(@config_file.path)
+    super
   end
 
-  it "generates FAQs and includes them in website" do
+  def test_generates_faqs_and_includes_them_in_website
     # Generate FAQs
     faq_generator = Jojo::Commands::Faq::Generator.new(
       @employer,
@@ -85,7 +88,7 @@ describe "FAQ Workflow Integration" do
     @ai_client.verify
   end
 
-  it "handles missing FAQ file gracefully in website generation" do
+  def test_handles_missing_faq_file_gracefully_in_website_generation
     website_generator = Jojo::Commands::Website::Generator.new(
       @employer,
       @ai_client,
@@ -104,7 +107,7 @@ describe "FAQ Workflow Integration" do
     @ai_client.verify
   end
 
-  it "handles malformed FAQ JSON gracefully" do
+  def test_handles_malformed_faq_json_gracefully
     # Write malformed JSON
     File.write(@employer.faq_path, "This is not valid JSON")
 
@@ -122,7 +125,7 @@ describe "FAQ Workflow Integration" do
     @ai_client.verify
   end
 
-  it "renders FAQ section in correct position" do
+  def test_renders_faq_section_in_correct_position
     # Create FAQ file
     faqs = [{question: "Test?", answer: "Answer"}]
     File.write(@employer.faq_path, JSON.generate(faqs))

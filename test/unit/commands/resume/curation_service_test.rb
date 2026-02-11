@@ -2,8 +2,9 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/resume/curation_service"
 
-describe Jojo::Commands::Resume::CurationService do
-  before do
+class Jojo::Commands::Resume::CurationServiceTest < JojoTest
+  def setup
+    super
     @ai_client = Minitest::Mock.new
     @config = {
       "resume_data" => {
@@ -20,12 +21,12 @@ describe Jojo::Commands::Resume::CurationService do
     @service = Jojo::Commands::Resume::CurationService.new(
       ai_client: @ai_client,
       config: @config,
-      resume_data_path: "test/fixtures/resume_data.yml",
-      template_path: "test/fixtures/templates/resume_template.md.erb"
+      resume_data_path: fixture_path("resume_data.yml"),
+      template_path: fixture_path("templates/resume_template.md.erb")
     )
   end
 
-  it "curates resume from data using transformer and template" do
+  def test_curates_resume_from_data_using_transformer_and_template
     # Mock transformer calls
     @ai_client.expect(:generate_text, "[0, 1, 2]", [String]) # filter
     @ai_client.expect(:generate_text, "[2, 1, 0]", [String]) # reorder
@@ -40,15 +41,14 @@ describe Jojo::Commands::Resume::CurationService do
     @ai_client.verify
   end
 
-  it "caches curated data for same job context" do
-    cache_file = "test/fixtures/cached_resume_data.yml"
-    FileUtils.rm_f(cache_file)
+  def test_caches_curated_data_for_same_job_context
+    cache_file = File.join(@tmpdir, "cached_resume_data.yml")
 
     service_with_cache = Jojo::Commands::Resume::CurationService.new(
       ai_client: @ai_client,
       config: @config,
-      resume_data_path: "test/fixtures/resume_data.yml",
-      template_path: "test/fixtures/templates/resume_template.md.erb",
+      resume_data_path: fixture_path("resume_data.yml"),
+      template_path: fixture_path("templates/resume_template.md.erb"),
       cache_path: cache_file
     )
 
@@ -65,6 +65,5 @@ describe Jojo::Commands::Resume::CurationService do
     _(result2).must_include "Summary v1"
 
     @ai_client.verify
-    FileUtils.rm_f(cache_file)
   end
 end

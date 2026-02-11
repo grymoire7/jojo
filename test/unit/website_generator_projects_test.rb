@@ -3,20 +3,20 @@ require_relative "../../lib/jojo/commands/website/generator"
 require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/config"
 
-describe "Jojo::Commands::Website::Generator with Projects" do
-  before do
+class WebsiteGeneratorProjectsTest < JojoTest
+  def setup
+    super
+    copy_templates
     @application = Jojo::Application.new("test-corp")
     @application.create_directory!
-    @config = Jojo::Config.new("test/fixtures/valid_config.yml")
+    @config = Jojo::Config.new(fixture_path("valid_config.yml"))
 
-    # Create job_details.yml
     File.write(@application.job_details_path, <<~YAML)
       required_skills:
         - Ruby on Rails
         - PostgreSQL
     YAML
 
-    # Create separate test directory to avoid conflicts with main fixtures
     @test_fixtures_dir = Dir.mktmpdir("jojo-test-fixtures-")
     @resume_data_path = File.join(@test_fixtures_dir, "resume_data.yml")
     File.write(@resume_data_path, <<~YAML)
@@ -41,18 +41,16 @@ describe "Jojo::Commands::Website::Generator with Projects" do
     YAML
   end
 
-  after do
-    FileUtils.rm_rf("applications/test-corp")
+  def teardown
     FileUtils.rm_rf(@test_fixtures_dir) if @test_fixtures_dir && File.exist?(@test_fixtures_dir)
+    super
   end
 
-  it "loads projects from resume_data.yml" do
-    # Mock AI client (not used in this test)
+  def test_loads_projects_from_resume_data_yml
     mock_ai = Minitest::Mock.new
 
     generator = Jojo::Commands::Website::Generator.new(@application, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
 
-    # Access private method for testing
     projects = generator.send(:load_projects)
 
     _(projects).wont_be_empty
@@ -60,32 +58,26 @@ describe "Jojo::Commands::Website::Generator with Projects" do
     _(projects.first[:skills]).must_include "Ruby on Rails"
   end
 
-  it "includes projects in template variables" do
-    # Create minimal job description for full generation
+  def test_includes_projects_in_template_variables
     File.write(@application.job_description_path, "Test job description")
     File.write(@application.resume_path, "# Resume\n\nTest resume content")
     File.write(@application.branding_path, "Test branding statement")
 
-    # Mock AI client (not used since branding is read from file)
     mock_ai = Minitest::Mock.new
 
     generator = Jojo::Commands::Website::Generator.new(@application, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
-    # Read generated HTML
     html = File.read(@application.index_html_path)
 
-    # Should mention the project
     _(html).must_include "Rails Project"
   end
 
-  it "copies local project images to website directory" do
-    # Create test image
+  def test_copies_local_project_images_to_website_directory
     test_images_dir = File.join(@test_fixtures_dir, "images")
     FileUtils.mkdir_p(test_images_dir)
     File.write(File.join(test_images_dir, "test.png"), "fake image data")
 
-    # Update resume_data.yml with image
     File.write(@resume_data_path, <<~YAML)
       name: "Jane Doe"
       email: "jane@example.com"
@@ -111,17 +103,14 @@ describe "Jojo::Commands::Website::Generator with Projects" do
     File.write(@application.resume_path, "# Resume\n\nTest resume content")
     File.write(@application.branding_path, "Test branding")
 
-    # Mock AI client (not used since branding is read from file)
     mock_ai = Minitest::Mock.new
 
     generator = Jojo::Commands::Website::Generator.new(@application, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
-    # Check image was copied
     copied_image = File.join(@application.website_path, "images", "test.png")
     _(File.exist?(copied_image)).must_equal true
 
-    # Check HTML references image correctly
     html = File.read(@application.index_html_path)
     _(html).must_include 'src="images/test.png"'
   end

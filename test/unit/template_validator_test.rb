@@ -1,71 +1,49 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/template_validator"
 
-describe Jojo::TemplateValidator do
-  describe ".appears_unchanged?" do
-    it "returns false when file does not exist" do
-      result = Jojo::TemplateValidator.appears_unchanged?("nonexistent.md")
-      _(result).must_equal false
-    end
-
-    it "returns true when file contains marker" do
-      file = Tempfile.new(["test", ".md"])
-      file.write("<!-- JOJO_TEMPLATE_PLACEHOLDER - Delete this line -->\nContent")
-      file.close
-
-      result = Jojo::TemplateValidator.appears_unchanged?(file.path)
-      _(result).must_equal true
-
-      file.unlink
-    end
-
-    it "returns false when file does not contain marker" do
-      file = Tempfile.new(["test", ".md"])
-      file.write("# My Resume\nCustomized content")
-      file.close
-
-      result = Jojo::TemplateValidator.appears_unchanged?(file.path)
-      _(result).must_equal false
-
-      file.unlink
-    end
+class TemplateValidatorTest < JojoTest
+  def test_appears_unchanged_returns_false_when_file_does_not_exist
+    result = Jojo::TemplateValidator.appears_unchanged?("nonexistent.md")
+    _(result).must_equal false
   end
 
-  describe ".validate_required_file!" do
-    it "raises error when required file is missing" do
-      err = assert_raises(Jojo::TemplateValidator::MissingInputError) do
-        Jojo::TemplateValidator.validate_required_file!("inputs/nonexistent.md", "generic resume")
-      end
-      _(err.message).must_include "inputs/nonexistent.md not found"
-      _(err.message).must_include "jojo setup"
-    end
+  def test_appears_unchanged_returns_true_when_file_contains_marker
+    File.write("test.md", "<!-- JOJO_TEMPLATE_PLACEHOLDER - Delete this line -->\nContent")
 
-    it "does not raise when file exists without marker" do
-      file = Tempfile.new(["test", ".md"])
-      file.write("# Customized Resume")
-      file.close
-
-      Jojo::TemplateValidator.validate_required_file!(file.path, "resume")
-
-      file.unlink
-    end
+    result = Jojo::TemplateValidator.appears_unchanged?("test.md")
+    _(result).must_equal true
   end
 
-  describe ".warn_if_unchanged" do
-    it "returns :continue when file does not contain marker" do
-      file = Tempfile.new(["test", ".md"])
-      file.write("# Customized Resume")
-      file.close
+  def test_appears_unchanged_returns_false_when_file_does_not_contain_marker
+    File.write("test.md", "# My Resume\nCustomized content")
 
-      result = Jojo::TemplateValidator.warn_if_unchanged(file.path, "resume")
-      _(result).must_equal :continue
+    result = Jojo::TemplateValidator.appears_unchanged?("test.md")
+    _(result).must_equal false
+  end
 
-      file.unlink
+  def test_validate_required_file_raises_error_when_required_file_is_missing
+    err = assert_raises(Jojo::TemplateValidator::MissingInputError) do
+      Jojo::TemplateValidator.validate_required_file!("inputs/nonexistent.md", "generic resume")
     end
+    _(err.message).must_include "inputs/nonexistent.md not found"
+    _(err.message).must_include "jojo setup"
+  end
 
-    it "returns :skip when file does not exist" do
-      result = Jojo::TemplateValidator.warn_if_unchanged("nonexistent.md", "resume")
-      _(result).must_equal :skip
-    end
+  def test_validate_required_file_does_not_raise_when_file_exists_without_marker
+    File.write("test.md", "# Customized Resume")
+
+    Jojo::TemplateValidator.validate_required_file!("test.md", "resume")
+  end
+
+  def test_warn_if_unchanged_returns_continue_when_file_does_not_contain_marker
+    File.write("test.md", "# Customized Resume")
+
+    result = Jojo::TemplateValidator.warn_if_unchanged("test.md", "resume")
+    _(result).must_equal :continue
+  end
+
+  def test_warn_if_unchanged_returns_skip_when_file_does_not_exist
+    result = Jojo::TemplateValidator.warn_if_unchanged("nonexistent.md", "resume")
+    _(result).must_equal :skip
   end
 end

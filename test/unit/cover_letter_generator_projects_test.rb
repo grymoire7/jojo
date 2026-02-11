@@ -3,11 +3,12 @@ require_relative "../../lib/jojo/commands/cover_letter/generator"
 require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/config"
 
-describe "Jojo::Commands::CoverLetter::Generator with Projects" do
-  before do
+class CoverLetterGeneratorProjectsTest < JojoTest
+  def setup
+    super
     @application = Jojo::Application.new("test-corp")
     @application.create_directory!
-    @config = Jojo::Config.new("test/fixtures/valid_config.yml")
+    @config = Jojo::Config.new(fixture_path("valid_config.yml"))
 
     File.write(@application.job_description_path, "Ruby developer needed")
     File.write(@application.resume_path, "# Resume\n\nTailored resume...")
@@ -18,7 +19,6 @@ describe "Jojo::Commands::CoverLetter::Generator with Projects" do
         - Ruby on Rails
     YAML
 
-    # Create separate test directory to avoid conflicts
     @test_fixtures_dir = Dir.mktmpdir("jojo-test-fixtures-")
     @resume_data_path = File.join(@test_fixtures_dir, "resume_data.yml")
     File.write(@resume_data_path, <<~YAML)
@@ -37,12 +37,12 @@ describe "Jojo::Commands::CoverLetter::Generator with Projects" do
     YAML
   end
 
-  after do
-    FileUtils.rm_rf("applications/test-corp")
+  def teardown
     FileUtils.rm_rf(@test_fixtures_dir) if @test_fixtures_dir && File.exist?(@test_fixtures_dir)
+    super
   end
 
-  it "includes relevant projects in cover letter prompt" do
+  def test_includes_relevant_projects_in_cover_letter_prompt
     prompt_received = nil
 
     mock_ai = Minitest::Mock.new
@@ -54,7 +54,6 @@ describe "Jojo::Commands::CoverLetter::Generator with Projects" do
     generator = Jojo::Commands::CoverLetter::Generator.new(@application, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
-    # Verify the prompt includes project information
     _(prompt_received).must_include "Rails App"
     _(prompt_received).must_include "Projects to Highlight"
 

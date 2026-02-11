@@ -20,8 +20,10 @@ class RecommendationsWorkflowTestConfigStub
   end
 end
 
-describe "Recommendations Workflow Integration" do
-  before do
+class RecommendationsWorkflowIntegrationTest < JojoTest
+  def setup
+    super
+    copy_templates
     @employer = Jojo::Application.new("integration-test-corp")
 
     # Create required files
@@ -31,7 +33,7 @@ describe "Recommendations Workflow Integration" do
     File.write(@employer.branding_path, "I am the perfect fit for this opportunity.")
 
     # Create test inputs directory (NOT production inputs/)
-    @inputs_path = "test/fixtures/tmp_recommendations"
+    @inputs_path = File.join(@tmpdir, "test_inputs_recommendations")
     FileUtils.mkdir_p(@inputs_path)
 
     # Mock AI client
@@ -41,12 +43,13 @@ describe "Recommendations Workflow Integration" do
     @config = RecommendationsWorkflowTestConfigStub.new
   end
 
-  after do
+  def teardown
     FileUtils.rm_rf(@employer.base_path)
     FileUtils.rm_rf(@inputs_path) if File.exist?(@inputs_path)
+    super
   end
 
-  it "generates complete website with recommendations carousel" do
+  def test_generates_complete_website_with_recommendations_carousel
     # Create resume_data.yml with recommendations
     resume_data = {
       "name" => "Test User",
@@ -100,7 +103,7 @@ describe "Recommendations Workflow Integration" do
     _(html).must_include "startAutoAdvance"
   end
 
-  it "generates website without carousel when no recommendations" do
+  def test_generates_website_without_carousel_when_no_recommendations
     # Don't create recommendations file
 
     generator = Jojo::Commands::Website::Generator.new(
@@ -118,7 +121,7 @@ describe "Recommendations Workflow Integration" do
     _(html).wont_include "Recommendations Carousel JavaScript"
   end
 
-  it "generates static card for single recommendation" do
+  def test_generates_static_card_for_single_recommendation
     # Create resume_data.yml with single recommendation
     resume_data = {
       "name" => "Test User",
@@ -154,7 +157,7 @@ describe "Recommendations Workflow Integration" do
     _(html).wont_include "Recommendations Carousel JavaScript"
   end
 
-  it "positions recommendations after job description and before projects" do
+  def test_positions_recommendations_after_job_description_and_before_projects
     # Add all sections
     resume_data = {
       "name" => "Test User",

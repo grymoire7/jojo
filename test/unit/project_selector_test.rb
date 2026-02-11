@@ -2,12 +2,12 @@ require_relative "../test_helper"
 require_relative "../../lib/jojo/project_selector"
 require_relative "../../lib/jojo/application"
 
-describe Jojo::ProjectSelector do
-  before do
+class ProjectSelectorTest < JojoTest
+  def setup
+    super
     @application = Jojo::Application.new("test-corp")
     @application.create_directory!
 
-    # Create job_details.yml fixture
     File.write(@application.job_details_path, <<~YAML)
       required_skills:
         - Ruby on Rails
@@ -35,11 +35,7 @@ describe Jojo::ProjectSelector do
     ]
   end
 
-  after do
-    FileUtils.rm_rf("applications/test-corp")
-  end
-
-  it "selects projects based on skill matching" do
+  def test_selects_projects_based_on_skill_matching
     selector = Jojo::ProjectSelector.new(@application, @projects)
     selected = selector.select_for_landing_page(limit: 3)
 
@@ -48,7 +44,7 @@ describe Jojo::ProjectSelector do
     _(selected.first[:score]).must_be :>, 0
   end
 
-  it "applies recency bonus to recent projects" do
+  def test_applies_recency_bonus_to_recent_projects
     current_year = Time.now.year
     projects = [
       {
@@ -72,7 +68,7 @@ describe Jojo::ProjectSelector do
     _(selected.first[:score]).must_be :>, selected.last[:score]
   end
 
-  it "returns empty array when no projects match" do
+  def test_returns_empty_array_when_no_projects_match
     projects = [
       {
         title: "Unrelated Project",

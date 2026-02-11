@@ -2,77 +2,74 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/setup/command"
 
-describe Jojo::Commands::Setup::Command do
-  include CommandTestHelper
-
-  before do
-    setup_temp_project
+class Jojo::Commands::Setup::CommandTest < JojoTest
+  def setup
+    super
+    write_test_config
     @mock_cli = Minitest::Mock.new
   end
 
-  after { teardown_temp_project }
-
-  it "inherits from Base" do
+  def test_inherits_from_base
     _(Jojo::Commands::Setup::Command.ancestors).must_include Jojo::Commands::Base
   end
 
-  describe "successful execution" do
-    it "calls service.run" do
-      @mock_service = Minitest::Mock.new
-      @mock_service.expect(:run, nil)
+  # -- successful execution --
 
-      command = Jojo::Commands::Setup::Command.new(
-        @mock_cli,
-        service: @mock_service
-      )
-      command.execute
+  def test_calls_service_run
+    @mock_service = Minitest::Mock.new
+    @mock_service.expect(:run, nil)
 
-      @mock_service.verify
-    end
+    command = Jojo::Commands::Setup::Command.new(
+      @mock_cli,
+      service: @mock_service
+    )
+    command.execute
+
+    @mock_service.verify
   end
 
-  describe "error recovery" do
-    it "displays error message when service fails" do
-      @mock_service = Minitest::Mock.new
-      @mock_service.expect(:run, nil) { raise StandardError, "Configuration error" }
+  # -- error recovery --
 
-      @mock_cli.expect(:say, nil, ["Setup failed: Configuration error", :red])
+  def test_displays_error_message_when_service_fails
+    @mock_service = Minitest::Mock.new
+    @mock_service.expect(:run, nil) { raise StandardError, "Configuration error" }
 
-      command = Jojo::Commands::Setup::Command.new(
-        @mock_cli,
-        service: @mock_service
-      )
+    @mock_cli.expect(:say, nil, ["Setup failed: Configuration error", :red])
 
-      assert_raises(SystemExit) { command.execute }
-      @mock_cli.verify
-    end
+    command = Jojo::Commands::Setup::Command.new(
+      @mock_cli,
+      service: @mock_service
+    )
 
-    it "exits with status 1 on error" do
-      @mock_service = Minitest::Mock.new
-      @mock_service.expect(:run, nil) { raise StandardError, "Error" }
+    assert_raises(SystemExit) { command.execute }
+    @mock_cli.verify
+  end
 
-      @mock_cli.expect(:say, nil, [String, :red])
+  def test_exits_with_status_1_on_error
+    @mock_service = Minitest::Mock.new
+    @mock_service.expect(:run, nil) { raise StandardError, "Error" }
 
-      command = Jojo::Commands::Setup::Command.new(
-        @mock_cli,
-        service: @mock_service
-      )
+    @mock_cli.expect(:say, nil, [String, :red])
 
-      error = assert_raises(SystemExit) { command.execute }
-      _(error.status).must_equal 1
-    end
+    command = Jojo::Commands::Setup::Command.new(
+      @mock_cli,
+      service: @mock_service
+    )
 
-    it "allows clean exit from service" do
-      @mock_service = Minitest::Mock.new
-      @mock_service.expect(:run, nil) { exit 0 }
+    error = assert_raises(SystemExit) { command.execute }
+    _(error.status).must_equal 1
+  end
 
-      command = Jojo::Commands::Setup::Command.new(
-        @mock_cli,
-        service: @mock_service
-      )
+  def test_allows_clean_exit_from_service
+    @mock_service = Minitest::Mock.new
+    @mock_service.expect(:run, nil) { exit 0 }
 
-      error = assert_raises(SystemExit) { command.execute }
-      _(error.status).must_equal 0
-    end
+    command = Jojo::Commands::Setup::Command.new(
+      @mock_cli,
+      service: @mock_service
+    )
+
+    error = assert_raises(SystemExit) { command.execute }
+    _(error.status).must_equal 0
   end
 end

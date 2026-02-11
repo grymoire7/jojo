@@ -16,8 +16,10 @@ class WebsiteGeneratorTestConfigStub
   end
 end
 
-describe Jojo::Commands::Website::Generator do
-  before do
+class Jojo::Commands::Website::GeneratorTest < JojoTest
+  def setup
+    super
+    copy_templates
     @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = WebsiteGeneratorTestConfigStub.new
@@ -26,7 +28,7 @@ describe Jojo::Commands::Website::Generator do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
     # Clean up and create directories
@@ -41,11 +43,12 @@ describe Jojo::Commands::Website::Generator do
     File.write(@application.branding_path, "I'm a perfect fit for Acme Corp...\n\nMy experience aligns perfectly...")
   end
 
-  after do
+  def teardown
     FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+    super
   end
 
-  it "generates website with all inputs" do
+  def test_generates_website_with_all_inputs
     result = @generator.generate
 
     _(result).must_include "Am I a good match for Acme Corp?"
@@ -55,7 +58,7 @@ describe Jojo::Commands::Website::Generator do
     _(result).must_include "https://calendly.com/janedoe/30min"
   end
 
-  it "saves website to index.html" do
+  def test_saves_website_to_index_html
     @generator.generate
 
     _(File.exist?(@application.index_html_path)).must_equal true
@@ -65,7 +68,7 @@ describe Jojo::Commands::Website::Generator do
     _(content).must_include "</html>"
   end
 
-  it "generates website with minimal inputs (no research, no job_details)" do
+  def test_generates_website_with_minimal_inputs
     FileUtils.rm_f(@application.research_path)
     File.write(@application.branding_path, "Branding statement without research...")
 
@@ -74,7 +77,7 @@ describe Jojo::Commands::Website::Generator do
     _(result).must_include "Branding statement without research"
   end
 
-  it "generates website with custom template" do
+  def test_generates_website_with_custom_template
     # Create test template
     FileUtils.mkdir_p("templates/website")
     File.write("templates/website/modern.html.erb", "<html><body><h1><%= seeker_name %></h1></body></html>")
@@ -88,7 +91,7 @@ describe Jojo::Commands::Website::Generator do
     FileUtils.rm_f("templates/website/modern.html.erb")
   end
 
-  it "raises error when template is missing" do
+  def test_raises_error_when_template_is_missing
     generator = Jojo::Commands::Website::Generator.new(@application, @ai_client, config: @config, template: "nonexistent", verbose: false)
 
     error = assert_raises(RuntimeError) do
@@ -99,7 +102,7 @@ describe Jojo::Commands::Website::Generator do
     _(error.message).must_include "nonexistent"
   end
 
-  it "fails when resume is missing" do
+  def test_fails_when_resume_is_missing
     FileUtils.rm_f(@application.resume_path)
 
     error = assert_raises(RuntimeError) do
@@ -109,7 +112,7 @@ describe Jojo::Commands::Website::Generator do
     _(error.message).must_include "Resume not found"
   end
 
-  it "fails when job description is missing" do
+  def test_fails_when_job_description_is_missing
     FileUtils.rm_f(@application.job_description_path)
 
     error = assert_raises(RuntimeError) do
@@ -119,8 +122,8 @@ describe Jojo::Commands::Website::Generator do
     _(error.message).must_include "Job description not found"
   end
 
-  it "copies branding image when it exists" do
-    # test/fixtures already has branding_image.jpg, and @generator uses inputs_path: 'test/fixtures'
+  def test_copies_branding_image_when_it_exists
+    # fixture_path already has branding_image.jpg, and @generator uses inputs_path: fixture_path
     @generator.generate
 
     # Check that image was copied
@@ -132,14 +135,14 @@ describe Jojo::Commands::Website::Generator do
     _(html).must_include "branding_image.jpg"
   end
 
-  it "skips branding image when missing" do
+  def test_skips_branding_image_when_missing
     # Create a generator with nonexistent inputs path (no branding_image.jpg)
     generator_no_image = Jojo::Commands::Website::Generator.new(
       @application,
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures/nonexistent"
+      inputs_path: fixture_path("nonexistent")
     )
 
     generator_no_image.generate
@@ -149,7 +152,7 @@ describe Jojo::Commands::Website::Generator do
     _(File.exist?(image_path)).must_equal false
   end
 
-  it "renders template with all variables" do
+  def test_renders_template_with_all_variables
     result = @generator.generate
 
     # Check all template variables rendered
@@ -161,7 +164,7 @@ describe Jojo::Commands::Website::Generator do
     _(result).must_include "cover-letter.pdf"
   end
 
-  it "handles missing CTA link gracefully" do
+  def test_handles_missing_cta_link_gracefully
     @config.website_cta_link = nil  # No CTA link configured
 
     result = @generator.generate
@@ -171,7 +174,7 @@ describe Jojo::Commands::Website::Generator do
     _(result).wont_include 'class="cta-button"'
   end
 
-  it "handles empty CTA link gracefully" do
+  def test_handles_empty_cta_link_gracefully
     @config.website_cta_link = "   "  # Empty/whitespace CTA link
 
     result = @generator.generate
@@ -181,7 +184,7 @@ describe Jojo::Commands::Website::Generator do
     _(result).wont_include 'class="cta-button"'
   end
 
-  it "loads and injects annotations into job description HTML" do
+  def test_loads_and_injects_annotations_into_job_description_html
     # Update job description to include text being annotated
     File.write(@application.job_description_path, "We need Ruby and distributed systems experience.")
 
@@ -200,7 +203,7 @@ describe Jojo::Commands::Website::Generator do
     _(result).must_include '<span class="annotated" data-tier="moderate" data-match="Built message queue">distributed systems</span>'
   end
 
-  it "omits annotation section when annotations.json missing" do
+  def test_omits_annotation_section_when_annotations_json_missing
     # Don't create annotations file
 
     result = @generator.generate
@@ -210,7 +213,7 @@ describe Jojo::Commands::Website::Generator do
     _(result).wont_include '<div id="annotation-tooltip"'
   end
 
-  it "annotates all occurrences of same text" do
+  def test_annotates_all_occurrences_of_same_text
     # Job description with duplicate text
     File.write(@application.job_description_path, "We need Ruby skills. Ruby is our main language. Ruby developers wanted.")
 
@@ -226,7 +229,7 @@ describe Jojo::Commands::Website::Generator do
     _(annotation_count).must_equal 3
   end
 
-  it "prevents nested spans when annotation texts overlap" do
+  def test_prevents_nested_spans_when_annotation_texts_overlap
     # Job description with overlapping text patterns
     # "Ruby" appears alone and within "Ruby on Rails"
     File.write(@application.job_description_path, "We need Ruby developers who know Ruby on Rails.\n\nRuby is great. Ruby on Rails is a framework.")
@@ -258,7 +261,7 @@ describe Jojo::Commands::Website::Generator do
     _(data_match_with_spans.empty?).must_equal true
   end
 
-  it "loads and passes FAQs to template" do
+  def test_loads_and_passes_faqs_to_template
     # Create mock FAQs file
     faqs_data = [
       {question: "What's your experience?", answer: "I have 7 years..."},
@@ -273,7 +276,7 @@ describe Jojo::Commands::Website::Generator do
     _(html).must_include "Your Questions, Answered"
   end
 
-  it "handles missing FAQ file gracefully" do
+  def test_handles_missing_faq_file_gracefully
     FileUtils.rm_f(@application.faq_path) if File.exist?(@application.faq_path)
     File.write(@application.branding_path, "Branding statement")
 
@@ -283,7 +286,7 @@ describe Jojo::Commands::Website::Generator do
     _(html).wont_include '<div class="faq-accordion"'
   end
 
-  it "fails when branding.md is missing" do
+  def test_fails_when_branding_md_is_missing
     FileUtils.rm_f(@application.branding_path)
 
     error = assert_raises(RuntimeError) do
@@ -294,7 +297,7 @@ describe Jojo::Commands::Website::Generator do
     _(error.message).must_include "jojo branding"
   end
 
-  it "fails when branding.md is empty" do
+  def test_fails_when_branding_md_is_empty
     File.write(@application.branding_path, "")
 
     error = assert_raises(RuntimeError) do

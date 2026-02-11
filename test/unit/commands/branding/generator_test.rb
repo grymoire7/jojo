@@ -12,8 +12,9 @@ class BrandingGeneratorTestConfigStub
   end
 end
 
-describe Jojo::Commands::Branding::Generator do
-  before do
+class Jojo::Commands::Branding::GeneratorTest < JojoTest
+  def setup
+    super
     @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = BrandingGeneratorTestConfigStub.new
@@ -31,11 +32,7 @@ describe Jojo::Commands::Branding::Generator do
     File.write(@application.resume_path, "# Jane Doe\n\nSenior Ruby developer...")
   end
 
-  after do
-    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
-  end
-
-  it "generates branding statement and saves to file" do
+  def test_generates_branding_statement_and_saves_to_file
     expected_branding = "I'm a perfect fit for Acme Corp...\n\nMy experience aligns perfectly..."
     @ai_client.expect(:generate_text, expected_branding, [String])
 
@@ -48,19 +45,19 @@ describe Jojo::Commands::Branding::Generator do
     @ai_client.verify
   end
 
-  it "raises error when job description missing" do
+  def test_raises_error_when_job_description_missing
     FileUtils.rm_f(@application.job_description_path)
 
     _ { @generator.generate }.must_raise RuntimeError
   end
 
-  it "raises error when resume missing" do
+  def test_raises_error_when_resume_missing
     FileUtils.rm_f(@application.resume_path)
 
     _ { @generator.generate }.must_raise RuntimeError
   end
 
-  it "handles missing research gracefully" do
+  def test_handles_missing_research_gracefully
     FileUtils.rm_f(@application.research_path)
 
     expected_branding = "Branding without research..."
@@ -72,7 +69,7 @@ describe Jojo::Commands::Branding::Generator do
     @ai_client.verify
   end
 
-  it "handles missing job_details gracefully" do
+  def test_handles_missing_job_details_gracefully
     FileUtils.rm_f(@application.job_details_path)
 
     expected_branding = "Branding without job details..."

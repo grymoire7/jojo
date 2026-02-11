@@ -2,154 +2,161 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/job_description/command"
 
-describe Jojo::Commands::JobDescription::Command do
-  include CommandTestHelper
-
-  before do
-    setup_temp_project
-    create_employer_fixture("acme-corp", files: {})
+class Jojo::Commands::JobDescription::CommandTest < JojoTest
+  def setup
+    super
+    write_test_config
+    create_application_fixture("acme-corp", files: {})
     @mock_cli = Minitest::Mock.new
   end
 
-  after { teardown_temp_project }
-
-  it "inherits from Base" do
+  def test_inherits_from_base
     _(Jojo::Commands::JobDescription::Command.ancestors).must_include Jojo::Commands::Base
   end
 
-  describe "guard failures" do
-    it "exits when no slug specified and no state" do
-      @mock_cli.expect(:say, nil, [/No application specified/, :red])
+  # -- guard failures --
 
-      command = Jojo::Commands::JobDescription::Command.new(@mock_cli, job: "job.txt")
+  def test_exits_when_no_slug_specified_and_no_state
+    @mock_cli.expect(:say, nil, [/No application specified/, :red])
 
-      assert_raises(SystemExit) { command.execute }
-      @mock_cli.verify
-    end
+    command = Jojo::Commands::JobDescription::Command.new(@mock_cli, job: "job.txt")
 
-    it "exits when employer directory does not exist" do
-      @mock_cli.expect(:say, nil, [/does not exist/, :red])
-
-      command = Jojo::Commands::JobDescription::Command.new(@mock_cli, slug: "nonexistent", job: "job.txt")
-
-      assert_raises(SystemExit) { command.execute }
-      @mock_cli.verify
-    end
+    assert_raises(SystemExit) { command.execute }
+    @mock_cli.verify
   end
 
-  describe "successful execution" do
-    before do
-      @mock_status_logger = Minitest::Mock.new
-      @mock_application = Minitest::Mock.new
-      @mock_ai_client = Minitest::Mock.new
+  def test_exits_when_employer_directory_does_not_exist
+    @mock_cli.expect(:say, nil, [/does not exist/, :red])
 
-      @mock_application.expect(:base_path, "applications/acme-corp")
-      @mock_application.expect(:status_logger, @mock_status_logger)
-    end
+    command = Jojo::Commands::JobDescription::Command.new(@mock_cli, slug: "nonexistent", job: "job.txt")
 
-    it "processes job description and creates artifacts" do
-      @mock_application.expect(:create_artifacts, nil) do |job_source, ai_client, **kwargs|
-        job_source == "job.txt" && kwargs[:overwrite_flag] == false && kwargs[:verbose] == false
-      end
-      @mock_ai_client.expect(:total_tokens_used, 150)
-      @mock_status_logger.expect(:log, nil, [], step: :job_description, tokens: 150, status: "complete")
-
-      @mock_cli.expect(:say, nil, ["Processing job description for: acme-corp", :green])
-      @mock_cli.expect(:say, nil, ["-> Job description processed and saved", :green])
-      @mock_cli.expect(:say, nil, ["-> Job details extracted and saved", :green])
-
-      command = Jojo::Commands::JobDescription::Command.new(
-        @mock_cli,
-        slug: "acme-corp",
-        job: "job.txt",
-        application: @mock_application,
-        ai_client: @mock_ai_client
-      )
-      command.execute
-
-      @mock_application.verify
-      @mock_cli.verify
-    end
+    assert_raises(SystemExit) { command.execute }
+    @mock_cli.verify
   end
 
-  describe "logging" do
-    before do
-      @mock_status_logger = Minitest::Mock.new
-      @mock_application = Minitest::Mock.new
-      @mock_ai_client = Minitest::Mock.new
+  # -- successful execution --
 
-      @mock_application.expect(:base_path, "applications/acme-corp")
-      @mock_application.expect(:status_logger, @mock_status_logger)
-      @mock_application.expect(:create_artifacts, nil, [String, Object], overwrite_flag: false, cli_instance: Object, verbose: false)
+  def test_processes_job_description_and_creates_artifacts
+    setup_successful_execution_mocks
 
-      @mock_cli.expect(:say, nil, [String, :green])
-      @mock_cli.expect(:say, nil, [String, :green])
-      @mock_cli.expect(:say, nil, [String, :green])
+    @mock_application.expect(:create_artifacts, nil) do |job_source, ai_client, **kwargs|
+      job_source == "job.txt" && kwargs[:overwrite_flag] == false && kwargs[:verbose] == false
     end
+    @mock_ai_client.expect(:total_tokens_used, 150)
+    @mock_status_logger.expect(:log, nil, [], step: :job_description, tokens: 150, status: "complete")
 
-    it "logs with token count on success" do
-      @mock_ai_client.expect(:total_tokens_used, 250)
-      @mock_status_logger.expect(:log, nil, [], step: :job_description, tokens: 250, status: "complete")
+    @mock_cli.expect(:say, nil, ["Processing job description for: acme-corp", :green])
+    @mock_cli.expect(:say, nil, ["-> Job description processed and saved", :green])
+    @mock_cli.expect(:say, nil, ["-> Job details extracted and saved", :green])
 
-      command = Jojo::Commands::JobDescription::Command.new(
-        @mock_cli,
-        slug: "acme-corp",
-        job: "job.txt",
-        application: @mock_application,
-        ai_client: @mock_ai_client
-      )
-      command.execute
+    command = Jojo::Commands::JobDescription::Command.new(
+      @mock_cli,
+      slug: "acme-corp",
+      job: "job.txt",
+      application: @mock_application,
+      ai_client: @mock_ai_client
+    )
+    command.execute
 
-      @mock_status_logger.verify
-    end
+    @mock_application.verify
+    @mock_cli.verify
   end
 
-  describe "error recovery" do
-    before do
-      @mock_status_logger = Minitest::Mock.new
-      @mock_application = Minitest::Mock.new
-      @mock_ai_client = Minitest::Mock.new
+  # -- logging --
 
-      @mock_application.expect(:base_path, "applications/acme-corp")
-      @mock_application.expect(:status_logger, @mock_status_logger)
-    end
+  def test_logs_with_token_count_on_success
+    setup_logging_mocks
 
-    it "displays error message when create_artifacts fails" do
-      @mock_application.expect(:create_artifacts, nil) { raise StandardError, "Failed to process job" }
-      @mock_status_logger.expect(:log, nil, [], step: :job_description, status: "failed", error: "Failed to process job")
+    @mock_ai_client.expect(:total_tokens_used, 250)
+    @mock_status_logger.expect(:log, nil, [], step: :job_description, tokens: 250, status: "complete")
 
-      @mock_cli.expect(:say, nil, [String, :green])
-      @mock_cli.expect(:say, nil, ["Error processing job description: Failed to process job", :red])
+    command = Jojo::Commands::JobDescription::Command.new(
+      @mock_cli,
+      slug: "acme-corp",
+      job: "job.txt",
+      application: @mock_application,
+      ai_client: @mock_ai_client
+    )
+    command.execute
 
-      command = Jojo::Commands::JobDescription::Command.new(
-        @mock_cli,
-        slug: "acme-corp",
-        job: "job.txt",
-        application: @mock_application,
-        ai_client: @mock_ai_client
-      )
+    @mock_status_logger.verify
+  end
 
-      assert_raises(SystemExit) { command.execute }
-      @mock_cli.verify
-    end
+  # -- error recovery --
 
-    it "exits with status 1 on error" do
-      @mock_application.expect(:create_artifacts, nil) { raise StandardError, "Error" }
-      @mock_status_logger.expect(:log, nil, [], step: :job_description, status: "failed", error: "Error")
+  def test_displays_error_message_when_create_artifacts_fails
+    setup_error_recovery_mocks
 
-      @mock_cli.expect(:say, nil, [String, :green])
-      @mock_cli.expect(:say, nil, [String, :red])
+    @mock_application.expect(:create_artifacts, nil) { raise StandardError, "Failed to process job" }
+    @mock_status_logger.expect(:log, nil, [], step: :job_description, status: "failed", error: "Failed to process job")
 
-      command = Jojo::Commands::JobDescription::Command.new(
-        @mock_cli,
-        slug: "acme-corp",
-        job: "job.txt",
-        application: @mock_application,
-        ai_client: @mock_ai_client
-      )
+    @mock_cli.expect(:say, nil, [String, :green])
+    @mock_cli.expect(:say, nil, ["Error processing job description: Failed to process job", :red])
 
-      error = assert_raises(SystemExit) { command.execute }
-      _(error.status).must_equal 1
-    end
+    command = Jojo::Commands::JobDescription::Command.new(
+      @mock_cli,
+      slug: "acme-corp",
+      job: "job.txt",
+      application: @mock_application,
+      ai_client: @mock_ai_client
+    )
+
+    assert_raises(SystemExit) { command.execute }
+    @mock_cli.verify
+  end
+
+  def test_exits_with_status_1_on_error
+    setup_error_recovery_mocks
+
+    @mock_application.expect(:create_artifacts, nil) { raise StandardError, "Error" }
+    @mock_status_logger.expect(:log, nil, [], step: :job_description, status: "failed", error: "Error")
+
+    @mock_cli.expect(:say, nil, [String, :green])
+    @mock_cli.expect(:say, nil, [String, :red])
+
+    command = Jojo::Commands::JobDescription::Command.new(
+      @mock_cli,
+      slug: "acme-corp",
+      job: "job.txt",
+      application: @mock_application,
+      ai_client: @mock_ai_client
+    )
+
+    error = assert_raises(SystemExit) { command.execute }
+    _(error.status).must_equal 1
+  end
+
+  private
+
+  def setup_successful_execution_mocks
+    @mock_status_logger = Minitest::Mock.new
+    @mock_application = Minitest::Mock.new
+    @mock_ai_client = Minitest::Mock.new
+
+    @mock_application.expect(:base_path, "applications/acme-corp")
+    @mock_application.expect(:status_logger, @mock_status_logger)
+  end
+
+  def setup_logging_mocks
+    @mock_status_logger = Minitest::Mock.new
+    @mock_application = Minitest::Mock.new
+    @mock_ai_client = Minitest::Mock.new
+
+    @mock_application.expect(:base_path, "applications/acme-corp")
+    @mock_application.expect(:status_logger, @mock_status_logger)
+    @mock_application.expect(:create_artifacts, nil, [String, Object], overwrite_flag: false, cli_instance: Object, verbose: false)
+
+    @mock_cli.expect(:say, nil, [String, :green])
+    @mock_cli.expect(:say, nil, [String, :green])
+    @mock_cli.expect(:say, nil, [String, :green])
+  end
+
+  def setup_error_recovery_mocks
+    @mock_status_logger = Minitest::Mock.new
+    @mock_application = Minitest::Mock.new
+    @mock_ai_client = Minitest::Mock.new
+
+    @mock_application.expect(:base_path, "applications/acme-corp")
+    @mock_application.expect(:status_logger, @mock_status_logger)
   end
 end

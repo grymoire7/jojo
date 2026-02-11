@@ -2,73 +2,70 @@
 require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/commands/new/command"
 
-describe Jojo::Commands::New::Command do
-  include CommandTestHelper
-
-  before do
-    setup_temp_project
+class Jojo::Commands::New::CommandTest < JojoTest
+  def setup
+    super
+    write_test_config
     create_inputs_fixture(files: {
       "resume_data.yml" => "name: Test User\n# Modified content"
     })
     @mock_cli = Minitest::Mock.new
   end
 
-  after { teardown_temp_project }
-
-  it "inherits from Base" do
+  def test_inherits_from_base
     _(Jojo::Commands::New::Command.ancestors).must_include Jojo::Commands::Base
   end
 
-  describe "validation" do
-    it "exits when resume_data.yml is missing" do
-      FileUtils.rm("inputs/resume_data.yml")
+  # -- validation --
 
-      @mock_cli.expect(:say, nil, [/inputs\/resume_data\.yml not found/, :red])
+  def test_exits_when_resume_data_yml_is_missing
+    FileUtils.rm("inputs/resume_data.yml")
 
-      command = Jojo::Commands::New::Command.new(@mock_cli, slug: "new-corp")
+    @mock_cli.expect(:say, nil, [/inputs\/resume_data\.yml not found/, :red])
 
-      error = assert_raises(SystemExit) { command.execute }
-      _(error.status).must_equal 1
-      @mock_cli.verify
-    end
+    command = Jojo::Commands::New::Command.new(@mock_cli, slug: "new-corp")
+
+    error = assert_raises(SystemExit) { command.execute }
+    _(error.status).must_equal 1
+    @mock_cli.verify
   end
 
-  describe "guard failures" do
-    it "exits if employer already exists" do
-      create_employer_fixture("existing", files: {})
+  # -- guard failures --
 
-      @mock_cli.expect(:say, nil, [/already exists/, :yellow])
+  def test_exits_if_employer_already_exists
+    create_application_fixture("existing", files: {})
 
-      command = Jojo::Commands::New::Command.new(@mock_cli, slug: "existing")
+    @mock_cli.expect(:say, nil, [/already exists/, :yellow])
 
-      error = assert_raises(SystemExit) { command.execute }
-      _(error.status).must_equal 1
-      @mock_cli.verify
-    end
+    command = Jojo::Commands::New::Command.new(@mock_cli, slug: "existing")
+
+    error = assert_raises(SystemExit) { command.execute }
+    _(error.status).must_equal 1
+    @mock_cli.verify
   end
 
-  describe "successful execution" do
-    it "creates employer directory" do
-      @mock_cli.expect(:say, nil, ["Created application workspace: applications/new-corp", :green])
-      @mock_cli.expect(:say, nil, ["\nNext step:", :cyan])
-      @mock_cli.expect(:say, nil, ["  jojo job_description -s new-corp -j <job_file_or_url>", :white])
+  # -- successful execution --
 
-      command = Jojo::Commands::New::Command.new(@mock_cli, slug: "new-corp")
-      command.execute
+  def test_creates_employer_directory
+    @mock_cli.expect(:say, nil, ["Created application workspace: applications/new-corp", :green])
+    @mock_cli.expect(:say, nil, ["\nNext step:", :cyan])
+    @mock_cli.expect(:say, nil, ["  jojo job_description -s new-corp -j <job_file_or_url>", :white])
 
-      _(Dir.exist?("applications/new-corp")).must_equal true
-      @mock_cli.verify
-    end
+    command = Jojo::Commands::New::Command.new(@mock_cli, slug: "new-corp")
+    command.execute
 
-    it "shows next step instructions" do
-      @mock_cli.expect(:say, nil, [String, :green])
-      @mock_cli.expect(:say, nil, ["\nNext step:", :cyan])
-      @mock_cli.expect(:say, nil, [/jojo job_description -s test-corp/, :white])
+    _(Dir.exist?("applications/new-corp")).must_equal true
+    @mock_cli.verify
+  end
 
-      command = Jojo::Commands::New::Command.new(@mock_cli, slug: "test-corp")
-      command.execute
+  def test_shows_next_step_instructions
+    @mock_cli.expect(:say, nil, [String, :green])
+    @mock_cli.expect(:say, nil, ["\nNext step:", :cyan])
+    @mock_cli.expect(:say, nil, [/jojo job_description -s test-corp/, :white])
 
-      @mock_cli.verify
-    end
+    command = Jojo::Commands::New::Command.new(@mock_cli, slug: "test-corp")
+    command.execute
+
+    @mock_cli.verify
   end
 end

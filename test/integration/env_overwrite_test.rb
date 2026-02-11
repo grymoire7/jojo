@@ -3,7 +3,7 @@ require "test_helper"
 require "fileutils"
 require "tmpdir"
 
-class EnvOverwriteTest < Minitest::Test
+class EnvOverwriteTest < JojoTest
   # Test class that includes OverwriteHelper
   class TestCLI
     include Jojo::OverwriteHelper
@@ -16,12 +16,14 @@ class EnvOverwriteTest < Minitest::Test
   end
 
   def setup
+    super
     @test_dir = Dir.mktmpdir
     @cli = TestCLI.new
   end
 
   def teardown
     FileUtils.rm_rf(@test_dir)
+    super
   end
 
   def test_env_var_true_overwrites_without_prompting

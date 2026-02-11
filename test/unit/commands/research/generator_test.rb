@@ -3,8 +3,9 @@ require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/research/generator"
 
-describe Jojo::Commands::Research::Generator do
-  before do
+class Jojo::Commands::Research::GeneratorTest < JojoTest
+  def setup
+    super
     @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
@@ -13,11 +14,9 @@ describe Jojo::Commands::Research::Generator do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
-    # Clean up and create directories
-    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
     @application.create_directory!
 
     # Create job description and job details fixtures
@@ -25,12 +24,12 @@ describe Jojo::Commands::Research::Generator do
     File.write(@application.job_details_path, "company_name: Acme Corp\njob_title: Senior Ruby Developer")
   end
 
-  after do
-    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+  def teardown
     @config&.verify
+    super
   end
 
-  it "generates research from all inputs" do
+  def test_generates_research_from_all_inputs
     # Mock web search results
     web_results = "Acme Corp is a leading tech company..."
 
@@ -47,7 +46,7 @@ describe Jojo::Commands::Research::Generator do
     @ai_client.verify
   end
 
-  it "saves research to file" do
+  def test_saves_research_to_file
     web_results = "Acme Corp info..."
     expected_research = "# Company Profile\n\nResearch content..."
     @ai_client.expect(:reason, expected_research, [String])
@@ -62,7 +61,7 @@ describe Jojo::Commands::Research::Generator do
     @ai_client.verify
   end
 
-  it "handles missing job description" do
+  def test_handles_missing_job_description
     FileUtils.rm_f(@application.job_description_path)
 
     error = assert_raises(RuntimeError) do
@@ -72,7 +71,7 @@ describe Jojo::Commands::Research::Generator do
     _(error.message).must_include "Job description not found"
   end
 
-  it "continues when web search fails" do
+  def test_continues_when_web_search_fails
     expected_research = "# Company Profile\n\nResearch without web data..."
     @ai_client.expect(:reason, expected_research, [String])
 
@@ -85,14 +84,14 @@ describe Jojo::Commands::Research::Generator do
     @ai_client.verify
   end
 
-  it "continues when generic resume is missing" do
+  def test_continues_when_generic_resume_is_missing
     # Create a generator with a nonexistent inputs path
     generator_no_resume = Jojo::Commands::Research::Generator.new(
       @application,
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures/nonexistent"
+      inputs_path: fixture_path("nonexistent")
     )
 
     web_results = "Acme Corp info..."
@@ -107,7 +106,7 @@ describe Jojo::Commands::Research::Generator do
     @ai_client.verify
   end
 
-  it "extracts company name from job details" do
+  def test_extracts_company_name_from_job_details
     inputs = @generator.send(:gather_inputs)
 
     _(inputs[:company_name]).must_equal "Acme Corp"

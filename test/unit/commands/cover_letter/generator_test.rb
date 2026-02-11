@@ -3,8 +3,9 @@ require_relative "../../../test_helper"
 require_relative "../../../../lib/jojo/application"
 require_relative "../../../../lib/jojo/commands/cover_letter/generator"
 
-describe Jojo::Commands::CoverLetter::Generator do
-  before do
+class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
+  def setup
+    super
     @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new
@@ -13,7 +14,7 @@ describe Jojo::Commands::CoverLetter::Generator do
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures"
+      inputs_path: fixture_path
     )
 
     # Clean up and create directories
@@ -27,12 +28,12 @@ describe Jojo::Commands::CoverLetter::Generator do
     File.write(@application.job_details_path, "company_name: Acme Corp\nposition_title: Senior Developer\n")
   end
 
-  after do
-    FileUtils.rm_rf(@application.base_path) if Dir.exist?(@application.base_path)
+  def teardown
     @config&.verify
+    super
   end
 
-  it "generates cover letter from all inputs" do
+  def test_generates_cover_letter_from_all_inputs
     expected_cover_letter = "Dear Hiring Manager,\n\nI am genuinely excited about the opportunity..."
     @config.expect(:voice_and_tone, "professional and friendly")
     @config.expect(:base_url, "https://tracyatteberry.com")
@@ -48,7 +49,7 @@ describe Jojo::Commands::CoverLetter::Generator do
     @config.verify
   end
 
-  it "saves cover letter to file" do
+  def test_saves_cover_letter_to_file
     expected_cover_letter = "Dear Hiring Manager,\n\nTailored content..."
     @config.expect(:voice_and_tone, "professional")
     @config.expect(:base_url, "https://example.com")
@@ -65,7 +66,7 @@ describe Jojo::Commands::CoverLetter::Generator do
     @config.verify
   end
 
-  it "fails when tailored resume is missing" do
+  def test_fails_when_tailored_resume_is_missing
     FileUtils.rm_f(@application.resume_path)
 
     error = assert_raises(RuntimeError) do
@@ -75,14 +76,14 @@ describe Jojo::Commands::CoverLetter::Generator do
     _(error.message).must_include "Tailored resume not found"
   end
 
-  it "fails when generic resume is missing" do
+  def test_fails_when_generic_resume_is_missing
     # Create a generator with a nonexistent inputs path
     generator_no_resume = Jojo::Commands::CoverLetter::Generator.new(
       @application,
       @ai_client,
       config: @config,
       verbose: false,
-      inputs_path: "test/fixtures/nonexistent"
+      inputs_path: fixture_path("nonexistent")
     )
 
     error = assert_raises(RuntimeError) do
@@ -92,7 +93,7 @@ describe Jojo::Commands::CoverLetter::Generator do
     _(error.message).must_include "Resume data not found"
   end
 
-  it "fails when job description is missing" do
+  def test_fails_when_job_description_is_missing
     FileUtils.rm_f(@application.job_description_path)
 
     error = assert_raises(RuntimeError) do
@@ -102,7 +103,7 @@ describe Jojo::Commands::CoverLetter::Generator do
     _(error.message).must_include "Job description not found"
   end
 
-  it "continues when research is missing with warning" do
+  def test_continues_when_research_is_missing_with_warning
     FileUtils.rm_f(@application.research_path)
 
     expected_cover_letter = "Cover letter without research insights..."
@@ -118,7 +119,7 @@ describe Jojo::Commands::CoverLetter::Generator do
     @config.verify
   end
 
-  it "generates correct landing page link" do
+  def test_generates_correct_landing_page_link
     expected_cover_letter = "Cover letter content..."
     @config.expect(:voice_and_tone, "professional")
     @config.expect(:base_url, "https://tracyatteberry.com")

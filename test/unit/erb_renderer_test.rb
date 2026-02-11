@@ -2,9 +2,9 @@
 require_relative "../test_helper"
 require_relative "../../lib/jojo/erb_renderer"
 
-describe Jojo::ErbRenderer do
-  it "renders ERB template with data" do
-    template_path = "test/fixtures/templates/resume_template.md.erb"
+class ErbRendererTest < JojoTest
+  def test_renders_erb_template_with_data
+    template_path = fixture_path("templates/resume_template.md.erb")
     data = {
       "name" => "Jane Doe",
       "email" => "jane@example.com",
@@ -57,8 +57,8 @@ describe Jojo::ErbRenderer do
     _(result).must_include "Jane Smith"
   end
 
-  it "handles missing optional fields" do
-    template_path = "test/fixtures/templates/resume_template.md.erb"
+  def test_handles_missing_optional_fields
+    template_path = fixture_path("templates/resume_template.md.erb")
     data = {
       "name" => "John Doe",
       "email" => "john@example.com",

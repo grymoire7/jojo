@@ -3,8 +3,10 @@ require_relative "../../lib/jojo/commands/website/generator"
 require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/config"
 
-describe "Projects Integration Workflow" do
-  before do
+class ProjectsIntegrationWorkflowTest < JojoTest
+  def setup
+    super
+    copy_templates
     @employer = Jojo::Application.new("integration-test-corp")
     @employer.create_directory!
 
@@ -63,13 +65,14 @@ describe "Projects Integration Workflow" do
     YAML
   end
 
-  after do
-    FileUtils.rm_rf("applications/integration-test-corp")
+  def teardown
+    FileUtils.rm_rf(@employer.base_path) if @employer
     FileUtils.rm_rf(@test_fixtures_dir) if @test_fixtures_dir && File.exist?(@test_fixtures_dir)
+    super
   end
 
-  it "generates website with projects from resume_data.yml" do
-    config = Jojo::Config.new("test/fixtures/valid_config.yml")
+  def test_generates_website_with_projects_from_resume_data
+    config = Jojo::Config.new(fixture_path("valid_config.yml"))
 
     mock_ai = Minitest::Mock.new
 
