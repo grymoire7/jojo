@@ -6,6 +6,6 @@ class Jojo::Commands::Interactive::CommandTest < JojoTest
   def test_initializes_with_options
     mock_cli = Minitest::Mock.new
     command = Jojo::Commands::Interactive::Command.new(mock_cli, slug: "test-corp")
-    _(command.options[:slug]).must_equal "test-corp"
+    assert_equal "test-corp", command.options[:slug]
   end
 end

@@ -13,9 +13,9 @@ class Jojo::Commands::BaseTest < JojoTest
   def test_stores_cli_and_options
     base = Jojo::Commands::Base.new(@mock_cli, slug: "acme", verbose: true)
 
-    _(base.cli.object_id).must_equal @mock_cli.object_id
-    _(base.options[:slug]).must_equal "acme"
-    _(base.options[:verbose]).must_equal true
+    assert_equal @mock_cli.object_id, base.cli.object_id
+    assert_equal "acme", base.options[:slug]
+    assert_equal true, base.options[:verbose]
   end
 
   # --- #execute ---
@@ -23,29 +23,29 @@ class Jojo::Commands::BaseTest < JojoTest
   def test_execute_raises_not_implemented_error
     base = Jojo::Commands::Base.new(@mock_cli)
 
-    _ { base.execute }.must_raise NotImplementedError
+    assert_raises(NotImplementedError) { base.execute }
   end
 
   # --- option accessors ---
 
   def test_returns_slug_from_options
     base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
-    _(base.send(:slug)).must_equal "acme-corp"
+    assert_equal "acme-corp", base.send(:slug)
   end
 
   def test_returns_verbose_from_options_with_default_false
     base = Jojo::Commands::Base.new(@mock_cli)
-    _(base.send(:verbose?)).must_equal false
+    assert_equal false, base.send(:verbose?)
   end
 
   def test_returns_overwrite_from_options_with_default_false
     base = Jojo::Commands::Base.new(@mock_cli)
-    _(base.send(:overwrite?)).must_equal false
+    assert_equal false, base.send(:overwrite?)
   end
 
   def test_returns_quiet_from_options_with_default_false
     base = Jojo::Commands::Base.new(@mock_cli)
-    _(base.send(:quiet?)).must_equal false
+    assert_equal false, base.send(:quiet?)
   end
 
   # --- output helpers ---
@@ -65,7 +65,7 @@ class Jojo::Commands::BaseTest < JojoTest
 
     result = base.send(:yes?, "Continue?")
 
-    _(result).must_equal true
+    assert_equal true, result
     @mock_cli.verify
   end
 
@@ -77,8 +77,8 @@ class Jojo::Commands::BaseTest < JojoTest
 
     application = base.send(:application)
 
-    _(application).must_be_kind_of Jojo::Application
-    _(application.slug).must_equal "acme-corp"
+    assert_kind_of Jojo::Application, application
+    assert_equal "acme-corp", application.slug
   end
 
   def test_caches_application_instance
@@ -88,7 +88,7 @@ class Jojo::Commands::BaseTest < JojoTest
     app1 = base.send(:application)
     app2 = base.send(:application)
 
-    _(app1.object_id).must_equal app2.object_id
+    assert_equal app2.object_id, app1.object_id
   end
 
   def test_creates_config
@@ -97,7 +97,7 @@ class Jojo::Commands::BaseTest < JojoTest
 
     config = base.send(:config)
 
-    _(config).must_be_kind_of Jojo::Config
+    assert_kind_of Jojo::Config, config
   end
 
   def test_creates_status_logger_for_application
@@ -106,7 +106,7 @@ class Jojo::Commands::BaseTest < JojoTest
 
     logger = base.send(:status_logger)
 
-    _(logger).must_be_kind_of Jojo::StatusLogger
+    assert_kind_of Jojo::StatusLogger, logger
   end
 
   # --- validation helpers: #application ---
@@ -118,8 +118,8 @@ class Jojo::Commands::BaseTest < JojoTest
 
     base = Jojo::Commands::Base.new(@mock_cli, slug: "acme-corp")
 
-    _(base.send(:application)).must_be_instance_of Jojo::Application
-    _(base.send(:application).slug).must_equal "acme-corp"
+    assert_instance_of Jojo::Application, base.send(:application)
+    assert_equal "acme-corp", base.send(:application).slug
   end
 
   def test_validation_caches_application_instance
@@ -132,7 +132,7 @@ class Jojo::Commands::BaseTest < JojoTest
     first_call = base.send(:application)
     second_call = base.send(:application)
 
-    _(first_call).must_be_same_as second_call
+    assert_same second_call, first_call
   end
 
   # --- validation helpers: #require_application! ---

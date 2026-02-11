@@ -10,8 +10,8 @@ class InteractiveIntegrationTest < JojoTest
 
   def test_shows_welcome_screen_with_no_applications
     runner = Jojo::Commands::Interactive::Runner.new
-    _(runner.application).must_be_nil
-    _(runner.list_applications).must_be_empty
+    assert_nil runner.application
+    assert_empty runner.list_applications
   end
 
   def test_loads_application_state
@@ -19,9 +19,9 @@ class InteractiveIntegrationTest < JojoTest
     Jojo::StatePersistence.save_slug(@slug)
 
     runner = Jojo::Commands::Interactive::Runner.new
-    _(runner.slug).must_equal @slug
-    _(runner.application).wont_be_nil
-    _(runner.application.company_name).must_equal "Test Company"
+    assert_equal @slug, runner.slug
+    refute_nil runner.application
+    assert_equal "Test Company", runner.application.company_name
   end
 
   def test_computes_workflow_status_correctly
@@ -32,9 +32,9 @@ class InteractiveIntegrationTest < JojoTest
 
     statuses = Jojo::Commands::Interactive::Workflow.all_statuses(employer)
 
-    _(statuses[:job_description]).must_equal :generated
-    _(statuses[:research]).must_equal :ready  # dependency met
-    _(statuses[:resume]).must_equal :blocked  # needs research
+    assert_equal :generated, statuses[:job_description]
+    assert_equal :ready, statuses[:research]  # dependency met
+    assert_equal :blocked, statuses[:resume]  # needs research
   end
 
   def test_detects_when_resume_is_up_to_date
@@ -42,7 +42,7 @@ class InteractiveIntegrationTest < JojoTest
 
     runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
     status = Jojo::Commands::Interactive::Workflow.status(:resume, runner.application)
-    _(status).must_equal :generated
+    assert_equal :generated, status
   end
 
   def test_detects_when_resume_becomes_stale
@@ -55,7 +55,7 @@ class InteractiveIntegrationTest < JojoTest
 
     runner = Jojo::Commands::Interactive::Runner.new(slug: @slug)
     status = Jojo::Commands::Interactive::Workflow.status(:resume, runner.application)
-    _(status).must_equal :stale
+    assert_equal :stale, status
   end
 
   def test_lists_all_available_applications
@@ -64,17 +64,17 @@ class InteractiveIntegrationTest < JojoTest
     runner = Jojo::Commands::Interactive::Runner.new
     apps = runner.list_applications
 
-    _(apps.length).must_equal 2
-    _(apps).must_include @app1
-    _(apps).must_include @app2
+    assert_equal 2, apps.length
+    assert_includes apps, @app1
+    assert_includes apps, @app2
   end
 
   def test_has_no_current_employer_when_slug_not_provided
     setup_multiple_applications
 
     runner = Jojo::Commands::Interactive::Runner.new
-    _(runner.application).must_be_nil
-    _(runner.slug).must_be_nil
+    assert_nil runner.application
+    assert_nil runner.slug
   end
 
   def test_can_switch_between_applications
@@ -84,13 +84,13 @@ class InteractiveIntegrationTest < JojoTest
 
     # Switch to first app
     runner.switch_application(@app1)
-    _(runner.slug).must_equal @app1
-    _(runner.application.slug).must_equal @app1
+    assert_equal @app1, runner.slug
+    assert_equal @app1, runner.application.slug
 
     # Switch to second app
     runner.switch_application(@app2)
-    _(runner.slug).must_equal @app2
-    _(runner.application.slug).must_equal @app2
+    assert_equal @app2, runner.slug
+    assert_equal @app2, runner.application.slug
   end
 
   def test_persists_slug_selection_across_runner_instances
@@ -101,7 +101,7 @@ class InteractiveIntegrationTest < JojoTest
 
     # Create new instance - should load saved slug
     runner2 = Jojo::Commands::Interactive::Runner.new
-    _(runner2.slug).must_equal @app1
+    assert_equal @app1, runner2.slug
   end
 
   private

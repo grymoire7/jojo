@@ -14,7 +14,7 @@ class Jojo::Commands::Branding::CommandTest < JojoTest
   end
 
   def test_inherits_from_base
-    _(Jojo::Commands::Branding::Command.ancestors).must_include Jojo::Commands::Base
+    assert_includes Jojo::Commands::Branding::Command.ancestors, Jojo::Commands::Base
   end
 
   # --- guard failures ---
@@ -50,7 +50,7 @@ class Jojo::Commands::Branding::CommandTest < JojoTest
     command = Jojo::Commands::Branding::Command.new(@mock_cli, slug: "acme-corp")
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
     @mock_cli.verify
   end
 
@@ -166,7 +166,7 @@ class Jojo::Commands::Branding::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
   end
 
   def test_continues_even_if_logging_fails_during_error_handling
@@ -192,7 +192,7 @@ class Jojo::Commands::Branding::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
   end
 
   # --- generator creation (when not injected) ---
@@ -235,11 +235,11 @@ class Jojo::Commands::Branding::CommandTest < JojoTest
       command.execute
     end
 
-    _(generator_created).must_equal true
-    _(generator_args[:application].object_id).must_equal mock_application.object_id
-    _(generator_args[:ai_client].object_id).must_equal mock_ai_client.object_id
-    _(generator_args[:opts][:verbose]).must_equal true
-    _(generator_args[:opts][:config]).wont_be_nil
+    assert_equal true, generator_created
+    assert_equal mock_application.object_id, generator_args[:application].object_id
+    assert_equal mock_ai_client.object_id, generator_args[:ai_client].object_id
+    assert_equal true, generator_args[:opts][:verbose]
+    refute_nil generator_args[:opts][:config]
   end
 
   private

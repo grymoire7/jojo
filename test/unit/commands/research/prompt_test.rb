@@ -16,14 +16,14 @@ class Jojo::Commands::Research::PromptTest < JojoTest
       resume: resume
     )
 
-    _(prompt).must_include "Acme Corp"
-    _(prompt).must_include "Senior Ruby Developer"
-    _(prompt).must_include "Series B funding"
-    _(prompt).must_include "Software Engineer at Previous Co"
-    _(prompt).must_include "Company Profile"
-    _(prompt).must_include "Role Analysis"
-    _(prompt).must_include "Strategic Positioning"
-    _(prompt).must_include "Tailoring Recommendations"
+    assert_includes prompt, "Acme Corp"
+    assert_includes prompt, "Senior Ruby Developer"
+    assert_includes prompt, "Series B funding"
+    assert_includes prompt, "Software Engineer at Previous Co"
+    assert_includes prompt, "Company Profile"
+    assert_includes prompt, "Role Analysis"
+    assert_includes prompt, "Strategic Positioning"
+    assert_includes prompt, "Tailoring Recommendations"
   end
 
   def test_generates_prompt_without_web_results
@@ -38,8 +38,8 @@ class Jojo::Commands::Research::PromptTest < JojoTest
       resume: resume
     )
 
-    _(prompt).must_include "Acme Corp"
-    _(prompt).must_include "no additional web research available"
+    assert_includes prompt, "Acme Corp"
+    assert_includes prompt, "no additional web research available"
   end
 
   def test_generates_prompt_without_resume
@@ -54,8 +54,8 @@ class Jojo::Commands::Research::PromptTest < JojoTest
       resume: nil
     )
 
-    _(prompt).must_include "Acme Corp"
-    _(prompt).wont_include "Strategic Positioning"
-    _(prompt).must_include "generic recommendations"
+    assert_includes prompt, "Acme Corp"
+    refute_includes prompt, "Strategic Positioning"
+    assert_includes prompt, "generic recommendations"
   end
 end

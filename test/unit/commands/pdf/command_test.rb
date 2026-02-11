@@ -15,7 +15,7 @@ class Jojo::Commands::Pdf::CommandTest < JojoTest
   end
 
   def test_inherits_from_base
-    _(Jojo::Commands::Pdf::Command.ancestors).must_include Jojo::Commands::Base
+    assert_includes Jojo::Commands::Pdf::Command.ancestors, Jojo::Commands::Base
   end
 
   # -- guard failures --
@@ -98,7 +98,7 @@ class Jojo::Commands::Pdf::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
     @mock_cli.verify
   end
 
@@ -143,7 +143,7 @@ class Jojo::Commands::Pdf::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
     @mock_cli.verify
   end
 
@@ -184,7 +184,7 @@ class Jojo::Commands::Pdf::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
   end
 
   private

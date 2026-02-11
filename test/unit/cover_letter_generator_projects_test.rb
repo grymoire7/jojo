@@ -54,8 +54,8 @@ class CoverLetterGeneratorProjectsTest < JojoTest
     generator = Jojo::Commands::CoverLetter::Generator.new(@application, mock_ai, config: @config, inputs_path: @test_fixtures_dir)
     generator.generate
 
-    _(prompt_received).must_include "Rails App"
-    _(prompt_received).must_include "Projects to Highlight"
+    assert_includes prompt_received, "Rails App"
+    assert_includes prompt_received, "Projects to Highlight"
 
     mock_ai.verify
   end

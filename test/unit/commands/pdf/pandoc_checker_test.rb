@@ -7,13 +7,13 @@ class Jojo::Commands::Pdf::PandocCheckerTest < JojoTest
 
   def test_available_returns_true_when_pandoc_is_installed
     Jojo::Commands::Pdf::PandocChecker.stub(:system, true) do
-      _(Jojo::Commands::Pdf::PandocChecker.available?).must_equal true
+      assert_equal true, Jojo::Commands::Pdf::PandocChecker.available?
     end
   end
 
   def test_available_returns_false_when_pandoc_is_not_installed
     Jojo::Commands::Pdf::PandocChecker.stub(:system, false) do
-      _(Jojo::Commands::Pdf::PandocChecker.available?).must_equal false
+      assert_equal false, Jojo::Commands::Pdf::PandocChecker.available?
     end
   end
 
@@ -22,14 +22,14 @@ class Jojo::Commands::Pdf::PandocCheckerTest < JojoTest
   def test_version_returns_version_string_when_installed
     Jojo::Commands::Pdf::PandocChecker.stub(:available?, true) do
       Jojo::Commands::Pdf::PandocChecker.stub(:`, "pandoc 3.1.11\n") do
-        _(Jojo::Commands::Pdf::PandocChecker.version).must_equal "3.1.11"
+        assert_equal "3.1.11", Jojo::Commands::Pdf::PandocChecker.version
       end
     end
   end
 
   def test_version_returns_nil_when_not_installed
     Jojo::Commands::Pdf::PandocChecker.stub(:available?, false) do
-      _(Jojo::Commands::Pdf::PandocChecker.version).must_be_nil
+      assert_nil Jojo::Commands::Pdf::PandocChecker.version
     end
   end
 
@@ -40,13 +40,13 @@ class Jojo::Commands::Pdf::PandocCheckerTest < JojoTest
       error = assert_raises(Jojo::Commands::Pdf::PandocChecker::PandocNotFoundError) do
         Jojo::Commands::Pdf::PandocChecker.check!
       end
-      _(error.message).must_include "Pandoc is not installed"
+      assert_includes error.message, "Pandoc is not installed"
     end
   end
 
   def test_check_returns_true_when_installed
     Jojo::Commands::Pdf::PandocChecker.stub(:available?, true) do
-      _(Jojo::Commands::Pdf::PandocChecker.check!).must_equal true
+      assert_equal true, Jojo::Commands::Pdf::PandocChecker.check!
     end
   end
 end

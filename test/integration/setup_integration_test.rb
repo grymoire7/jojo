@@ -75,17 +75,17 @@ class SetupIntegrationTest < JojoTest
     prompt.verify
 
     # Verify .env
-    _(File.exist?(".env")).must_equal true
+    assert_equal true, File.exist?(".env")
     env_content = File.read(".env")
-    _(env_content).must_include "ANTHROPIC_API_KEY=sk-ant-test123"
+    assert_includes env_content, "ANTHROPIC_API_KEY=sk-ant-test123"
 
     # Verify config.yml
-    _(File.exist?("config.yml")).must_equal true
+    assert_equal true, File.exist?("config.yml")
     config_content = File.read("config.yml")
-    _(config_content).must_include "seeker_name: Test User"
-    _(config_content).must_include "service: anthropic"
-    _(config_content).must_include "model: claude-sonnet-4-5"
-    _(config_content).must_include "model: claude-3-5-haiku-20241022"
+    assert_includes config_content, "seeker_name: Test User"
+    assert_includes config_content, "service: anthropic"
+    assert_includes config_content, "model: claude-sonnet-4-5"
+    assert_includes config_content, "model: claude-3-5-haiku-20241022"
 
     # Verify input files
   end
@@ -161,13 +161,13 @@ class SetupIntegrationTest < JojoTest
 
     # Verify .env
     env_content = File.read(".env")
-    _(env_content).must_include "OPENAI_API_KEY=sk-test-openai"
+    assert_includes env_content, "OPENAI_API_KEY=sk-test-openai"
 
     # Verify config.yml
     config_content = File.read("config.yml")
-    _(config_content).must_include "service: openai"
-    _(config_content).must_include "model: gpt-4o"
-    _(config_content).must_include "model: gpt-4o-mini"
+    assert_includes config_content, "service: openai"
+    assert_includes config_content, "model: gpt-4o"
+    assert_includes config_content, "model: gpt-4o-mini"
   end
 
   def test_completes_full_setup_flow_with_search_provider
@@ -232,17 +232,17 @@ class SetupIntegrationTest < JojoTest
     prompt.verify
 
     # Verify .env
-    _(File.exist?(".env")).must_equal true
+    assert_equal true, File.exist?(".env")
     env_content = File.read(".env")
-    _(env_content).must_include "ANTHROPIC_API_KEY=sk-ant-test123"
-    _(env_content).must_include "TAVILY_API_KEY=sk-tavily-test"
+    assert_includes env_content, "ANTHROPIC_API_KEY=sk-ant-test123"
+    assert_includes env_content, "TAVILY_API_KEY=sk-tavily-test"
 
     # Verify config.yml
-    _(File.exist?("config.yml")).must_equal true
+    assert_equal true, File.exist?("config.yml")
     config_content = File.read("config.yml")
-    _(config_content).must_include "seeker_name: Test User"
-    _(config_content).must_include "service: anthropic"
-    _(config_content).must_include "search: tavily"
+    assert_includes config_content, "seeker_name: Test User"
+    assert_includes config_content, "service: anthropic"
+    assert_includes config_content, "search: tavily"
 
     # Verify input files
   end

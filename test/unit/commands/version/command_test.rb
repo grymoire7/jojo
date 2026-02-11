@@ -9,7 +9,7 @@ class Jojo::Commands::Version::CommandTest < JojoTest
   end
 
   def test_inherits_from_base
-    _(Jojo::Commands::Version::Command.ancestors).must_include Jojo::Commands::Base
+    assert_includes Jojo::Commands::Version::Command.ancestors, Jojo::Commands::Base
   end
 
   def test_outputs_version_string

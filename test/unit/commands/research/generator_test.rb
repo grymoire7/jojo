@@ -40,7 +40,7 @@ class Jojo::Commands::Research::GeneratorTest < JojoTest
     # Stub web search
     @generator.stub(:perform_web_search, web_results) do
       result = @generator.generate
-      _(result).must_equal expected_research
+      assert_equal expected_research, result
     end
 
     @ai_client.verify
@@ -55,8 +55,8 @@ class Jojo::Commands::Research::GeneratorTest < JojoTest
       @generator.generate
     end
 
-    _(File.exist?(@application.research_path)).must_equal true
-    _(File.read(@application.research_path)).must_equal expected_research
+    assert_equal true, File.exist?(@application.research_path)
+    assert_equal expected_research, File.read(@application.research_path)
 
     @ai_client.verify
   end
@@ -68,7 +68,7 @@ class Jojo::Commands::Research::GeneratorTest < JojoTest
       @generator.generate
     end
 
-    _(error.message).must_include "Job description not found"
+    assert_includes error.message, "Job description not found"
   end
 
   def test_continues_when_web_search_fails
@@ -78,7 +78,7 @@ class Jojo::Commands::Research::GeneratorTest < JojoTest
     # Stub web search to return nil (failure)
     @generator.stub(:perform_web_search, nil) do
       result = @generator.generate
-      _(result).must_equal expected_research
+      assert_equal expected_research, result
     end
 
     @ai_client.verify
@@ -100,7 +100,7 @@ class Jojo::Commands::Research::GeneratorTest < JojoTest
 
     generator_no_resume.stub(:perform_web_search, web_results) do
       result = generator_no_resume.generate
-      _(result).must_equal expected_research
+      assert_equal expected_research, result
     end
 
     @ai_client.verify
@@ -109,6 +109,6 @@ class Jojo::Commands::Research::GeneratorTest < JojoTest
   def test_extracts_company_name_from_job_details
     inputs = @generator.send(:gather_inputs)
 
-    _(inputs[:company_name]).must_equal "Acme Corp"
+    assert_equal "Acme Corp", inputs[:company_name]
   end
 end

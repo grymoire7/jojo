@@ -7,9 +7,9 @@ class ResumeDataLoaderTest < JojoTest
     loader = Jojo::ResumeDataLoader.new(fixture_path("resume_data.yml"))
     data = loader.load
 
-    _(data["name"]).must_equal "Jane Doe"
-    _(data["skills"]).must_be_kind_of Array
-    _(data["experience"]).must_be_kind_of Array
+    assert_equal "Jane Doe", data["name"]
+    assert_kind_of Array, data["skills"]
+    assert_kind_of Array, data["experience"]
   end
 
   def test_raises_error_for_missing_file
@@ -19,7 +19,7 @@ class ResumeDataLoaderTest < JojoTest
       loader.load
     end
 
-    _(error.message).must_include "not found"
+    assert_includes error.message, "not found"
   end
 
   def test_validates_required_fields
@@ -31,6 +31,6 @@ class ResumeDataLoaderTest < JojoTest
       loader.load
     end
 
-    _(error.message).must_include "name"
+    assert_includes error.message, "name"
   end
 end

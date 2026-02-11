@@ -5,28 +5,28 @@ require "stringio"
 class ConfigTest < JojoTest
   def test_loads_seeker_name
     config = Jojo::Config.new(fixture_path("valid_config.yml"))
-    _(config.seeker_name).must_equal "Test User"
+    assert_equal "Test User", config.seeker_name
   end
 
   def test_loads_reasoning_ai_config
     config = Jojo::Config.new(fixture_path("valid_config.yml"))
-    _(config.reasoning_ai_service).must_equal "anthropic"
-    _(config.reasoning_ai_model).must_equal "sonnet"
+    assert_equal "anthropic", config.reasoning_ai_service
+    assert_equal "sonnet", config.reasoning_ai_model
   end
 
   def test_loads_text_generation_ai_config
     config = Jojo::Config.new(fixture_path("valid_config.yml"))
-    _(config.text_generation_ai_service).must_equal "anthropic"
-    _(config.text_generation_ai_model).must_equal "haiku"
+    assert_equal "anthropic", config.text_generation_ai_service
+    assert_equal "haiku", config.text_generation_ai_model
   end
 
   def test_loads_voice_and_tone
     config = Jojo::Config.new(fixture_path("valid_config.yml"))
-    _(config.voice_and_tone).must_equal "professional and friendly"
+    assert_equal "professional and friendly", config.voice_and_tone
   end
 
   def test_aborts_when_config_file_is_missing
-    _ {
+    assert_raises(SystemExit) {
       original_stderr = $stderr
       $stderr = StringIO.new
       begin
@@ -35,11 +35,11 @@ class ConfigTest < JojoTest
       ensure
         $stderr = original_stderr
       end
-    }.must_raise SystemExit
+    }
   end
 
   def test_aborts_when_ai_config_is_invalid
-    _ {
+    assert_raises(SystemExit) {
       original_stderr = $stderr
       $stderr = StringIO.new
       begin
@@ -48,12 +48,12 @@ class ConfigTest < JojoTest
       ensure
         $stderr = original_stderr
       end
-    }.must_raise SystemExit
+    }
   end
 
   def test_returns_base_url_from_config
     config = Jojo::Config.new(fixture_path("valid_config.yml"))
-    _(config.base_url).must_equal "https://tracyatteberry.com"
+    assert_equal "https://tracyatteberry.com", config.base_url
   end
 
   def test_validates_base_url_is_present
@@ -64,7 +64,7 @@ class ConfigTest < JojoTest
         model: sonnet
     YAML
 
-    _ {
+    assert_raises(SystemExit) {
       original_stderr = $stderr
       $stderr = StringIO.new
       begin
@@ -73,12 +73,12 @@ class ConfigTest < JojoTest
       ensure
         $stderr = original_stderr
       end
-    }.must_raise SystemExit
+    }
   end
 
   def test_returns_search_service_from_config
     config = Jojo::Config.new(fixture_path("valid_config.yml"))
-    _(config.search_service).must_equal "serper"
+    assert_equal "serper", config.search_service
   end
 
   def test_returns_nil_when_search_not_configured
@@ -94,7 +94,7 @@ class ConfigTest < JojoTest
     YAML
 
     config = Jojo::Config.new("config.yml")
-    _(config.search_service).must_be_nil
+    assert_nil config.search_service
   end
 
   def test_returns_api_key_from_env_based_on_service_name
@@ -104,7 +104,7 @@ class ConfigTest < JojoTest
     ENV["TAVILY_API_KEY"] = "test-tavily-key"
 
     config = Jojo::Config.new("config.yml")
-    _(config.search_api_key).must_equal "test-tavily-key"
+    assert_equal "test-tavily-key", config.search_api_key
   ensure
     ENV["TAVILY_API_KEY"] = original_key
   end
@@ -113,7 +113,7 @@ class ConfigTest < JojoTest
     File.write("config.yml", "seeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
 
     config = Jojo::Config.new("config.yml")
-    _(config.search_api_key).must_be_nil
+    assert_nil config.search_api_key
   end
 
   def test_returns_nil_search_api_key_when_env_var_not_set
@@ -122,7 +122,7 @@ class ConfigTest < JojoTest
     original_value = ENV.delete("SERPER_API_KEY")
 
     config = Jojo::Config.new("config.yml")
-    _(config.search_api_key).must_be_nil
+    assert_nil config.search_api_key
   ensure
     ENV["SERPER_API_KEY"] = original_value if original_value
   end
@@ -134,7 +134,7 @@ class ConfigTest < JojoTest
     ENV["TAVILY_API_KEY"] = "test-key"
 
     config = Jojo::Config.new("config.yml")
-    _(config.search_configured?).must_equal true
+    assert_equal true, config.search_configured?
   ensure
     ENV["TAVILY_API_KEY"] = original_key
   end
@@ -143,7 +143,7 @@ class ConfigTest < JojoTest
     File.write("config.yml", "seeker_name: Test\nbase_url: https://example.com\nreasoning_ai:\n  service: anthropic\n  model: sonnet\ntext_generation_ai:\n  service: anthropic\n  model: haiku")
 
     config = Jojo::Config.new("config.yml")
-    _(config.search_configured?).must_equal false
+    assert_equal false, config.search_configured?
   end
 
   def test_search_configured_returns_false_when_api_key_missing
@@ -153,7 +153,7 @@ class ConfigTest < JojoTest
     ENV.delete("TAVILY_API_KEY")
 
     config = Jojo::Config.new("config.yml")
-    _(config.search_configured?).must_equal false
+    assert_equal false, config.search_configured?
   ensure
     ENV["TAVILY_API_KEY"] = original_key
   end

@@ -10,34 +10,34 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
   def test_stores_cli_instance_and_overwrite_flag
     cli = Object.new
     service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: true)
-    _(service.instance_variable_get(:@cli)).must_be_same_as cli
-    _(service.instance_variable_get(:@overwrite)).must_equal true
+    assert_same cli, service.instance_variable_get(:@cli)
+    assert_equal true, service.instance_variable_get(:@overwrite)
   end
 
   def test_defaults_overwrite_to_false
     cli = Object.new
     service = Jojo::Commands::Setup::Service.new(cli_instance: cli)
-    _(service.instance_variable_get(:@overwrite)).must_equal false
+    assert_equal false, service.instance_variable_get(:@overwrite)
   end
 
   def test_initializes_tracking_arrays
     cli = Object.new
     service = Jojo::Commands::Setup::Service.new(cli_instance: cli)
-    _(service.instance_variable_get(:@created_files)).must_equal []
-    _(service.instance_variable_get(:@skipped_files)).must_equal []
+    assert_equal [], service.instance_variable_get(:@created_files)
+    assert_equal [], service.instance_variable_get(:@skipped_files)
   end
 
   def test_accepts_optional_prompt_parameter
     cli = Object.new
     prompt = Object.new
     service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt)
-    _(service.instance_variable_get(:@prompt)).must_be_same_as prompt
+    assert_same prompt, service.instance_variable_get(:@prompt)
   end
 
   def test_creates_default_tty_prompt_when_prompt_not_provided
     cli = Object.new
     service = Jojo::Commands::Setup::Service.new(cli_instance: cli)
-    _(service.instance_variable_get(:@prompt)).must_be_instance_of TTY::Prompt
+    assert_instance_of TTY::Prompt, service.instance_variable_get(:@prompt)
   end
 
   # -- setup_api_configuration --
@@ -52,8 +52,8 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     service.send(:setup_api_configuration)
 
     cli.verify
-    _(File.read(".env")).must_equal "ANTHROPIC_API_KEY=existing"
-    _(service.instance_variable_get(:@provider_slug)).must_equal "anthropic"
+    assert_equal "ANTHROPIC_API_KEY=existing", File.read(".env")
+    assert_equal "anthropic", service.instance_variable_get(:@provider_slug)
   end
 
   def test_setup_api_configuration_gathers_llm_config_when_env_missing
@@ -73,9 +73,9 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
 
     cli.verify
     prompt.verify
-    _(File.exist?(".env")).must_equal false  # File not created yet
-    _(service.instance_variable_get(:@llm_provider_slug)).must_equal "anthropic"
-    _(service.instance_variable_get(:@llm_api_key)).must_equal "sk-ant-test-key"
+    assert_equal false, File.exist?(".env")  # File not created yet
+    assert_equal "anthropic", service.instance_variable_get(:@llm_provider_slug)
+    assert_equal "sk-ant-test-key", service.instance_variable_get(:@llm_api_key)
   end
 
   # -- setup_personal_configuration --
@@ -132,12 +132,12 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
 
     cli.verify
     prompt.verify
-    _(File.exist?("config.yml")).must_equal true
+    assert_equal true, File.exist?("config.yml")
     content = File.read("config.yml")
-    _(content).must_include "Tracy Atteberry"
-    _(content).must_include "service: anthropic"
-    _(content).must_include "model: claude-sonnet-4-5"
-    _(content).must_include "model: claude-3-5-haiku-20241022"
+    assert_includes content, "Tracy Atteberry"
+    assert_includes content, "service: anthropic"
+    assert_includes content, "model: claude-sonnet-4-5"
+    assert_includes content, "model: claude-3-5-haiku-20241022"
   end
 
   # -- setup_search_configuration --
@@ -156,9 +156,9 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
 
     cli.verify
     prompt.verify
-    _(service.instance_variable_get(:@search_provider_slug)).must_equal "tavily"
-    _(service.instance_variable_get(:@search_api_key)).must_equal "sk-tavily-test"
-    _(service.instance_variable_get(:@search_env_var_name)).must_equal "TAVILY_API_KEY"
+    assert_equal "tavily", service.instance_variable_get(:@search_provider_slug)
+    assert_equal "sk-tavily-test", service.instance_variable_get(:@search_api_key)
+    assert_equal "TAVILY_API_KEY", service.instance_variable_get(:@search_env_var_name)
   end
 
   def test_setup_search_configuration_configures_search_when_user_selects_yes_and_serper
@@ -175,9 +175,9 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
 
     cli.verify
     prompt.verify
-    _(service.instance_variable_get(:@search_provider_slug)).must_equal "serper"
-    _(service.instance_variable_get(:@search_api_key)).must_equal "serper-key-123"
-    _(service.instance_variable_get(:@search_env_var_name)).must_equal "SERPER_API_KEY"
+    assert_equal "serper", service.instance_variable_get(:@search_provider_slug)
+    assert_equal "serper-key-123", service.instance_variable_get(:@search_api_key)
+    assert_equal "SERPER_API_KEY", service.instance_variable_get(:@search_env_var_name)
   end
 
   def test_setup_search_configuration_skips_search_when_user_selects_no
@@ -192,7 +192,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
 
     cli.verify
     prompt.verify
-    _(service.instance_variable_get(:@search_provider_slug)).must_be_nil
+    assert_nil service.instance_variable_get(:@search_provider_slug)
   end
 
   # -- write_env_file --
@@ -220,11 +220,11 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     service.send(:write_env_file)
 
     cli.verify
-    _(File.exist?(".env")).must_equal true
+    assert_equal true, File.exist?(".env")
     content = File.read(".env")
-    _(content).must_include "ANTHROPIC_API_KEY=sk-ant-test"
-    _(content).wont_include "TAVILY"
-    _(content).wont_include "SERPER"
+    assert_includes content, "ANTHROPIC_API_KEY=sk-ant-test"
+    refute_includes content, "TAVILY"
+    refute_includes content, "SERPER"
   end
 
   def test_write_env_file_writes_env_with_both_llm_and_search_config
@@ -252,10 +252,10 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     service.send(:write_env_file)
 
     cli.verify
-    _(File.exist?(".env")).must_equal true
+    assert_equal true, File.exist?(".env")
     content = File.read(".env")
-    _(content).must_include "OPENAI_API_KEY=sk-openai-test"
-    _(content).must_include "TAVILY_API_KEY=sk-tavily-test"
+    assert_includes content, "OPENAI_API_KEY=sk-openai-test"
+    assert_includes content, "TAVILY_API_KEY=sk-tavily-test"
   end
 
   def test_write_env_file_skips_writing_when_env_already_exists_in_skipped_files
@@ -274,7 +274,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
 
     cli.verify
     # File should NOT be overwritten
-    _(File.read(".env")).must_equal "ANTHROPIC_API_KEY=original-key"
+    assert_equal "ANTHROPIC_API_KEY=original-key", File.read(".env")
   end
 
   # -- setup_input_files --
@@ -294,8 +294,8 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     service.send(:setup_input_files)
 
     cli.verify
-    _(Dir.exist?("inputs")).must_equal true
-    _(Dir.exist?("inputs/templates")).must_equal true
+    assert_equal true, Dir.exist?("inputs")
+    assert_equal true, Dir.exist?("inputs/templates")
   end
 
   def test_setup_input_files_copies_template_files_to_inputs
@@ -314,10 +314,10 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     service.send(:setup_input_files)
 
     cli.verify
-    _(File.exist?("inputs/resume_data.yml")).must_equal true
-    _(File.read("inputs/resume_data.yml")).must_include "JOJO_TEMPLATE_PLACEHOLDER"
-    _(File.exist?("inputs/templates/default_resume.md.erb")).must_equal true
-    _(File.read("inputs/templates/default_resume.md.erb")).must_include "JOJO_TEMPLATE_PLACEHOLDER"
+    assert_equal true, File.exist?("inputs/resume_data.yml")
+    assert_includes File.read("inputs/resume_data.yml"), "JOJO_TEMPLATE_PLACEHOLDER"
+    assert_equal true, File.exist?("inputs/templates/default_resume.md.erb")
+    assert_includes File.read("inputs/templates/default_resume.md.erb"), "JOJO_TEMPLATE_PLACEHOLDER"
   end
 
   def test_setup_input_files_skips_existing_files_unless_overwrite_mode
@@ -339,7 +339,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     service.send(:setup_input_files)
 
     cli.verify
-    _(File.read("inputs/resume_data.yml")).must_equal "Existing data"
+    assert_equal "Existing data", File.read("inputs/resume_data.yml")
   end
 
   # -- show_summary --

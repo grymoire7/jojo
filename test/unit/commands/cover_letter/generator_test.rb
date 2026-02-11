@@ -41,9 +41,9 @@ class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
 
     result = @generator.generate
 
-    _(result).must_include "Specifically for Acme Corp"
-    _(result).must_include "https://tracyatteberry.com/resume/acme-corp"
-    _(result).must_include expected_cover_letter
+    assert_includes result, "Specifically for Acme Corp"
+    assert_includes result, "https://tracyatteberry.com/resume/acme-corp"
+    assert_includes result, expected_cover_letter
 
     @ai_client.verify
     @config.verify
@@ -57,10 +57,10 @@ class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
 
     @generator.generate
 
-    _(File.exist?(@application.cover_letter_path)).must_equal true
+    assert_equal true, File.exist?(@application.cover_letter_path)
     content = File.read(@application.cover_letter_path)
-    _(content).must_include "Specifically for Acme Corp"
-    _(content).must_include expected_cover_letter
+    assert_includes content, "Specifically for Acme Corp"
+    assert_includes content, expected_cover_letter
 
     @ai_client.verify
     @config.verify
@@ -73,7 +73,7 @@ class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
       @generator.generate
     end
 
-    _(error.message).must_include "Tailored resume not found"
+    assert_includes error.message, "Tailored resume not found"
   end
 
   def test_fails_when_generic_resume_is_missing
@@ -90,7 +90,7 @@ class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
       generator_no_resume.generate
     end
 
-    _(error.message).must_include "Resume data not found"
+    assert_includes error.message, "Resume data not found"
   end
 
   def test_fails_when_job_description_is_missing
@@ -100,7 +100,7 @@ class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
       @generator.generate
     end
 
-    _(error.message).must_include "Job description not found"
+    assert_includes error.message, "Job description not found"
   end
 
   def test_continues_when_research_is_missing_with_warning
@@ -113,7 +113,7 @@ class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
 
     # Should not raise error
     result = @generator.generate
-    _(result).must_include expected_cover_letter
+    assert_includes result, expected_cover_letter
 
     @ai_client.verify
     @config.verify
@@ -127,7 +127,7 @@ class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
 
     result = @generator.generate
 
-    _(result).must_include "**Specifically for Acme Corp**: https://tracyatteberry.com/resume/acme-corp"
+    assert_includes result, "**Specifically for Acme Corp**: https://tracyatteberry.com/resume/acme-corp"
 
     @ai_client.verify
     @config.verify

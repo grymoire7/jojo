@@ -26,12 +26,12 @@ class ResumeTransformerVcrTest < JojoTest
 
       @transformer.send(:filter_field, "skills", data)
 
-      _(data["skills"]).must_be_kind_of Array
-      _(data["skills"].length).must_be :>, 0
-      _(data["skills"].length).must_be :<=, 8
+      assert_kind_of Array, data["skills"]
+      assert_operator data["skills"].length, :>, 0
+      assert_operator data["skills"].length, :<=, 8
 
       data["skills"].each do |skill|
-        _(["Ruby", "Python", "JavaScript", "Java", "C++", "Go", "PHP", "Rust"]).must_include skill
+        assert_includes ["Ruby", "Python", "JavaScript", "Java", "C++", "Go", "PHP", "Rust"], skill
       end
     end
   end
@@ -50,10 +50,10 @@ class ResumeTransformerVcrTest < JojoTest
 
       @transformer.send(:reorder_field, "experience", data, can_remove: false)
 
-      _(data["experience"].length).must_equal original_count
-      _(data["experience"]).must_be_kind_of Array
+      assert_equal original_count, data["experience"].length
+      assert_kind_of Array, data["experience"]
       companies = data["experience"].map { |exp| exp["company"] }.sort
-      _(companies).must_equal ["ConsultingCo", "StartupXYZ", "TechCorp"]
+      assert_equal ["ConsultingCo", "StartupXYZ", "TechCorp"], companies
     end
   end
 
@@ -63,9 +63,9 @@ class ResumeTransformerVcrTest < JojoTest
 
       @transformer.send(:reorder_field, "skills", data, can_remove: true)
 
-      _(data["skills"]).must_be_kind_of Array
-      _(data["skills"].length).must_be :>, 0
-      _(data["skills"].length).must_be :<=, 5
+      assert_kind_of Array, data["skills"]
+      assert_operator data["skills"].length, :>, 0
+      assert_operator data["skills"].length, :<=, 5
     end
   end
 
@@ -77,9 +77,9 @@ class ResumeTransformerVcrTest < JojoTest
 
       @transformer.send(:rewrite_field, "summary", data)
 
-      _(data["summary"]).must_be_kind_of String
-      _(data["summary"].length).must_be :>, 0
-      _(data["summary"]).wont_equal original_summary
+      assert_kind_of String, data["summary"]
+      assert_operator data["summary"].length, :>, 0
+      refute_equal original_summary, data["summary"]
     end
   end
 
@@ -97,9 +97,9 @@ class ResumeTransformerVcrTest < JojoTest
 
       begin
         transformer.send(:reorder_field, "languages", data, can_remove: false)
-        _(data["languages"].length).must_equal 5
+        assert_equal 5, data["languages"].length
       rescue Jojo::PermissionViolation => e
-        _(e.message).must_include "removed items"
+        assert_includes e.message, "removed items"
       end
     end
   end

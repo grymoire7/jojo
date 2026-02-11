@@ -25,7 +25,7 @@ class Jojo::Commands::Pdf::ConverterTest < JojoTest
     }) do
       Jojo::Commands::Pdf::PandocChecker.stub(:check!, true) do
         generator.generate_resume_pdf
-        _(File.exist?(@application.resume_pdf_path)).must_equal true
+        assert_equal true, File.exist?(@application.resume_pdf_path)
       end
     end
   end
@@ -37,7 +37,7 @@ class Jojo::Commands::Pdf::ConverterTest < JojoTest
       generator.generate_resume_pdf
     end
 
-    _(error.message).must_include "resume.md not found"
+    assert_includes error.message, "resume.md not found"
   end
 
   # -- generate_cover_letter_pdf --
@@ -54,7 +54,7 @@ class Jojo::Commands::Pdf::ConverterTest < JojoTest
     }) do
       Jojo::Commands::Pdf::PandocChecker.stub(:check!, true) do
         generator.generate_cover_letter_pdf
-        _(File.exist?(@application.cover_letter_pdf_path)).must_equal true
+        assert_equal true, File.exist?(@application.cover_letter_pdf_path)
       end
     end
   end
@@ -80,9 +80,9 @@ class Jojo::Commands::Pdf::ConverterTest < JojoTest
       Jojo::Commands::Pdf::PandocChecker.stub(:check!, true) do
         result = generator.generate_all
 
-        _(result[:generated].length).must_equal 2
-        _(result[:generated]).must_include :resume
-        _(result[:generated]).must_include :cover_letter
+        assert_equal 2, result[:generated].length
+        assert_includes result[:generated], :resume
+        assert_includes result[:generated], :cover_letter
       end
     end
   end
@@ -93,8 +93,8 @@ class Jojo::Commands::Pdf::ConverterTest < JojoTest
     Jojo::Commands::Pdf::PandocChecker.stub(:check!, true) do
       result = generator.generate_all
 
-      _(result[:generated]).must_be_empty
-      _(result[:skipped].length).must_equal 2
+      assert_empty result[:generated]
+      assert_equal 2, result[:skipped].length
     end
   end
 
@@ -109,7 +109,7 @@ class Jojo::Commands::Pdf::ConverterTest < JojoTest
     generator.stub(:system, true) do
       Jojo::Commands::Pdf::PandocChecker.stub(:check!, true) do
         generator.generate_resume_pdf
-        _(output.string).must_include "pandoc"
+        assert_includes output.string, "pandoc"
       end
     end
   end

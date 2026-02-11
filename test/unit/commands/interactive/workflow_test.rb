@@ -10,20 +10,20 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
   def test_defines_all_workflow_steps_in_order
     steps = Jojo::Commands::Interactive::Workflow::STEPS
 
-    _(steps).must_be_kind_of Array
-    _(steps.length).must_equal 9
-    _(steps.first[:key]).must_equal :job_description
-    _(steps.last[:key]).must_equal :pdf
+    assert_kind_of Array, steps
+    assert_equal 9, steps.length
+    assert_equal :job_description, steps.first[:key]
+    assert_equal :pdf, steps.last[:key]
   end
 
   def test_includes_required_fields_for_each_step
     Jojo::Commands::Interactive::Workflow::STEPS.each do |step|
-      _(step).must_include :key
-      _(step).must_include :label
-      _(step).must_include :dependencies
-      _(step).must_include :command
-      _(step).must_include :paid
-      _(step).must_include :output_file
+      assert_includes step, :key
+      assert_includes step, :label
+      assert_includes step, :dependencies
+      assert_includes step, :command
+      assert_includes step, :paid
+      assert_includes step, :output_file
     end
   end
 
@@ -34,7 +34,7 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     application.expect :base_path, "/tmp/test-employer"
 
     path = Jojo::Commands::Interactive::Workflow.file_path(:resume, application)
-    _(path).must_equal "/tmp/test-employer/resume.md"
+    assert_equal "/tmp/test-employer/resume.md", path
   end
 
   def test_file_path_handles_nested_paths_like_website
@@ -43,12 +43,12 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     application.expect :base_path, "/tmp/test-employer"
 
     path = Jojo::Commands::Interactive::Workflow.file_path(:website, application)
-    _(path).must_equal "/tmp/test-employer/website/index.html"
+    assert_equal "/tmp/test-employer/website/index.html", path
   end
 
   def test_file_path_raises_for_unknown_step
     application = Minitest::Mock.new
-    _ { Jojo::Commands::Interactive::Workflow.file_path(:unknown, application) }.must_raise ArgumentError
+    assert_raises(ArgumentError) { Jojo::Commands::Interactive::Workflow.file_path(:unknown, application) }
   end
 
   # .status
@@ -61,7 +61,7 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     application.expect :base_path, @tmpdir
 
     status = Jojo::Commands::Interactive::Workflow.status(:resume, application)
-    _(status).must_equal :blocked
+    assert_equal :blocked, status
   end
 
   def test_status_returns_ready_when_dependencies_exist_but_output_missing
@@ -76,7 +76,7 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     application.expect :base_path, @tmpdir
 
     status = Jojo::Commands::Interactive::Workflow.status(:resume, application)
-    _(status).must_equal :ready
+    assert_equal :ready, status
   end
 
   def test_status_returns_generated_when_output_exists_and_up_to_date
@@ -95,7 +95,7 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     application.expect :base_path, @tmpdir
 
     status = Jojo::Commands::Interactive::Workflow.status(:resume, application)
-    _(status).must_equal :generated
+    assert_equal :generated, status
   end
 
   def test_status_returns_stale_when_dependency_is_newer_than_output
@@ -114,7 +114,7 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     application.expect :base_path, @tmpdir
 
     status = Jojo::Commands::Interactive::Workflow.status(:resume, application)
-    _(status).must_equal :stale
+    assert_equal :stale, status
   end
 
   def test_status_returns_ready_for_job_description_with_no_dependencies
@@ -122,7 +122,7 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     application.expect :base_path, @tmpdir
 
     status = Jojo::Commands::Interactive::Workflow.status(:job_description, application)
-    _(status).must_equal :ready
+    assert_equal :ready, status
   end
 
   # .all_statuses
@@ -134,10 +134,10 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
 
     statuses = Jojo::Commands::Interactive::Workflow.all_statuses(application)
 
-    _(statuses).must_be_kind_of Hash
-    _(statuses.keys.length).must_equal 9
-    _(statuses[:job_description]).must_equal :ready
-    _(statuses[:resume]).must_equal :blocked
+    assert_kind_of Hash, statuses
+    assert_equal 9, statuses.keys.length
+    assert_equal :ready, statuses[:job_description]
+    assert_equal :blocked, statuses[:resume]
   end
 
   # .missing_dependencies
@@ -148,8 +148,8 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
 
     missing = Jojo::Commands::Interactive::Workflow.missing_dependencies(:resume, application)
 
-    _(missing).must_include "Job Description"
-    _(missing).must_include "Research"
+    assert_includes missing, "Job Description"
+    assert_includes missing, "Research"
   end
 
   def test_missing_dependencies_returns_empty_array_when_all_deps_met
@@ -161,7 +161,7 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     5.times { application.expect :base_path, @tmpdir }
 
     missing = Jojo::Commands::Interactive::Workflow.missing_dependencies(:resume, application)
-    _(missing).must_be_empty
+    assert_empty missing
   end
 
   # .progress
@@ -171,7 +171,7 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     27.times { application.expect :base_path, @tmpdir }
 
     progress = Jojo::Commands::Interactive::Workflow.progress(application)
-    _(progress).must_equal 0
+    assert_equal 0, progress
   end
 
   def test_progress_returns_percentage_of_generated_non_stale_items
@@ -183,7 +183,7 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
     27.times { application.expect :base_path, @tmpdir }
 
     progress = Jojo::Commands::Interactive::Workflow.progress(application)
-    _(progress).must_equal 11  # 1/9 rounded
+    assert_equal 11, progress  # 1/9 rounded
   end
 
   private

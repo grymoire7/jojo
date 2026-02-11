@@ -21,8 +21,8 @@ class AIClientTest < JojoTest
     config = Jojo::Config.new("config.yml")
     client = Jojo::AIClient.new(config)
 
-    _(client).must_be_instance_of Jojo::AIClient
-    _(client.config).must_equal config
+    assert_instance_of Jojo::AIClient, client
+    assert_equal config, client.config
   ensure
     ENV["ANTHROPIC_API_KEY"] = original_key
   end
@@ -45,8 +45,8 @@ class AIClientTest < JojoTest
     config = Jojo::Config.new("config.yml")
     client = Jojo::AIClient.new(config)
 
-    _(client).must_be_instance_of Jojo::AIClient
-    _(client.config).must_equal config
+    assert_instance_of Jojo::AIClient, client
+    assert_equal config, client.config
   ensure
     ENV["OPENAI_API_KEY"] = original_key
   end

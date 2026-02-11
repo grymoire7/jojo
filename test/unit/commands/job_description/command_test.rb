@@ -11,7 +11,7 @@ class Jojo::Commands::JobDescription::CommandTest < JojoTest
   end
 
   def test_inherits_from_base
-    _(Jojo::Commands::JobDescription::Command.ancestors).must_include Jojo::Commands::Base
+    assert_includes Jojo::Commands::JobDescription::Command.ancestors, Jojo::Commands::Base
   end
 
   # -- guard failures --
@@ -123,7 +123,7 @@ class Jojo::Commands::JobDescription::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
   end
 
   private

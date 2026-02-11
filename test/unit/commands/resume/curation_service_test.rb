@@ -34,9 +34,9 @@ class Jojo::Commands::Resume::CurationServiceTest < JojoTest
 
     result = @service.generate(@job_context)
 
-    _(result).must_include "# Jane Doe"
-    _(result).must_include "Tailored Ruby developer summary"
-    _(result).must_include "Skills"
+    assert_includes result, "# Jane Doe"
+    assert_includes result, "Tailored Ruby developer summary"
+    assert_includes result, "Skills"
 
     @ai_client.verify
   end
@@ -58,11 +58,11 @@ class Jojo::Commands::Resume::CurationServiceTest < JojoTest
     @ai_client.expect(:generate_text, "Summary v1", [String])
 
     result1 = service_with_cache.generate(@job_context)
-    _(result1).must_include "Summary v1"
+    assert_includes result1, "Summary v1"
 
     # Second call - uses cache (no AI calls)
     result2 = service_with_cache.generate(@job_context)
-    _(result2).must_include "Summary v1"
+    assert_includes result2, "Summary v1"
 
     @ai_client.verify
   end

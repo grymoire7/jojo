@@ -18,12 +18,12 @@ class Jojo::Commands::Resume::PromptTest < JojoTest
       voice_and_tone: voice_and_tone
     )
 
-    _(prompt).must_include "Senior Ruby Developer"
-    _(prompt).must_include "Acme Corp"
-    _(prompt).must_include "Jane Doe"
-    _(prompt).must_include "professional and friendly"
-    _(prompt).must_include "PRESERVE"
-    _(prompt).must_include "PRUNE"
+    assert_includes prompt, "Senior Ruby Developer"
+    assert_includes prompt, "Acme Corp"
+    assert_includes prompt, "Jane Doe"
+    assert_includes prompt, "professional and friendly"
+    assert_includes prompt, "PRESERVE"
+    assert_includes prompt, "PRUNE"
   end
 
   def test_generates_prompt_without_optional_inputs
@@ -38,8 +38,8 @@ class Jojo::Commands::Resume::PromptTest < JojoTest
       voice_and_tone: "professional"
     )
 
-    _(prompt).must_include "Ruby Developer"
-    _(prompt).must_include "Jane Doe"
-    _(prompt).wont_include "# Company Profile"
+    assert_includes prompt, "Ruby Developer"
+    assert_includes prompt, "Jane Doe"
+    refute_includes prompt, "# Company Profile"
   end
 end

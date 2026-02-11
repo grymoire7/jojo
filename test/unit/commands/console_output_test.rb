@@ -33,7 +33,7 @@ class Jojo::Commands::ConsoleOutputTest < JojoTest
     assert_output(/Continue\?/) { result = output.yes?("Continue?") }
     $stdin = STDIN
 
-    _(result).must_equal true
+    assert_equal true, result
   end
 
   def test_yes_returns_true_for_yes_input
@@ -44,7 +44,7 @@ class Jojo::Commands::ConsoleOutputTest < JojoTest
     assert_output(/Continue\?/) { result = output.yes?("Continue?") }
     $stdin = STDIN
 
-    _(result).must_equal true
+    assert_equal true, result
   end
 
   def test_yes_returns_false_for_n_input
@@ -55,6 +55,6 @@ class Jojo::Commands::ConsoleOutputTest < JojoTest
     assert_output(/Continue\?/) { result = output.yes?("Continue?") }
     $stdin = STDIN
 
-    _(result).must_equal false
+    assert_equal false, result
   end
 end

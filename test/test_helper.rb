@@ -57,11 +57,6 @@ end
 require_relative "../lib/jojo"
 
 class JojoTest < Minitest::Test
-  # Provide _() expectation wrapper (normally only available in Minitest::Spec)
-  def _(value = nil, &block)
-    Minitest::Expectation.new(block || value, self)
-  end
-
   def setup
     @original_dir = Dir.pwd
     @tmpdir = Dir.mktmpdir

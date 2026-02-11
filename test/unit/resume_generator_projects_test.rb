@@ -48,8 +48,8 @@ class ResumeGeneratorProjectsTest < JojoTest
     generator = Jojo::Commands::Resume::Generator.new(@application, mock_ai, config: @config, inputs_path: fixture_path)
     result = generator.generate
 
-    _(result).must_include "# Jane Doe"
-    _(result).must_include "Test Corp"
+    assert_includes result, "# Jane Doe"
+    assert_includes result, "Test Corp"
 
     mock_ai.verify
   end

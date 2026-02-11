@@ -15,7 +15,7 @@ class Jojo::Commands::Website::CommandTest < JojoTest
   end
 
   def test_inherits_from_base
-    _(Jojo::Commands::Website::Command.ancestors).must_include Jojo::Commands::Base
+    assert_includes Jojo::Commands::Website::Command.ancestors, Jojo::Commands::Base
   end
 
   # guard failures
@@ -39,7 +39,7 @@ class Jojo::Commands::Website::CommandTest < JojoTest
     command = Jojo::Commands::Website::Command.new(@mock_cli, slug: "acme-corp")
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
     @mock_cli.verify
   end
 
@@ -206,6 +206,6 @@ class Jojo::Commands::Website::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
   end
 end

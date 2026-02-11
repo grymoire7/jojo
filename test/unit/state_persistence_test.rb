@@ -11,27 +11,27 @@ class StatePersistenceTest < JojoTest
   def test_saves_slug_to_state_file
     Jojo::StatePersistence.save_slug("acme-corp-dev")
 
-    _(File.exist?(@state_file)).must_equal true
-    _(File.read(@state_file).strip).must_equal "acme-corp-dev"
+    assert_equal true, File.exist?(@state_file)
+    assert_equal "acme-corp-dev", File.read(@state_file).strip
   end
 
   def test_returns_nil_when_no_state_file_exists
     slug = Jojo::StatePersistence.load_slug
-    _(slug).must_be_nil
+    assert_nil slug
   end
 
   def test_returns_saved_slug_when_state_file_exists
     File.write(@state_file, "acme-corp-dev")
 
     slug = Jojo::StatePersistence.load_slug
-    _(slug).must_equal "acme-corp-dev"
+    assert_equal "acme-corp-dev", slug
   end
 
   def test_strips_whitespace_from_saved_slug
     File.write(@state_file, "  acme-corp-dev  \n")
 
     slug = Jojo::StatePersistence.load_slug
-    _(slug).must_equal "acme-corp-dev"
+    assert_equal "acme-corp-dev", slug
   end
 
   def test_clear_removes_the_state_file
@@ -39,7 +39,7 @@ class StatePersistenceTest < JojoTest
 
     Jojo::StatePersistence.clear
 
-    _(File.exist?(@state_file)).must_equal false
+    assert_equal false, File.exist?(@state_file)
   end
 
   def test_clear_does_nothing_if_no_state_file_exists

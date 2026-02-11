@@ -24,7 +24,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
   end
 
   def test_initializes_with_required_parameters
-    _(@transformer).wont_be_nil
+    refute_nil @transformer
   end
 
   # -- get_field --
@@ -32,7 +32,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
   def test_get_field_gets_top_level_field
     data = {"skills" => ["Ruby", "Python"]}
     result = @transformer.send(:get_field, data, "skills")
-    _(result).must_equal ["Ruby", "Python"]
+    assert_equal ["Ruby", "Python"], result
   end
 
   def test_get_field_gets_nested_field_with_dot_notation
@@ -42,13 +42,13 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
       ]
     }
     result = @transformer.send(:get_field, data, "experience.description")
-    _(result).must_equal "Led team"
+    assert_equal "Led team", result
   end
 
   def test_get_field_returns_nil_for_missing_field
     data = {"skills" => []}
     result = @transformer.send(:get_field, data, "nonexistent")
-    _(result).must_be_nil
+    assert_nil result
   end
 
   # -- set_field --
@@ -56,7 +56,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
   def test_set_field_sets_top_level_field
     data = {"skills" => ["Ruby"]}
     @transformer.send(:set_field, data, "skills", ["Python"])
-    _(data["skills"]).must_equal ["Python"]
+    assert_equal ["Python"], data["skills"]
   end
 
   def test_set_field_sets_field_on_all_array_items
@@ -67,14 +67,14 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
       ]
     }
     @transformer.send(:set_field, data, "experience.description", "new")
-    _(data["experience"][0]["description"]).must_equal "new"
-    _(data["experience"][1]["description"]).must_equal "new"
+    assert_equal "new", data["experience"][0]["description"]
+    assert_equal "new", data["experience"][1]["description"]
   end
 
   def test_set_field_sets_nested_scalar_field
     data = {"contact" => {"email" => "old@example.com"}}
     @transformer.send(:set_field, data, "contact.email", "new@example.com")
-    _(data["contact"]["email"]).must_equal "new@example.com"
+    assert_equal "new@example.com", data["contact"]["email"]
   end
 
   # -- filter_field --
@@ -87,7 +87,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
 
     @transformer.send(:filter_field, "skills", data)
 
-    _(data["skills"]).must_equal ["Ruby", "Python", "Go"]
+    assert_equal ["Ruby", "Python", "Go"], data["skills"]
     @ai_client.verify
   end
 
@@ -96,7 +96,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
 
     @transformer.send(:filter_field, "summary", data)
 
-    _(data["summary"]).must_equal "Some text"
+    assert_equal "Some text", data["summary"]
   end
 
   def test_filter_field_does_nothing_for_missing_fields
@@ -104,7 +104,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
 
     @transformer.send(:filter_field, "nonexistent", data)
 
-    _(data["skills"]).must_equal ["Ruby"]
+    assert_equal ["Ruby"], data["skills"]
   end
 
   # -- reorder_field --
@@ -117,7 +117,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
 
     @transformer.send(:reorder_field, "skills", data, can_remove: true)
 
-    _(data["skills"]).must_equal ["Java", "Ruby", "Python"]
+    assert_equal ["Java", "Ruby", "Python"], data["skills"]
     @ai_client.verify
   end
 
@@ -131,8 +131,8 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
       @transformer.send(:reorder_field, "experience", data, can_remove: false)
     end
 
-    _(error.message).must_include "removed items"
-    _(error.message).must_include "experience"
+    assert_includes error.message, "removed items"
+    assert_includes error.message, "experience"
   end
 
   def test_reorder_field_raises_error_when_llm_returns_invalid_indices
@@ -145,7 +145,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
       @transformer.send(:reorder_field, "experience", data, can_remove: false)
     end
 
-    _(error.message).must_include "invalid indices"
+    assert_includes error.message, "invalid indices"
   end
 
   def test_reorder_field_allows_removal_when_can_remove_is_true
@@ -156,7 +156,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
 
     @transformer.send(:reorder_field, "skills", data, can_remove: true)
 
-    _(data["skills"]).must_equal ["Ruby", "Java"]
+    assert_equal ["Ruby", "Java"], data["skills"]
     @ai_client.verify
   end
 
@@ -170,7 +170,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
 
     @transformer.send(:rewrite_field, "summary", data)
 
-    _(data["summary"]).must_equal tailored
+    assert_equal tailored, data["summary"]
     @ai_client.verify
   end
 
@@ -179,7 +179,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
 
     @transformer.send(:rewrite_field, "skills", data)
 
-    _(data["skills"]).must_equal ["Ruby", "Python"]
+    assert_equal ["Ruby", "Python"], data["skills"]
   end
 
   def test_rewrite_field_does_nothing_for_missing_fields
@@ -187,7 +187,7 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
 
     @transformer.send(:rewrite_field, "nonexistent", data)
 
-    _(data["summary"]).must_equal "text"
+    assert_equal "text", data["summary"]
   end
 
   # -- transform --
@@ -213,11 +213,11 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
     result = @full_transformer.transform(data)
 
     # Skills filtered and reordered
-    _(result["skills"].length).must_equal 3
+    assert_equal 3, result["skills"].length
     # Experience reordered (all 3 preserved)
-    _(result["experience"]).must_equal ["exp3", "exp2", "exp1"]
+    assert_equal ["exp3", "exp2", "exp1"], result["experience"]
     # Summary rewritten
-    _(result["summary"]).must_equal "Tailored summary"
+    assert_equal "Tailored summary", result["summary"]
 
     @ai_client.verify
   end
@@ -238,8 +238,8 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
     result = @full_transformer.transform(data)
 
     # Read-only fields preserved exactly
-    _(result["name"]).must_equal "Jane Doe"
-    _(result["email"]).must_equal "jane@example.com"
+    assert_equal "Jane Doe", result["name"]
+    assert_equal "jane@example.com", result["email"]
   end
 
   private

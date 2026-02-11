@@ -3,7 +3,7 @@ require_relative "../../lib/jojo/cli"
 
 class CLIBrandingTest < JojoTest
   def test_has_branding_command
-    _(Jojo::CLI.commands.key?("branding")).must_equal true
+    assert_equal true, Jojo::CLI.commands.key?("branding")
   end
 
   def test_fails_when_application_does_not_exist
@@ -15,6 +15,6 @@ class CLIBrandingTest < JojoTest
     end
     output = out + err
 
-    _(output).must_include "not found"
+    assert_includes output, "not found"
   end
 end

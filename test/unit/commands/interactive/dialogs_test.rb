@@ -8,10 +8,10 @@ class Jojo::Commands::Interactive::DialogsTest < JojoTest
   def test_blocked_dialog_renders_dialog_showing_missing_prerequisites
     output = Jojo::Commands::Interactive::Dialogs.blocked_dialog("Cover Letter", ["Resume"])
 
-    _(output).must_include "Cover Letter"
-    _(output).must_include "Cannot generate yet"
-    _(output).must_include "Resume"
-    _(output).must_include "[Esc] Back"
+    assert_includes output, "Cover Letter"
+    assert_includes output, "Cannot generate yet"
+    assert_includes output, "Resume"
+    assert_includes output, "[Esc] Back"
   end
 
   # .ready_dialog
@@ -24,13 +24,13 @@ class Jojo::Commands::Interactive::DialogsTest < JojoTest
 
     output = Jojo::Commands::Interactive::Dialogs.ready_dialog("Cover Letter", inputs, "cover_letter.md", paid: true)
 
-    _(output).must_include "Cover Letter"
-    _(output).must_include "Generate"
-    _(output).must_include "$"
-    _(output).must_include "resume.md"
-    _(output).must_include "2 hours ago"
-    _(output).must_include "cover_letter.md"
-    _(output).must_include "[Enter] Generate"
+    assert_includes output, "Cover Letter"
+    assert_includes output, "Generate"
+    assert_includes output, "$"
+    assert_includes output, "resume.md"
+    assert_includes output, "2 hours ago"
+    assert_includes output, "cover_letter.md"
+    assert_includes output, "[Enter] Generate"
   end
 
   # .generated_dialog
@@ -38,11 +38,11 @@ class Jojo::Commands::Interactive::DialogsTest < JojoTest
   def test_generated_dialog_renders_dialog_for_already_generated_item
     output = Jojo::Commands::Interactive::Dialogs.generated_dialog("Cover Letter", "1 hour ago", paid: true)
 
-    _(output).must_include "cover_letter.md already exists"
-    _(output).must_include "1 hour ago"
-    _(output).must_include "[r] Regenerate"
-    _(output).must_include "$"
-    _(output).must_include "[v] View"
+    assert_includes output, "cover_letter.md already exists"
+    assert_includes output, "1 hour ago"
+    assert_includes output, "[r] Regenerate"
+    assert_includes output, "$"
+    assert_includes output, "[v] View"
   end
 
   # .error_dialog
@@ -50,11 +50,11 @@ class Jojo::Commands::Interactive::DialogsTest < JojoTest
   def test_error_dialog_renders_error_dialog_with_message
     output = Jojo::Commands::Interactive::Dialogs.error_dialog("Cover Letter", "API Error: Rate limit exceeded")
 
-    _(output).must_include "Error"
-    _(output).must_include "Cover Letter generation failed"
-    _(output).must_include "Rate limit exceeded"
-    _(output).must_include "[r] Retry"
-    _(output).must_include "[Esc] Back"
+    assert_includes output, "Error"
+    assert_includes output, "Cover Letter generation failed"
+    assert_includes output, "Rate limit exceeded"
+    assert_includes output, "[r] Retry"
+    assert_includes output, "[Esc] Back"
   end
 
   # .input_dialog
@@ -62,8 +62,8 @@ class Jojo::Commands::Interactive::DialogsTest < JojoTest
   def test_input_dialog_renders_input_dialog_with_prompt
     output = Jojo::Commands::Interactive::Dialogs.input_dialog("New Application", "Slug (e.g., acme-corp-senior-dev):")
 
-    _(output).must_include "New Application"
-    _(output).must_include "Slug"
-    _(output).must_include "> "
+    assert_includes output, "New Application"
+    assert_includes output, "Slug"
+    assert_includes output, "> "
   end
 end

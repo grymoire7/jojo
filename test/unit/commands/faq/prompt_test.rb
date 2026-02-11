@@ -14,7 +14,7 @@ class Jojo::Commands::Faq::PromptTest < JojoTest
       voice_and_tone: "professional and friendly"
     )
 
-    _(prompt).must_include "We need a Python developer with 5+ years experience."
+    assert_includes prompt, "We need a Python developer with 5+ years experience."
   end
 
   def test_includes_resume_in_prompt
@@ -28,8 +28,8 @@ class Jojo::Commands::Faq::PromptTest < JojoTest
       voice_and_tone: "professional"
     )
 
-    _(prompt).must_include "# John Doe"
-    _(prompt).must_include "Senior developer with expertise"
+    assert_includes prompt, "# John Doe"
+    assert_includes prompt, "Senior developer with expertise"
   end
 
   def test_includes_research_when_available
@@ -43,7 +43,7 @@ class Jojo::Commands::Faq::PromptTest < JojoTest
       voice_and_tone: "professional"
     )
 
-    _(prompt).must_include "Acme Corp is a fintech startup"
+    assert_includes prompt, "Acme Corp is a fintech startup"
   end
 
   def test_includes_base_url_for_pdf_links
@@ -57,7 +57,7 @@ class Jojo::Commands::Faq::PromptTest < JojoTest
       voice_and_tone: "professional"
     )
 
-    _(prompt).must_include "https://johndoe.com"
+    assert_includes prompt, "https://johndoe.com"
   end
 
   def test_specifies_required_faq_categories
@@ -71,10 +71,10 @@ class Jojo::Commands::Faq::PromptTest < JojoTest
       voice_and_tone: "professional"
     )
 
-    _(prompt).must_include "Tech stack"
-    _(prompt).must_include "Remote work"
-    _(prompt).must_include "AI philosophy"
-    _(prompt).must_include "Why this company"
+    assert_includes prompt, "Tech stack"
+    assert_includes prompt, "Remote work"
+    assert_includes prompt, "AI philosophy"
+    assert_includes prompt, "Why this company"
   end
 
   def test_handles_missing_research_gracefully
@@ -88,7 +88,7 @@ class Jojo::Commands::Faq::PromptTest < JojoTest
       voice_and_tone: "professional"
     )
 
-    _(prompt).wont_be_nil
-    _(prompt).must_be_kind_of String
+    refute_nil prompt
+    assert_kind_of String, prompt
   end
 end

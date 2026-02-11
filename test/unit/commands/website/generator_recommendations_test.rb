@@ -74,9 +74,9 @@ class Jojo::Commands::Website::GeneratorRecommendationsTest < JojoTest
 
     recommendations = generator.send(:load_recommendations)
 
-    _(recommendations.length).must_equal 1
-    _(recommendations[0][:name]).must_equal "Jane Smith"
-    _(recommendations[0][:quote]).must_equal "Great engineer"
+    assert_equal 1, recommendations.length
+    assert_equal "Jane Smith", recommendations[0][:name]
+    assert_equal "Great engineer", recommendations[0][:quote]
   end
 
   def test_handles_missing_resume_data_yml_gracefully
@@ -92,6 +92,6 @@ class Jojo::Commands::Website::GeneratorRecommendationsTest < JojoTest
     )
 
     recommendations = generator.send(:load_recommendations)
-    _(recommendations).must_be_nil
+    assert_nil recommendations
   end
 end

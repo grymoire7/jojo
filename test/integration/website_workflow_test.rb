@@ -54,30 +54,30 @@ class WebsiteWorkflowTest < JojoTest
     generator.generate
 
     # Verify file was created
-    _(File.exist?(@employer.index_html_path)).must_equal true
+    assert_equal true, File.exist?(@employer.index_html_path)
 
     # Verify HTML structure
     html = File.read(@employer.index_html_path)
-    _(html).must_include "<!DOCTYPE html>"
-    _(html).must_include "<html lang=\"en\">"
-    _(html).must_include "</html>"
+    assert_includes html, "<!DOCTYPE html>"
+    assert_includes html, "<html lang=\"en\">"
+    assert_includes html, "</html>"
 
     # Verify content sections
-    _(html).must_include "Am I a good match for Test Company?"
-    _(html).must_include "I'm excited about Test Company because"
-    _(html).must_include "With 10 years of experience"
-    _(html).must_include "Schedule a Call"
-    _(html).must_include "https://calendly.com/johndoe/30min"
+    assert_includes html, "Am I a good match for Test Company?"
+    assert_includes html, "I'm excited about Test Company because"
+    assert_includes html, "With 10 years of experience"
+    assert_includes html, "Schedule a Call"
+    assert_includes html, "https://calendly.com/johndoe/30min"
 
     # Verify footer links
-    _(html).must_include "resume.pdf"
-    _(html).must_include "cover-letter.pdf"
+    assert_includes html, "resume.pdf"
+    assert_includes html, "cover-letter.pdf"
 
     # Verify responsive CSS
     styles_css = File.read(File.join(@employer.website_path, "styles.css"))
-    _(styles_css).must_include "@media (max-width: 640px)"
-    _(html).must_include '<link rel="stylesheet" href="styles.css">'
-    _(html).must_include "viewport"
+    assert_includes styles_css, "@media (max-width: 640px)"
+    assert_includes html, '<link rel="stylesheet" href="styles.css">'
+    assert_includes html, "viewport"
 
     @ai_client.verify
   end
@@ -110,10 +110,10 @@ class WebsiteWorkflowTest < JojoTest
 
     result = generator.generate
 
-    _(result).must_include "Custom Template"
-    _(result).must_include "John Doe - Test Company"
-    _(result).must_include "I'm excited about Test Company"
-    _(result).must_include "https://calendly.com/johndoe/30min"
+    assert_includes result, "Custom Template"
+    assert_includes result, "John Doe - Test Company"
+    assert_includes result, "I'm excited about Test Company"
+    assert_includes result, "https://calendly.com/johndoe/30min"
 
     FileUtils.rm_f("templates/website/custom.html.erb")
     @ai_client.verify
@@ -133,12 +133,12 @@ class WebsiteWorkflowTest < JojoTest
 
     # Verify image was copied to website directory
     website_image = File.join(@employer.website_path, "branding_image.jpg")
-    _(File.exist?(website_image)).must_equal true
+    assert_equal true, File.exist?(website_image)
 
     # Verify HTML includes image reference
     html = File.read(@employer.index_html_path)
-    _(html).must_include "branding_image.jpg"
-    _(html).must_include '<img src="branding_image.jpg"'
+    assert_includes html, "branding_image.jpg"
+    assert_includes html, '<img src="branding_image.jpg"'
 
     @ai_client.verify
   end
@@ -158,12 +158,12 @@ class WebsiteWorkflowTest < JojoTest
     html = File.read(@employer.index_html_path)
 
     # CTA section should not be present
-    _(html).wont_include '<section class="cta-section">'
-    _(html).wont_include 'class="cta-button"'
+    refute_includes html, '<section class="cta-section">'
+    refute_includes html, 'class="cta-button"'
 
     # But rest of website should be intact
-    _(html).must_include "Am I a good match for Test Company?"
-    _(html).must_include "I'm excited about Test Company"
+    assert_includes html, "Am I a good match for Test Company?"
+    assert_includes html, "I'm excited about Test Company"
 
     @ai_client.verify
   end
@@ -182,8 +182,8 @@ class WebsiteWorkflowTest < JojoTest
     # Should not raise error
     result = generator.generate
 
-    _(File.exist?(@employer.index_html_path)).must_equal true
-    _(result).must_include "I'm excited about Test Company"
+    assert_equal true, File.exist?(@employer.index_html_path)
+    assert_includes result, "I'm excited about Test Company"
 
     @ai_client.verify
   end

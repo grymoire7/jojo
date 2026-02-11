@@ -11,11 +11,11 @@ class StatusLoggerTest < JojoTest
   end
 
   def test_creates_status_log_file_on_first_write
-    _(File.exist?(@application.status_log_path)).wont_equal true
+    refute_equal true, File.exist?(@application.status_log_path)
 
     @logger.log("Test message")
 
-    _(File.exist?(@application.status_log_path)).must_equal true
+    assert_equal true, File.exist?(@application.status_log_path)
   end
 
   def test_appends_to_existing_status_log
@@ -26,8 +26,8 @@ class StatusLoggerTest < JojoTest
     entry1 = JSON.parse(content.lines[0])
     entry2 = JSON.parse(content.lines[1])
 
-    _(entry1["message"]).must_equal "First message"
-    _(entry2["message"]).must_equal "Second message"
+    assert_equal "First message", entry1["message"]
+    assert_equal "Second message", entry2["message"]
   end
 
   def test_includes_timestamp_in_log_entry
@@ -36,7 +36,7 @@ class StatusLoggerTest < JojoTest
     content = File.read(@application.status_log_path)
     entry = JSON.parse(content.lines.first)
 
-    _(entry["timestamp"]).must_match(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)
+    assert_match(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/, entry["timestamp"])
   end
 
   def test_formats_log_entry_as_json
@@ -45,8 +45,8 @@ class StatusLoggerTest < JojoTest
     content = File.read(@application.status_log_path)
     entry = JSON.parse(content.lines.first)
 
-    _(entry["message"]).must_equal "Test message"
-    _(entry["timestamp"]).wont_be_nil
+    assert_equal "Test message", entry["message"]
+    refute_nil entry["timestamp"]
   end
 
   def test_logs_step_with_metadata
@@ -55,10 +55,10 @@ class StatusLoggerTest < JojoTest
     content = File.read(@application.status_log_path)
     entry = JSON.parse(content.lines.first)
 
-    _(entry["step"]).must_equal "Job Description Processing"
-    _(entry["tokens"]).must_equal 1500
-    _(entry["status"]).must_equal "complete"
-    _(entry["timestamp"]).wont_be_nil
+    assert_equal "Job Description Processing", entry["step"]
+    assert_equal 1500, entry["tokens"]
+    assert_equal "complete", entry["status"]
+    refute_nil entry["timestamp"]
   end
 
   def test_creates_valid_jsonl_with_multiple_entries
@@ -69,11 +69,11 @@ class StatusLoggerTest < JojoTest
     content = File.read(@application.status_log_path)
     lines = content.lines
 
-    _(lines.length).must_equal 3
+    assert_equal 3, lines.length
 
     lines.each do |line|
       parsed = JSON.parse(line)
-      _(parsed).wont_be_nil
+      refute_nil parsed
     end
   end
 end

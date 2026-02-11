@@ -38,9 +38,9 @@ class Jojo::Commands::Branding::GeneratorTest < JojoTest
 
     result = @generator.generate
 
-    _(result).must_equal expected_branding
-    _(File.exist?(@application.branding_path)).must_equal true
-    _(File.read(@application.branding_path)).must_equal expected_branding
+    assert_equal expected_branding, result
+    assert_equal true, File.exist?(@application.branding_path)
+    assert_equal expected_branding, File.read(@application.branding_path)
 
     @ai_client.verify
   end
@@ -48,13 +48,13 @@ class Jojo::Commands::Branding::GeneratorTest < JojoTest
   def test_raises_error_when_job_description_missing
     FileUtils.rm_f(@application.job_description_path)
 
-    _ { @generator.generate }.must_raise RuntimeError
+    assert_raises(RuntimeError) { @generator.generate }
   end
 
   def test_raises_error_when_resume_missing
     FileUtils.rm_f(@application.resume_path)
 
-    _ { @generator.generate }.must_raise RuntimeError
+    assert_raises(RuntimeError) { @generator.generate }
   end
 
   def test_handles_missing_research_gracefully
@@ -64,7 +64,7 @@ class Jojo::Commands::Branding::GeneratorTest < JojoTest
     @ai_client.expect(:generate_text, expected_branding, [String])
 
     result = @generator.generate
-    _(result).must_equal expected_branding
+    assert_equal expected_branding, result
 
     @ai_client.verify
   end
@@ -76,7 +76,7 @@ class Jojo::Commands::Branding::GeneratorTest < JojoTest
     @ai_client.expect(:generate_text, expected_branding, [String])
 
     result = @generator.generate
-    _(result).must_equal expected_branding
+    assert_equal expected_branding, result
 
     @ai_client.verify
   end

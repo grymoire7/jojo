@@ -82,17 +82,17 @@ class ProjectsIntegrationWorkflowTest < JojoTest
     html = File.read(@employer.index_html_path)
 
     # Should include all projects from resume_data
-    _(html).must_include "E-commerce Platform"
-    _(html).must_include "Team Leadership Award"
-    _(html).must_include "Python Project"
+    assert_includes html, "E-commerce Platform"
+    assert_includes html, "Team Leadership Award"
+    assert_includes html, "Python Project"
 
     # Should include project metadata
-    _(html).must_include "2024"
-    _(html).must_include "at Previous Corp"
+    assert_includes html, "2024"
+    assert_includes html, "at Previous Corp"
 
     # Should include links
-    _(html).must_include "https://example.com/blog/ecommerce"
-    _(html).must_include "https://github.com/user/ecommerce"
+    assert_includes html, "https://example.com/blog/ecommerce"
+    assert_includes html, "https://github.com/user/ecommerce"
 
     mock_ai.verify
   end

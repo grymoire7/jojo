@@ -10,7 +10,7 @@ class Jojo::Commands::Setup::CommandTest < JojoTest
   end
 
   def test_inherits_from_base
-    _(Jojo::Commands::Setup::Command.ancestors).must_include Jojo::Commands::Base
+    assert_includes Jojo::Commands::Setup::Command.ancestors, Jojo::Commands::Base
   end
 
   # -- successful execution --
@@ -57,7 +57,7 @@ class Jojo::Commands::Setup::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
   end
 
   def test_allows_clean_exit_from_service
@@ -70,6 +70,6 @@ class Jojo::Commands::Setup::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 0
+    assert_equal 0, error.status
   end
 end

@@ -27,10 +27,10 @@ class Jojo::Commands::JobDescription::ProcessorTest < JojoTest
 
     result = @processor.process(@test_file)
 
-    _(result[:job_description]).must_equal "Clean job description"
-    _(result[:job_details]).must_include "Test Company"
-    _(File.exist?(@application.job_description_path)).must_equal true
-    _(File.exist?(@application.job_details_path)).must_equal true
+    assert_equal "Clean job description", result[:job_description]
+    assert_includes result[:job_details], "Test Company"
+    assert_equal true, File.exist?(@application.job_description_path)
+    assert_equal true, File.exist?(@application.job_details_path)
 
     @ai_client.verify
   end
@@ -40,7 +40,7 @@ class Jojo::Commands::JobDescription::ProcessorTest < JojoTest
       @processor.process("nonexistent_file.txt")
     end
 
-    _(error.message).must_include "File not found"
+    assert_includes error.message, "File not found"
   end
 
   def test_extracts_job_description_using_ai
@@ -52,7 +52,7 @@ class Jojo::Commands::JobDescription::ProcessorTest < JojoTest
     # We need to stub fetch_content method to avoid actual file/URL access
     @processor.stub(:fetch_content, raw_content) do
       result = @processor.process("dummy.txt")
-      _(result[:job_description]).must_equal "Ruby Developer job"
+      assert_equal "Ruby Developer job", result[:job_description]
     end
 
     @ai_client.verify
@@ -64,8 +64,8 @@ class Jojo::Commands::JobDescription::ProcessorTest < JojoTest
 
     result = @processor.process(@test_file)
 
-    _(result[:job_details]).must_include "company_name"
-    _(result[:job_details]).must_include "job_title"
+    assert_includes result[:job_details], "company_name"
+    assert_includes result[:job_details], "job_title"
 
     @ai_client.verify
   end

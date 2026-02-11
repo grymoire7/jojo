@@ -48,13 +48,13 @@ class ErbRendererTest < JojoTest
     renderer = Jojo::ErbRenderer.new(template_path)
     result = renderer.render(data)
 
-    _(result).must_include "# Jane Doe"
-    _(result).must_include "jane@example.com"
-    _(result).must_include "Experienced engineer"
-    _(result).must_include "Ruby • Python"
-    _(result).must_include "### Senior Dev at TechCo"
-    _(result).must_include "> Great engineer"
-    _(result).must_include "Jane Smith"
+    assert_includes result, "# Jane Doe"
+    assert_includes result, "jane@example.com"
+    assert_includes result, "Experienced engineer"
+    assert_includes result, "Ruby • Python"
+    assert_includes result, "### Senior Dev at TechCo"
+    assert_includes result, "> Great engineer"
+    assert_includes result, "Jane Smith"
   end
 
   def test_handles_missing_optional_fields
@@ -74,7 +74,7 @@ class ErbRendererTest < JojoTest
     renderer = Jojo::ErbRenderer.new(template_path)
     result = renderer.render(data)
 
-    _(result).must_include "# John Doe"
-    _(result).wont_include "## Recommendations"
+    assert_includes result, "# John Doe"
+    refute_includes result, "## Recommendations"
   end
 end

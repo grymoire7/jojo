@@ -14,7 +14,7 @@ class Jojo::Commands::Faq::CommandTest < JojoTest
   end
 
   def test_inherits_from_base
-    _(Jojo::Commands::Faq::Command.ancestors).must_include Jojo::Commands::Base
+    assert_includes Jojo::Commands::Faq::Command.ancestors, Jojo::Commands::Base
   end
 
   # -- guard failures --
@@ -38,7 +38,7 @@ class Jojo::Commands::Faq::CommandTest < JojoTest
     command = Jojo::Commands::Faq::Command.new(@mock_cli, slug: "acme-corp")
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
     @mock_cli.verify
   end
 
@@ -131,7 +131,7 @@ class Jojo::Commands::Faq::CommandTest < JojoTest
     )
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
   end
 
   private

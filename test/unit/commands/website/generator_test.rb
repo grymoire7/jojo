@@ -51,21 +51,21 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
   def test_generates_website_with_all_inputs
     result = @generator.generate
 
-    _(result).must_include "Am I a good match for Acme Corp?"
-    _(result).must_include "I'm a perfect fit for Acme Corp..."
-    _(result).must_include "My experience aligns perfectly..."
-    _(result).must_include "Schedule a Call"
-    _(result).must_include "https://calendly.com/janedoe/30min"
+    assert_includes result, "Am I a good match for Acme Corp?"
+    assert_includes result, "I'm a perfect fit for Acme Corp..."
+    assert_includes result, "My experience aligns perfectly..."
+    assert_includes result, "Schedule a Call"
+    assert_includes result, "https://calendly.com/janedoe/30min"
   end
 
   def test_saves_website_to_index_html
     @generator.generate
 
-    _(File.exist?(@application.index_html_path)).must_equal true
+    assert_equal true, File.exist?(@application.index_html_path)
     content = File.read(@application.index_html_path)
-    _(content).must_include "I'm a perfect fit for Acme Corp..."
-    _(content).must_include "<!DOCTYPE html>"
-    _(content).must_include "</html>"
+    assert_includes content, "I'm a perfect fit for Acme Corp..."
+    assert_includes content, "<!DOCTYPE html>"
+    assert_includes content, "</html>"
   end
 
   def test_generates_website_with_minimal_inputs
@@ -74,7 +74,7 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
 
     # Should not raise error
     result = @generator.generate
-    _(result).must_include "Branding statement without research"
+    assert_includes result, "Branding statement without research"
   end
 
   def test_generates_website_with_custom_template
@@ -86,7 +86,7 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
 
     result = generator.generate
 
-    _(result).must_include "<h1>Jane Doe</h1>"
+    assert_includes result, "<h1>Jane Doe</h1>"
 
     FileUtils.rm_f("templates/website/modern.html.erb")
   end
@@ -98,8 +98,8 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
       generator.generate
     end
 
-    _(error.message).must_include "Template not found"
-    _(error.message).must_include "nonexistent"
+    assert_includes error.message, "Template not found"
+    assert_includes error.message, "nonexistent"
   end
 
   def test_fails_when_resume_is_missing
@@ -109,7 +109,7 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
       @generator.generate
     end
 
-    _(error.message).must_include "Resume not found"
+    assert_includes error.message, "Resume not found"
   end
 
   def test_fails_when_job_description_is_missing
@@ -119,7 +119,7 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
       @generator.generate
     end
 
-    _(error.message).must_include "Job description not found"
+    assert_includes error.message, "Job description not found"
   end
 
   def test_copies_branding_image_when_it_exists
@@ -128,11 +128,11 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
 
     # Check that image was copied
     image_path = File.join(@application.website_path, "branding_image.jpg")
-    _(File.exist?(image_path)).must_equal true
+    assert_equal true, File.exist?(image_path)
 
     # Check that HTML references the image
     html = File.read(@application.index_html_path)
-    _(html).must_include "branding_image.jpg"
+    assert_includes html, "branding_image.jpg"
   end
 
   def test_skips_branding_image_when_missing
@@ -149,19 +149,19 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
 
     # Image should not exist in website directory
     image_path = File.join(@application.website_path, "branding_image.jpg")
-    _(File.exist?(image_path)).must_equal false
+    assert_equal false, File.exist?(image_path)
   end
 
   def test_renders_template_with_all_variables
     result = @generator.generate
 
     # Check all template variables rendered
-    _(result).must_include "Jane Doe"
-    _(result).must_include "Acme Corp"
-    _(result).must_include "Schedule a Call"
-    _(result).must_include "https://calendly.com/janedoe/30min"
-    _(result).must_include "resume.pdf"
-    _(result).must_include "cover-letter.pdf"
+    assert_includes result, "Jane Doe"
+    assert_includes result, "Acme Corp"
+    assert_includes result, "Schedule a Call"
+    assert_includes result, "https://calendly.com/janedoe/30min"
+    assert_includes result, "resume.pdf"
+    assert_includes result, "cover-letter.pdf"
   end
 
   def test_handles_missing_cta_link_gracefully
@@ -170,8 +170,8 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
     result = @generator.generate
 
     # CTA section should not be rendered (check for actual section tag, not CSS class)
-    _(result).wont_include '<section class="cta-section">'
-    _(result).wont_include 'class="cta-button"'
+    refute_includes result, '<section class="cta-section">'
+    refute_includes result, 'class="cta-button"'
   end
 
   def test_handles_empty_cta_link_gracefully
@@ -180,8 +180,8 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
     result = @generator.generate
 
     # CTA section should not be rendered (check for actual section tag, not CSS class)
-    _(result).wont_include '<section class="cta-section">'
-    _(result).wont_include 'class="cta-button"'
+    refute_includes result, '<section class="cta-section">'
+    refute_includes result, 'class="cta-button"'
   end
 
   def test_loads_and_injects_annotations_into_job_description_html
@@ -198,9 +198,9 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
     result = @generator.generate
 
     # Should include annotated job description section
-    _(result).must_include "Compare Me to the Job Description"
-    _(result).must_include '<span class="annotated" data-tier="strong" data-match="7 years Ruby experience">Ruby</span>'
-    _(result).must_include '<span class="annotated" data-tier="moderate" data-match="Built message queue">distributed systems</span>'
+    assert_includes result, "Compare Me to the Job Description"
+    assert_includes result, '<span class="annotated" data-tier="strong" data-match="7 years Ruby experience">Ruby</span>'
+    assert_includes result, '<span class="annotated" data-tier="moderate" data-match="Built message queue">distributed systems</span>'
   end
 
   def test_omits_annotation_section_when_annotations_json_missing
@@ -209,8 +209,8 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
     result = @generator.generate
 
     # Should NOT include annotation section
-    _(result).wont_include "Compare Me to the Job Description"
-    _(result).wont_include '<div id="annotation-tooltip"'
+    refute_includes result, "Compare Me to the Job Description"
+    refute_includes result, '<div id="annotation-tooltip"'
   end
 
   def test_annotates_all_occurrences_of_same_text
@@ -226,7 +226,7 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
 
     # Count occurrences of annotated "Ruby"
     annotation_count = result.scan(/<span class="annotated"[^>]*>Ruby<\/span>/).length
-    _(annotation_count).must_equal 3
+    assert_equal 3, annotation_count
   end
 
   def test_prevents_nested_spans_when_annotation_texts_overlap
@@ -244,21 +244,21 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
     result = @generator.generate
 
     # Check that standalone "Ruby" is annotated
-    _(result).must_match(/<span class="annotated"[^>]*>Ruby<\/span> developers who know/)
+    assert_match(/<span class="annotated"[^>]*>Ruby<\/span> developers who know/, result)
 
     # Check that "Ruby on Rails" is annotated as a whole phrase
-    _(result).must_match(/know <span class="annotated"[^>]*>Ruby on Rails<\/span>\./)
+    assert_match(/know <span class="annotated"[^>]*>Ruby on Rails<\/span>\./, result)
 
     # Check that "Ruby" WITHIN "Ruby on Rails" is NOT separately annotated (no nested spans)
     # This regex looks for a span containing another span - which would indicate nesting
     nested_spans = result.scan(/<span class="annotated"[^>]*>(.*?)<\/span>/m).any? do |match|
       match[0].include?("<span class=\"annotated\"")
     end
-    _(nested_spans).must_equal false
+    assert_equal false, nested_spans
 
     # Check that data-match attributes don't contain span tags (malformed HTML)
     data_match_with_spans = result.scan(/data-match="([^"]*<span[^"]*)"/)
-    _(data_match_with_spans.empty?).must_equal true
+    assert_equal true, data_match_with_spans.empty?
   end
 
   def test_loads_and_passes_faqs_to_template
@@ -271,9 +271,9 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
 
     html = @generator.generate
 
-    _(html).must_include "What's your experience?"
-    _(html).must_include "Why this company?"
-    _(html).must_include "Your Questions, Answered"
+    assert_includes html, "What's your experience?"
+    assert_includes html, "Why this company?"
+    assert_includes html, "Your Questions, Answered"
   end
 
   def test_handles_missing_faq_file_gracefully
@@ -282,8 +282,8 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
 
     html = @generator.generate
 
-    _(html).wont_include "Your Questions, Answered"
-    _(html).wont_include '<div class="faq-accordion"'
+    refute_includes html, "Your Questions, Answered"
+    refute_includes html, '<div class="faq-accordion"'
   end
 
   def test_fails_when_branding_md_is_missing
@@ -293,8 +293,8 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
       @generator.generate
     end
 
-    _(error.message).must_include "branding.md not found"
-    _(error.message).must_include "jojo branding"
+    assert_includes error.message, "branding.md not found"
+    assert_includes error.message, "jojo branding"
   end
 
   def test_fails_when_branding_md_is_empty
@@ -304,6 +304,6 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
       @generator.generate
     end
 
-    _(error.message).must_include "branding.md not found"
+    assert_includes error.message, "branding.md not found"
   end
 end

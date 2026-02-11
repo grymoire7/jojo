@@ -35,12 +35,12 @@ class JobDescriptionCommandIntegrationTest < JojoTest
     employer = Jojo::Application.new(slug)
     FileUtils.mkdir_p(employer.base_path)
 
-    _(Dir.exist?(File.join(@applications_dir, slug))).must_equal true
-    _(employer.artifacts_exist?).must_equal false
+    assert_equal true, Dir.exist?(File.join(@applications_dir, slug))
+    assert_equal false, employer.artifacts_exist?
 
     # Step 2: Verify job_description would work (without actual AI call)
-    _(File.exist?(employer.base_path)).must_equal true
-    _(File.exist?(@job_file)).must_equal true
+    assert_equal true, File.exist?(employer.base_path)
+    assert_equal true, File.exist?(@job_file)
   end
 
   def test_uses_slug_from_state_file_when_not_provided
@@ -54,6 +54,6 @@ class JobDescriptionCommandIntegrationTest < JojoTest
     Jojo::StatePersistence.save_slug(slug)
 
     # Verify state is saved
-    _(Jojo::StatePersistence.load_slug).must_equal slug
+    assert_equal slug, Jojo::StatePersistence.load_slug
   end
 end

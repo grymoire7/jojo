@@ -36,9 +36,9 @@ class Jojo::Commands::Resume::GeneratorTest < JojoTest
 
     result = @generator.generate
 
-    _(result).must_include "# Jane Doe"
-    _(result).must_include "Specifically for Acme Corp"
-    _(result).must_include "https://example.com/resume/acme-corp"
+    assert_includes result, "# Jane Doe"
+    assert_includes result, "Specifically for Acme Corp"
+    assert_includes result, "https://example.com/resume/acme-corp"
 
     @ai_client.verify
   end
@@ -53,9 +53,9 @@ class Jojo::Commands::Resume::GeneratorTest < JojoTest
 
     @generator.generate
 
-    _(File.exist?(@application.resume_path)).must_equal true
+    assert_equal true, File.exist?(@application.resume_path)
     content = File.read(@application.resume_path)
-    _(content).must_include "Specifically for Acme Corp"
+    assert_includes content, "Specifically for Acme Corp"
   end
 
   def test_fails_when_resume_data_yml_is_missing
@@ -73,6 +73,6 @@ class Jojo::Commands::Resume::GeneratorTest < JojoTest
       generator_no_data.generate
     end
 
-    _(error.message).must_include "not found"
+    assert_includes error.message, "not found"
   end
 end

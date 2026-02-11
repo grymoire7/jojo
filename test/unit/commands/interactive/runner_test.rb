@@ -7,21 +7,21 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
 
   def test_accepts_optional_slug_parameter
     runner = Jojo::Commands::Interactive::Runner.new(slug: "test-slug")
-    _(runner.slug).must_equal "test-slug"
+    assert_equal "test-slug", runner.slug
   end
 
   def test_loads_slug_from_state_persistence_when_not_provided
     File.write(".jojo_state", "saved-slug")
     runner = Jojo::Commands::Interactive::Runner.new
 
-    _(runner.slug).must_equal "saved-slug"
+    assert_equal "saved-slug", runner.slug
   end
 
   # #application
 
   def test_application_returns_nil_when_no_slug_set
     runner = Jojo::Commands::Interactive::Runner.new
-    _(runner.application).must_be_nil
+    assert_nil runner.application
   end
 
   def test_application_returns_application_instance_when_slug_is_set
@@ -30,8 +30,8 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     runner = Jojo::Commands::Interactive::Runner.new(slug: "test-slug")
     application = runner.application
 
-    _(application).must_be_kind_of Jojo::Application
-    _(application.slug).must_equal "test-slug"
+    assert_kind_of Jojo::Application, application
+    assert_equal "test-slug", application.slug
   end
 
   # #list_applications
@@ -40,7 +40,7 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     FileUtils.mkdir_p("applications")
 
     runner = Jojo::Commands::Interactive::Runner.new
-    _(runner.list_applications).must_equal []
+    assert_equal [], runner.list_applications
   end
 
   def test_list_applications_returns_list_of_application_slugs
@@ -50,8 +50,8 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     runner = Jojo::Commands::Interactive::Runner.new
     apps = runner.list_applications
 
-    _(apps).must_include "acme-corp"
-    _(apps).must_include "globex-inc"
+    assert_includes apps, "acme-corp"
+    assert_includes apps, "globex-inc"
   end
 
   def test_list_applications_excludes_non_directories
@@ -61,7 +61,7 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     runner = Jojo::Commands::Interactive::Runner.new
     apps = runner.list_applications
 
-    _(apps).must_equal ["acme-corp"]
+    assert_equal ["acme-corp"], apps
   end
 
   # #switch_application
@@ -72,8 +72,8 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     runner = Jojo::Commands::Interactive::Runner.new(slug: "old-app")
     runner.switch_application("new-app")
 
-    _(runner.slug).must_equal "new-app"
-    _(Jojo::StatePersistence.load_slug).must_equal "new-app"
+    assert_equal "new-app", runner.slug
+    assert_equal "new-app", Jojo::StatePersistence.load_slug
   end
 
   def test_switch_application_clears_cached_application
@@ -92,42 +92,42 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     setup_test_app
     runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
     result = runner.handle_key("q")
-    _(result).must_equal :quit
+    assert_equal :quit, result
   end
 
   def test_handle_key_returns_switch_for_s_key
     setup_test_app
     runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
     result = runner.handle_key("s")
-    _(result).must_equal :switch
+    assert_equal :switch, result
   end
 
   def test_handle_key_returns_open_for_o_key
     setup_test_app
     runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
     result = runner.handle_key("o")
-    _(result).must_equal :open
+    assert_equal :open, result
   end
 
   def test_handle_key_returns_all_for_a_key
     setup_test_app
     runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
     result = runner.handle_key("a")
-    _(result).must_equal :all
+    assert_equal :all, result
   end
 
   def test_handle_key_returns_step_index_for_number_keys
     setup_test_app
     runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
-    _(runner.handle_key("1")).must_equal 0
-    _(runner.handle_key("5")).must_equal 4
-    _(runner.handle_key("9")).must_equal 8
+    assert_equal 0, runner.handle_key("1")
+    assert_equal 4, runner.handle_key("5")
+    assert_equal 8, runner.handle_key("9")
   end
 
   def test_handle_key_returns_nil_for_unrecognized_keys
     setup_test_app
     runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
-    _(runner.handle_key("x")).must_be_nil
+    assert_nil runner.handle_key("x")
   end
 
   # #run initial render with existing applications
@@ -139,9 +139,9 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     runner = Jojo::Commands::Interactive::Runner.new
     apps = runner.list_applications
 
-    _(apps.length).must_equal 2
-    _(apps).must_include "acme-corp"
-    _(apps).must_include "globex-inc"
+    assert_equal 2, apps.length
+    assert_includes apps, "acme-corp"
+    assert_includes apps, "globex-inc"
   end
 
   def test_shows_welcome_when_no_applications_exist
@@ -150,7 +150,7 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     runner = Jojo::Commands::Interactive::Runner.new
     apps = runner.list_applications
 
-    _(apps).must_equal []
+    assert_equal [], apps
   end
 
   # #handle_new_application behavior
@@ -165,8 +165,8 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     app = Jojo::Application.new(slug)
     FileUtils.mkdir_p(app.base_path)
 
-    _(Dir.exist?(File.join("applications", slug))).must_equal true
-    _(app.artifacts_exist?).must_equal false
+    assert_equal true, Dir.exist?(File.join("applications", slug))
+    assert_equal false, app.artifacts_exist?
   end
 
   # #handle_step_selection for job_description
@@ -181,7 +181,7 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     runner = Jojo::Commands::Interactive::Runner.new(slug: slug)
     status = Jojo::Commands::Interactive::Workflow.status(:job_description, runner.application)
 
-    _(status).must_equal :ready
+    assert_equal :ready, status
   end
 
   private

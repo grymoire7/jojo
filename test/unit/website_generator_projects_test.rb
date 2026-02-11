@@ -53,9 +53,9 @@ class WebsiteGeneratorProjectsTest < JojoTest
 
     projects = generator.send(:load_projects)
 
-    _(projects).wont_be_empty
-    _(projects.first[:name]).must_equal "Rails Project"
-    _(projects.first[:skills]).must_include "Ruby on Rails"
+    refute_empty projects
+    assert_equal "Rails Project", projects.first[:name]
+    assert_includes projects.first[:skills], "Ruby on Rails"
   end
 
   def test_includes_projects_in_template_variables
@@ -70,7 +70,7 @@ class WebsiteGeneratorProjectsTest < JojoTest
 
     html = File.read(@application.index_html_path)
 
-    _(html).must_include "Rails Project"
+    assert_includes html, "Rails Project"
   end
 
   def test_copies_local_project_images_to_website_directory
@@ -109,9 +109,9 @@ class WebsiteGeneratorProjectsTest < JojoTest
     generator.generate
 
     copied_image = File.join(@application.website_path, "images", "test.png")
-    _(File.exist?(copied_image)).must_equal true
+    assert_equal true, File.exist?(copied_image)
 
     html = File.read(@application.index_html_path)
-    _(html).must_include 'src="images/test.png"'
+    assert_includes html, 'src="images/test.png"'
   end
 end

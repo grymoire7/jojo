@@ -13,7 +13,7 @@ class Jojo::Commands::New::CommandTest < JojoTest
   end
 
   def test_inherits_from_base
-    _(Jojo::Commands::New::Command.ancestors).must_include Jojo::Commands::Base
+    assert_includes Jojo::Commands::New::Command.ancestors, Jojo::Commands::Base
   end
 
   # -- validation --
@@ -26,7 +26,7 @@ class Jojo::Commands::New::CommandTest < JojoTest
     command = Jojo::Commands::New::Command.new(@mock_cli, slug: "new-corp")
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
     @mock_cli.verify
   end
 
@@ -40,7 +40,7 @@ class Jojo::Commands::New::CommandTest < JojoTest
     command = Jojo::Commands::New::Command.new(@mock_cli, slug: "existing")
 
     error = assert_raises(SystemExit) { command.execute }
-    _(error.status).must_equal 1
+    assert_equal 1, error.status
     @mock_cli.verify
   end
 
@@ -54,7 +54,7 @@ class Jojo::Commands::New::CommandTest < JojoTest
     command = Jojo::Commands::New::Command.new(@mock_cli, slug: "new-corp")
     command.execute
 
-    _(Dir.exist?("applications/new-corp")).must_equal true
+    assert_equal true, Dir.exist?("applications/new-corp")
     @mock_cli.verify
   end
 

@@ -37,9 +37,9 @@ class Jojo::Commands::Faq::GeneratorTest < JojoTest
 
     result = @generator.generate
 
-    _(result).must_be_kind_of Array
-    _(result.length).must_equal 2
-    _(result[0][:question]).must_equal "What's your Python experience?"
+    assert_kind_of Array, result
+    assert_equal 2, result.length
+    assert_equal "What's your Python experience?", result[0][:question]
 
     @ai_client.verify
     @config.verify
@@ -58,11 +58,11 @@ class Jojo::Commands::Faq::GeneratorTest < JojoTest
 
     @generator.generate
 
-    _(File.exist?(@application.faq_path)).must_equal true
+    assert_equal true, File.exist?(@application.faq_path)
 
     saved_data = JSON.parse(File.read(@application.faq_path), symbolize_names: true)
-    _(saved_data.length).must_equal 1
-    _(saved_data[0][:question]).must_equal "What's your experience?"
+    assert_equal 1, saved_data.length
+    assert_equal "What's your experience?", saved_data[0][:question]
 
     @ai_client.verify
     @config.verify
@@ -77,7 +77,7 @@ class Jojo::Commands::Faq::GeneratorTest < JojoTest
 
     result = @generator.generate
 
-    _(result).must_equal []
+    assert_equal [], result
 
     @ai_client.verify
     @config.verify
@@ -99,8 +99,8 @@ class Jojo::Commands::Faq::GeneratorTest < JojoTest
 
     result = @generator.generate
 
-    _(result.length).must_equal 1
-    _(result[0][:question]).must_equal "Valid question?"
+    assert_equal 1, result.length
+    assert_equal "Valid question?", result[0][:question]
 
     @ai_client.verify
     @config.verify
@@ -121,7 +121,7 @@ class Jojo::Commands::Faq::GeneratorTest < JojoTest
 
     result = @generator.generate
 
-    _(result.length).must_equal 1
+    assert_equal 1, result.length
 
     @ai_client.verify
     @config.verify
@@ -130,12 +130,12 @@ class Jojo::Commands::Faq::GeneratorTest < JojoTest
   def test_raises_error_when_job_description_missing
     FileUtils.rm_f(@application.job_description_path)
 
-    _ { @generator.generate }.must_raise RuntimeError
+    assert_raises(RuntimeError) { @generator.generate }
   end
 
   def test_raises_error_when_resume_missing
     FileUtils.rm_f(@application.resume_path)
 
-    _ { @generator.generate }.must_raise RuntimeError
+    assert_raises(RuntimeError) { @generator.generate }
   end
 end

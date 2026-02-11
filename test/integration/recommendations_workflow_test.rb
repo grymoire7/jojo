@@ -84,23 +84,23 @@ class RecommendationsWorkflowIntegrationTest < JojoTest
     html = generator.generate
 
     # Verify HTML includes carousel structure
-    _(html).must_match(/<section class="recommendations[^"]*"/)
-    _(html).must_include "What Others Say"
-    _(html).must_include "carousel-track"
-    _(html).must_include "carousel-slide"
-    _(html).must_include "carousel-arrow"
-    _(html).must_include "carousel-dots"
+    assert_match(/<section class="recommendations[^"]*"/, html)
+    assert_includes html, "What Others Say"
+    assert_includes html, "carousel-track"
+    assert_includes html, "carousel-slide"
+    assert_includes html, "carousel-arrow"
+    assert_includes html, "carousel-dots"
 
     # Verify recommendations content
-    _(html).must_include "Jane Smith"
-    _(html).must_include "Senior Engineering Manager"
-    _(html).must_include "excellent engineer"
-    _(html).must_include "Bob Johnson"
+    assert_includes html, "Jane Smith"
+    assert_includes html, "Senior Engineering Manager"
+    assert_includes html, "excellent engineer"
+    assert_includes html, "Bob Johnson"
 
     # Verify JavaScript is included
-    _(html).must_include "Recommendations Carousel JavaScript"
-    _(html).must_include "function goToSlide"
-    _(html).must_include "startAutoAdvance"
+    assert_includes html, "Recommendations Carousel JavaScript"
+    assert_includes html, "function goToSlide"
+    assert_includes html, "startAutoAdvance"
   end
 
   def test_generates_website_without_carousel_when_no_recommendations
@@ -116,9 +116,9 @@ class RecommendationsWorkflowIntegrationTest < JojoTest
     html = generator.generate
 
     # Verify no carousel HTML (CSS will be there but HTML elements should not)
-    _(html).wont_include '<section class="recommendations">'
-    _(html).wont_include '<div class="carousel-track">'
-    _(html).wont_include "Recommendations Carousel JavaScript"
+    refute_includes html, '<section class="recommendations">'
+    refute_includes html, '<div class="carousel-track">'
+    refute_includes html, "Recommendations Carousel JavaScript"
   end
 
   def test_generates_static_card_for_single_recommendation
@@ -150,11 +150,11 @@ class RecommendationsWorkflowIntegrationTest < JojoTest
     html = generator.generate
 
     # Verify recommendations section exists with single-recommendation class
-    _(html).must_match(/<section class="recommendations single-recommendation"/)
-    _(html).must_include "Alice Lee"
+    assert_match(/<section class="recommendations single-recommendation"/, html)
+    assert_includes html, "Alice Lee"
 
     # Verify no carousel JavaScript (single recommendation)
-    _(html).wont_include "Recommendations Carousel JavaScript"
+    refute_includes html, "Recommendations Carousel JavaScript"
   end
 
   def test_positions_recommendations_after_job_description_and_before_projects
@@ -193,11 +193,11 @@ class RecommendationsWorkflowIntegrationTest < JojoTest
 
     # Verify order (skip nil checks for sections that might not exist)
     if job_desc_pos && recommendations_pos
-      _(recommendations_pos).must_be :>, job_desc_pos
+      assert_operator recommendations_pos, :>, job_desc_pos
     end
 
     if recommendations_pos && projects_pos
-      _(projects_pos).must_be :>, recommendations_pos
+      assert_operator projects_pos, :>, recommendations_pos
     end
   end
 end
