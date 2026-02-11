@@ -1,6 +1,6 @@
 require "minitest/test_task"
 
-task default: "test:usual"
+task default: "test:all"
 
 namespace :test do
   Minitest::TestTask.create(:unit) do |t|
@@ -31,5 +31,5 @@ namespace :test do
   end
 
   desc "Run all tests and style checks"
-  task usual: [:standard, :minitest]
+  task all: [:standard, :minitest]
 end
