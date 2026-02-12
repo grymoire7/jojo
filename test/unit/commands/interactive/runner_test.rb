@@ -184,6 +184,26 @@ class Jojo::Commands::Interactive::RunnerTest < JojoTest
     assert_equal :ready, status
   end
 
+  # #handle_step_selection
+
+  def test_handle_step_selection_ignores_out_of_range_index
+    setup_test_app
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+
+    # Should not raise for out-of-range indices
+    runner.handle_step_selection(-1)
+    runner.handle_step_selection(99)
+  end
+
+  # #handle_key returns :new for n key
+
+  def test_handle_key_returns_new_for_n_key
+    setup_test_app
+    runner = Jojo::Commands::Interactive::Runner.new(slug: "test-app")
+    assert_equal :new, runner.handle_key("n")
+    assert_equal :new, runner.handle_key("N")
+  end
+
   private
 
   def setup_test_app

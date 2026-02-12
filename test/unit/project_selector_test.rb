@@ -83,4 +83,90 @@ class ProjectSelectorTest < JojoTest
     assert_kind_of Array, selected
     assert_empty selected
   end
+
+  def test_filters_zero_score_projects
+    projects = [
+      {title: "Relevant", skills: ["Ruby on Rails"]},
+      {title: "Irrelevant A", skills: ["C++"]},
+      {title: "Irrelevant B", skills: ["Haskell"]}
+    ]
+
+    selector = Jojo::ProjectSelector.new(@application, projects)
+    selected = selector.select_for_landing_page(limit: 5)
+
+    assert_equal 1, selected.size
+    assert_equal "Relevant", selected.first[:title]
+  end
+
+  def test_handles_missing_year_field
+    projects = [
+      {title: "No Year Project", skills: ["Ruby on Rails"]}
+    ]
+
+    selector = Jojo::ProjectSelector.new(@application, projects)
+    selected = selector.select_for_landing_page(limit: 3)
+
+    assert_equal 1, selected.size
+    assert_equal "No Year Project", selected.first[:title]
+  end
+
+  def test_select_for_resume_respects_limit
+    current_year = Time.now.year
+    projects = [
+      {title: "P1", skills: ["Ruby on Rails", "PostgreSQL"], year: current_year},
+      {title: "P2", skills: ["Ruby on Rails"], year: current_year},
+      {title: "P3", skills: ["PostgreSQL"], year: current_year},
+      {title: "P4", skills: ["leadership"], year: current_year}
+    ]
+
+    selector = Jojo::ProjectSelector.new(@application, projects)
+    selected = selector.select_for_resume(limit: 2)
+
+    assert_equal 2, selected.size
+  end
+
+  def test_select_for_cover_letter_respects_limit
+    current_year = Time.now.year
+    projects = [
+      {title: "P1", skills: ["Ruby on Rails", "PostgreSQL"], year: current_year},
+      {title: "P2", skills: ["Ruby on Rails"], year: current_year},
+      {title: "P3", skills: ["PostgreSQL"], year: current_year}
+    ]
+
+    selector = Jojo::ProjectSelector.new(@application, projects)
+    selected = selector.select_for_cover_letter(limit: 2)
+
+    assert_equal 2, selected.size
+  end
+
+  def test_empty_job_skills_returns_empty
+    # Overwrite job_details with empty skills
+    File.write(@application.job_details_path, <<~YAML)
+      required_skills: []
+      desired_skills: []
+    YAML
+
+    projects = [
+      {title: "P1", skills: ["Ruby on Rails"]},
+      {title: "P2", skills: ["Python"]}
+    ]
+
+    selector = Jojo::ProjectSelector.new(@application, projects)
+    selected = selector.select_for_landing_page(limit: 5)
+
+    assert_empty selected
+  end
+
+  def test_handles_missing_job_details_file
+    FileUtils.rm(@application.job_details_path)
+
+    projects = [
+      {title: "P1", skills: ["Ruby on Rails"]}
+    ]
+
+    selector = Jojo::ProjectSelector.new(@application, projects)
+    selected = selector.select_for_landing_page(limit: 5)
+
+    assert_empty selected
+  end
 end

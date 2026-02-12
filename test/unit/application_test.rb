@@ -84,4 +84,79 @@ class ApplicationTest < JojoTest
     assert_equal true, File.directory?("applications/new-app")
     assert_equal true, File.directory?("applications/new-app/website")
   end
+
+  def test_returns_branding_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/branding.md", app.branding_path
+  end
+
+  def test_returns_resume_pdf_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/resume.pdf", app.resume_pdf_path
+  end
+
+  def test_returns_cover_letter_pdf_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/cover_letter.pdf", app.cover_letter_pdf_path
+  end
+
+  def test_returns_status_log_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/status.log", app.status_log_path
+  end
+
+  def test_returns_index_html_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/website/index.html", app.index_html_path
+  end
+
+  def test_returns_job_description_annotations_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/job_description_annotations.json", app.job_description_annotations_path
+  end
+
+  def test_job_details_returns_empty_hash_when_file_missing
+    app = Jojo::Application.new("test-app")
+    assert_equal({}, app.job_details)
+  end
+
+  def test_job_details_returns_parsed_yaml
+    FileUtils.mkdir_p("applications/test-app")
+    File.write("applications/test-app/job_details.yml", "company_name: Test\njob_title: Dev")
+
+    app = Jojo::Application.new("test-app")
+    details = app.job_details
+
+    assert_equal "Test", details["company_name"]
+    assert_equal "Dev", details["job_title"]
+  end
+
+  def test_job_details_returns_empty_hash_on_malformed_yaml
+    FileUtils.mkdir_p("applications/test-app")
+    File.write("applications/test-app/job_details.yml", "")
+
+    app = Jojo::Application.new("test-app")
+    assert_equal({}, app.job_details)
+  end
+
+  def test_artifacts_exist_returns_true_when_job_details_exist
+    FileUtils.mkdir_p("applications/existing-app")
+    File.write("applications/existing-app/job_details.yml", "company_name: Test")
+
+    app = Jojo::Application.new("existing-app")
+    assert_equal true, app.artifacts_exist?
+  end
+
+  def test_name_defaults_to_slug
+    app = Jojo::Application.new("my-slug")
+    assert_equal "my-slug", app.name
+  end
+
+  def test_status_logger_returns_status_logger_instance
+    app = Jojo::Application.new("test-app")
+    app.create_directory!
+
+    logger = app.status_logger
+    assert_instance_of Jojo::StatusLogger, logger
+  end
 end

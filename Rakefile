@@ -7,6 +7,7 @@ namespace :test do
     t.libs << "test"
     t.libs << "lib"
     t.warning = false
+    t.test_prelude = 'require "test_helper"'
     t.test_globs = ["test/unit/**/*_test.rb"]
   end
 
@@ -14,6 +15,7 @@ namespace :test do
     t.libs << "test"
     t.libs << "lib"
     t.warning = false
+    t.test_prelude = 'require "test_helper"'
     t.test_globs = ["test/integration/**/*_test.rb"]
   end
 
@@ -21,6 +23,7 @@ namespace :test do
     t.libs << "test"
     t.libs << "lib"
     t.warning = false
+    t.test_prelude = 'require "test_helper"'
     t.test_globs = ["test/unit/**/*_test.rb", "test/integration/**/*_test.rb"]
   end
 
