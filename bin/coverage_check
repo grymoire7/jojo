@@ -1,0 +1,127 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Diagnoses whether SimpleCov is measuring actual test execution or just
+# file-loading coverage. This matters because Minitest::TestTask prepends
+# `require "minitest/autorun"` before test files load. If SimpleCov starts
+# AFTER minitest/autorun, its at_exit hook runs BEFORE tests execute (LIFO),
+# and you get misleadingly low numbers (e.g. 30% when actual coverage is 84%).
+#
+# The fix is `t.test_prelude = 'require "test_helper"'` in the Rakefile,
+# which ensures SimpleCov starts before minitest/autorun registers its hook.
+#
+# Usage:
+#   ./bin/coverage_check          # run after ./bin/test
+
+require "json"
+
+if ARGV.include?("--help") || ARGV.include?("-h")
+  puts <<~HELP
+    Usage: ./bin/coverage_check
+
+    Verifies that SimpleCov is correctly measuring test execution coverage,
+    not just file-loading coverage.
+
+    Checks performed:
+      1. coverage/coverage.json exists (tests have been run)
+      2. .last_run coverage is reasonable (not suspiciously low)
+      3. Rakefile has test_prelude set (SimpleCov loads before minitest/autorun)
+      4. test_helper.rb starts SimpleCov before requiring minitest/autorun
+
+    Prerequisites:
+      Run ./bin/test first to generate coverage data.
+
+    Background:
+      Minitest::TestTask prepends `require "minitest/autorun"` before loading
+      test files. Ruby's at_exit hooks run LIFO (last registered, first run).
+      If SimpleCov.start runs AFTER minitest/autorun is loaded, SimpleCov's
+      at_exit hook fires BEFORE tests execute, reporting only require-time
+      coverage. The Rakefile's test_prelude option forces test_helper (and
+      thus SimpleCov) to load first, so its hook runs last — after all tests.
+  HELP
+  exit 0
+end
+
+project_root = File.expand_path("..", __dir__)
+issues = []
+warnings = []
+
+# Check 1: Coverage data exists
+coverage_file = File.join(project_root, "coverage", "coverage.json")
+unless File.exist?(coverage_file)
+  puts "No coverage data found. Run ./bin/test first."
+  exit 1
+end
+
+# Check 2: Overall coverage is reasonable
+last_run_file = File.join(project_root, "coverage", ".last_run.json")
+if File.exist?(last_run_file)
+  last_run = JSON.parse(File.read(last_run_file))
+  line_pct = last_run.dig("result", "line")
+  if line_pct && line_pct < 40
+    issues << "Coverage is only #{line_pct}% — this is suspiciously low and may indicate " \
+              "SimpleCov is not measuring test execution (see --help for background)."
+  elsif line_pct && line_pct < 60
+    warnings << "Coverage is #{line_pct}% — on the low side. Verify this reflects actual test execution."
+  else
+    puts "Coverage: #{line_pct}%"
+  end
+end
+
+# Check 3: Rakefile has test_prelude
+rakefile = File.join(project_root, "Rakefile")
+if File.exist?(rakefile)
+  content = File.read(rakefile)
+  task_count = content.scan(/Minitest::TestTask\.create/).length
+  prelude_count = content.scan(/test_prelude/).length
+
+  if task_count > 0 && prelude_count == 0
+    issues << "Rakefile defines #{task_count} Minitest::TestTask(s) but none set test_prelude. " \
+              "Add `t.test_prelude = 'require \"test_helper\"'` to each task."
+  elsif task_count > prelude_count
+    warnings << "Rakefile has #{task_count} Minitest::TestTask(s) but only #{prelude_count} set test_prelude. " \
+                "All tasks should set test_prelude for accurate coverage."
+  end
+end
+
+# Check 4: test_helper loads SimpleCov before minitest/autorun
+test_helper = File.join(project_root, "test", "test_helper.rb")
+if File.exist?(test_helper)
+  lines = File.readlines(test_helper)
+  simplecov_line = lines.index { |l| l.include?("SimpleCov") }
+  autorun_line = lines.index { |l| l.include?("minitest/autorun") }
+
+  if simplecov_line.nil?
+    warnings << "test_helper.rb does not reference SimpleCov."
+  elsif autorun_line && simplecov_line > autorun_line
+    issues << "test_helper.rb loads SimpleCov (line #{simplecov_line + 1}) AFTER " \
+              "minitest/autorun (line #{autorun_line + 1}). SimpleCov must come first."
+  end
+end
+
+# Check 5: Spot-check that coverage data looks like test execution, not just requires
+data = JSON.parse(File.read(coverage_file))
+file_coverages = data["coverage"].map do |path, info|
+  relevant = info["lines"].compact
+  next nil if relevant.empty?
+  covered = relevant.count { |n| n > 0 }
+  covered.to_f / relevant.size * 100
+end.compact
+
+high_coverage_files = file_coverages.count { |pct| pct > 90 }
+ratio = file_coverages.empty? ? 0 : (high_coverage_files.to_f / file_coverages.size * 100).round(0)
+if ratio < 20 && file_coverages.size > 10
+  issues << "Only #{ratio}% of files have >90% coverage. If tests are comprehensive, " \
+            "this may indicate SimpleCov is measuring require-time coverage only."
+end
+
+# Report
+if issues.empty? && warnings.empty?
+  puts "All checks passed. Coverage measurement looks correct."
+  exit 0
+end
+
+warnings.each { |w| puts "WARNING: #{w}" }
+issues.each { |i| puts "PROBLEM: #{i}" }
+
+exit(issues.empty? ? 0 : 1)
