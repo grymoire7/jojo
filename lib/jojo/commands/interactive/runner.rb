@@ -10,6 +10,7 @@ require_relative "workflow"
 require_relative "dashboard"
 require_relative "dialogs"
 require_relative "../console_output"
+require_relative "../../time_formatter"
 
 module Jojo
   module Commands
@@ -173,7 +174,7 @@ module Jojo
           inputs = step[:dependencies].map do |dep_key|
             dep_step = Workflow::STEPS.find { |s| s[:key] == dep_key }
             path = Workflow.file_path(dep_key, application)
-            age = File.exist?(path) ? time_ago(File.mtime(path)) : nil
+            age = File.exist?(path) ? TimeFormatter.time_ago(File.mtime(path)) : nil
             {name: dep_step[:output_file], age: age}
           end
 
@@ -196,7 +197,7 @@ module Jojo
 
         def show_generated_dialog(step)
           path = Workflow.file_path(step[:key], application)
-          age = time_ago(File.mtime(path))
+          age = TimeFormatter.time_ago(File.mtime(path))
 
           clear_screen
           puts Dialogs.generated_dialog(step[:label], age, paid: step[:paid])
@@ -263,20 +264,6 @@ module Jojo
           end
 
           reader.read_line(prompt).strip
-        end
-
-        def time_ago(time)
-          seconds = Time.now - time
-          case seconds
-          when 0..59
-            "just now"
-          when 60..3599
-            "#{(seconds / 60).to_i} minutes ago"
-          when 3600..86399
-            "#{(seconds / 3600).to_i} hours ago"
-          else
-            "#{(seconds / 86400).to_i} days ago"
-          end
         end
 
         def view_file(path)

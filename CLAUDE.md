@@ -48,6 +48,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | ./bin/jojo help           | Display help for using jojo from the CLI.   |
 | ./bin/jojo help [command] | Display help for a particular jojo command. |
 | ./bin/test                | Run all tests. Use this often.              |
+| ./bin/coverage_summary    | Get text coverage summaery (see --help).    |
 
 ## Common Tasks
 

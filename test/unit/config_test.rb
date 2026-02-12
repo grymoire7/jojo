@@ -157,4 +157,75 @@ class ConfigTest < JojoTest
   ensure
     ENV["TAVILY_API_KEY"] = original_key
   end
+
+  def test_resume_template_accessor
+    File.write("config.yml", <<~YAML)
+      seeker_name: Test
+      base_url: https://example.com
+      resume_template: custom_template
+      reasoning_ai:
+        service: anthropic
+        model: sonnet
+      text_generation_ai:
+        service: anthropic
+        model: haiku
+    YAML
+
+    config = Jojo::Config.new("config.yml")
+    assert_equal "custom_template", config.resume_template
+  end
+
+  def test_resume_template_returns_nil_when_not_set
+    config = Jojo::Config.new(fixture_path("valid_config.yml"))
+    assert_nil config.resume_template
+  end
+
+  def test_to_h_returns_hash
+    config = Jojo::Config.new(fixture_path("valid_config.yml"))
+    result = config.to_h
+
+    assert_kind_of Hash, result
+    assert_equal "Test User", result["seeker_name"]
+    assert_equal "anthropic", result.dig("reasoning_ai", "service")
+    assert_equal "sonnet", result.dig("reasoning_ai", "model")
+  end
+
+  def test_voice_and_tone_returns_default_when_not_set
+    File.write("config.yml", <<~YAML)
+      seeker_name: Test
+      base_url: https://example.com
+      reasoning_ai:
+        service: anthropic
+        model: sonnet
+      text_generation_ai:
+        service: anthropic
+        model: haiku
+    YAML
+
+    config = Jojo::Config.new("config.yml")
+    assert_equal "professional and friendly", config.voice_and_tone
+  end
+
+  def test_website_cta_text_returns_default
+    config = Jojo::Config.new(fixture_path("valid_config.yml"))
+    assert_equal "Get in Touch", config.website_cta_text
+  end
+
+  def test_website_cta_text_returns_custom_value
+    File.write("config.yml", <<~YAML)
+      seeker_name: Test
+      base_url: https://example.com
+      reasoning_ai:
+        service: anthropic
+        model: sonnet
+      text_generation_ai:
+        service: anthropic
+        model: haiku
+      website:
+        cta_text: Hire Me
+    YAML
+
+    config = Jojo::Config.new("config.yml")
+    assert_equal "Hire Me", config.website_cta_text
+  end
 end

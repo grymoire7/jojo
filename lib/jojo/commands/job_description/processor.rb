@@ -1,8 +1,8 @@
 # lib/jojo/commands/job_description/processor.rb
-require "uri"
 require "net/http"
 require "html_to_markdown"
 require_relative "prompt"
+require_relative "../../url_detector"
 
 module Jojo
   module Commands
@@ -25,7 +25,7 @@ module Jojo
           log "Processing job description from: #{source}"
 
           raw_content = fetch_content(source)
-          save_raw_content(raw_content) if url?(source)
+          save_raw_content(raw_content) if UrlDetector.url?(source)
 
           job_description = extract_job_description(raw_content)
           save_job_description(job_description)
@@ -43,15 +43,11 @@ module Jojo
         private
 
         def fetch_content(source)
-          if url?(source)
+          if UrlDetector.url?(source)
             fetch_from_url(source)
           else
             fetch_from_file(source)
           end
-        end
-
-        def url?(source)
-          source =~ URI::DEFAULT_PARSER.make_regexp
         end
 
         def fetch_from_url(url)

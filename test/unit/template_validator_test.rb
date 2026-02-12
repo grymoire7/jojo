@@ -46,4 +46,41 @@ class TemplateValidatorTest < JojoTest
     result = Jojo::TemplateValidator.warn_if_unchanged("nonexistent.md", "resume")
     assert_equal :skip, result
   end
+
+  def test_warn_if_unchanged_returns_needs_warning_when_unchanged_without_cli
+    File.write("test.md", "JOJO_TEMPLATE_PLACEHOLDER\nTemplate content")
+
+    result = Jojo::TemplateValidator.warn_if_unchanged("test.md", "resume")
+    assert_equal :needs_warning, result
+  end
+
+  def test_warn_if_unchanged_returns_continue_when_user_confirms
+    File.write("test.md", "JOJO_TEMPLATE_PLACEHOLDER\nTemplate content")
+
+    mock_cli = Minitest::Mock.new
+    mock_cli.expect(:say, nil, [String, :yellow])
+    mock_cli.expect(:say, nil, [String, :yellow])
+    mock_cli.expect(:say, nil, [""])
+    mock_cli.expect(:yes?, true, ["Continue anyway?"])
+
+    result = Jojo::TemplateValidator.warn_if_unchanged("test.md", "resume", cli_instance: mock_cli)
+    assert_equal :continue, result
+
+    mock_cli.verify
+  end
+
+  def test_warn_if_unchanged_returns_abort_when_user_declines
+    File.write("test.md", "JOJO_TEMPLATE_PLACEHOLDER\nTemplate content")
+
+    mock_cli = Minitest::Mock.new
+    mock_cli.expect(:say, nil, [String, :yellow])
+    mock_cli.expect(:say, nil, [String, :yellow])
+    mock_cli.expect(:say, nil, [""])
+    mock_cli.expect(:yes?, false, ["Continue anyway?"])
+
+    result = Jojo::TemplateValidator.warn_if_unchanged("test.md", "resume", cli_instance: mock_cli)
+    assert_equal :abort, result
+
+    mock_cli.verify
+  end
 end

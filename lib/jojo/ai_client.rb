@@ -11,6 +11,28 @@ module Jojo
 
     class AIError < StandardError; end
 
+    def self.resolve_model_name(model_shortname)
+      SHORT_NAME_TO_MODEL_ID[model_shortname.to_s.downcase] || model_shortname
+    end
+
+    def self.estimate_tokens(prompt, response)
+      (prompt.length + response.length) / 4
+    end
+
+    def self.build_error_message(task_type, error, max_retries)
+      base_message = "AI #{task_type} failed after #{max_retries} retries: #{error.message}"
+
+      suggestions = [
+        "\nPossible causes:",
+        "- Invalid API key (check your ANTHROPIC_API_KEY environment variable)",
+        "- Network connection issues",
+        "- Rate limiting (try again in a few minutes)",
+        "- Model unavailability or service outage"
+      ]
+
+      base_message + suggestions.join("\n")
+    end
+
     attr_reader :config, :verbose
 
     def initialize(config, verbose: false)
@@ -77,7 +99,7 @@ module Jojo
         log_verbose "Starting #{task_type} with #{model}..."
 
         # Create a chat with the specified model
-        chat = RubyLLM.chat(model: resolve_model_name(model))
+        chat = RubyLLM.chat(model: self.class.resolve_model_name(model))
 
         # Send the prompt and get response
         response = chat.ask(prompt)
@@ -85,7 +107,7 @@ module Jojo
         # Extract text content
         response_text = response.content
 
-        tokens = estimate_tokens(prompt, response_text)
+        tokens = self.class.estimate_tokens(prompt, response_text)
         @total_tokens += tokens
 
         log_verbose "#{task_type.capitalize} complete. Estimated tokens: #{tokens}"
@@ -98,34 +120,9 @@ module Jojo
           sleep(2**retries) # Exponential backoff
           retry
         else
-          raise AIError, build_error_message(task_type, e, max_retries)
+          raise AIError, self.class.build_error_message(task_type, e, max_retries)
         end
       end
-    end
-
-    def build_error_message(task_type, error, max_retries)
-      base_message = "AI #{task_type} failed after #{max_retries} retries: #{error.message}"
-
-      suggestions = [
-        "\nPossible causes:",
-        "- Invalid API key (check your ANTHROPIC_API_KEY environment variable)",
-        "- Network connection issues",
-        "- Rate limiting (try again in a few minutes)",
-        "- Model unavailability or service outage"
-      ]
-
-      base_message + suggestions.join("\n")
-    end
-
-    def resolve_model_name(model_shortname)
-      model_id = SHORT_NAME_TO_MODEL_ID[model_shortname.to_s.downcase]
-      model_id || model_shortname
-    end
-
-    def estimate_tokens(prompt, response)
-      # Rough estimation: 1 token ≈ 4 characters
-      # This is approximate; real token counting would require the tokenizer
-      (prompt.length + response.length) / 4
     end
 
     def log_verbose(message)

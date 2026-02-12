@@ -33,4 +33,55 @@ class ResumeDataLoaderTest < JojoTest
 
     assert_includes error.message, "name"
   end
+
+  def test_raises_on_invalid_yaml_syntax
+    File.write("malformed.yml", "name: [\ninvalid: yaml: content: {broken")
+
+    loader = Jojo::ResumeDataLoader.new("malformed.yml")
+
+    error = assert_raises(Jojo::ResumeDataLoader::LoadError) do
+      loader.load
+    end
+
+    assert_includes error.message, "Invalid YAML"
+  end
+
+  def test_raises_when_skills_is_not_array
+    File.write("bad_skills.yml", <<~YAML)
+      name: Test
+      email: test@example.com
+      summary: A summary
+      skills: "ruby"
+      experience:
+        - company: Co
+          title: Dev
+    YAML
+
+    loader = Jojo::ResumeDataLoader.new("bad_skills.yml")
+
+    error = assert_raises(Jojo::ResumeDataLoader::ValidationError) do
+      loader.load
+    end
+
+    assert_includes error.message, "skills must be an array"
+  end
+
+  def test_raises_when_experience_is_not_array
+    File.write("bad_experience.yml", <<~YAML)
+      name: Test
+      email: test@example.com
+      summary: A summary
+      skills:
+        - Ruby
+      experience: "stuff"
+    YAML
+
+    loader = Jojo::ResumeDataLoader.new("bad_experience.yml")
+
+    error = assert_raises(Jojo::ResumeDataLoader::ValidationError) do
+      loader.load
+    end
+
+    assert_includes error.message, "experience must be an array"
+  end
 end
