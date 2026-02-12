@@ -592,7 +592,8 @@ bundle exec rake test:all          # All tests - includes service tests
 
 ## Testing
 
-Jojo includes comprehensive testing to ensure reliability and performance.
+Jojo uses Minitest for testing, VCR for recording HTTP interactions, and
+SimpleCov for test coverage. Tests are organized into categories:
 
 ### Test Categories
 
@@ -615,6 +616,13 @@ bundle exec rake test:standard     # Standard Ruby style checks
 bundle exec rake test:minitest     # Unit + integration (no standard)
 bundle exec rake test:all          # Standard + unit + integration (same as ./bin/test)
 ```
+
+### Test coverage
+Coverage reports are generated with SimpleCov and can be found in `coverage/`
+after running tests. Open `coverage/index.html` in your browser to view
+detailed coverage information. You (or your AI assistant) can also use
+`./bin/coverage_summary --help` to get a text summary of coverage results.
+
 
 ## Architecture
 
