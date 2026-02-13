@@ -25,6 +25,22 @@ has_children: true
 | `jojo version` | Show version | None |
 | `jojo help [COMMAND]` | Show help | None |
 
+## Inputs/Outputs
+
+| Command | Inputs | Outputs |
+|---------|--------|---------|
+| [`jojo setup`](setup) | None (interactive) | `.env`, `config.yml`, `inputs/resume_data.yml`, `inputs/templates/default_resume.md.erb` |
+| [`jojo new`](new) | `inputs/resume_data.yml`, job source (file or URL via `-j`) | `applications/<slug>/job_description_raw.md`, `job_description.md`, `job_details.yml`, `website/` |
+| [`jojo generate`](generate) | `applications/<slug>/job_description.md`, `job_details.yml`, `inputs/resume_data.yml`, `templates/*` | `research.md`, `resume.md`, `cover_letter.md`, `job_description_annotations.json`, `branding_statement.json`, `faq.json`, `website/index.html`, `*.pdf` (if Pandoc installed), `status_log.md` |
+| [`jojo research`](research) | `applications/<slug>/job_description.md`, `job_details.yml` | `applications/<slug>/research.md`, `status_log.md` |
+| [`jojo resume`](resume) | `applications/<slug>/job_description.md`, `job_details.yml`, `inputs/resume_data.yml` | `applications/<slug>/resume.md`, `status_log.md` |
+| [`jojo cover_letter`](cover-letter) | `applications/<slug>/job_description.md`, `job_details.yml`, `resume.md`, `inputs/resume_data.yml` | `applications/<slug>/cover_letter.md`, `status_log.md` |
+| [`jojo annotate`](annotate) | `applications/<slug>/job_description.md`, `job_details.yml` | `applications/<slug>/job_description_annotations.json` |
+| [`jojo branding`](branding) | `applications/<slug>/job_description.md`, `job_details.yml`, `resume.md`, optional: `research.md` | `applications/<slug>/branding_statement.json` |
+| [`jojo faq`](faq) | `applications/<slug>/job_description.md`, `job_details.yml`, `resume.md` | `applications/<slug>/faq.json` |
+| [`jojo website`](website) | `applications/<slug>/job_description.md`, `job_details.yml`, `resume.md`, optional: `research.md`, `faq.json`, `job_description_annotations.json`, `templates/*` | `applications/<slug>/website/index.html`, `status_log.md` |
+| [`jojo pdf`](pdf) | `applications/<slug>/resume.md`, `cover_letter.md` | `applications/<slug>/resume.pdf`, `cover_letter.pdf` |
+
 ## Global options
 
 | Option | Description |
