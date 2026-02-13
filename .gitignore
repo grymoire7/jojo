@@ -29,6 +29,7 @@
 
 # Ignore local Claude AI settings
 /.claude/settings.local.json
+docs/.claude/
 
 # Jojo-specific
 applications/
