@@ -18,6 +18,12 @@ aux_links:
 
 aux_links_new_tab: true
 
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
 exclude:
   - plans/
   - examples/
