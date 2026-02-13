@@ -26,4 +26,5 @@ defaults:
 
 exclude:
   - plans/
-  - examples/
+  - examples/config_permissions_example.yml
+  - examples/resume_data_example.yml
