@@ -26,13 +26,20 @@ into an active pitch.
 Think of it as treating each job application like a product launch. You're the
 product. The company is the customer. Jojo builds the marketing campaign.
 
-```
-Resume data ──→ ┌──────┐ ──→ Tailored resume
-                │      │ ──→ Cover letter
-Job description ──→ │ Jojo │ ──→ Company research
-                │      │ ──→ Landing page website
-                └──────┘ ──→ PDF exports
-```
+{{< mermaid >}}
+flowchart LR
+    A[Resume data] --> J(Jojo)
+    B[Job description] --> J
+    J --> C[Tailored resume]
+    J --> D[Cover letter]
+    J --> E[Company research]
+    J --> F[Landing page website]
+    J --> G[PDF exports]
+
+    style J fill:#CC0000,stroke:#333,stroke-width:2px
+    style A fill:#6F42C1,stroke:#333,stroke-width:2px
+    style B fill:#6F42C1,stroke:#333,stroke-width:2px
+{{< /mermaid >}}
 
 ## How it works
 
