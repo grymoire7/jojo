@@ -118,8 +118,8 @@ it was built from the old research.
 └───────────────────────────────────────────────────┘
 ```
 
-The `$` indicator shows which steps call paid APIs, so you know what each
-action will cost before you press the key. Steps that just combine existing
+The `$` indicator shows which steps call paid APIs, so you know if each action
+will cost something before you press the key. Steps that just combine existing
 artifacts (like website generation) are free.
 
 ## Architecture: the command pipeline
@@ -173,8 +173,7 @@ generation, or whatever combination suits your budget and quality needs.
 
 ## Solving the hallucination problem
 
-This is the technical decision I'm most proud of, because it came from a real
-failure.
+This is a technical decision that came from a hard fail.
 
 The original resume generation worked like this: take the user's resume data
 (stored as structured YAML), combine it with the job description and research,
@@ -187,7 +186,7 @@ The AI ignored these instructions about 15% of the time. I'd review a
 generated resume and find "Kubernetes" listed in my skills because the AI
 noticed I mentioned Docker and helpfully inferred I must know Kubernetes too.
 Or it would embellish a job description with responsibilities I never had. For
-most content, AI creativity is a feature. For a resume, it's a liability.
+some content, AI creativity is a feature. For a resume, it's a liability.
 
 The first instinct was to add more guardrails to the prompt. More emphatic
 instructions. More examples of what not to do. This helped a little, but it
@@ -200,13 +199,13 @@ A professional summary should be rewritten for each role — that's the whole
 point. But a list of programming languages must not be modified. The years you
 worked at a company are facts. Your name is your name.
 
-The problem wasn't "AI can't be trusted." It was "AI shouldn't have the same
-permissions everywhere." Some fields need creative tailoring. Others need strict
-preservation. And there's a spectrum in between.
+The problem was that "AI shouldn't have the same permissions everywhere." Some
+fields need creative tailoring. Others need strict preservation. And there's a
+spectrum in between.
 
 ### Permission-based curation
 
-The solution is a permission system embedded directly in the resume data:
+The solution was a permission system embedded directly in the resume data:
 
 ```yaml
 name: "Tracy Atteberry"          # default: read-only
@@ -271,10 +270,10 @@ experience descriptions. It uses the original content as a factual baseline.
 Then an ERB template renders the final markdown. The template handles structure
 and formatting — the AI never touches the output format.
 
-Here's what makes this work as an engineering solution: the Ruby code *enforces*
-the permissions. If the AI returns a reordered list that's shorter than the
-original for a field that only has `reorder` permission, the `Transformer`
-class raises a `PermissionViolation` error:
+Here's what makes this work as an engineering solution: the Ruby code
+*enforces* the permissions where possible. If the AI returns a reordered list
+that's shorter than the original for a field that only has `reorder`
+permission, the `Transformer` class raises a `PermissionViolation` error:
 
 ```ruby
 unless can_remove
@@ -295,6 +294,29 @@ The result: my skills section always contains skills I actually have. My job
 dates are always accurate. But my professional summary is freshly written for
 each role, emphasizing the experience most relevant to that specific position.
 
+## What structured data enables
+
+In order to make the permission system work, we had to switch from an unstructured
+markdown resume to a structured YAML format. This was a significant
+architectural change — it required reworking the entire resume generation
+pipeline — but it was necessary to solve the hallucination problem.
+
+The permission system is the most visible benefit of using structured data, but
+there are other advantages:
+
+- **Narrower AI focus** — With structured data, the AI can focus on curating specific
+  fields rather than trying to parse and understand a free-form markdown
+  document. This leads to better quality and more consistent results.
+- **Better output control** — The ERB template handles formatting and
+  structure, so the AI only generates content. This reduces the chances of
+  formatting errors or hallucinated sections and increases the human control over
+  the final output.
+- **Easier testing** — Structured data is easier to work with in tests. You can
+  create synthetic resume data with specific permissions and verify that the
+  output respects those permissions. With unstructured markdown, it's harder to
+  assert that the AI didn't add or modify content it shouldn't have.
+
+
 ## Testing as a development discipline
 
 Jojo has 530 tests across two tiers, with 84% code coverage. Getting there was
@@ -303,36 +325,31 @@ a deliberate investment, not something that happened naturally.
 AI coding assistants are enthusiastic about writing features. They're less
 enthusiastic about writing tests. This mirrors human tendencies — tests aren't
 as exciting as shipping the next feature — but with AI-accelerated development
-the gap is amplified. You can build features so fast that test coverage falls
-behind before you notice.
+the gap is amplified.
 
-I noticed around Phase 3, when I had working code for research generation, job
-description processing, and resume tailoring, but coverage was sitting at 31%.
-The code worked, but I had no safety net for refactoring. The push to 84% was a
-conscious decision to stop adding features and invest in the test suite.
+When the first large refactor was needed I noticed that test coverage was
+sitting at 31%. The code worked, but I had no safety net for refactoring. The
+push to 84% was a conscious decision to invest in change enablement.
 
-### Three test tiers
+### Three kinds of tests
 
-The test organization follows a simple decision rule:
+Jojo has three kinds of tests:
 
-| If the test... | It goes in... |
-|----------------|---------------|
-| Calls a real external API | `test/service/` (costs money, runs on demand) |
-| Uses mocked external services | `test/integration/` |
-| Tests pure logic | `test/unit/` |
+| Kind of test...    | It tests...                   |
+| ------------------ | ----------------------------- |
+| Unit tests         | Do small units work?          |
+| Inetegration tests | Do small units work together? |
+| Linting            | Static code analysis          |
 
-Unit and integration tests run on every `./bin/test` invocation and in CI.
-Service tests run only when explicitly requested and require a confirmation
-prompt (to avoid accidental API charges).
+All tests run on every `./bin/test` (or `rake test:all`) invocation and in CI.
 
 ### Testing AI-dependent code
 
-The trickiest part of testing Jojo is that most of the interesting logic
+The trickiest part of testing Jojo is that a lot of the interesting work
 involves AI API calls. You can't run those in CI without spending money on
 every test run, but you also want tests that exercise real response parsing.
 
-The solution is VCR (Video Cassette Recorder — yes, the Ruby gem is named
-after the thing that plays tapes). VCR records real HTTP interactions the first
+The solution was the VCR gem. VCR records real HTTP interactions the first
 time a test runs and saves them as "cassettes." On subsequent runs, it replays
 the recorded responses instead of making real API calls. You get fast,
 deterministic tests that still exercise the full response-parsing pipeline.
@@ -340,13 +357,14 @@ deterministic tests that still exercise the full response-parsing pipeline.
 ### Fixture discipline
 
 One rule that might seem like overkill but has saved me more than once: tests
-never touch the `inputs/` directory. That directory contains real resume data —
-my actual work history, recommendations, and contact information. Tests use
-`test/fixtures/` exclusively, with synthetic data designed for testability.
+(and AI) never touch the `inputs/` directory. That directory contains real
+resume data — my actual work history, recommendations, and contact information.
+Tests use `test/fixtures/` exclusively, with synthetic data designed for
+testability.
 
-This is codified in the project's CLAUDE.md (the instructions file for AI
-coding assistants), so even when an AI tool is writing tests, it follows this
-rule. The instructions are explicit: "NEVER read from `inputs/` in tests."
+This is codified in the project's AI guidelines, which was previously prone
+to such mistakes. The instructions explicit, emphatic, and took few iterations
+to be effective.
 
 ## Building with AI
 
@@ -355,30 +373,32 @@ content, and it was built with AI assistance. Both
 [Claude](https://claude.ai/code) and [Z](https://z.ai) helped with
 development — not as novelties, but as daily tools throughout the process.
 
-The project has 486 commits over about two months. That pace reflects what AI-
-assisted development actually looks like when it's working: rapid iteration
-with frequent, small commits. AI is excellent at generating boilerplate,
-exploring design alternatives, writing test cases, and automating the tedious
-parts of refactoring (like updating 50 files when you rename a class).
+The project has 486 commits over about two months. For a hobby project, that's
+not a bad pace. It's not a "built in a weekend" kind of pace, but it's faster than
+the typical pace of a project of this scope without AI assistance.
+AI is good at generating boilerplate, exploring design alternatives, writing
+test cases, and automating the tedious parts of refactoring (like updating 50
+files when you rename a class).
 
-But the decisions this post is about — the permission-based curation system,
-the command pipeline architecture, the choice to stop and refactor an 877-line
-file, the three-tier test organization — those were human decisions. AI helped
-me implement them faster. It didn't tell me they were needed.
+But the decisions this post is about — the curation system, the architecture,
+the decision to refactor and when, the test organization — those were human
+decisions. AI helped implement them a bit faster, but it didn't tell me they
+were needed.
 
-The most valuable part of AI-assisted development wasn't code generation. It
-was the ability to explore approaches quickly. When I was designing the
-permission system, I could describe three different architectures to Claude and
-get working prototypes of each in minutes, then evaluate them against real data.
-That kind of rapid experimentation is transformative. The design thinking still
+The most valuable part of AI-assisted development was arguably the ability to
+explore approaches quickly. When I was designing the permission system, I could
+describe three different architectures to Claude, brainstorm, and get working
+prototypes of each in minutes, then evaluate them against real data. That kind
+of rapid experimentation is transformative. The design thinking, however, still
 has to be yours.
 
 The least valuable part was trusting AI to know when to stop building features
-and start testing. Left to its own devices, an AI assistant will happily build
-feature after feature, each one working in isolation, with no test coverage and
-growing technical debt. Just like a human developer on a deadline, it needs
-someone to say "we're not adding anything else until we have tests for what we
-already have."
+and start testing. Also, let's be honest, the temptation to let the AI go a
+little too long before reviewing its output. Left to its own devices, an AI
+assistant will happily build feature after feature, each one working in
+isolation, with no test coverage and growing technical debt. Just like a human
+developer on a deadline, it needs someone to say "we're not adding anything
+else until we address the technical debt, and that includes tests."
 
 ## What I learned and what's next
 
@@ -397,9 +417,21 @@ dramatically more usable, but it came in Phase 6 out of 7. Earlier access to
 the dependency graph and staleness detection would have improved my own
 workflow during development.
 
+**Force TDD from the start, or very near it.** I had a test suite from the
+beginning, but it wasn't until I hit a major refactor that I made a conscious
+decision to invest in test coverage. If I had enforced TDD from the start, I
+would have had a safety net for refactoring much earlier, which would have made
+the architecture more flexible and reduced the risk of breaking things when
+adding features.
+
+Basically, I would have spent a lot more time up front on planning the
+architecture and testing strategy, which would have made the development
+process smoother and more maintainable. AI assistance can be great, but
+it's also really good at seducing you into bad habits.
+
 ### What's next
 
-A few things on the roadmap:
+A few potential things for the roadmap:
 
 - **Interview prep generation** — STAR-method examples drawn from your resume
   data, tailored to the specific role
@@ -407,6 +439,9 @@ A few things on the roadmap:
   structure instead of copying static files
 - **Application tracking** — Status tracking across all applications with dates,
   notes, and follow-up reminders
+- **Full SaaS product** — A Rails app version of Jojo with a user-friendly interface
+  and full job search management features — this would be a much bigger project
+  but could help a wider audience.
 
 ### Try it out
 
@@ -417,5 +452,5 @@ about five minutes.
 
 If you're interested in the code, the architecture, or just want to talk about
 AI-assisted development, I'd enjoy hearing from you. You can find me on
-[LinkedIn](https://linkedin.com/in/tracyatteberry) or at
-[tracyatteberry.com](https://tracyatteberry.com).
+[LinkedIn](https://linkedin.com/in/tracyatteberry) or [Mastodon](https://mastodon.social/@grymoire7).
+
