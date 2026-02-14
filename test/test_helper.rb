@@ -42,6 +42,11 @@ Minitest::Reporters.use!
 require "vcr"
 require "webmock"
 
+# Ensure API keys are set so RubyLLM passes config validation
+# before making HTTP requests that VCR can intercept
+ENV["ANTHROPIC_API_KEY"] ||= "test-key-for-vcr"
+ENV["OPENAI_API_KEY"] ||= "test-key-for-vcr"
+
 VCR.configure do |config|
   config.cassette_library_dir = File.expand_path("cassettes", __dir__)
   config.hook_into :webmock
