@@ -76,7 +76,7 @@ class WebsiteWorkflowTest < JojoTest
     # Verify Tailwind CSS output with DaisyUI theme
     styles_css = File.read(File.join(@employer.website_path, "styles.css"))
     assert_includes styles_css, "tailwindcss"
-    assert_includes styles_css, "--p:#4f9cf9" # DaisyUI jojo theme primary color
+    assert_includes styles_css, "--color-primary:oklch" # DaisyUI jojo theme primary color
     assert_includes html, '<link rel="stylesheet" href="styles.css">'
     assert_includes html, "viewport"
     assert_includes html, "Inter" # Google Fonts
