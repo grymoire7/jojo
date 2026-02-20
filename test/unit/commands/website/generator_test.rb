@@ -170,8 +170,8 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
     result = @generator.generate
 
     # CTA section should not be rendered (check for actual section tag, not CSS class)
-    refute_includes result, '<section class="cta-section">'
-    refute_includes result, 'class="cta-button"'
+    refute_includes result, "Let's Connect"
+    refute_includes result, "btn btn-primary btn-lg"
   end
 
   def test_handles_empty_cta_link_gracefully
@@ -180,8 +180,8 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
     result = @generator.generate
 
     # CTA section should not be rendered (check for actual section tag, not CSS class)
-    refute_includes result, '<section class="cta-section">'
-    refute_includes result, 'class="cta-button"'
+    refute_includes result, "Let's Connect"
+    refute_includes result, "btn btn-primary btn-lg"
   end
 
   def test_loads_and_injects_annotations_into_job_description_html
@@ -283,7 +283,7 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
     html = @generator.generate
 
     refute_includes html, "Your Questions, Answered"
-    refute_includes html, '<div class="faq-accordion"'
+    refute_includes html, "faq-accordion"
   end
 
   def test_fails_when_branding_md_is_missing

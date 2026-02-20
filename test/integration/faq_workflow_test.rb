@@ -82,8 +82,8 @@ class FaqWorkflowIntegrationTest < JojoTest
     assert_includes html, "Your Questions, Answered"
     assert_includes html, "What's your Ruby experience?"
     assert_includes html, "Why this company?"
-    assert_includes html, "faq-accordion"
-    assert_includes html, "toggleFaq" # JavaScript function
+    assert_includes html, "collapse collapse-arrow" # DaisyUI accordion
+    assert_includes html, "faq-accordion" # radio group name
 
     @ai_client.verify
   end
@@ -102,7 +102,7 @@ class FaqWorkflowIntegrationTest < JojoTest
     html = website_generator.generate
 
     refute_includes html, "Your Questions, Answered"
-    refute_includes html, '<div class="faq-accordion"'
+    refute_includes html, "faq-accordion"
 
     @ai_client.verify
   end
@@ -141,7 +141,7 @@ class FaqWorkflowIntegrationTest < JojoTest
 
     # FAQ should come before footer
     faq_position = html.index("Your Questions, Answered")
-    footer_position = html.index('<footer class="footer">')
+    footer_position = html.index('<footer class="footer footer-center')
 
     refute_nil faq_position
     refute_nil footer_position

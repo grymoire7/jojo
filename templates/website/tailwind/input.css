@@ -33,3 +33,37 @@
   --wa: #FFE492;
   --er: #ef4444;
 }
+
+/* Annotation highlight styles */
+@layer components {
+  .annotated[data-tier="strong"] {
+    @apply bg-primary/25 rounded-sm cursor-help;
+  }
+  .annotated[data-tier="moderate"] {
+    @apply bg-primary/15 rounded-sm cursor-help;
+  }
+  .annotated[data-tier="mention"] {
+    @apply bg-primary/[0.08] rounded-sm cursor-help;
+  }
+  .annotated:hover {
+    @apply bg-primary/35;
+  }
+
+  /* Annotation tooltip */
+  .annotation-tooltip {
+    @apply fixed z-50 max-w-xs px-3 py-2 text-sm bg-neutral text-neutral-content rounded-lg shadow-lg opacity-0 pointer-events-none;
+    transition: opacity 0.2s ease-in-out;
+  }
+  .annotation-tooltip.visible {
+    @apply opacity-100;
+  }
+  .annotation-tooltip .tooltip-arrow {
+    @apply absolute w-2 h-2 bg-neutral rotate-45;
+  }
+  .annotation-tooltip.below .tooltip-arrow {
+    @apply -top-1 left-1/2 -translate-x-1/2;
+  }
+  .annotation-tooltip.above .tooltip-arrow {
+    @apply -bottom-1 left-1/2 -translate-x-1/2;
+  }
+}

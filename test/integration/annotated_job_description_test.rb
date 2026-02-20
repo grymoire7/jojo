@@ -82,9 +82,9 @@ class AnnotatedJobDescriptionIntegrationTest < JojoTest
     assert_includes html, "Moderate match"
     assert_includes html, "Worth a mention"
 
-    # Verify JavaScript present
-    assert_includes html, "function showTooltip"
-    assert_includes html, "annotation.dataset.match"
+    # Verify tooltip container and script reference present
+    assert_includes html, "annotation-tooltip"
+    assert_includes html, 'script src="script.js"'
 
     @ai_client.verify
   end

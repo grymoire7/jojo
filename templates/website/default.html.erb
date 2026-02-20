@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="jojo">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<%= seeker_name %> - Application for <%= company_name %>">
   <title><%= seeker_name %> | <%= company_name %><% if job_title %> - <%= job_title %><% end %></title>
-  <link rel="stylesheet" href="https://unpkg.com/open-props">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -33,200 +35,209 @@
     </defs>
   </svg>
 
-  <!-- Fixed Header -->
-  <header class="site-header">
-    <div class="header-container">
-      <a href="#" class="header-logo"><%= seeker_name %></a>
-
-      <nav class="header-nav">
-        <% if branding_statement %><a href="#branding">About</a><% end %>
-        <% if annotated_job_description %><a href="#job-description">Match</a><% end %>
-        <% if recommendations && !recommendations.empty? %><a href="#recommendations">Recommendations</a><% end %>
-        <% if faqs && !faqs.empty? %><a href="#faq">FAQ</a><% end %>
-        <% if projects && !projects.empty? %><a href="#projects">Projects</a><% end %>
-      </nav>
-
+  <!-- Navbar -->
+  <div class="navbar bg-secondary text-secondary-content sticky top-0 z-50 shadow-lg">
+    <div class="navbar-start">
+      <a class="text-xl font-bold" href="#"><%= seeker_name %></a>
+    </div>
+    <div class="navbar-center hidden lg:flex">
+      <ul class="menu menu-horizontal px-1 gap-2">
+        <% if branding_statement %><li><a href="#branding">About</a></li><% end %>
+        <% if annotated_job_description %><li><a href="#job-description">Match</a></li><% end %>
+        <% if recommendations && !recommendations.empty? %><li><a href="#recommendations">Recommendations</a></li><% end %>
+        <% if faqs && !faqs.empty? %><li><a href="#faq">FAQ</a></li><% end %>
+        <% if projects && !projects.empty? %><li><a href="#projects">Projects</a></li><% end %>
+      </ul>
+    </div>
+    <div class="navbar-end">
       <% if cta_link && !cta_link.strip.empty? %>
-      <div class="header-cta">
-        <a href="<%= cta_link %>" class="cta-button"><%= cta_text %></a>
+      <a href="<%= cta_link %>" class="btn btn-primary"><%= cta_text %></a>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero min-h-[60vh] bg-base-100">
+    <div class="hero-content text-center flex-col">
+      <h1 class="text-5xl font-bold text-secondary">
+        Am I a good match for <%= company_name %>?
+      </h1>
+      <p class="text-xl text-gray-600 max-w-2xl">
+        <% if job_title %><%= job_title %> Candidate<% else %>Let's find out<% end %>
+      </p>
+      <% if has_branding_image %>
+      <div class="mt-8">
+        <img src="<%= branding_image_path %>" alt="<%= seeker_name %>" class="rounded-xl max-w-sm shadow-lg">
       </div>
       <% end %>
     </div>
-  </header>
+  </div>
 
-  <div class="container">
-    <!-- Masthead -->
-    <header class="masthead">
-      <h1>Am I a good match for <%= company_name %>?</h1>
-      <h4><% if job_title %><%= job_title %> Candidate<% else %>Let's find out<% end %></h4>
-
-      <% if has_branding_image %>
-      <div class="masthead-image">
-        <img src="<%= branding_image_path %>" alt="<%= seeker_name %>">
+  <!-- Branding Statement -->
+  <section id="branding" class="bg-base-100 py-16 px-4">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-lg leading-relaxed text-gray-600 space-y-4">
+        <%= branding_statement.split("\n\n").map { |para| "<p>#{para}</p>" }.join("\n") %>
       </div>
-      <% end %>
-    </header>
+    </div>
+  </section>
 
-    <!-- Branding Statement -->
-    <section class="branding" id="branding">
-      <%= branding_statement.split("\n\n").map { |para| "<p>#{para}</p>" }.join("\n      ") %>
-    </section>
-
-    <!-- Annotated Job Description -->
-    <% if annotated_job_description %>
-    <section class="job-description-comparison" id="job-description">
-      <h2>Compare Me to the Job Description</h2>
-      <div class="job-description-content">
-        <%= annotated_job_description %>
+  <!-- Annotated Job Description -->
+  <% if annotated_job_description %>
+  <section id="job-description" class="bg-base-300/30 py-16 px-4">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-secondary mb-8 text-center">
+        Compare Me to the Job Description
+      </h2>
+      <div class="card bg-base-100 shadow-md">
+        <div class="card-body prose max-w-none">
+          <%= annotated_job_description %>
+        </div>
       </div>
-      <p class="annotation-legend">
-        <span class="legend-item"><span class="sample strong"></span> Strong match</span>
-        <span class="legend-item"><span class="sample moderate"></span> Moderate match</span>
-        <span class="legend-item"><span class="sample mention"></span> Worth a mention</span>
-        <span class="legend-hint">Hover or tap highlighted text to see details</span>
+      <p class="flex flex-wrap gap-4 justify-center mt-6 text-sm text-gray-500">
+        <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 bg-primary/25 rounded-sm"></span> Strong match</span>
+        <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 bg-primary/15 rounded-sm"></span> Moderate match</span>
+        <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 bg-primary/[0.08] rounded-sm"></span> Worth a mention</span>
       </p>
-    </section>
-    <% end %>
+      <p class="text-center text-xs text-gray-400 mt-2">Hover or tap highlighted text to see details</p>
+    </div>
+  </section>
+  <% end %>
 
-    <!-- Recommendations Carousel -->
-    <% if recommendations && !recommendations.empty? %>
-    <section class="recommendations<%= ' single-recommendation' if recommendations.size == 1 %>" id="recommendations">
-      <h2>What Others Say</h2>
-      <div class="carousel-container" role="region" aria-label="Recommendations carousel">
-        <div class="carousel-track">
-          <% recommendations.each_with_index do |rec, index| %>
-          <div class="carousel-slide" role="tabpanel" aria-hidden="<%= index != 0 %>">
-            <div class="recommendation-card">
-              <div class="recommendation-quote">
-                <%= rec[:quote] %>
-              </div>
-              <div class="recommendation-attribution">
-                <strong><%= rec[:name] %></strong><% if rec[:title] %>, <%= rec[:title] %><% end %>
+  <!-- Recommendations -->
+  <% if recommendations && !recommendations.empty? %>
+  <section id="recommendations" class="bg-base-100 py-16 px-4">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-secondary mb-8 text-center">
+        What Others Say
+      </h2>
+      <div class="carousel w-full gap-4">
+        <% recommendations.each_with_index do |rec, index| %>
+        <div id="rec-<%= index %>" class="carousel-item w-full">
+          <div class="card bg-base-100 shadow-md border border-base-300 w-full">
+            <div class="card-body">
+              <blockquote class="text-lg italic text-gray-700">
+                "<%= rec[:quote] %>"
+              </blockquote>
+              <p class="text-sm text-gray-500 mt-4">
+                <strong><%= rec[:name] %></strong><%= ", #{rec[:title]}" if rec[:title] %>
                 <br><%= rec[:relationship] %>
-              </div>
+              </p>
             </div>
           </div>
-          <% end %>
         </div>
+        <% end %>
       </div>
-      <div class="carousel-navigation">
-        <button class="carousel-arrow prev" aria-label="Previous recommendation">‹</button>
-        <div class="carousel-dots" role="tablist">
-          <% recommendations.each_with_index do |_, index| %>
-          <button class="carousel-dot<%= ' active' if index == 0 %>"
-                  aria-label="Go to recommendation <%= index + 1 %>"
-                  data-index="<%= index %>"></button>
-          <% end %>
-        </div>
-        <button class="carousel-arrow next" aria-label="Next recommendation">›</button>
+      <% if recommendations.size > 1 %>
+      <div class="flex justify-center gap-2 py-4">
+        <% recommendations.each_with_index do |_, index| %>
+        <a href="#rec-<%= index %>" class="btn btn-xs btn-circle <%= index == 0 ? 'btn-primary' : 'btn-ghost' %>"><%= index + 1 %></a>
+        <% end %>
       </div>
-      <div class="sr-only" aria-live="polite" aria-atomic="true" id="carousel-status">
-        Showing recommendation <span id="carousel-current">1</span> of <%= recommendations.size %>
-      </div>
-    </section>
-    <% end %>
+      <% end %>
+    </div>
+  </section>
+  <% end %>
 
-    <!-- FAQ Section -->
-    <% if faqs && !faqs.empty? %>
-    <section class="faq" id="faq">
-      <h2>Your Questions, Answered</h2>
-      <div class="faq-accordion" role="region" aria-label="Frequently asked questions">
+  <!-- FAQ Section -->
+  <% if faqs && !faqs.empty? %>
+  <section id="faq" class="bg-base-300/30 py-16 px-4">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-secondary mb-8 text-center">
+        Your Questions, Answered
+      </h2>
+      <div class="space-y-3">
         <% faqs.each_with_index do |faq, index| %>
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false" aria-controls="answer-<%= index %>">
+        <div class="collapse collapse-arrow bg-base-100 shadow-sm border border-base-300">
+          <input type="radio" name="faq-accordion" <%= 'checked="checked"' if index == 0 %> />
+          <div class="collapse-title font-semibold text-secondary">
             <%= faq[:question] %>
-            <span class="faq-chevron" aria-hidden="true">›</span>
-          </button>
-          <div class="faq-answer" id="answer-<%= index %>">
+          </div>
+          <div class="collapse-content text-gray-600">
             <p><%= faq[:answer] %></p>
           </div>
         </div>
         <% end %>
       </div>
-    </section>
-    <% end %>
+    </div>
+  </section>
+  <% end %>
 
-    <!-- Projects Section -->
-    <% if projects && !projects.empty? %>
-    <section class="projects" id="projects">
-      <h2>Relevant Projects</h2>
-      <div class="project-list">
+  <!-- Projects Section -->
+  <% if projects && !projects.empty? %>
+  <section id="projects" class="bg-base-100 py-16 px-4">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-3xl font-bold text-secondary mb-8 text-center">
+        Relevant Projects
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <% projects.each do |project| %>
-        <div class="project-card">
-          <div class="project-header">
-            <% if project[:image_url] %>
-            <img src="<%= project[:image_url] %>" alt="" class="project-icon" loading="lazy">
-            <% end %>
-            <h3 class="project-title"><%= project[:name] %></h3>
-          </div>
-
-          <p class="project-headline"><%= project[:description] %></p>
-
-          <% if project[:skills] && !project[:skills].empty? %>
-          <div class="project-tech">
-            <% project[:skills].each do |skill| %>
-            <span class="tech-tag"><%= skill %></span>
-            <% end %>
-          </div>
+        <div class="card bg-base-100 shadow-md border border-base-300 hover:shadow-lg transition-shadow">
+          <% if project[:image_url] %>
+          <figure><img src="<%= project[:image_url] %>" alt="" loading="lazy" class="w-full h-48 object-cover" /></figure>
           <% end %>
-
-          <% if project[:blog_post_url] || project[:live_url] || project[:url] %>
-          <div class="project-actions">
-            <% if project[:blog_post_url] %>
-            <a href="<%= project[:blog_post_url] %>" class="btn btn-primary">
-              <svg class="icon"><use href="#icon-book"></use></svg>
-              Technical Deep Dive
-            </a>
+          <div class="card-body">
+            <h3 class="card-title text-secondary"><%= project[:name] %></h3>
+            <p class="text-gray-600"><%= project[:description] %></p>
+            <% if project[:skills] && !project[:skills].empty? %>
+            <div class="flex flex-wrap gap-2 mt-2">
+              <% project[:skills].each do |skill| %>
+              <span class="badge badge-outline badge-sm"><%= skill %></span>
+              <% end %>
+            </div>
             <% end %>
-            <% if project[:live_url] %>
-            <a href="<%= project[:live_url] %>" class="btn btn-secondary">
-              <svg class="icon"><use href="#icon-external-link"></use></svg>
-              Live Demo
-            </a>
-            <% end %>
-            <% if project[:url] %>
-            <a href="<%= project[:url] %>" class="btn btn-tertiary">
-              <svg class="icon"><use href="#icon-github"></use></svg>
-              Source Code
-            </a>
+            <div class="card-actions justify-start mt-4">
+              <% if project[:blog_post_url] %>
+              <a href="<%= project[:blog_post_url] %>" class="btn btn-primary btn-sm">Technical Deep Dive</a>
+              <% end %>
+              <% if project[:live_url] %>
+              <a href="<%= project[:live_url] %>" class="btn btn-accent btn-sm">Live Demo</a>
+              <% end %>
+              <% if project[:url] %>
+              <a href="<%= project[:url] %>" class="btn btn-outline btn-sm">Source Code</a>
+              <% end %>
+            </div>
+            <% if project[:year] || project[:context] %>
+            <div class="text-xs text-gray-400 mt-2 pt-2 border-t border-base-300 flex justify-between">
+              <% if project[:year] %><span><%= project[:year] %></span><% end %>
+              <% if project[:context] %><span class="italic"><%= project[:context] %></span><% end %>
+            </div>
             <% end %>
           </div>
-          <% end %>
-
-          <% if project[:year] || project[:context] %>
-          <div class="project-footer">
-            <% if project[:year] %><span class="project-date"><%= project[:year] %></span><% end %>
-            <% if project[:context] %><span class="project-context"><%= project[:context] %></span><% end %>
-          </div>
-          <% end %>
         </div>
         <% end %>
       </div>
-    </section>
-    <% end %>
+    </div>
+  </section>
+  <% end %>
 
-    <!-- Call to Action -->
-    <% if cta_link && !cta_link.strip.empty? %>
-    <section class="cta-section">
-      <a href="<%= cta_link %>" class="cta-button"><%= cta_text %></a>
-    </section>
-    <% end %>
+  <!-- Call to Action -->
+  <% if cta_link && !cta_link.strip.empty? %>
+  <section class="bg-secondary text-secondary-content py-20 px-4">
+    <div class="max-w-2xl mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-4">Let's Connect</h2>
+      <p class="text-lg opacity-90 mb-8">Interested in learning more? I'd love to chat.</p>
+      <a href="<%= cta_link %>" class="btn btn-primary btn-lg"><%= cta_text %></a>
+    </div>
+  </section>
+  <% end %>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>Application materials for <%= company_name %></p>
-      <div class="footer-links">
-        <a href="resume.pdf">
-          <svg class="icon"><use href="#icon-download"></use></svg>
+  <!-- Footer -->
+  <footer class="footer footer-center p-6 bg-base-200 text-base-content border-t border-base-300">
+    <div>
+      <p class="text-sm text-gray-500 mb-2">Application materials for <%= company_name %></p>
+      <div class="flex gap-4 justify-center">
+        <a href="resume.pdf" class="link link-hover flex items-center gap-1">
+          <svg class="w-4 h-4 fill-current"><use href="#icon-download"></use></svg>
           Resume (pdf)
         </a>
-        <a href="cover-letter.pdf">
-          <svg class="icon"><use href="#icon-download"></use></svg>
+        <a href="cover-letter.pdf" class="link link-hover flex items-center gap-1">
+          <svg class="w-4 h-4 fill-current"><use href="#icon-download"></use></svg>
           Cover Letter (pdf)
         </a>
       </div>
-    </footer>
-  </div>
+    </div>
+  </footer>
 
   <% if annotated_job_description %>
   <!-- Annotation tooltip container -->
@@ -234,384 +245,6 @@
     <div class="tooltip-content"></div>
     <div class="tooltip-arrow"></div>
   </div>
-
-  <script>
-  (function() {
-    'use strict';
-
-    const tooltip = document.getElementById('annotation-tooltip');
-    const tooltipContent = tooltip.querySelector('.tooltip-content');
-    const annotations = document.querySelectorAll('.annotated');
-    const isTouchDevice = window.matchMedia('(hover: none)').matches;
-    let currentAnnotation = null;
-
-    // Show tooltip
-    function showTooltip(annotation) {
-      const match = annotation.dataset.match;
-      if (!match) return;
-
-      currentAnnotation = annotation;
-      tooltipContent.textContent = match;
-
-      // Position tooltip
-      positionTooltip(annotation);
-
-      // Show with animation
-      tooltip.classList.add('visible');
-    }
-
-    // Hide tooltip
-    function hideTooltip() {
-      tooltip.classList.remove('visible');
-      currentAnnotation = null;
-    }
-
-    // Position tooltip above or below annotation
-    function positionTooltip(annotation) {
-      const rect = annotation.getBoundingClientRect();
-      const tooltipRect = tooltip.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const spaceAbove = rect.top;
-      const spaceBelow = viewportHeight - rect.bottom;
-
-      // Decide position: above or below
-      const showAbove = spaceAbove > tooltipRect.height + 10 && spaceBelow < tooltipRect.height + 10;
-
-      if (showAbove) {
-        tooltip.classList.add('above');
-        tooltip.classList.remove('below');
-        tooltip.style.top = (window.scrollY + rect.top - tooltipRect.height - 10) + 'px';
-      } else {
-        tooltip.classList.add('below');
-        tooltip.classList.remove('above');
-        tooltip.style.top = (window.scrollY + rect.bottom + 10) + 'px';
-      }
-
-      // Center horizontally
-      const left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-      const maxLeft = window.innerWidth - tooltipRect.width - 10;
-      tooltip.style.left = Math.max(10, Math.min(left, maxLeft)) + 'px';
-    }
-
-    // Add event listeners to each annotation
-    annotations.forEach(function(annotation) {
-      // Make focusable for keyboard navigation
-      annotation.setAttribute('tabindex', '0');
-
-      if (isTouchDevice) {
-        // Touch: tap to show, tap outside to hide
-        annotation.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (currentAnnotation === annotation) {
-            hideTooltip();
-          } else {
-            showTooltip(annotation);
-          }
-        });
-      } else {
-        // Desktop: hover to show
-        annotation.addEventListener('mouseenter', function() {
-          showTooltip(annotation);
-        });
-
-        annotation.addEventListener('mouseleave', function() {
-          hideTooltip();
-        });
-      }
-
-      // Keyboard: Enter to show, Escape to hide
-      annotation.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          showTooltip(annotation);
-        } else if (e.key === 'Escape') {
-          e.preventDefault();
-          hideTooltip();
-        }
-      });
-    });
-
-    // Click outside to close (for touch devices)
-    if (isTouchDevice) {
-      document.addEventListener('click', function(e) {
-        if (!tooltip.contains(e.target) && !e.target.classList.contains('annotated')) {
-          hideTooltip();
-        }
-      });
-    }
-  })();
-  </script>
-  <% end %>
-
-  <% if recommendations && recommendations.size > 1 %>
-  <!-- Recommendations Carousel JavaScript -->
-  <script>
-  (function() {
-    'use strict';
-
-    // Carousel state
-    const carousel = {
-      track: document.querySelector('.recommendations .carousel-track'),
-      slides: document.querySelectorAll('.recommendations .carousel-slide'),
-      prevBtn: document.querySelector('.recommendations .carousel-arrow.prev'),
-      nextBtn: document.querySelector('.recommendations .carousel-arrow.next'),
-      dots: document.querySelectorAll('.recommendations .carousel-dot'),
-      currentIndex: 0,
-      totalSlides: <%= recommendations.size %>,
-      isTransitioning: false,
-      autoAdvanceInterval: null,
-      autoAdvanceDelay: 6000
-    };
-
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Go to specific slide
-    function goToSlide(index) {
-      if (carousel.isTransitioning) return;
-
-      carousel.isTransitioning = true;
-      carousel.currentIndex = index;
-
-      // Update transform
-      const offset = -index * 100;
-      carousel.track.style.transform = `translateX(${offset}%)`;
-
-      // Update dots
-      carousel.dots.forEach((dot, i) => {
-        dot.classList.toggle('active', i === index);
-      });
-
-      // Update ARIA
-      carousel.slides.forEach((slide, i) => {
-        slide.setAttribute('aria-hidden', i !== index);
-      });
-
-      // Update ARIA live region
-      const statusCurrent = document.getElementById('carousel-current');
-      if (statusCurrent) {
-        statusCurrent.textContent = index + 1;
-      }
-
-      setTimeout(() => {
-        carousel.isTransitioning = false;
-      }, 300);
-    }
-
-    // Next slide
-    function nextSlide() {
-      const next = (carousel.currentIndex + 1) % carousel.totalSlides;
-      goToSlide(next);
-    }
-
-    // Previous slide
-    function prevSlide() {
-      const prev = (carousel.currentIndex - 1 + carousel.totalSlides) % carousel.totalSlides;
-      goToSlide(prev);
-    }
-
-    // Auto-advance
-    function startAutoAdvance() {
-      if (carousel.autoAdvanceInterval || prefersReducedMotion) return;
-
-      carousel.autoAdvanceInterval = setInterval(() => {
-        nextSlide();
-      }, carousel.autoAdvanceDelay);
-    }
-
-    function pauseAutoAdvance() {
-      if (carousel.autoAdvanceInterval) {
-        clearInterval(carousel.autoAdvanceInterval);
-        carousel.autoAdvanceInterval = null;
-      }
-    }
-
-    function resumeAutoAdvance() {
-      pauseAutoAdvance();
-      setTimeout(startAutoAdvance, 1000);
-    }
-
-    // Event listeners
-    carousel.prevBtn.addEventListener('click', () => {
-      prevSlide();
-      pauseAutoAdvance();
-    });
-
-    carousel.nextBtn.addEventListener('click', () => {
-      nextSlide();
-      pauseAutoAdvance();
-    });
-
-    carousel.dots.forEach((dot, index) => {
-      dot.addEventListener('click', () => {
-        goToSlide(index);
-        pauseAutoAdvance();
-      });
-    });
-
-    // Pause on hover
-    const container = document.querySelector('.recommendations');
-    container.addEventListener('mouseenter', pauseAutoAdvance);
-    container.addEventListener('mouseleave', resumeAutoAdvance);
-
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (e.target.closest('.recommendations')) {
-        if (e.key === 'ArrowLeft') {
-          prevSlide();
-          pauseAutoAdvance();
-        } else if (e.key === 'ArrowRight') {
-          nextSlide();
-          pauseAutoAdvance();
-        }
-      }
-    });
-
-    // Touch/swipe support
-    const isTouchDevice = window.matchMedia('(hover: none)').matches;
-    let touchStartX = 0;
-    let touchEndX = 0;
-    const swipeThreshold = 50;
-
-    function handleSwipe() {
-      const diff = touchStartX - touchEndX;
-
-      if (Math.abs(diff) > swipeThreshold) {
-        if (diff > 0) {
-          // Swipe left - next slide
-          nextSlide();
-        } else {
-          // Swipe right - previous slide
-          prevSlide();
-        }
-        pauseAutoAdvance();
-        setTimeout(resumeAutoAdvance, 2000);
-      }
-    }
-
-    container.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-      pauseAutoAdvance();
-    }, { passive: true });
-
-    container.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
-    }, { passive: true });
-
-    // Initialize
-    goToSlide(0);
-    startAutoAdvance();
-
-    // Pause when tab not visible
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        pauseAutoAdvance();
-      } else {
-        resumeAutoAdvance();
-      }
-    });
-  })();
-  </script>
-  <% end %>
-
-  <% if faqs && !faqs.empty? %>
-  <!-- FAQ Accordion JavaScript -->
-  <script>
-  (function() {
-    'use strict';
-
-    // FAQ state
-    const faq = {
-      items: document.querySelectorAll('.faq .faq-item'),
-      currentlyOpenIndex: null,
-      isAnimating: false
-    };
-
-    if (faq.items.length === 0) return;
-
-    // Toggle FAQ
-    function toggleFaq(index) {
-      if (faq.isAnimating) return;
-
-      if (faq.currentlyOpenIndex === index) {
-        // Clicking currently open FAQ - close it
-        closeFaq(index);
-        faq.currentlyOpenIndex = null;
-      } else {
-        // Opening a new FAQ
-        if (faq.currentlyOpenIndex !== null) {
-          closeFaq(faq.currentlyOpenIndex);
-        }
-        openFaq(index);
-        faq.currentlyOpenIndex = index;
-      }
-    }
-
-    // Open FAQ
-    function openFaq(index) {
-      const item = faq.items[index];
-      const button = item.querySelector('.faq-question');
-      const answer = item.querySelector('.faq-answer');
-
-      faq.isAnimating = true;
-
-      // Set max-height to scrollHeight for smooth animation
-      answer.style.maxHeight = answer.scrollHeight + 'px';
-
-      // Update visual state
-      button.classList.add('active');
-      button.setAttribute('aria-expanded', 'true');
-
-      // Clear animation lock after transition
-      setTimeout(() => { faq.isAnimating = false; }, 300);
-    }
-
-    // Close FAQ
-    function closeFaq(index) {
-      const item = faq.items[index];
-      const button = item.querySelector('.faq-question');
-      const answer = item.querySelector('.faq-answer');
-
-      faq.isAnimating = true;
-
-      // Collapse to 0 height
-      answer.style.maxHeight = '0';
-
-      // Update visual state
-      button.classList.remove('active');
-      button.setAttribute('aria-expanded', 'false');
-
-      setTimeout(() => { faq.isAnimating = false; }, 300);
-    }
-
-    // Click event listeners
-    faq.items.forEach((item, index) => {
-      const button = item.querySelector('.faq-question');
-
-      button.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleFaq(index);
-      });
-    });
-
-    // Keyboard event listeners
-    document.addEventListener('keydown', (e) => {
-      if (e.target.classList.contains('faq-question')) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          const index = Array.from(faq.items).indexOf(e.target.closest('.faq-item'));
-          toggleFaq(index);
-        } else if (e.key === 'Escape' && faq.currentlyOpenIndex !== null) {
-          e.preventDefault();
-          closeFaq(faq.currentlyOpenIndex);
-          faq.currentlyOpenIndex = null;
-        }
-      }
-    });
-  })();
-  </script>
   <% end %>
 
   <script src="script.js"></script>

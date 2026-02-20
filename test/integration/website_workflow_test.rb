@@ -59,7 +59,7 @@ class WebsiteWorkflowTest < JojoTest
     # Verify HTML structure
     html = File.read(@employer.index_html_path)
     assert_includes html, "<!DOCTYPE html>"
-    assert_includes html, "<html lang=\"en\">"
+    assert_includes html, '<html lang="en" data-theme="jojo">'
     assert_includes html, "</html>"
 
     # Verify content sections
@@ -73,11 +73,13 @@ class WebsiteWorkflowTest < JojoTest
     assert_includes html, "resume.pdf"
     assert_includes html, "cover-letter.pdf"
 
-    # Verify responsive CSS
+    # Verify Tailwind CSS output with DaisyUI theme
     styles_css = File.read(File.join(@employer.website_path, "styles.css"))
-    assert_includes styles_css, "@media (max-width: 640px)"
+    assert_includes styles_css, "tailwindcss"
+    assert_includes styles_css, "--p:#4f9cf9" # DaisyUI jojo theme primary color
     assert_includes html, '<link rel="stylesheet" href="styles.css">'
     assert_includes html, "viewport"
+    assert_includes html, "Inter" # Google Fonts
 
     @ai_client.verify
   end
@@ -158,8 +160,8 @@ class WebsiteWorkflowTest < JojoTest
     html = File.read(@employer.index_html_path)
 
     # CTA section should not be present
-    refute_includes html, '<section class="cta-section">'
-    refute_includes html, 'class="cta-button"'
+    refute_includes html, "Let's Connect"
+    refute_includes html, "btn btn-primary btn-lg"
 
     # But rest of website should be intact
     assert_includes html, "Am I a good match for Test Company?"
