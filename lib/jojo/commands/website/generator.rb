@@ -242,21 +242,33 @@ module Jojo
         end
 
         def build_tailwind_css
-          template_dir = File.join("templates", "website")
+          template_dir = File.expand_path(File.join("templates", "website"))
           input_css = File.join(template_dir, "tailwind", "input.css")
-          output_css = File.join(application.website_path, "styles.css")
+          output_css = File.expand_path(File.join(application.website_path, "styles.css"))
 
-          # Run outside Bundler context since tailwindcss may not be in the bundle
-          unbundled = defined?(Bundler) ? ->(cmd) { Bundler.with_unbundled_env { system(cmd) } } : method(:system)
-
-          unless unbundled.call("which tailwindcss > /dev/null 2>&1")
-            raise "tailwindcss CLI not found. Install it: https://tailwindcss.com/docs/installation"
+          node_modules = File.join(template_dir, "node_modules")
+          unless Dir.exist?(node_modules)
+            raise "node_modules not found in #{template_dir}. Run: cd #{template_dir} && npm install"
           end
 
-          cmd = "tailwindcss -i #{input_css} -o #{output_css} --minify"
+          tailwind_bin = File.join(node_modules, ".bin", "tailwindcss")
+          unless File.exist?(tailwind_bin)
+            raise "tailwindcss not found in node_modules. Run: cd #{template_dir} && npm install"
+          end
+
+          cmd = "#{tailwind_bin} -i #{input_css} -o #{output_css} --minify"
           log "Building Tailwind CSS: #{cmd}"
 
-          unless unbundled.call(cmd)
+          # Run from template dir so DaisyUI plugin resolves from local node_modules
+          success = Dir.chdir(template_dir) do
+            if defined?(Bundler)
+              Bundler.with_unbundled_env { system(cmd) }
+            else
+              system(cmd)
+            end
+          end
+
+          unless success
             raise "Tailwind CSS build failed. Check your template for syntax errors."
           end
         end

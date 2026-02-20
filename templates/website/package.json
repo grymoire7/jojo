@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "description": "Tailwind CSS + DaisyUI build dependencies for jojo website templates",
+  "dependencies": {
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/cli": "^4.1.0",
+    "daisyui": "^5.0.0"
+  }
+}

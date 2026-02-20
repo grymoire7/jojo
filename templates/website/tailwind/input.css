@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: jojo --default;
+}
 
 @theme {
   --color-primary-dark: #034873;
@@ -7,4 +10,26 @@
   --color-secondary-blue: #A7CEFC;
   --color-dark: #212529;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@plugin "daisyui/theme" {
+  name: "jojo";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --p: #4F9CF9;
+  --pc: #ffffff;
+  --s: #034873;
+  --sc: #ffffff;
+  --a: #FFE492;
+  --ac: #212529;
+  --n: #212529;
+  --nc: #ffffff;
+  --b1: #ffffff;
+  --b2: #f8fafc;
+  --b3: #A7CEFC;
+  --in: #A7CEFC;
+  --su: #22c55e;
+  --wa: #FFE492;
+  --er: #ef4444;
 }

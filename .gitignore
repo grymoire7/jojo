@@ -39,3 +39,7 @@ vendor/bundle/
 
 # Git worktrees
 .worktrees/
+
+# Node modules (Tailwind CSS build dependencies)
+templates/website/node_modules/
+templates/website/package-lock.json
