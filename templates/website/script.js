@@ -91,3 +91,30 @@
     });
   }
 })();
+
+(function() {
+  'use strict';
+
+  var carousel = document.querySelector('#recommendations .carousel');
+  var navButtons = document.querySelectorAll('#recommendations .btn-circle');
+  if (!carousel || navButtons.length === 0) return;
+
+  navButtons.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      var targetId = btn.getAttribute('href').slice(1);
+      var targetItem = document.getElementById(targetId);
+      if (targetItem) {
+        carousel.scrollTo({ left: targetItem.offsetLeft, behavior: 'smooth' });
+      }
+
+      navButtons.forEach(function(b) {
+        b.classList.remove('btn-primary');
+        b.classList.add('btn-ghost');
+      });
+      btn.classList.remove('btn-ghost');
+      btn.classList.add('btn-primary');
+    });
+  });
+})();
