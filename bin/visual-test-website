@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Visual test script for website output
+# Usage: bin/visual-test-website <application-slug>
+#
+# Requires: rodney CLI (Chrome automation tool)
+
+SLUG="${1:?Usage: bin/visual-test-website <application-slug>}"
+WEBSITE_DIR="applications/${SLUG}/website"
+INDEX="${WEBSITE_DIR}/index.html"
+
+if [ ! -f "$INDEX" ]; then
+  echo "Error: ${INDEX} not found. Generate the website first."
+  exit 1
+fi
+
+SCREENSHOT_DIR="${WEBSITE_DIR}/screenshots"
+mkdir -p "$SCREENSHOT_DIR"
+
+echo "Starting Chrome..."
+rodney start --show
+
+echo "Opening ${INDEX}..."
+rodney open "file://$(pwd)/${INDEX}"
+rodney wait idle
+
+echo "Taking desktop screenshot (1440px)..."
+rodney screenshot "${SCREENSHOT_DIR}/desktop-1440.png" --full-page --width 1440
+
+echo "Taking tablet screenshot (768px)..."
+rodney screenshot "${SCREENSHOT_DIR}/tablet-768.png" --full-page --width 768
+
+echo "Taking mobile screenshot (375px)..."
+rodney screenshot "${SCREENSHOT_DIR}/mobile-375.png" --full-page --width 375
+
+echo "Stopping Chrome..."
+rodney stop
+
+echo ""
+echo "Screenshots saved to ${SCREENSHOT_DIR}/"
+ls -la "${SCREENSHOT_DIR}/"
