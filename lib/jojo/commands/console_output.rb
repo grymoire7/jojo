@@ -1,7 +1,11 @@
 # lib/jojo/commands/console_output.rb
+require_relative "../overwrite_helper"
+
 module Jojo
   module Commands
     class ConsoleOutput
+      include Jojo::OverwriteHelper
+
       def initialize(quiet: false)
         @quiet = quiet
       end
