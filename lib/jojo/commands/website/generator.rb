@@ -221,8 +221,12 @@ module Jojo
           # Ensure website directory exists
           FileUtils.mkdir_p(application.website_path)
 
+          # Build Tailwind CSS
+          build_tailwind_css
+
+          # Copy static assets (CSS is now built by Tailwind, not copied)
           template_dir = File.join("templates", "website")
-          assets = ["styles.css", "script.js", "icons.svg"]
+          assets = ["script.js", "icons.svg"]
 
           assets.each do |asset|
             source = File.join(template_dir, asset)
@@ -234,6 +238,26 @@ module Jojo
             else
               log "Warning: Asset not found: #{source}"
             end
+          end
+        end
+
+        def build_tailwind_css
+          template_dir = File.join("templates", "website")
+          input_css = File.join(template_dir, "tailwind", "input.css")
+          output_css = File.join(application.website_path, "styles.css")
+
+          # Run outside Bundler context since tailwindcss may not be in the bundle
+          unbundled = defined?(Bundler) ? ->(cmd) { Bundler.with_unbundled_env { system(cmd) } } : method(:system)
+
+          unless unbundled.call("which tailwindcss > /dev/null 2>&1")
+            raise "tailwindcss CLI not found. Install it: https://tailwindcss.com/docs/installation"
+          end
+
+          cmd = "tailwindcss -i #{input_css} -o #{output_css} --minify"
+          log "Building Tailwind CSS: #{cmd}"
+
+          unless unbundled.call(cmd)
+            raise "Tailwind CSS build failed. Check your template for syntax errors."
           end
         end
 
