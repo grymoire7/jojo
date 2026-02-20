@@ -7,8 +7,8 @@ class AIClientTest < JojoTest
   def setup
     super
     write_test_config(
-      "reasoning_ai" => {"service" => "anthropic", "model" => "sonnet"},
-      "text_generation_ai" => {"service" => "anthropic", "model" => "haiku"}
+      "reasoning_ai" => {"service" => "anthropic", "model" => "claude-sonnet-4"},
+      "text_generation_ai" => {"service" => "anthropic", "model" => "claude-haiku-4-5"}
     )
     @config = Jojo::Config.new("config.yml")
   end
@@ -91,7 +91,7 @@ class AIClientTest < JojoTest
     mock_chat.expect(:ask, mock_response, ["Generate something"])
 
     RubyLLM.stub :chat, ->(**kwargs) {
-      assert_equal "claude-3-5-haiku-20241022", kwargs[:model]
+      assert_equal "claude-haiku-4-5", kwargs[:model]
       mock_chat
     } do
       result = client.generate_text("Generate something")
@@ -174,9 +174,9 @@ class AIClientTest < JojoTest
   end
 
   def test_resolve_model_name_maps_shortnames
-    assert_equal "claude-sonnet-4", Jojo::AIClient.resolve_model_name("sonnet")
-    assert_equal "claude-3-5-haiku-20241022", Jojo::AIClient.resolve_model_name("haiku")
-    assert_equal "claude-opus-4", Jojo::AIClient.resolve_model_name("opus")
+    assert_equal Jojo::AIClient::SHORT_NAME_TO_MODEL_ID["sonnet"], Jojo::AIClient.resolve_model_name("sonnet")
+    assert_equal Jojo::AIClient::SHORT_NAME_TO_MODEL_ID["haiku"], Jojo::AIClient.resolve_model_name("haiku")
+    assert_equal Jojo::AIClient::SHORT_NAME_TO_MODEL_ID["opus"], Jojo::AIClient.resolve_model_name("opus")
   end
 
   def test_resolve_model_name_passes_through_unknown
