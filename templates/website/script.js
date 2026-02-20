@@ -37,11 +37,11 @@
     if (showAbove) {
       tooltip.classList.add('above');
       tooltip.classList.remove('below');
-      tooltip.style.top = (window.scrollY + rect.top - tooltipRect.height - 10) + 'px';
+      tooltip.style.top = (rect.top - tooltipRect.height - 10) + 'px';
     } else {
       tooltip.classList.add('below');
       tooltip.classList.remove('above');
-      tooltip.style.top = (window.scrollY + rect.bottom + 10) + 'px';
+      tooltip.style.top = (rect.bottom + 10) + 'px';
     }
 
     var left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
