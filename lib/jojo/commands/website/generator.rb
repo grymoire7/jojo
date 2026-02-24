@@ -259,16 +259,25 @@ module Jojo
           cmd = "#{tailwind_bin} -i #{input_css} -o #{output_css} --minify"
           log "Building Tailwind CSS: #{cmd}"
 
-          # Run from template dir so DaisyUI plugin resolves from local node_modules
-          success = Dir.chdir(template_dir) do
+          require "open3"
+
+          # Run from template dir so DaisyUI plugin resolves from local node_modules.
+          # Capture output so version banners don't pollute the user's terminal;
+          # only print on failure so error details are not lost.
+          build_output, success = Dir.chdir(template_dir) do
             if defined?(Bundler)
-              Bundler.with_unbundled_env { system(cmd) }
+              Bundler.with_unbundled_env do
+                out, status = Open3.capture2e(cmd)
+                [out, status.success?]
+              end
             else
-              system(cmd)
+              out, status = Open3.capture2e(cmd)
+              [out, status.success?]
             end
           end
 
           unless success
+            warn build_output
             raise "Tailwind CSS build failed. Check your template for syntax errors."
           end
         end
