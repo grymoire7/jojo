@@ -57,12 +57,37 @@
   </div>
 
   <!-- Hero -->
-  <div class="hero min-h-[40vh] bg-base-300/30">
-    <div class="hero-content text-center flex-col">
-      <h1 class="text-5xl font-bold text-secondary">
+  <div class="hero min-h-[40vh] hero-dark">
+    <!-- Abstract wave decoration -->
+    <div class="hero-wave-bg" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMid slice">
+        <!-- Background glow blobs -->
+        <ellipse cx="15%" cy="60%" rx="280" ry="220" fill="rgba(100, 160, 255, 0.10)"/>
+        <ellipse cx="88%" cy="35%" rx="320" ry="240" fill="rgba(80, 140, 240, 0.08)"/>
+        <!-- Wave 1 - subtle bottom wave -->
+        <path fill="rgba(255,255,255,0.04)" d="M0,180 C200,280 500,80 800,200 C1050,300 1280,140 1440,180 L1440,400 L0,400 Z"/>
+        <!-- Wave 2 - slightly more opaque -->
+        <path fill="rgba(255,255,255,0.06)" d="M0,260 C360,380 720,140 1080,260 C1260,320 1380,220 1440,260 L1440,400 L0,400 Z"/>
+        <!-- Scattered dots -->
+        <circle cx="5%" cy="25%" r="3" fill="rgba(255,255,255,0.25)"/>
+        <circle cx="12%" cy="65%" r="2" fill="rgba(255,255,255,0.18)"/>
+        <circle cx="25%" cy="20%" r="2.5" fill="rgba(255,255,255,0.20)"/>
+        <circle cx="78%" cy="15%" r="3" fill="rgba(255,255,255,0.22)"/>
+        <circle cx="88%" cy="70%" r="2" fill="rgba(255,255,255,0.18)"/>
+        <circle cx="95%" cy="40%" r="3.5" fill="rgba(255,255,255,0.15)"/>
+        <circle cx="60%" cy="10%" r="2" fill="rgba(255,255,255,0.20)"/>
+      </svg>
+      <!-- Decorative rings -->
+      <div class="hero-ring hero-ring-1"></div>
+      <div class="hero-ring hero-ring-2"></div>
+      <div class="hero-ring hero-ring-3"></div>
+      <div class="hero-ring hero-ring-4"></div>
+    </div>
+    <div class="hero-content text-center flex-col hero-z-content">
+      <h1 class="text-5xl font-bold text-secondary-content">
         Am I a good match for <%= company_name %>?
       </h1>
-      <p class="text-xl text-gray-600 max-w-2xl">
+      <p class="text-xl text-secondary-content opacity-90 max-w-2xl">
         <% if job_title %><%= job_title %> Candidate<% else %>Let's find out<% end %>
       </p>
       <% if has_branding_image %>
@@ -84,9 +109,9 @@
 
   <!-- Annotated Job Description -->
   <% if annotated_job_description %>
-  <section id="job-description" class="bg-base-300/30 py-16 px-4">
+  <section id="job-description" class="bg-secondary py-16 px-4">
     <div class="max-w-3xl mx-auto">
-      <h2 class="text-3xl font-bold text-secondary mb-8 text-center">
+      <h2 class="text-3xl font-bold text-secondary-content mb-8 text-center">
         Compare Me to the Job Description
       </h2>
       <div class="card bg-base-100 shadow-md">
@@ -94,12 +119,12 @@
           <%= annotated_job_description %>
         </div>
       </div>
-      <p class="flex flex-wrap gap-4 justify-center mt-6 text-sm text-gray-500">
+      <p class="flex flex-wrap gap-4 justify-center mt-6 text-sm text-secondary-content opacity-90">
         <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 bg-primary/25 rounded-sm"></span> Strong match</span>
         <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 bg-primary/15 rounded-sm"></span> Moderate match</span>
         <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 bg-primary/[0.08] rounded-sm"></span> Worth a mention</span>
       </p>
-      <p class="text-center text-xs text-gray-400 mt-2">Hover or tap highlighted text to see details</p>
+      <p class="text-center text-xs text-secondary-content opacity-90 mt-2">Hover or tap highlighted text to see details</p>
     </div>
   </section>
   <% end %>
@@ -141,9 +166,9 @@
 
   <!-- FAQ Section -->
   <% if faqs && !faqs.empty? %>
-  <section id="faq" class="bg-base-300/30 py-16 px-4">
+  <section id="faq" class="bg-secondary py-16 px-4">
     <div class="max-w-3xl mx-auto">
-      <h2 class="text-3xl font-bold text-secondary mb-8 text-center">
+      <h2 class="text-3xl font-bold text-secondary-content mb-8 text-center">
         Your Questions, Answered
       </h2>
       <div class="space-y-3">
