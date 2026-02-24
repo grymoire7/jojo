@@ -162,6 +162,45 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
 
   # -- rewrite_field --
 
+  def test_rewrite_field_rewrites_each_array_item_individually
+    data = {
+      "experience" => [
+        {"description" => "Led Ruby team at TechCorp building Rails APIs"},
+        {"description" => "Built C++ document processing pipelines at Inso"}
+      ]
+    }
+
+    @ai_client.expect(:generate_text, "Rails-focused Ruby engineer", [String])
+    @ai_client.expect(:generate_text, "Document processing with C++", [String])
+
+    @transformer.send(:rewrite_field, "experience.description", data)
+
+    assert_equal "Rails-focused Ruby engineer", data["experience"][0]["description"]
+    assert_equal "Document processing with C++", data["experience"][1]["description"]
+    @ai_client.verify
+  end
+
+  def test_rewrite_field_prompt_prohibits_inventing_technologies_not_in_original
+    data = {"summary" => "Ruby on Rails developer with Vue.js experience"}
+
+    captured_prompt = nil
+    mock_client = Object.new
+    mock_client.define_singleton_method(:generate_text) do |prompt|
+      captured_prompt = prompt
+      "tailored result"
+    end
+
+    transformer = Jojo::Commands::Resume::Transformer.new(
+      ai_client: mock_client,
+      config: @config,
+      job_context: @job_context
+    )
+
+    transformer.send(:rewrite_field, "summary", data)
+
+    assert_match(/do not add|never add|only.*original|CRITICAL/i, captured_prompt)
+  end
+
   def test_rewrite_field_rewrites_text_field_using_ai
     data = {"summary" => "Generic software engineer with broad experience"}
 

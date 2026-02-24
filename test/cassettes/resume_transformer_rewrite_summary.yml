@@ -6,8 +6,11 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"model":"claude-haiku-4-5","messages":[{"role":"user","content":[{"type":"text","text":"Tailor
-        this content for the specific job opportunity.\nUse the original as factual
-        baseline - no new claims.\n\nJob Description:\nLooking for a Senior Ruby on
+        this content for the specific job opportunity.\n\nCRITICAL: Use ONLY information
+        present in the original content below.\nDO NOT add, invent, or imply experience
+        with any technology, framework, or skill\nthat is not explicitly mentioned in
+        the original content.\nDO NOT claim proficiency in languages, tools, or frameworks
+        absent from the original.\n\nJob Description:\nLooking for a Senior Ruby on
         Rails developer with PostgreSQL and Docker experience. Must have strong backend
         skills and experience with microservices architecture.\n\nOriginal Content:\nExperienced
         software engineer with broad technical background across multiple domains\n\nReturn

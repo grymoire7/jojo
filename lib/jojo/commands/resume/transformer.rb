@@ -145,13 +145,37 @@ module Jojo
         end
 
         def rewrite_field(field_path, data)
-          original = get_field(data, field_path)
-          return unless original.is_a?(String)
+          parts = field_path.split(".")
+          *parent_path, key = parts
 
-          # Simple, focused prompt
+          if parent_path.empty?
+            original = data[key]
+            return unless original.is_a?(String)
+            data[key] = call_rewrite_ai(original)
+          else
+            parent = parent_path.reduce(data) { |obj, k| obj[k] }
+            if parent.is_a?(Array)
+              parent.each do |item|
+                original = item[key]
+                next unless original.is_a?(String)
+                item[key] = call_rewrite_ai(original)
+              end
+            else
+              original = parent&.dig(key)
+              return unless original.is_a?(String)
+              parent[key] = call_rewrite_ai(original)
+            end
+          end
+        end
+
+        def call_rewrite_ai(original)
           prompt = <<~PROMPT
             Tailor this content for the specific job opportunity.
-            Use the original as factual baseline - no new claims.
+
+            CRITICAL: Use ONLY information present in the original content below.
+            DO NOT add, invent, or imply experience with any technology, framework, or skill
+            that is not explicitly mentioned in the original content.
+            DO NOT claim proficiency in languages, tools, or frameworks absent from the original.
 
             Job Description:
             #{@job_context[:job_description]}
@@ -162,8 +186,7 @@ module Jojo
             Return only the tailored content, no explanations.
           PROMPT
 
-          tailored = @ai_client.generate_text(prompt)
-          set_field(data, field_path, tailored)
+          @ai_client.generate_text(prompt)
         end
       end
     end

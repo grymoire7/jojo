@@ -38,7 +38,9 @@ class ResumeGeneratorProjectsTest < JojoTest
 
     # Nested fields (dot notation)
     mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # projects.skills: reorder
-    mock_ai.expect(:generate_text, "Tailored description", [String]) # experience.description: rewrite
+    mock_ai.expect(:generate_text, "Tailored description 1", [String]) # experience[0].description: rewrite
+    mock_ai.expect(:generate_text, "Tailored description 2", [String]) # experience[1].description: rewrite
+    mock_ai.expect(:generate_text, "Tailored description 3", [String]) # experience[2].description: rewrite
     mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience.technologies: remove
     mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience.technologies: reorder
     mock_ai.expect(:generate_text, "[0]", [String]) # experience.tags: remove
