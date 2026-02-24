@@ -50,6 +50,7 @@ class WebsiteWorkflowTest < JojoTest
       template: "default",
       verbose: false
     )
+    enable_tailwind_build(generator)
 
     generator.generate
 

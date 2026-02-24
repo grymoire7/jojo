@@ -61,6 +61,15 @@ end
 
 require_relative "../lib/jojo"
 
+# Stub Tailwind CSS builds by default in all tests to avoid the ~150ms CLI
+# invocation in tests that don't need to verify CSS output. Call
+# enable_tailwind_build(generator) in the rare test that does need it.
+class Jojo::Commands::Website::Generator
+  alias_method :build_tailwind_css_real, :build_tailwind_css
+  private def build_tailwind_css
+  end
+end
+
 class JojoTest < Minitest::Test
   def setup
     @original_dir = Dir.pwd
@@ -82,7 +91,31 @@ class JojoTest < Minitest::Test
   end
 
   def copy_templates
-    FileUtils.cp_r(File.join(@original_dir, "templates"), "templates")
+    require "find"
+    src = File.join(@original_dir, "templates")
+    dst = "templates"
+
+    # Copy template files, skipping node_modules (21MB — symlinked below instead)
+    Find.find(src) do |path|
+      Find.prune if File.basename(path) == "node_modules" && File.directory?(path)
+      rel = path[src.length + 1..]
+      target = rel ? File.join(dst, rel) : dst
+      if File.directory?(path)
+        FileUtils.mkdir_p(target)
+      else
+        FileUtils.mkdir_p(File.dirname(target))
+        FileUtils.cp(path, target)
+      end
+    end
+
+    # Symlink node_modules so Tailwind/DaisyUI bins resolve without copying 21MB per test
+    nm_src = File.join(src, "website", "node_modules")
+    nm_dst = File.join(dst, "website", "node_modules")
+    FileUtils.ln_s(nm_src, nm_dst) if Dir.exist?(nm_src) && !File.exist?(nm_dst)
+  end
+
+  def enable_tailwind_build(generator)
+    generator.define_singleton_method(:build_tailwind_css) { build_tailwind_css_real }
   end
 
   def with_vcr(cassette_name, &block)
