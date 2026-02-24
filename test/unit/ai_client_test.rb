@@ -179,6 +179,15 @@ class AIClientTest < JojoTest
     assert_equal Jojo::AIClient::SHORT_NAME_TO_MODEL_ID["opus"], Jojo::AIClient.resolve_model_name("opus")
   end
 
+  def test_all_shortname_model_ids_are_valid_ruby_llm_models
+    known_ids = RubyLLM::Models.all.map(&:id)
+    %w[sonnet haiku opus].each do |shortname|
+      resolved = Jojo::AIClient.resolve_model_name(shortname)
+      assert_includes known_ids, resolved,
+        "'#{shortname}' resolves to '#{resolved}' which is not in RubyLLM's model registry"
+    end
+  end
+
   def test_resolve_model_name_passes_through_unknown
     assert_equal "gpt-4o", Jojo::AIClient.resolve_model_name("gpt-4o")
     assert_equal "custom-model", Jojo::AIClient.resolve_model_name("custom-model")
