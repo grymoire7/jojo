@@ -37,7 +37,9 @@ require "dotenv/load"  # Load .env file for service tests
 require "minitest/autorun"
 require "minitest/spec"
 require "minitest/reporters"
-Minitest::Reporters.use!
+# Skip reporters in verbose mode (-v) so rake test:*:slow can grep the
+# standard per-test timing format ("TestFoo#test_bar = 0.01 s = .").
+Minitest::Reporters.use! unless ENV["A"]&.include?("-v")
 
 require "vcr"
 require "webmock"

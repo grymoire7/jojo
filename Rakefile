@@ -1,3 +1,4 @@
+require "bundler/setup"
 require "minitest/test_task"
 
 task default: "test:all"
