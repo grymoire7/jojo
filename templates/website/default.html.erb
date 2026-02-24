@@ -101,8 +101,21 @@
   <!-- Branding Statement -->
   <section id="branding" class="bg-base-100 py-16 px-4">
     <div class="max-w-3xl mx-auto">
+      <h2 class="text-4xl font-bold text-secondary mb-8 text-center">Why I'm a Strong Fit</h2>
+      <% branding_paragraphs = branding_statement.split("\n\n") %>
       <div class="text-lg leading-relaxed text-gray-600 space-y-4">
-        <%= branding_statement.split("\n\n").map { |para| "<p>#{para}</p>" }.join("\n") %>
+        <div id="branding-preview" class="relative overflow-hidden max-h-32">
+          <p><%= branding_paragraphs.first %></p>
+          <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+        </div>
+        <% if branding_paragraphs.size > 1 %>
+        <div id="branding-full" class="hidden space-y-4">
+          <% branding_paragraphs.each do |para| %>
+          <p><%= para %></p>
+          <% end %>
+        </div>
+        <% end %>
+        <button id="branding-toggle" class="text-primary font-semibold hover:underline focus:outline-none cursor-pointer">Show more</button>
       </div>
     </div>
   </section>
@@ -111,7 +124,7 @@
   <% if annotated_job_description %>
   <section id="job-description" class="bg-secondary py-16 px-4">
     <div class="max-w-3xl mx-auto">
-      <h2 class="text-3xl font-bold text-secondary-content mb-8 text-center">
+      <h2 class="text-4xl font-bold text-secondary-content mb-8 text-center">
         Compare Me to the Job Description
       </h2>
       <div class="card bg-base-100 shadow-md">
@@ -119,12 +132,12 @@
           <%= annotated_job_description %>
         </div>
       </div>
-      <p class="flex flex-wrap gap-4 justify-center mt-6 text-sm text-secondary-content opacity-90">
-        <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 bg-primary/25 rounded-sm"></span> Strong match</span>
-        <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 bg-primary/15 rounded-sm"></span> Moderate match</span>
-        <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 bg-primary/[0.08] rounded-sm"></span> Worth a mention</span>
-      </p>
-      <p class="text-center text-xs text-secondary-content opacity-90 mt-2">Hover or tap highlighted text to see details</p>
+      <div class="flex flex-wrap gap-6 justify-center mt-6 bg-base-100/10 rounded-lg px-6 py-3 border border-secondary-content/20">
+        <span class="flex items-center gap-2 text-sm font-medium text-secondary-content"><span class="inline-flex w-5 h-4 rounded-sm overflow-hidden bg-white"><span class="flex-1 bg-primary/25"></span></span> Strong match</span>
+        <span class="flex items-center gap-2 text-sm font-medium text-secondary-content"><span class="inline-flex w-5 h-4 rounded-sm overflow-hidden bg-white"><span class="flex-1 bg-primary/15"></span></span> Moderate match</span>
+        <span class="flex items-center gap-2 text-sm font-medium text-secondary-content"><span class="inline-flex w-5 h-4 rounded-sm overflow-hidden bg-white"><span class="flex-1 bg-primary/[0.08]"></span></span> Worth a mention</span>
+        <span class="text-xs text-secondary-content/70 self-center italic">Hover or tap to see details</span>
+      </div>
     </div>
   </section>
   <% end %>
@@ -133,7 +146,7 @@
   <% if recommendations && !recommendations.empty? %>
   <section id="recommendations" class="bg-base-100 py-16 px-4">
     <div class="max-w-3xl mx-auto">
-      <h2 class="text-3xl font-bold text-secondary mb-8 text-center">
+      <h2 class="text-4xl font-bold text-secondary mb-8 text-center">
         What Others Say
       </h2>
       <div class="carousel w-full gap-4">
@@ -168,17 +181,17 @@
   <% if faqs && !faqs.empty? %>
   <section id="faq" class="bg-secondary py-16 px-4">
     <div class="max-w-3xl mx-auto">
-      <h2 class="text-3xl font-bold text-secondary-content mb-8 text-center">
+      <h2 class="text-4xl font-bold text-secondary-content mb-8 text-center">
         Your Questions, Answered
       </h2>
       <div class="space-y-3">
         <% faqs.each_with_index do |faq, index| %>
         <div class="collapse collapse-arrow bg-base-100 shadow-sm border border-base-300">
           <input type="radio" name="faq-accordion" <%= 'checked="checked"' if index == 0 %> />
-          <div class="collapse-title font-semibold text-secondary">
+          <div class="collapse-title font-bold text-secondary">
             <%= faq[:question] %>
           </div>
-          <div class="collapse-content text-gray-600">
+          <div class="collapse-content text-gray-700">
             <p><%= faq[:answer] %></p>
           </div>
         </div>
@@ -192,12 +205,13 @@
   <% if projects && !projects.empty? %>
   <section id="projects" class="bg-base-100 py-16 px-4">
     <div class="max-w-5xl mx-auto">
-      <h2 class="text-3xl font-bold text-secondary mb-8 text-center">
+      <h2 class="text-4xl font-bold text-secondary mb-8 text-center">
         Relevant Projects
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <% projects.each do |project| %>
-        <div class="card bg-base-100 shadow-md border border-base-300 hover:shadow-lg transition-shadow">
+        <div class="card bg-base-100 shadow-md border border-base-300 hover:shadow-lg transition-shadow overflow-hidden">
+          <div class="h-1 bg-primary"></div>
           <% if project[:image_url] %>
           <figure><img src="<%= project[:image_url] %>" alt="" loading="lazy" class="w-full h-48 object-cover" /></figure>
           <% end %>

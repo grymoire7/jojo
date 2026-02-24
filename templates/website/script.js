@@ -118,3 +118,25 @@
     });
   });
 })();
+
+(function() {
+  'use strict';
+
+  var preview = document.getElementById('branding-preview');
+  var full = document.getElementById('branding-full');
+  var toggle = document.getElementById('branding-toggle');
+  if (!preview || !full || !toggle) return;
+
+  toggle.addEventListener('click', function() {
+    var isExpanded = !full.classList.contains('hidden');
+    if (isExpanded) {
+      full.classList.add('hidden');
+      preview.classList.remove('hidden');
+      toggle.textContent = 'Show more';
+    } else {
+      preview.classList.add('hidden');
+      full.classList.remove('hidden');
+      toggle.textContent = 'Show less';
+    }
+  });
+})();
