@@ -51,6 +51,11 @@ module Jojo
 
       # Common validations
       def require_application!
+        if slug.nil? || slug.strip.empty?
+          say "No application slug specified. Use --slug=COMPANY_SLUG (e.g., --slug=acme-corp)", :red
+          exit 1
+        end
+
         return if application.artifacts_exist?
 
         say "Application '#{slug}' not found.", :red

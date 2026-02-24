@@ -15,7 +15,7 @@ module Jojo
     def load
       raise LoadError, "Resume data file not found: #{@file_path}" unless File.exist?(@file_path)
 
-      data = YAML.load_file(@file_path)
+      data = YAML.load_file(@file_path, aliases: true)
       validate!(data)
       data
     rescue Psych::SyntaxError => e
