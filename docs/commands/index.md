@@ -33,7 +33,7 @@ has_children: true
 | [`jojo new`](new) | `inputs/resume_data.yml`, job source (file or URL via `-j`) | `applications/<slug>/job_description_raw.md`, `job_description.md`, `job_details.yml`, `website/` |
 | [`jojo generate`](generate) | `applications/<slug>/job_description.md`, `job_details.yml`, `inputs/resume_data.yml`, `templates/*` | `research.md`, `resume.md`, `cover_letter.md`, `job_description_annotations.json`, `branding_statement.json`, `faq.json`, `website/index.html`, `*.pdf` (if Pandoc installed), `status_log.md` |
 | [`jojo research`](research) | `applications/<slug>/job_description.md`, `job_details.yml` | `applications/<slug>/research.md`, `status_log.md` |
-| [`jojo resume`](resume) | `applications/<slug>/job_description.md`, `job_details.yml`, `inputs/resume_data.yml` | `applications/<slug>/resume.md`, `status_log.md` |
+| [`jojo resume`](resume) | `applications/<slug>/job_description.md`, `job_details.yml`, `inputs/resume_data.yml`, `resume_data_curated.yml` (cache, if present) | `applications/<slug>/resume.md`, `resume_data_curated.yml` (cache), `status_log.md` |
 | [`jojo cover_letter`](cover-letter) | `applications/<slug>/job_description.md`, `job_details.yml`, `resume.md`, `inputs/resume_data.yml` | `applications/<slug>/cover_letter.md`, `status_log.md` |
 | [`jojo annotate`](annotate) | `applications/<slug>/job_description.md`, `job_details.yml` | `applications/<slug>/job_description_annotations.json` |
 | [`jojo branding`](branding) | `applications/<slug>/job_description.md`, `job_details.yml`, `resume.md`, optional: `research.md` | `applications/<slug>/branding_statement.json` |

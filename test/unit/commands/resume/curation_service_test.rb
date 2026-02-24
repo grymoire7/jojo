@@ -41,6 +41,57 @@ class Jojo::Commands::Resume::CurationServiceTest < JojoTest
     @ai_client.verify
   end
 
+  def test_overwrite_bypasses_cache_and_reruns_ai
+    cache_file = File.join(@tmpdir, "cached_resume_data.yml")
+
+    service = Jojo::Commands::Resume::CurationService.new(
+      ai_client: @ai_client,
+      config: @config,
+      resume_data_path: fixture_path("resume_data.yml"),
+      template_path: fixture_path("templates/resume_template.md.erb"),
+      cache_path: cache_file,
+      overwrite: true
+    )
+
+    # First call - runs AI and writes cache
+    @ai_client.expect(:generate_text, "[0, 1]", [String])
+    @ai_client.expect(:generate_text, "[1, 0]", [String])
+    @ai_client.expect(:generate_text, "Summary v1", [String])
+    service.generate(@job_context)
+
+    # Second call - overwrite: true must bypass cache and run AI again
+    @ai_client.expect(:generate_text, "[0, 1]", [String])
+    @ai_client.expect(:generate_text, "[1, 0]", [String])
+    @ai_client.expect(:generate_text, "Summary v2", [String])
+    result2 = service.generate(@job_context)
+
+    assert_includes result2, "Summary v2"
+    @ai_client.verify
+  end
+
+  def test_overwrite_replaces_corrupt_cache_on_disk
+    cache_file = File.join(@tmpdir, "cached_resume_data.yml")
+    File.write(cache_file, "corrupt: data with react hallucination\n")
+
+    service = Jojo::Commands::Resume::CurationService.new(
+      ai_client: @ai_client,
+      config: @config,
+      resume_data_path: fixture_path("resume_data.yml"),
+      template_path: fixture_path("templates/resume_template.md.erb"),
+      cache_path: cache_file,
+      overwrite: true
+    )
+
+    @ai_client.expect(:generate_text, "[0, 1]", [String])
+    @ai_client.expect(:generate_text, "[1, 0]", [String])
+    @ai_client.expect(:generate_text, "Fresh summary", [String])
+
+    result = service.generate(@job_context)
+
+    assert_includes result, "Fresh summary"
+    @ai_client.verify
+  end
+
   def test_caches_curated_data_for_same_job_context
     cache_file = File.join(@tmpdir, "cached_resume_data.yml")
 

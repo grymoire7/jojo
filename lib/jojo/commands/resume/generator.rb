@@ -37,7 +37,8 @@ module Jojo
             config: config,
             resume_data_path: resume_data_path,
             template_path: template_path,
-            cache_path: cache_path
+            cache_path: cache_path,
+            overwrite: overwrite_flag || false
           )
 
           resume = service.generate(job_context)

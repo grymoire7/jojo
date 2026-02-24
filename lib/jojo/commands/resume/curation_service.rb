@@ -9,12 +9,13 @@ module Jojo
   module Commands
     module Resume
       class CurationService
-        def initialize(ai_client:, config:, resume_data_path:, template_path:, cache_path: nil)
+        def initialize(ai_client:, config:, resume_data_path:, template_path:, cache_path: nil, overwrite: false)
           @ai_client = ai_client
           @config = config
           @resume_data_path = resume_data_path
           @template_path = template_path
           @cache_path = cache_path
+          @overwrite = overwrite
         end
 
         def generate(job_context)
@@ -24,7 +25,7 @@ module Jojo
 
           # Check cache
           if @cache_path && cache_valid?(job_context)
-            data = YAML.load_file(@cache_path)
+            data = YAML.load_file(@cache_path, aliases: true)
           else
             # Transform data based on permissions
             transformer = Transformer.new(
@@ -46,9 +47,9 @@ module Jojo
         private
 
         def cache_valid?(job_context)
+          return false if @overwrite
           return false unless File.exist?(@cache_path)
 
-          # Simple cache validation - could be enhanced with timestamp checks
           true
         end
 
