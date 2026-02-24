@@ -134,6 +134,8 @@ module Jojo
             log "  Add website.cta_link to config.yml (e.g., Calendly URL or mailto link)"
           end
 
+          contact_info = load_contact_info
+
           {
             seeker_name: config.seeker_name,
             company_name: inputs[:company_name],
@@ -148,7 +150,10 @@ module Jojo
             projects: projects,
             annotated_job_description: annotated_job_description,
             recommendations: recommendations,
-            faqs: faqs
+            faqs: faqs,
+            seeker_email: contact_info[:email],
+            seeker_linkedin: contact_info[:linkedin],
+            seeker_github: contact_info[:github]
           }
         end
 
@@ -176,6 +181,9 @@ module Jojo
           annotated_job_description = vars[:annotated_job_description]
           recommendations = vars[:recommendations]
           faqs = vars[:faqs]
+          seeker_email = vars[:seeker_email]
+          seeker_linkedin = vars[:seeker_linkedin]
+          seeker_github = vars[:seeker_github]
 
           ERB.new(template_content).result(binding)
         end
@@ -486,6 +494,22 @@ module Jojo
         rescue => e
           log "Error loading recommendations: #{e.message}"
           nil
+        end
+
+        def load_contact_info
+          resume_data_path = File.join(inputs_path, "resume_data.yml")
+          return {email: nil, linkedin: nil, github: nil} unless File.exist?(resume_data_path)
+
+          loader = ResumeDataLoader.new(resume_data_path)
+          data = loader.load
+          {
+            email: data["email"],
+            linkedin: data["linkedin"],
+            github: data["github"]
+          }
+        rescue => e
+          log "Warning: Could not load contact info: #{e.message}"
+          {email: nil, linkedin: nil, github: nil}
         end
 
         def load_faqs

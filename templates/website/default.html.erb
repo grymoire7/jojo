@@ -32,6 +32,9 @@
       <symbol id="icon-book" viewBox="0 0 512 512">
         <path d="M256 141.3l0 309.3 .5-.2C311.1 427.7 369.7 416 428.8 416l19.2 0 0-320-19.2 0c-42.2 0-84.1 8.4-123.1 24.6-16.8 7-33.4 13.9-49.7 20.7zM230.9 61.5L256 72 281.1 61.5C327.9 42 378.1 32 428.8 32L464 32c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-35.2 0c-50.7 0-100.9 10-147.7 29.5l-12.8 5.3c-7.9 3.3-16.7 3.3-24.6 0l-12.8-5.3C184.1 490 133.9 480 83.2 480L48 480c-26.5 0-48-21.5-48-48L0 80C0 53.5 21.5 32 48 32l35.2 0c50.7 0 100.9 10 147.7 29.5z"/>
       </symbol>
+      <symbol id="icon-envelope" viewBox="0 0 512 512">
+        <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -257,24 +260,41 @@
       <h2 class="text-3xl font-bold mb-4">Let's Connect</h2>
       <p class="text-lg opacity-90 mb-8">Interested in learning more? I'd love to chat.</p>
       <a href="<%= cta_link %>" class="btn btn-primary btn-lg"><%= cta_text %></a>
+      <div class="flex gap-6 justify-center mt-8 opacity-75">
+        <a href="resume.pdf" class="link link-hover flex items-center gap-2 text-sm text-secondary-content">
+          <svg class="w-4 h-4 fill-current"><use href="#icon-download"></use></svg>
+          Resume (pdf)
+        </a>
+        <a href="cover-letter.pdf" class="link link-hover flex items-center gap-2 text-sm text-secondary-content">
+          <svg class="w-4 h-4 fill-current"><use href="#icon-download"></use></svg>
+          Cover Letter (pdf)
+        </a>
+      </div>
     </div>
   </section>
   <% end %>
 
   <!-- Footer -->
   <footer class="footer footer-center p-6 bg-base-200 text-base-content border-t border-base-300">
-    <div>
-      <p class="text-sm text-gray-500 mb-2">Application materials for <%= company_name %></p>
-      <div class="flex gap-4 justify-center">
-        <a href="resume.pdf" class="link link-hover flex items-center gap-1">
-          <svg class="w-4 h-4 fill-current"><use href="#icon-download"></use></svg>
-          Resume (pdf)
+    <div class="flex flex-col items-center gap-3">
+      <div class="flex gap-4">
+        <% if seeker_github %>
+        <a href="<%= seeker_github %>" class="text-gray-500 hover:text-secondary transition-colors" aria-label="GitHub">
+          <svg class="w-5 h-5 fill-current"><use href="#icon-github"></use></svg>
         </a>
-        <a href="cover-letter.pdf" class="link link-hover flex items-center gap-1">
-          <svg class="w-4 h-4 fill-current"><use href="#icon-download"></use></svg>
-          Cover Letter (pdf)
+        <% end %>
+        <% if seeker_linkedin %>
+        <a href="<%= seeker_linkedin %>" class="text-gray-500 hover:text-secondary transition-colors" aria-label="LinkedIn">
+          <svg class="w-5 h-5 fill-current"><use href="#icon-linkedin"></use></svg>
         </a>
+        <% end %>
+        <% if seeker_email %>
+        <a href="mailto:<%= seeker_email %>" class="text-gray-500 hover:text-secondary transition-colors" aria-label="Email">
+          <svg class="w-5 h-5 fill-current"><use href="#icon-envelope"></use></svg>
+        </a>
+        <% end %>
       </div>
+      <p class="text-xs text-gray-400">&copy; <%= Time.now.year %> <%= seeker_name %>. All rights reserved.</p>
     </div>
   </footer>
 
