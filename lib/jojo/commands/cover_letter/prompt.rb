@@ -41,6 +41,7 @@ module Jojo
             - Reference specific company insights from research when available
 
             ## STRUCTURE (Flexible, Adapt to Company Culture):
+            - Start with: "I'm writing to apply for the [Job Title] role at [Company Name]..."
             - Typical range: 200-400 words, 2-4 paragraphs
             - Adapt length/formality based on company culture signals
             - Modern startups: brief, direct, authentic
