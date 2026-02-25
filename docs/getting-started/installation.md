@@ -15,6 +15,7 @@ nav_order: 1
   - [Serper](https://serper.dev/) API key, or
   - [Tavily](https://tavily.com/) API key
 - **Pandoc** (optional) — For PDF generation: `brew install pandoc` on macOS
+- **wkhtmltopdf** (optional) — For PDF generation: `brew install --cask wkhtmltopdf` on macOS
 
 ## Install Jojo
 
