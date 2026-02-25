@@ -68,8 +68,8 @@ module Jojo
 
             ## Document URLs
 
-            - Resume: #{base_url}/resume/#{company_slug}
-            - Cover Letter: #{base_url}/cover_letter/#{company_slug}
+            - Resume: #{base_url}/resume/#{company_slug}/resume.pdf
+            - Cover Letter: #{base_url}/resume/#{company_slug}/cover_letter.pdf
 
             # Output Format
 
