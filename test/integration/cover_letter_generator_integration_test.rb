@@ -32,9 +32,14 @@ class CoverLetterGeneratorIntegrationTest < JojoTest
     )
     result = generator.generate
 
-    # Verify landing page link prepended
-    assert_includes result, "**Specifically for Acme Corp**: https://example.com/resume/acme-corp"
+    # Verify letter structure
+    assert_includes result, "Jane Doe"
+    assert_includes result, "Dear Hiring Manager,"
     assert_includes result, cover_letter_content
+    assert_includes result, "Sincerely,"
+    assert_includes result, "P.S."
+    assert_includes result, "https://example.com/acme-corp"
+    refute result.start_with?("**Specifically")
 
     # Verify file saved
     assert File.exist?(@application.cover_letter_path)
