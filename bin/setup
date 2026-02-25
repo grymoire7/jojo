@@ -125,3 +125,7 @@ else
   (cd templates/website && npm install)
   echo -e "${GREEN}✓ npm packages installed${NC}"
 fi
+
+# Step 4: Check/install pandoc (required for 'jojo pdf')
+echo ""
+check_and_install "pandoc" "pandoc" "formula" "pandoc"
