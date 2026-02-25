@@ -7,6 +7,61 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Check for a system dependency and optionally install it.
+# Usage: check_and_install <label> <brew_formula> <brew_type> <apt_package>
+#   brew_type: "formula" or "cask"
+check_and_install() {
+  local label="$1"
+  local brew_formula="$2"
+  local brew_type="$3"
+  local apt_package="$4"
+
+  if command -v "$label" > /dev/null 2>&1; then
+    echo -e "${GREEN}✓ $label already installed${NC}"
+    return
+  fi
+
+  if $CHECK_ONLY; then
+    echo -e "${YELLOW}⚠ $label not found (required for 'jojo pdf')${NC}"
+    return
+  fi
+
+  read -rp "$label not found. Install it? [y/N] " reply
+  echo
+  if [[ "$reply" =~ ^[Yy]$ ]]; then
+    local os
+    os="$(uname -s)"
+    case "$os" in
+      Darwin)
+        if ! command -v brew > /dev/null 2>&1; then
+          echo -e "${RED}✗ Homebrew not found${NC}"
+          echo "  Install Homebrew from https://brew.sh, then re-run ./bin/setup"
+          exit 1
+        fi
+        if [[ "$brew_type" == "cask" ]]; then
+          brew install --cask "$brew_formula"
+        else
+          brew install "$brew_formula"
+        fi
+        ;;
+      Linux)
+        if command -v apt-get > /dev/null 2>&1; then
+          sudo apt-get install -y "$apt_package"
+        else
+          echo -e "${YELLOW}  Unsupported Linux package manager${NC}"
+          echo "  Install $label manually, then re-run ./bin/setup"
+        fi
+        ;;
+      *)
+        echo -e "${YELLOW}  Unsupported OS: $os${NC}"
+        echo "  Install $label manually, then re-run ./bin/setup"
+        ;;
+    esac
+  else
+    echo -e "${YELLOW}  Skipping $label. Note: 'jojo pdf' requires $label.${NC}"
+  fi
+}
+
 # Parse flags
 CHECK_ONLY=false
 for arg in "$@"; do
