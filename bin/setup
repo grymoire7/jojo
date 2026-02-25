@@ -129,3 +129,37 @@ fi
 # Step 4: Check/install pandoc (required for 'jojo pdf')
 echo ""
 check_and_install "pandoc" "pandoc" "formula" "pandoc"
+
+# Step 5: Check/install wkhtmltopdf (required for 'jojo pdf')
+if command -v wkhtmltopdf > /dev/null 2>&1; then
+  echo -e "${GREEN}✓ wkhtmltopdf already installed${NC}"
+elif $CHECK_ONLY; then
+  echo -e "${YELLOW}⚠ wkhtmltopdf not found (required for 'jojo pdf')${NC}"
+else
+  read -rp "wkhtmltopdf not found. Install it? [y/N] " reply
+  echo
+  if [[ "$reply" =~ ^[Yy]$ ]]; then
+    wk_os="$(uname -s)"
+    case "$wk_os" in
+      Darwin)
+        echo "  Download and install wkhtmltopdf from:"
+        echo "  https://wkhtmltopdf.org/downloads.html"
+        echo "  Then re-run ./bin/setup"
+        ;;
+      Linux)
+        if command -v apt-get > /dev/null 2>&1; then
+          sudo apt-get install -y wkhtmltopdf
+        else
+          echo -e "${YELLOW}  Unsupported Linux package manager${NC}"
+          echo "  Install wkhtmltopdf manually, then re-run ./bin/setup"
+        fi
+        ;;
+      *)
+        echo -e "${YELLOW}  Unsupported OS: $wk_os${NC}"
+        echo "  Install wkhtmltopdf manually, then re-run ./bin/setup"
+        ;;
+    esac
+  else
+    echo -e "${YELLOW}  Skipping wkhtmltopdf. Note: 'jojo pdf' requires wkhtmltopdf.${NC}"
+  fi
+fi
