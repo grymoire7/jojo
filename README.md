@@ -33,11 +33,12 @@ Full documentation is available at the **[Jojo documentation site](https://grymo
 ```bash
 git clone https://github.com/grymoire7/jojo.git
 cd jojo
-bundle install
-./bin/jojo setup
+./bin/setup
 ```
 
-The setup wizard guides you through provider selection, API key configuration, and model selection. Then customize `inputs/resume_data.yml` with your experience and run:
+`./bin/setup` installs Ruby gems, npm packages, and checks for system dependencies
+(pandoc, wkhtmltopdf for PDF export), then runs the configuration wizard for your
+API keys and preferences. Then customize `inputs/resume_data.yml` with your experience and run:
 
 ```bash
 ./bin/jojo new -s company-role -j job_description.txt
