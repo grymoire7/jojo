@@ -2,6 +2,7 @@
 require_relative "../base"
 require_relative "converter"
 require_relative "pandoc_checker"
+require_relative "wkhtmltopdf_checker"
 
 module Jojo
   module Commands
@@ -21,7 +22,7 @@ module Jojo
 
           # Report what was generated
           results[:generated].each do |doc_type|
-            say "#{doc_type.to_s.capitalize} PDF generated", :green
+            say "#{doc_type.to_s.capitalize} HTML and PDF generated", :green
           end
 
           # Report what was skipped
@@ -40,6 +41,14 @@ module Jojo
           say e.message, :red
           begin
             log(step: :pdf, status: "failed", error: "Pandoc not installed")
+          rescue
+            # Ignore logging errors
+          end
+          exit 1
+        rescue WkhtmltopdfChecker::WkhtmltopdfNotFoundError => e
+          say e.message, :red
+          begin
+            log(step: :pdf, status: "failed", error: e.message)
           rescue
             # Ignore logging errors
           end

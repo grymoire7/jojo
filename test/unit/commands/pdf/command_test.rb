@@ -40,8 +40,8 @@ class Jojo::Commands::Pdf::CommandTest < JojoTest
     @mock_status_logger.expect(:log, nil, [], step: :pdf, status: "complete", generated: 2)
 
     @mock_cli.expect(:say, nil, ["Generating PDFs for Acme Corp...", :green])
-    @mock_cli.expect(:say, nil, ["Resume PDF generated", :green])
-    @mock_cli.expect(:say, nil, ["Cover_letter PDF generated", :green])
+    @mock_cli.expect(:say, nil, ["Resume HTML and PDF generated", :green])
+    @mock_cli.expect(:say, nil, ["Cover_letter HTML and PDF generated", :green])
     @mock_cli.expect(:say, nil, ["PDF generation complete!", :green])
 
     command = Jojo::Commands::Pdf::Command.new(
@@ -64,7 +64,7 @@ class Jojo::Commands::Pdf::CommandTest < JojoTest
     @mock_status_logger.expect(:log, nil, [], step: :pdf, status: "complete", generated: 1)
 
     @mock_cli.expect(:say, nil, ["Generating PDFs for Acme Corp...", :green])
-    @mock_cli.expect(:say, nil, ["Resume PDF generated", :green])
+    @mock_cli.expect(:say, nil, ["Resume HTML and PDF generated", :green])
     @mock_cli.expect(:say, nil, ["Skipped cover_letter: markdown file not found", :yellow])
     @mock_cli.expect(:say, nil, ["PDF generation complete!", :green])
 
@@ -134,6 +134,29 @@ class Jojo::Commands::Pdf::CommandTest < JojoTest
 
     @mock_cli.expect(:say, nil, [String, :green])
     @mock_cli.expect(:say, nil, ["Pandoc not installed", :red])
+
+    command = Jojo::Commands::Pdf::Command.new(
+      @mock_cli,
+      slug: "acme-corp",
+      application: @mock_application,
+      converter: @mock_converter
+    )
+
+    error = assert_raises(SystemExit) { command.execute }
+    assert_equal 1, error.status
+    @mock_cli.verify
+  end
+
+  def test_handles_wkhtmltopdf_not_found_error
+    setup_error_recovery_mocks
+
+    @mock_converter.expect(:generate_all, nil) do
+      raise Jojo::Commands::Pdf::WkhtmltopdfChecker::WkhtmltopdfNotFoundError, "wkhtmltopdf is not installed"
+    end
+    @mock_status_logger.expect(:log, nil, [], step: :pdf, status: "failed", error: "wkhtmltopdf is not installed")
+
+    @mock_cli.expect(:say, nil, [String, :green])
+    @mock_cli.expect(:say, nil, ["wkhtmltopdf is not installed", :red])
 
     command = Jojo::Commands::Pdf::Command.new(
       @mock_cli,
