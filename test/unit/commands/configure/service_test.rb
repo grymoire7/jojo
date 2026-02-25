@@ -1,28 +1,28 @@
-# test/unit/commands/setup/service_test.rb
+# test/unit/commands/configure/service_test.rb
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/commands/setup/service"
+require_relative "../../../../lib/jojo/commands/configure/service"
 require_relative "../../../../lib/jojo/provider_helper"
 require "thor"
 
-class Jojo::Commands::Setup::ServiceTest < JojoTest
+class Jojo::Commands::Configure::ServiceTest < JojoTest
   # -- initialize --
 
   def test_stores_cli_instance_and_overwrite_flag
     cli = Object.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: true)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: true)
     assert_same cli, service.instance_variable_get(:@cli)
     assert_equal true, service.instance_variable_get(:@overwrite)
   end
 
   def test_defaults_overwrite_to_false
     cli = Object.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli)
     assert_equal false, service.instance_variable_get(:@overwrite)
   end
 
   def test_initializes_tracking_arrays
     cli = Object.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli)
     assert_equal [], service.instance_variable_get(:@created_files)
     assert_equal [], service.instance_variable_get(:@skipped_files)
   end
@@ -30,13 +30,13 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
   def test_accepts_optional_prompt_parameter
     cli = Object.new
     prompt = Object.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, prompt: prompt)
     assert_same prompt, service.instance_variable_get(:@prompt)
   end
 
   def test_creates_default_tty_prompt_when_prompt_not_provided
     cli = Object.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli)
     assert_instance_of TTY::Prompt, service.instance_variable_get(:@prompt)
   end
 
@@ -48,7 +48,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli = Minitest::Mock.new
     cli.expect :say, nil, ["✓ .env already exists (skipped)", :green]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.send(:setup_api_configuration)
 
     cli.verify
@@ -68,7 +68,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     prompt = Minitest::Mock.new
     prompt.expect :select, "anthropic", ["Which LLM provider?", Jojo::ProviderHelper.available_providers, {per_page: 15}]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
     service.send(:setup_api_configuration)
 
     cli.verify
@@ -86,7 +86,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli = Minitest::Mock.new
     cli.expect :say, nil, ["✓ config.yml already exists (skipped)", :green]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.send(:setup_personal_configuration)
 
     cli.verify
@@ -125,7 +125,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
       {per_page: 15}
     ]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
     service.instance_variable_set(:@provider_slug, "anthropic")
     service.instance_variable_set(:@search_provider_slug, nil)
     service.send(:setup_personal_configuration)
@@ -151,7 +151,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     prompt.expect :select, "tavily", ["Which search provider?", ["tavily", "serper"], Hash]
     cli.expect :ask, "sk-tavily-test", ["Tavily API key:"]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
     service.send(:setup_search_configuration)
 
     cli.verify
@@ -170,7 +170,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     prompt.expect :select, "serper", ["Which search provider?", ["tavily", "serper"], Hash]
     cli.expect :ask, "serper-key-123", ["Serper API key:"]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
     service.send(:setup_search_configuration)
 
     cli.verify
@@ -187,7 +187,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli.expect :say, nil, [""]
     prompt.expect :yes?, false, ["Configure web search for company research? (requires Tavily or Serper API)"]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
     service.send(:setup_search_configuration)
 
     cli.verify
@@ -201,7 +201,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     FileUtils.mkdir_p("templates")
     File.write("templates/.env.erb", <<~ERB)
       # LLM Provider Configuration
-      # Generated during 'jojo setup' - edit this file to change your API key
+      # Generated during 'jojo configure' - edit this file to change your API key
       <%= llm_env_var_name %>=<%= llm_api_key %>
 
       <% if search_provider_slug %>
@@ -213,7 +213,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli = Minitest::Mock.new
     cli.expect :say, nil, ["✓ Created .env", :green]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.instance_variable_set(:@llm_env_var_name, "ANTHROPIC_API_KEY")
     service.instance_variable_set(:@llm_api_key, "sk-ant-test")
     service.instance_variable_set(:@search_provider_slug, nil)
@@ -231,7 +231,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     FileUtils.mkdir_p("templates")
     File.write("templates/.env.erb", <<~ERB)
       # LLM Provider Configuration
-      # Generated during 'jojo setup' - edit this file to change your API key
+      # Generated during 'jojo configure' - edit this file to change your API key
       <%= llm_env_var_name %>=<%= llm_api_key %>
 
       <% if search_provider_slug %>
@@ -243,7 +243,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli = Minitest::Mock.new
     cli.expect :say, nil, ["✓ Created .env", :green]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.instance_variable_set(:@llm_env_var_name, "OPENAI_API_KEY")
     service.instance_variable_set(:@llm_api_key, "sk-openai-test")
     service.instance_variable_set(:@search_provider_slug, "tavily")
@@ -265,7 +265,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli = Minitest::Mock.new
     # Should NOT expect "Created .env" message
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.instance_variable_set(:@skipped_files, [".env"])
     # Instance vars intentionally nil (not populated when skipped)
     service.instance_variable_set(:@llm_env_var_name, nil)
@@ -290,7 +290,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli.expect :say, nil, ["Setting up your profile templates...", :green]
     2.times { cli.expect :say, nil, [String, :green] }
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.send(:setup_input_files)
 
     cli.verify
@@ -310,7 +310,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli.expect :say, nil, ["✓ Created inputs/resume_data.yml (customize with your experience)", :green]
     cli.expect :say, nil, ["✓ Created inputs/templates/default_resume.md.erb (resume ERB template)", :green]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.send(:setup_input_files)
 
     cli.verify
@@ -335,7 +335,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli.expect :say, nil, ["✓ inputs/resume_data.yml already exists (skipped)", :green]
     cli.expect :say, nil, ["✓ Created inputs/templates/default_resume.md.erb (resume ERB template)", :green]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.send(:setup_input_files)
 
     cli.verify
@@ -346,11 +346,11 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
 
   def test_show_summary_displays_created_files_and_next_steps
     cli = Minitest::Mock.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli)
     service.instance_variable_set(:@created_files, [".env", "config.yml", "inputs/resume_data.yml"])
 
     cli.expect :say, nil, [""]
-    cli.expect :say, nil, ["Setup complete!", :green]
+    cli.expect :say, nil, ["Configuration complete!", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Created:"]
     3.times { cli.expect :say, nil, [String] }
@@ -369,12 +369,12 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
 
   def test_show_summary_shows_appropriate_message_when_no_files_created
     cli = Minitest::Mock.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli)
     service.instance_variable_set(:@created_files, [])
     service.instance_variable_set(:@skipped_files, [".env", "config.yml"])
 
     cli.expect :say, nil, [""]
-    cli.expect :say, nil, ["Setup complete!", :green]
+    cli.expect :say, nil, ["Configuration complete!", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Next steps:", :cyan]
     cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
@@ -396,7 +396,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli.expect :say, nil, ["  This will replace: .env, config.yml, and all inputs/ files", :yellow]
     cli.expect :yes?, true, ["Continue?"]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: true)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: true)
     service.send(:warn_if_overwrite_mode)
 
     cli.verify
@@ -408,7 +408,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli.expect :say, nil, ["  This will replace: .env, config.yml, and all inputs/ files", :yellow]
     cli.expect :yes?, false, ["Continue?"]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: true)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: true)
 
     assert_raises(SystemExit) do
       service.send(:warn_if_overwrite_mode)
@@ -417,7 +417,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
 
   def test_warn_if_overwrite_mode_does_nothing_when_not_in_overwrite_mode
     cli = Object.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.send(:warn_if_overwrite_mode)
     # No expectations, should complete without errors
   end
@@ -433,10 +433,10 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli.expect :say, nil, ["  Missing: config.yml", :yellow]
     cli.expect :say, nil, ["", :yellow]
     cli.expect :say, nil, ["Options:", :yellow]
-    cli.expect :say, nil, ["  • Run 'jojo setup --overwrite' to recreate all configuration", :yellow]
+    cli.expect :say, nil, ["  • Run 'jojo configure --overwrite' to recreate all configuration", :yellow]
     cli.expect :say, nil, ["  • Manually create config.yml to match your existing .env setup", :yellow]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
 
     assert_raises(SystemExit) do
       service.send(:validate_configuration_completeness)
@@ -454,10 +454,10 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     cli.expect :say, nil, ["  Missing: .env", :yellow]
     cli.expect :say, nil, ["", :yellow]
     cli.expect :say, nil, ["Options:", :yellow]
-    cli.expect :say, nil, ["  • Run 'jojo setup --overwrite' to recreate all configuration", :yellow]
+    cli.expect :say, nil, ["  • Run 'jojo configure --overwrite' to recreate all configuration", :yellow]
     cli.expect :say, nil, ["  • Manually create .env with your API keys", :yellow]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
 
     assert_raises(SystemExit) do
       service.send(:validate_configuration_completeness)
@@ -471,7 +471,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     File.write("config.yml", "seeker_name: Test")
 
     cli = Object.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
 
     # Should not raise
     service.send(:validate_configuration_completeness)
@@ -480,7 +480,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
   def test_validate_configuration_completeness_succeeds_when_neither_env_nor_config_yml_exist
     # Empty directory - normal setup flow
     cli = Object.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
 
     # Should not raise
     service.send(:validate_configuration_completeness)
@@ -491,7 +491,7 @@ class Jojo::Commands::Setup::ServiceTest < JojoTest
     # config.yml missing
 
     cli = Object.new
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, overwrite: true)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: true)
 
     # Should NOT raise, should proceed silently
     service.send(:validate_configuration_completeness)

@@ -1,10 +1,10 @@
-# lib/jojo/commands/setup/command.rb
+# lib/jojo/commands/configure/command.rb
 require_relative "../base"
 require_relative "service"
 
 module Jojo
   module Commands
-    module Setup
+    module Configure
       class Command < Base
         def initialize(cli, service: nil, **rest)
           super(cli, **rest)
@@ -17,7 +17,7 @@ module Jojo
           # Allow clean exit from service
           raise
         rescue => e
-          say "Setup failed: #{e.message}", :red
+          say "Configure failed: #{e.message}", :red
           exit 1
         end
 

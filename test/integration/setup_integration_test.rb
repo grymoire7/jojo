@@ -1,5 +1,5 @@
 require_relative "../test_helper"
-require_relative "../../lib/jojo/commands/setup/service"
+require_relative "../../lib/jojo/commands/configure/service"
 
 class SetupIntegrationTest < JojoTest
   def test_completes_full_setup_flow_with_anthropic_provider
@@ -56,7 +56,7 @@ class SetupIntegrationTest < JojoTest
 
     # show_summary
     cli.expect :say, nil, [""]
-    cli.expect :say, nil, ["Setup complete!", :green]
+    cli.expect :say, nil, ["Configuration complete!", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Created:"]
     4.times { cli.expect :say, nil, [String] } # 4 created files
@@ -68,7 +68,7 @@ class SetupIntegrationTest < JojoTest
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
     service.run
 
     cli.verify
@@ -141,7 +141,7 @@ class SetupIntegrationTest < JojoTest
 
     # show_summary
     cli.expect :say, nil, [""]
-    cli.expect :say, nil, ["Setup complete!", :green]
+    cli.expect :say, nil, ["Configuration complete!", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Created:"]
     4.times { cli.expect :say, nil, [String] } # 4 created files
@@ -153,7 +153,7 @@ class SetupIntegrationTest < JojoTest
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
     service.run
 
     cli.verify
@@ -213,7 +213,7 @@ class SetupIntegrationTest < JojoTest
 
     # show_summary
     cli.expect :say, nil, [""]
-    cli.expect :say, nil, ["Setup complete!", :green]
+    cli.expect :say, nil, ["Configuration complete!", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Created:"]
     4.times { cli.expect :say, nil, [String] } # 4 created files
@@ -225,7 +225,7 @@ class SetupIntegrationTest < JojoTest
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
 
-    service = Jojo::Commands::Setup::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
+    service = Jojo::Commands::Configure::Service.new(cli_instance: cli, prompt: prompt, overwrite: false)
     service.run
 
     cli.verify

@@ -10,7 +10,7 @@ has_children: true
 
 | Command | Description | Required Options |
 |---------|-------------|------------------|
-| [`jojo setup`](setup) | Interactive setup wizard for first-time configuration | None |
+| [`jojo configure`](configure) | Interactive configuration wizard for API keys and preferences | None |
 | [`jojo new`](new) | Create application workspace and process job description | `-s`, `-j` |
 | [`jojo generate`](generate) | Generate all materials in sequence | `-s` or `JOJO_APPLICATION_SLUG` |
 | [`jojo research`](research) | Generate company/role research only | `-s` or `JOJO_APPLICATION_SLUG` |
@@ -29,7 +29,7 @@ has_children: true
 
 | Command | Inputs | Outputs |
 |---------|--------|---------|
-| [`jojo setup`](setup) | None (interactive) | `.env`, `config.yml`, `inputs/resume_data.yml`, `inputs/templates/default_resume.md.erb` |
+| [`jojo configure`](configure) | None (interactive) | `.env`, `config.yml`, `inputs/resume_data.yml`, `inputs/templates/default_resume.md.erb` |
 | [`jojo new`](new) | `inputs/resume_data.yml`, job source (file or URL via `-j`) | `applications/<slug>/job_description_raw.md`, `job_description.md`, `job_details.yml`, `website/` |
 | [`jojo generate`](generate) | `applications/<slug>/job_description.md`, `job_details.yml`, `inputs/resume_data.yml`, `templates/*` | `research.md`, `resume.md`, `cover_letter.md`, `job_description_annotations.json`, `branding_statement.json`, `faq.json`, `website/index.html`, `*.pdf` (if Pandoc installed), `status_log.md` |
 | [`jojo research`](research) | `applications/<slug>/job_description.md`, `job_details.yml` | `applications/<slug>/research.md`, `status_log.md` |

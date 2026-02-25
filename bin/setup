@@ -169,12 +169,12 @@ if ! $CHECK_ONLY; then
   echo ""
   echo -e "${GREEN}Bootstrap complete!${NC}"
   echo ""
-  read -rp "Run './bin/jojo setup' to configure API keys and preferences? [Y/n] " reply
+  read -rp "Run './bin/jojo configure' to configure API keys and preferences? [Y/n] " reply
   echo
   if [[ ! "$reply" =~ ^[Nn]$ ]]; then
-    ./bin/jojo setup
+    ./bin/jojo configure
   else
-    echo "Run './bin/jojo setup' when you're ready to configure your API keys."
+    echo "Run './bin/jojo configure' when you're ready to configure your API keys."
     echo ""
   fi
 fi

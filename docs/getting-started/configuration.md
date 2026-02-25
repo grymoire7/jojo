@@ -8,7 +8,7 @@ nav_order: 2
 
 ## Environment variables
 
-The `jojo setup` command creates a `.env` file with your provider-specific API key:
+The `jojo configure` command creates a `.env` file with your provider-specific API key:
 
 ```bash
 # For Anthropic
@@ -25,7 +25,7 @@ SERPER_API_KEY=your_serper_key_here
 
 ## User configuration
 
-After running `./bin/jojo setup`, edit `config.yml` to customize:
+After running `./bin/jojo configure`, edit `config.yml` to customize:
 
 ```yaml
 seeker_name: Your Name
@@ -83,11 +83,11 @@ Jojo supports providers via [RubyLLM](https://rubyllm.com/available-models/) inc
 | **Google Vertex AI** | |
 | **GPUStack** | |
 
-To switch providers, run `jojo setup --overwrite` or manually edit `config.yml` and `.env`.
+To switch providers, run `jojo configure --overwrite` or manually edit `config.yml` and `.env`.
 
 ## Input files
 
-The setup command creates these files in `inputs/`:
+The configure command creates these files in `inputs/`:
 
 ### `inputs/resume_data.yml` (required)
 

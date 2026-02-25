@@ -17,7 +17,7 @@ If you haven't already, bootstrap and configure Jojo:
 If you've already run `./bin/setup`, you can re-run the configuration wizard alone:
 
 ```bash
-./bin/jojo setup
+./bin/jojo configure
 ```
 
 Then edit your structured resume data:

@@ -1,8 +1,8 @@
-# test/unit/commands/setup/command_test.rb
+# test/unit/commands/configure/command_test.rb
 require_relative "../../../test_helper"
-require_relative "../../../../lib/jojo/commands/setup/command"
+require_relative "../../../../lib/jojo/commands/configure/command"
 
-class Jojo::Commands::Setup::CommandTest < JojoTest
+class Jojo::Commands::Configure::CommandTest < JojoTest
   def setup
     super
     write_test_config
@@ -10,7 +10,7 @@ class Jojo::Commands::Setup::CommandTest < JojoTest
   end
 
   def test_inherits_from_base
-    assert_includes Jojo::Commands::Setup::Command.ancestors, Jojo::Commands::Base
+    assert_includes Jojo::Commands::Configure::Command.ancestors, Jojo::Commands::Base
   end
 
   # -- successful execution --
@@ -19,7 +19,7 @@ class Jojo::Commands::Setup::CommandTest < JojoTest
     @mock_service = Minitest::Mock.new
     @mock_service.expect(:run, nil)
 
-    command = Jojo::Commands::Setup::Command.new(
+    command = Jojo::Commands::Configure::Command.new(
       @mock_cli,
       service: @mock_service
     )
@@ -34,9 +34,9 @@ class Jojo::Commands::Setup::CommandTest < JojoTest
     @mock_service = Minitest::Mock.new
     @mock_service.expect(:run, nil) { raise StandardError, "Configuration error" }
 
-    @mock_cli.expect(:say, nil, ["Setup failed: Configuration error", :red])
+    @mock_cli.expect(:say, nil, ["Configure failed: Configuration error", :red])
 
-    command = Jojo::Commands::Setup::Command.new(
+    command = Jojo::Commands::Configure::Command.new(
       @mock_cli,
       service: @mock_service
     )
@@ -51,7 +51,7 @@ class Jojo::Commands::Setup::CommandTest < JojoTest
 
     @mock_cli.expect(:say, nil, [String, :red])
 
-    command = Jojo::Commands::Setup::Command.new(
+    command = Jojo::Commands::Configure::Command.new(
       @mock_cli,
       service: @mock_service
     )
@@ -64,7 +64,7 @@ class Jojo::Commands::Setup::CommandTest < JojoTest
     @mock_service = Minitest::Mock.new
     @mock_service.expect(:run, nil) { exit 0 }
 
-    command = Jojo::Commands::Setup::Command.new(
+    command = Jojo::Commands::Configure::Command.new(
       @mock_cli,
       service: @mock_service
     )

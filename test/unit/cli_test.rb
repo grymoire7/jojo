@@ -10,8 +10,8 @@ class CLITest < JojoTest
     assert_includes Jojo::CLI.ancestors, Thor
   end
 
-  def test_has_setup_command
-    assert_equal true, Jojo::CLI.commands.key?("setup")
+  def test_has_configure_command
+    assert_equal true, Jojo::CLI.commands.key?("configure")
   end
 
   def test_has_research_command

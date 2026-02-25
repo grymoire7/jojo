@@ -7,7 +7,7 @@ require_relative "commands/faq/command"
 require_relative "commands/branding/command"
 require_relative "commands/website/command"
 require_relative "commands/pdf/command"
-require_relative "commands/setup/command"
+require_relative "commands/configure/command"
 require_relative "commands/new/command"
 require_relative "commands/job_description/command"
 require_relative "commands/interactive/command"
@@ -33,9 +33,9 @@ module Jojo
       Commands::Version::Command.new(self, **command_options).execute
     end
 
-    desc "setup", "Setup configuration"
-    def setup
-      Commands::Setup::Command.new(self, **command_options).execute
+    desc "configure", "Configure API keys and preferences"
+    def configure
+      Commands::Configure::Command.new(self, **command_options).execute
     end
 
     desc "new", "Create a new job application workspace"

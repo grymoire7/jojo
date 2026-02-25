@@ -32,7 +32,7 @@ nav_order: 1
    This installs Ruby gems, npm packages, and checks for optional system dependencies
    (pandoc and wkhtmltopdf for PDF export — offering to install them if missing). It then
    runs the configuration wizard to set up your API keys and preferences.
-   See the [setup command](../commands/setup) for details on the configuration wizard.
+   See the [configure command](../commands/configure) for details on the configuration wizard.
 
 ## Verify installation
 

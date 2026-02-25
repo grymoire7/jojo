@@ -1,4 +1,4 @@
-# lib/jojo/commands/setup/service.rb
+# lib/jojo/commands/configure/service.rb
 require "fileutils"
 require "erb"
 require "tty-prompt"
@@ -6,7 +6,7 @@ require_relative "../../provider_helper"
 
 module Jojo
   module Commands
-    module Setup
+    module Configure
       class Service
         def initialize(cli_instance:, prompt: nil, overwrite: false)
           @cli = cli_instance
@@ -56,7 +56,7 @@ module Jojo
             @cli.say "  Missing: config.yml", :yellow
             @cli.say "", :yellow
             @cli.say "Options:", :yellow
-            @cli.say "  • Run 'jojo setup --overwrite' to recreate all configuration", :yellow
+            @cli.say "  • Run 'jojo configure --overwrite' to recreate all configuration", :yellow
             @cli.say "  • Manually create config.yml to match your existing .env setup", :yellow
             exit 1
           elsif config_exists && !env_exists
@@ -65,7 +65,7 @@ module Jojo
             @cli.say "  Missing: .env", :yellow
             @cli.say "", :yellow
             @cli.say "Options:", :yellow
-            @cli.say "  • Run 'jojo setup --overwrite' to recreate all configuration", :yellow
+            @cli.say "  • Run 'jojo configure --overwrite' to recreate all configuration", :yellow
             @cli.say "  • Manually create .env with your API keys", :yellow
             exit 1
           end
@@ -290,7 +290,7 @@ module Jojo
 
         def show_summary
           @cli.say ""
-          @cli.say "Setup complete!", :green
+          @cli.say "Configuration complete!", :green
           @cli.say ""
 
           if @created_files.any?

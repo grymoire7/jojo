@@ -1,17 +1,17 @@
 ---
-title: setup
+title: configure
 parent: Commands
 nav_order: 2
 ---
 
-# jojo setup
+# jojo configure
 
-Interactive setup wizard for first-time configuration.
+Interactive configuration wizard for API keys and preferences.
 
 ## Usage
 
 ```bash
-./bin/jojo setup [--overwrite]
+./bin/jojo configure [--overwrite]
 ```
 
 ## Options
@@ -32,7 +32,7 @@ Interactive setup wizard for first-time configuration.
 ## Example
 
 ```
-$ ./bin/jojo setup
+$ ./bin/jojo configure
 
 Which LLM provider? (Use ↑/↓ arrow keys, press Enter to select)
 ‣ anthropic
@@ -54,4 +54,4 @@ Which model for reasoning tasks (company research, resume tailoring)?
 ```
 
 {: .note }
-The setup command is idempotent — you can run it multiple times safely. It only creates missing files. Use `--overwrite` to recreate existing files.
+The configure command is idempotent — you can run it multiple times safely. It only creates missing files. Use `--overwrite` to recreate existing files.

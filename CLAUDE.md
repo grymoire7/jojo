@@ -57,12 +57,3 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Reference the design document at `docs/plans/design.md` for understanding the full scope and planned features.
 
-## Implementation Plan
-
-When completing a phase of work, update `docs/plans/implementation_plan.md`:
-1. Mark all completed tasks with `[x]` instead of `[ ]`
-2. Add "✅" to the phase heading
-3. Add `**Status**: COMPLETED` below the goal
-4. Update validation section with ✅ if validation passes
-5. Make any necessary corrections to task descriptions or code examples based on actual implementation
-
