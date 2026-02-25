@@ -44,3 +44,16 @@ if [[ "$current_ruby" != "$required_ruby" ]]; then
 fi
 
 echo -e "${GREEN}✓ Ruby $current_ruby${NC}"
+
+# Step 2: Install Ruby gems
+if $CHECK_ONLY; then
+  if [[ -f "Gemfile.lock" ]]; then
+    echo -e "${GREEN}✓ Ruby gems installed (Gemfile.lock present)${NC}"
+  else
+    echo -e "${YELLOW}⚠ Gemfile.lock not found — run ./bin/setup to install gems${NC}"
+  fi
+else
+  echo "Installing Ruby gems..."
+  bundle install
+  echo -e "${GREEN}✓ Ruby gems installed${NC}"
+fi
