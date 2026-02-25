@@ -57,3 +57,16 @@ else
   bundle install
   echo -e "${GREEN}✓ Ruby gems installed${NC}"
 fi
+
+# Step 3: Install npm packages (website template build deps)
+if $CHECK_ONLY; then
+  if [[ -d "templates/website/node_modules" ]]; then
+    echo -e "${GREEN}✓ npm packages installed${NC}"
+  else
+    echo -e "${YELLOW}⚠ templates/website/node_modules not found — run ./bin/setup to install${NC}"
+  fi
+else
+  echo "Installing npm packages..."
+  (cd templates/website && npm install)
+  echo -e "${GREEN}✓ npm packages installed${NC}"
+fi
