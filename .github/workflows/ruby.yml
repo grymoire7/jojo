@@ -23,6 +23,9 @@ jobs:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true
 
+    - name: Check setup script
+      run: ./bin/setup --check
+
     - name: Install dependencies
       run: bundle install
 
