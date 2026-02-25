@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -e
+
+# ANSI color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Parse flags
+CHECK_ONLY=false
+for arg in "$@"; do
+  case $arg in
+    --check) CHECK_ONLY=true ;;
+  esac
+done
+
+if $CHECK_ONLY; then
+  echo "Checking environment (--check mode, no changes will be made)..."
+  echo ""
+fi
