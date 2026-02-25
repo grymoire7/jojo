@@ -1,5 +1,6 @@
 # lib/jojo/commands/pdf/converter.rb
 require_relative "pandoc_checker"
+require_relative "wkhtmltopdf_checker"
 
 module Jojo
   module Commands
@@ -7,6 +8,9 @@ module Jojo
       class Converter
         class SourceFileNotFoundError < StandardError; end
         class PandocExecutionError < StandardError; end
+        class WkhtmltopdfExecutionError < StandardError; end
+
+        CSS_PATH = File.expand_path("../../../../templates/pdf-stylesheet.css", __dir__)
 
         attr_reader :application, :verbose, :output
 
@@ -18,10 +22,10 @@ module Jojo
 
         def generate_all
           PandocChecker.check!
+          WkhtmltopdfChecker.check!
 
           results = {generated: [], skipped: []}
 
-          # Generate resume PDF
           if File.exist?(application.resume_path)
             generate_resume_pdf
             results[:generated] << :resume
@@ -29,7 +33,6 @@ module Jojo
             results[:skipped] << :resume
           end
 
-          # Generate cover letter PDF
           if File.exist?(application.cover_letter_path)
             generate_cover_letter_pdf
             results[:generated] << :cover_letter
@@ -41,58 +44,71 @@ module Jojo
         end
 
         def generate_resume_pdf
-          generate_pdf(
+          generate_html_and_pdf(
             source: application.resume_path,
-            output: application.resume_pdf_path,
+            html_output: application.resume_html_path,
+            pdf_output: application.resume_pdf_path,
             document_type: "resume"
           )
         end
 
         def generate_cover_letter_pdf
-          generate_pdf(
+          generate_html_and_pdf(
             source: application.cover_letter_path,
-            output: application.cover_letter_pdf_path,
+            html_output: application.cover_letter_html_path,
+            pdf_output: application.cover_letter_pdf_path,
             document_type: "cover letter"
           )
         end
 
         private
 
-        def generate_pdf(source:, output:, document_type:)
+        def generate_html_and_pdf(source:, html_output:, pdf_output:, document_type:)
           unless File.exist?(source)
             raise SourceFileNotFoundError, "#{document_type}.md not found at #{source}"
           end
 
-          # Ensure output directory exists
-          FileUtils.mkdir_p(File.dirname(output))
+          FileUtils.mkdir_p(File.dirname(pdf_output))
 
-          # Build Pandoc command
-          cmd = build_pandoc_command(source, output)
+          html_cmd = build_pandoc_html_command(source, html_output)
+          log_verbose("Generating HTML: #{html_cmd}")
 
-          log_verbose("Generating PDF: #{cmd}") if verbose
-
-          success = system(cmd)
-
-          unless success
-            raise PandocExecutionError, "Pandoc failed to generate PDF for #{document_type}"
+          unless system(html_cmd)
+            raise PandocExecutionError, "Pandoc failed to generate HTML for #{document_type}"
           end
 
-          output
+          pdf_cmd = build_wkhtmltopdf_command(html_output, pdf_output)
+          log_verbose("Generating PDF: #{pdf_cmd}")
+
+          unless system(pdf_cmd)
+            raise WkhtmltopdfExecutionError, "wkhtmltopdf failed to generate PDF for #{document_type}"
+          end
+
+          pdf_output
         end
 
-        def build_pandoc_command(source, output)
+        def build_pandoc_html_command(source, html_output)
           [
             "pandoc",
             escape_path(source),
-            "-o", escape_path(output),
-            "--pdf-engine=pdflatex",
-            "-V", "geometry:margin=1in",
-            "-V", "fontsize=11pt"
+            "-f", "markdown",
+            "-t", "html",
+            "--embed-resources",
+            "--standalone",
+            "-c", escape_path(CSS_PATH),
+            "-o", escape_path(html_output)
+          ].join(" ")
+        end
+
+        def build_wkhtmltopdf_command(html_input, pdf_output)
+          [
+            "wkhtmltopdf",
+            escape_path(html_input),
+            escape_path(pdf_output)
           ].join(" ")
         end
 
         def escape_path(path)
-          # Escape spaces and special characters for shell
           "\"#{path}\""
         end
 
