@@ -3,11 +3,14 @@ require "yaml"
 require_relative "prompt"
 require_relative "../../resume_data_loader"
 require_relative "../../resume_data_formatter"
+require_relative "../../erb_renderer"
 
 module Jojo
   module Commands
     module CoverLetter
       class Generator
+        TEMPLATE_PATH = File.expand_path("cover_letter.md.erb", __dir__)
+
         attr_reader :application, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
 
         def initialize(application, ai_client, config:, verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
@@ -33,14 +36,14 @@ module Jojo
           log "Generating cover letter using AI..."
           cover_letter = call_ai(prompt)
 
-          log "Adding landing page link..."
-          cover_letter_with_link = add_landing_page_link(cover_letter, inputs)
+          log "Rendering cover letter template..."
+          rendered = render_template(cover_letter, inputs)
 
           log "Saving cover letter to #{application.cover_letter_path}..."
-          save_cover_letter(cover_letter_with_link)
+          save_cover_letter(rendered)
 
           log "Cover letter generation complete!"
-          cover_letter_with_link
+          rendered
         end
 
         private
@@ -80,7 +83,8 @@ module Jojo
             research: research,
             job_details: job_details,
             company_name: application.company_name,
-            company_slug: application.slug
+            company_slug: application.slug,
+            resume_data: resume_data
           }
         end
 
@@ -121,9 +125,18 @@ module Jojo
           ai_client.generate_text(prompt)
         end
 
-        def add_landing_page_link(cover_letter_content, inputs)
-          link = "**Specifically for #{inputs[:company_name]}**: #{config.base_url}/resume/#{inputs[:company_slug]}"
-          "#{link}\n\n#{cover_letter_content}"
+        def render_template(body, inputs)
+          resume_data = inputs[:resume_data]
+          renderer = ErbRenderer.new(TEMPLATE_PATH)
+          renderer.render(
+            "name" => resume_data["name"],
+            "email" => resume_data["email"],
+            "website" => resume_data["website"],
+            "date" => Time.now.strftime("%B, %Y"),
+            "body" => body,
+            "company_name" => inputs[:company_name],
+            "landing_page_url" => "#{config.base_url}/#{inputs[:company_slug]}"
+          )
         end
 
         def save_cover_letter(content)

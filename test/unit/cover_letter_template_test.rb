@@ -10,6 +10,7 @@ class CoverLetterTemplateTest < JojoTest
 
     File.write(@application.job_description_path, "Senior Ruby Developer at Acme Corp")
     File.write(@application.resume_path, "# Jane Doe\nSenior Ruby developer")
+    File.write(@application.job_details_path, "company_name: Acme Corp\n")
 
     @config = Minitest::Mock.new
     @config.expect(:voice_and_tone, "professional and friendly")

@@ -42,7 +42,7 @@ class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
     result = @generator.generate
 
     assert_includes result, "Specifically for Acme Corp"
-    assert_includes result, "https://tracyatteberry.com/resume/acme-corp"
+    assert_includes result, "https://tracyatteberry.com/acme-corp"
     assert_includes result, expected_cover_letter
 
     @ai_client.verify
@@ -127,7 +127,7 @@ class Jojo::Commands::CoverLetter::GeneratorTest < JojoTest
 
     result = @generator.generate
 
-    assert_includes result, "**Specifically for Acme Corp**: https://tracyatteberry.com/resume/acme-corp"
+    assert_includes result, "**Specifically for Acme Corp**: https://tracyatteberry.com/acme-corp"
 
     @ai_client.verify
     @config.verify
