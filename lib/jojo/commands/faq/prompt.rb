@@ -69,7 +69,7 @@ module Jojo
             ## Document URLs
 
             - Resume: #{base_url}/resume/#{company_slug}
-            - Cover Letter: #{base_url}/cover-letter/#{company_slug}
+            - Cover Letter: #{base_url}/cover_letter/#{company_slug}
 
             # Output Format
 
@@ -102,7 +102,7 @@ module Jojo
               },
               {
                 "question": "Where can I find your resume and cover letter?",
-                "answer": "You can download my full resume and cover letter tailored specifically for this role: <a href=\\"#{base_url}/resume/#{company_slug}\\">View Resume</a> | <a href=\\"#{base_url}/cover-letter/#{company_slug}\\">View Cover Letter</a>"
+                "answer": "You can download my full resume and cover letter tailored specifically for this role: <a href=\\"#{base_url}/resume/#{company_slug}\\">View Resume</a> | <a href=\\"#{base_url}/cover_letter/#{company_slug}\\">View Cover Letter</a>"
               }
             ]
             ```

@@ -72,7 +72,7 @@ class WebsiteWorkflowTest < JojoTest
 
     # Verify footer links
     assert_includes html, "resume.pdf"
-    assert_includes html, "cover-letter.pdf"
+    assert_includes html, "cover_letter.pdf"
 
     # Verify Tailwind CSS output with DaisyUI theme
     styles_css = File.read(File.join(@employer.website_path, "styles.css"))

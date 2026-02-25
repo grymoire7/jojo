@@ -161,7 +161,7 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
     assert_includes result, "Schedule a Call"
     assert_includes result, "https://calendly.com/janedoe/30min"
     assert_includes result, "resume.pdf"
-    assert_includes result, "cover-letter.pdf"
+    assert_includes result, "cover_letter.pdf"
   end
 
   def test_handles_missing_cta_link_gracefully
