@@ -163,3 +163,18 @@ else
     echo -e "${YELLOW}  Skipping wkhtmltopdf. Note: 'jojo pdf' requires wkhtmltopdf.${NC}"
   fi
 fi
+
+# Bootstrap complete
+if ! $CHECK_ONLY; then
+  echo ""
+  echo -e "${GREEN}Bootstrap complete!${NC}"
+  echo ""
+  read -rp "Run './bin/jojo setup' to configure API keys and preferences? [Y/n] " reply
+  echo
+  if [[ ! "$reply" =~ ^[Nn]$ ]]; then
+    ./bin/jojo setup
+  else
+    echo "Run './bin/jojo setup' when you're ready to configure your API keys."
+    echo ""
+  fi
+fi
