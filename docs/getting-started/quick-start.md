@@ -8,7 +8,13 @@ nav_order: 3
 
 ## Step 0: Setup and customize inputs
 
-If you haven't already, run setup and customize your input files:
+If you haven't already, bootstrap and configure Jojo:
+
+```bash
+./bin/setup        # installs deps and runs the configuration wizard
+```
+
+If you've already run `./bin/setup`, you can re-run the configuration wizard alone:
 
 ```bash
 ./bin/jojo setup
