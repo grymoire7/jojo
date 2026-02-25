@@ -21,6 +21,8 @@ module Jojo
     def cover_letter_path = File.join(base_path, "cover_letter.md")
     def resume_pdf_path = File.join(base_path, "resume.pdf")
     def cover_letter_pdf_path = File.join(base_path, "cover_letter.pdf")
+    def resume_html_path = File.join(base_path, "resume.html")
+    def cover_letter_html_path = File.join(base_path, "cover_letter.html")
     def status_log_path = File.join(base_path, "status.log")
     def website_path = File.join(base_path, "website")
     def faq_path = File.join(base_path, "faq.json")

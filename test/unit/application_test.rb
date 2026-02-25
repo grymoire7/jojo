@@ -100,6 +100,16 @@ class ApplicationTest < JojoTest
     assert_equal "applications/test-app/cover_letter.pdf", app.cover_letter_pdf_path
   end
 
+  def test_returns_resume_html_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/resume.html", app.resume_html_path
+  end
+
+  def test_returns_cover_letter_html_path
+    app = Jojo::Application.new("test-app")
+    assert_equal "applications/test-app/cover_letter.html", app.cover_letter_html_path
+  end
+
   def test_returns_status_log_path
     app = Jojo::Application.new("test-app")
     assert_equal "applications/test-app/status.log", app.status_log_path
