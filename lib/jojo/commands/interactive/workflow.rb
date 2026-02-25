@@ -77,7 +77,7 @@ module Jojo
             dependencies: [:resume, :cover_letter],
             command: :pdf,
             paid: false,
-            output_file: "resume.pdf"
+            output_file: "website/resume.pdf"
           }
         ].freeze
 
