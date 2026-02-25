@@ -19,3 +19,28 @@ if $CHECK_ONLY; then
   echo "Checking environment (--check mode, no changes will be made)..."
   echo ""
 fi
+
+# Step 1: Check Ruby version
+echo "Checking Ruby version..."
+required_ruby="$(cat .ruby-version | tr -d '[:space:]')"
+current_ruby="$(ruby -v 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+
+if [[ -z "$current_ruby" ]]; then
+  echo -e "${RED}✗ Ruby not found${NC}"
+  echo "  Install Ruby $required_ruby:"
+  echo "    rbenv: rbenv install $required_ruby && rbenv global $required_ruby"
+  echo "    mise:  mise use -g ruby@$required_ruby"
+  exit 1
+fi
+
+if [[ "$current_ruby" != "$required_ruby" ]]; then
+  echo -e "${RED}✗ Ruby version mismatch${NC}"
+  echo "  Required: $required_ruby"
+  echo "  Found:    $current_ruby"
+  echo "  Install the correct version:"
+  echo "    rbenv: rbenv install $required_ruby && rbenv global $required_ruby"
+  echo "    mise:  mise use -g ruby@$required_ruby"
+  exit 1
+fi
+
+echo -e "${GREEN}✓ Ruby $current_ruby${NC}"
