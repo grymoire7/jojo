@@ -1,6 +1,7 @@
 # test/fixtures/resume_data.yml
 name: "Jane Doe"
 email: "jane@example.com"
+website: "https://janedoe.example.com"
 phone: "+1-555-0123"
 location: "San Francisco, CA"
 
