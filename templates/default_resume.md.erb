@@ -1,4 +1,4 @@
-###### [[tracyatteberry.com](https://tracyatteberry.com)] . [ <%= email %> ] . [ <%= phone %> ]
+###### [[<%= website.sub(/^https?:\/\//, '') %>](<%= website %>)] . [ <%= email %> ] . [ <%= phone %> ]
 
 <%= summary %>
 
@@ -6,7 +6,9 @@
 
 <%= skills.join(" • ") %>
 
-###### [[linkedin.com/in/tracyatteberry](https:://linkedin.com/in/tracyatteberry/)] . [[github.com/grymoire7](https://github.com/grymoire7)]
+<% unless [linkedin, github].compact.empty? -%>
+###### <%= [linkedin, github].compact.map { |url| "[[#{url.sub(/^https?:\/\//, '')}](#{url})]" }.join(' . ') %>
+<% end -%>
 
 ## Experience
 
