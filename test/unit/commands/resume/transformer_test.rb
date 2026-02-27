@@ -91,6 +91,25 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
     @ai_client.verify
   end
 
+  def test_filter_field_filters_each_employers_technologies_independently
+    data = {
+      "experience" => [
+        {"company" => "BenchPrep", "technologies" => ["Ruby", "Rails", "Docker", "OpenAI"]},
+        {"company" => "Groupon", "technologies" => ["Python", "AWS", "Terraform"]}
+      ]
+    }
+
+    # One AI call per employer, each with different technologies
+    @ai_client.expect(:generate_text, "[0, 1]", [String])   # BenchPrep: keep Ruby, Rails
+    @ai_client.expect(:generate_text, "[0, 2]", [String])   # Groupon: keep Python, Terraform
+
+    @transformer.send(:filter_field, "experience.technologies", data)
+
+    assert_equal ["Ruby", "Rails"], data["experience"][0]["technologies"]
+    assert_equal ["Python", "Terraform"], data["experience"][1]["technologies"]
+    @ai_client.verify
+  end
+
   def test_filter_field_does_nothing_for_non_array_fields
     data = {"summary" => "Some text"}
 
@@ -118,6 +137,25 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
     @transformer.send(:reorder_field, "skills", data, can_remove: true)
 
     assert_equal ["Java", "Ruby", "Python"], data["skills"]
+    @ai_client.verify
+  end
+
+  def test_reorder_field_reorders_each_employers_technologies_independently
+    data = {
+      "experience" => [
+        {"company" => "BenchPrep", "technologies" => ["Ruby", "Rails", "Docker"]},
+        {"company" => "Groupon", "technologies" => ["Python", "AWS"]}
+      ]
+    }
+
+    # One AI call per employer, each with different results
+    @ai_client.expect(:generate_text, "[2, 0, 1]", [String])  # BenchPrep: Docker, Ruby, Rails
+    @ai_client.expect(:generate_text, "[1, 0]", [String])     # Groupon: AWS, Python
+
+    @transformer.send(:reorder_field, "experience.technologies", data, can_remove: true)
+
+    assert_equal ["Docker", "Ruby", "Rails"], data["experience"][0]["technologies"]
+    assert_equal ["AWS", "Python"], data["experience"][1]["technologies"]
     @ai_client.verify
   end
 

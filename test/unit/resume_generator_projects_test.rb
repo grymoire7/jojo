@@ -36,15 +36,24 @@ class ResumeGeneratorProjectsTest < JojoTest
     # Scalar/text fields
     mock_ai.expect(:generate_text, "Tailored summary", [String]) # summary: rewrite
 
-    # Nested fields (dot notation)
-    mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # projects.skills: reorder
+    # Nested fields (dot notation) - each employer/project processed independently
+    mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # projects.skills[0]: reorder (Open Source CLI Tool)
+    mock_ai.expect(:generate_text, "[0, 1, 2]", [String]) # projects.skills[1]: reorder (E-commerce Platform)
     mock_ai.expect(:generate_text, "Tailored description 1", [String]) # experience[0].description: rewrite
     mock_ai.expect(:generate_text, "Tailored description 2", [String]) # experience[1].description: rewrite
     mock_ai.expect(:generate_text, "Tailored description 3", [String]) # experience[2].description: rewrite
-    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience.technologies: remove
-    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience.technologies: reorder
-    mock_ai.expect(:generate_text, "[0]", [String]) # experience.tags: remove
-    mock_ai.expect(:generate_text, "[0]", [String]) # experience.tags: reorder
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience[0].technologies: remove (TechCorp)
+    mock_ai.expect(:generate_text, "[0, 2]", [String]) # experience[1].technologies: remove (StartupXYZ)
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience[2].technologies: remove (ConsultingCo)
+    mock_ai.expect(:generate_text, "[1, 0]", [String]) # experience[0].technologies: reorder (TechCorp, 2 items)
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience[1].technologies: reorder (StartupXYZ, 2 items)
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience[2].technologies: reorder (ConsultingCo, 2 items)
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience[0].tags: remove (TechCorp, 3 items)
+    mock_ai.expect(:generate_text, "[0]", [String])    # experience[1].tags: remove (StartupXYZ, 2 items)
+    mock_ai.expect(:generate_text, "[0]", [String])    # experience[2].tags: remove (ConsultingCo, 2 items)
+    mock_ai.expect(:generate_text, "[0, 1]", [String]) # experience[0].tags: reorder (TechCorp, 2 items)
+    mock_ai.expect(:generate_text, "[0]", [String])    # experience[1].tags: reorder (StartupXYZ, 1 item)
+    mock_ai.expect(:generate_text, "[0]", [String])    # experience[2].tags: reorder (ConsultingCo, 1 item)
     mock_ai.expect(:generate_text, "Tailored education description", [String]) # education.description: rewrite
 
     generator = Jojo::Commands::Resume::Generator.new(@application, mock_ai, config: @config, inputs_path: fixture_path)

@@ -77,10 +77,54 @@ module Jojo
         end
 
         def filter_field(field_path, data)
-          items = get_field(data, field_path)
-          return unless items.is_a?(Array)
+          parts = field_path.split(".")
+          *parent_path, key = parts
 
-          # Simple, focused prompt
+          if parent_path.empty?
+            items = data[key]
+            return unless items.is_a?(Array)
+            data[key] = filter_items(items)
+          else
+            parent = parent_path.reduce(data) { |obj, k| obj[k] }
+            if parent.is_a?(Array)
+              parent.each do |item|
+                items = item[key]
+                next unless items.is_a?(Array)
+                item[key] = filter_items(items)
+              end
+            else
+              items = parent&.dig(key)
+              return unless items.is_a?(Array)
+              parent[key] = filter_items(items)
+            end
+          end
+        end
+
+        def reorder_field(field_path, data, can_remove:)
+          parts = field_path.split(".")
+          *parent_path, key = parts
+
+          if parent_path.empty?
+            items = data[key]
+            return unless items.is_a?(Array)
+            data[key] = reorder_items(items, can_remove: can_remove, field_path: field_path)
+          else
+            parent = parent_path.reduce(data) { |obj, k| obj[k] }
+            if parent.is_a?(Array)
+              parent.each do |item|
+                items = item[key]
+                next unless items.is_a?(Array)
+                item[key] = reorder_items(items, can_remove: can_remove, field_path: field_path)
+              end
+            else
+              items = parent&.dig(key)
+              return unless items.is_a?(Array)
+              parent[key] = reorder_items(items, can_remove: can_remove, field_path: field_path)
+            end
+          end
+        end
+
+        def filter_items(items)
           prompt = <<~PROMPT
             Filter these items by relevance to the job description.
             Keep approximately 70% of the most relevant items.
@@ -97,18 +141,12 @@ module Jojo
 
           response = @ai_client.generate_text(prompt)
           indices = JSON.parse(response)
-          filtered = indices.map { |i| items[i] }
-
-          set_field(data, field_path, filtered)
+          indices.map { |i| items[i] }
         end
 
-        def reorder_field(field_path, data, can_remove:)
-          items = get_field(data, field_path)
-          return unless items.is_a?(Array)
-
+        def reorder_items(items, can_remove:, field_path:)
           original_count = items.length
 
-          # Simple, focused prompt
           prompt = <<~PROMPT
             Reorder these items by relevance to the job description.
             Most relevant should be first.
@@ -127,7 +165,6 @@ module Jojo
           response = @ai_client.generate_text(prompt)
           indices = JSON.parse(response)
 
-          # Ruby enforces the permission
           unless can_remove
             if indices.length != original_count
               raise PermissionViolation,
@@ -140,8 +177,7 @@ module Jojo
             end
           end
 
-          reordered = indices.map { |i| items[i] }
-          set_field(data, field_path, reordered)
+          indices.map { |i| items[i] }
         end
 
         def rewrite_field(field_path, data)
