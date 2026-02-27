@@ -8,16 +8,18 @@ http_interactions:
       string: '{"model":"claude-haiku-4-5","messages":[{"role":"user","content":[{"type":"text","text":"Tailor
         this content for the specific job opportunity.\n\nCRITICAL: Use ONLY information
         present in the original content below.\nDO NOT add, invent, or imply experience
-        with any technology, framework, or skill\nthat is not explicitly mentioned in
-        the original content.\nDO NOT claim proficiency in languages, tools, or frameworks
-        absent from the original.\n\nJob Description:\nLooking for a Senior Ruby on
-        Rails developer with PostgreSQL and Docker experience. Must have strong backend
-        skills and experience with microservices architecture.\n\nOriginal Content:\nExperienced
-        software engineer with broad technical background across multiple domains\n\nReturn
-        only the tailored content, no explanations.\n"}]}],"stream":false,"max_tokens":64000}'
+        with any technology, framework, or skill\nthat is not explicitly mentioned
+        in the original content.\nDO NOT claim proficiency in languages, tools, or
+        frameworks absent from the original.\n\nJob Description:\nLooking for a Senior
+        Ruby on Rails developer with PostgreSQL and Docker experience. Must have strong
+        backend skills and experience with microservices architecture.\n\nOriginal
+        Content:\nExperienced software engineer with broad technical background across
+        multiple domains\n\nReturn only the tailored content, no explanations.\nIf
+        you determine that none of the content is relevant to the job\ndescription,
+        return the original content without modification.\n"}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -34,7 +36,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 20 Feb 2026 06:42:26 GMT
+      - Fri, 27 Feb 2026 04:48:12 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -46,29 +48,29 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '450000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2026-02-20T06:42:26Z'
+      - '2026-02-27T04:48:12Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '90000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '90000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2026-02-20T06:42:26Z'
+      - '2026-02-27T04:48:12Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '1000'
       Anthropic-Ratelimit-Requests-Remaining:
       - '999'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2026-02-20T06:42:25Z'
+      - '2026-02-27T04:48:12Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '540000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '540000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2026-02-20T06:42:26Z'
+      - '2026-02-27T04:48:12Z'
       X-Robots-Tag:
       - none
       Request-Id:
-      - req_011CYJsBpKahNnzgEo6tsoK7
+      - req_011CYXy92YxDKdJqHTD3kxzj
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Anthropic-Organization-Id:
@@ -76,18 +78,16 @@ http_interactions:
       Server:
       - cloudflare
       X-Envoy-Upstream-Service-Time:
-      - '700'
+      - '449'
       Content-Security-Policy:
       - default-src 'none'; frame-ancestors 'none'
       Cf-Cache-Status:
       - DYNAMIC
       Cf-Ray:
-      - 9d0c061ebcdadac2-OMA
+      - 9d450c6c98c106b5-OMA
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-haiku-4-5-20251001","id":"msg_01VZdLsQrCmarg2HJ7k7b8Zx","type":"message","role":"assistant","content":[{"type":"text","text":"Senior
-        Ruby on Rails developer with strong backend expertise in PostgreSQL and Docker.
-        Experienced in designing and implementing microservices architecture across
-        multiple technical domains."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":92,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":33,"service_tier":"standard","inference_geo":"not_available"}}'
-  recorded_at: Fri, 20 Feb 2026 06:42:26 GMT
+      string: '{"model":"claude-haiku-4-5-20251001","id":"msg_01XJ4cmvQ8iWwjToT8CMHGWj","type":"message","role":"assistant","content":[{"type":"text","text":"Experienced
+        software engineer with broad technical background across multiple domains"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":167,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":14,"service_tier":"standard","inference_geo":"not_available"}}'
+  recorded_at: Fri, 27 Feb 2026 04:48:12 GMT
 recorded_with: VCR 6.4.0

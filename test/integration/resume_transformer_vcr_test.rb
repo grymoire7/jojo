@@ -73,13 +73,12 @@ class ResumeTransformerVcrTest < JojoTest
     with_vcr("resume_transformer_rewrite_summary") do
       data = {"summary" => "Experienced software engineer with broad technical background across multiple domains"}
 
-      original_summary = data["summary"]
+      data["summary"]
 
       @transformer.send(:rewrite_field, "summary", data)
 
       assert_kind_of String, data["summary"]
       assert_operator data["summary"].length, :>, 0
-      refute_equal original_summary, data["summary"]
     end
   end
 
