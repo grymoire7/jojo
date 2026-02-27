@@ -53,7 +53,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Common Tasks
 
 
-## Design Document
+## Documentation
 
-Reference the design document at `docs/plans/design.md` for understanding the full scope and planned features.
+Reference the documentation site in `docs/` for architecture, commands, and guides. Key files:
+- `docs/architecture/overview.md` — system design and directory structure
+- `docs/architecture/key-decisions.md` — why things are built the way they are
 
