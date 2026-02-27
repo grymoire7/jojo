@@ -11,8 +11,8 @@ has_children: true
 | Command | Description | Required Options |
 |---------|-------------|------------------|
 | [`jojo configure`](configure) | Interactive configuration wizard for API keys and preferences | None |
-| [`jojo new`](new) | Create application workspace and process job description | `-s`, `-j` |
-| [`jojo generate`](generate) | Generate all materials in sequence | `-s` or `JOJO_APPLICATION_SLUG` |
+| [`jojo new`](new) | Create a new application workspace | `-s` |
+| [`jojo job_description`](job-description) | Process job description for an application | `-j` |
 | [`jojo research`](research) | Generate company/role research only | `-s` or `JOJO_APPLICATION_SLUG` |
 | [`jojo resume`](resume) | Generate tailored resume only | `-s` or `JOJO_APPLICATION_SLUG` |
 | [`jojo cover_letter`](cover-letter) | Generate cover letter only | `-s` or `JOJO_APPLICATION_SLUG` |
@@ -30,8 +30,8 @@ has_children: true
 | Command | Inputs | Outputs |
 |---------|--------|---------|
 | [`jojo configure`](configure) | None (interactive) | `.env`, `config.yml`, `inputs/resume_data.yml`, `inputs/templates/default_resume.md.erb` |
-| [`jojo new`](new) | `inputs/resume_data.yml`, job source (file or URL via `-j`) | `applications/<slug>/job_description_raw.md`, `job_description.md`, `job_details.yml`, `website/` |
-| [`jojo generate`](generate) | `applications/<slug>/job_description.md`, `job_details.yml`, `inputs/resume_data.yml`, `templates/*` | `research.md`, `resume.md`, `cover_letter.md`, `job_description_annotations.json`, `branding_statement.json`, `faq.json`, `website/index.html`, `*.pdf` (if Pandoc installed), `status_log.md` |
+| [`jojo new`](new) | `inputs/resume_data.yml` | `applications/<slug>/` (workspace directory) |
+| [`jojo job_description`](job-description) | Job source (file or URL via `-j`) | `applications/<slug>/job_description_raw.md`, `job_description.md`, `job_details.yml`, `website/` |
 | [`jojo research`](research) | `applications/<slug>/job_description.md`, `job_details.yml` | `applications/<slug>/research.md`, `status_log.md` |
 | [`jojo resume`](resume) | `applications/<slug>/job_description.md`, `job_details.yml`, `inputs/resume_data.yml`, `resume_data_curated.yml` (cache, if present) | `applications/<slug>/resume.md`, `resume_data_curated.yml` (cache), `status_log.md` |
 | [`jojo cover_letter`](cover-letter) | `applications/<slug>/job_description.md`, `job_details.yml`, `resume.md`, `inputs/resume_data.yml` | `applications/<slug>/cover_letter.md`, `status_log.md` |

@@ -6,12 +6,12 @@ nav_order: 3
 
 # jojo new
 
-Create an application workspace and process a job description.
+Create a new application workspace directory.
 
 ## Usage
 
 ```bash
-./bin/jojo new -s SLUG -j JOB_SOURCE
+./bin/jojo new -s SLUG
 ```
 
 ## Options
@@ -19,36 +19,32 @@ Create an application workspace and process a job description.
 | Option | Description |
 |--------|-------------|
 | `-s, --slug SLUG` | **Required.** Unique identifier for this application |
-| `-j, --job JOB_SOURCE` | **Required.** Path to a job description file or a URL |
 
 ## Inputs
 
 | Input | Description |
 |-------|-------------|
-| Job source | A local file path or URL containing the job description |
-| `inputs/resume_data.yml` | Your structured resume data |
+| `inputs/resume_data.yml` | Your structured resume data (checked for presence) |
 
 ## Outputs
 
 | File | Description |
 |------|-------------|
-| `applications/<slug>/job_description_raw.md` | Original job description |
-| `applications/<slug>/job_description.md` | Processed job description |
-| `applications/<slug>/job_details.yml` | Extracted metadata (company, title, location, etc.) |
-| `applications/<slug>/website/` | Website directory scaffold |
+| `applications/<slug>/` | Workspace directory for the application |
+
+## Next step
+
+After creating the workspace, use [`jojo job_description`](job-description) to process the job posting:
+
+```bash
+jojo job_description -s SLUG -j <job_file_or_url>
+```
 
 ## Examples
 
-From a local file:
-
 ```bash
-./bin/jojo new -s acme-corp-senior-dev -j job_description.txt
-```
-
-From a URL:
-
-```bash
-./bin/jojo new -s acme-corp-senior-dev -j "https://careers.acmecorp.com/jobs/123"
+./bin/jojo new -s acme-corp-senior-dev
+./bin/jojo new -s bigco-principal-eng
 ```
 
 ## Slug guidelines
