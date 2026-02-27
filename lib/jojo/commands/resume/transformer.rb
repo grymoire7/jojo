@@ -184,6 +184,8 @@ module Jojo
             #{original}
 
             Return only the tailored content, no explanations.
+            If you determine that none of the content is relevant to the job
+            description, return the original content without modification.
           PROMPT
 
           @ai_client.generate_text(prompt)

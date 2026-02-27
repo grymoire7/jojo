@@ -59,6 +59,13 @@ module Jojo
             ## VOICE AND TONE:
             #{voice_and_tone}
 
+            Do not use the words delve, foster, transformative, realm, navigate
+            (metaphorically), or phrases like 'it's important to note.'
+          
+            Use contractions. Mix short punchy sentences with longer ones.
+            Don't make every paragraph the same length. Limit use of the em-dash
+            unless it's a direct quote.
+
             Match company culture from research:
             - Mirror their language style
             - Reflect their values authentically
