@@ -22,7 +22,7 @@ class Jojo::Commands::Interactive::DialogsTest < JojoTest
       {name: "job_description.md", age: nil}
     ]
 
-    output = Jojo::Commands::Interactive::Dialogs.ready_dialog("Cover Letter", inputs, "cover_letter.md", paid: true)
+    output = Jojo::Commands::Interactive::Dialogs.ready_dialog("Cover Letter", inputs, ["cover_letter.md"], paid: true)
 
     assert_includes output, "Cover Letter"
     assert_includes output, "Generate"
@@ -33,16 +33,35 @@ class Jojo::Commands::Interactive::DialogsTest < JojoTest
     assert_includes output, "[Enter] Generate"
   end
 
+  def test_ready_dialog_shows_all_output_files_for_multi_file_commands
+    inputs = [
+      {name: "resume.md", age: "1 day ago"},
+      {name: "cover_letter.md", age: "1 day ago"}
+    ]
+
+    output = Jojo::Commands::Interactive::Dialogs.ready_dialog("PDF", inputs, ["website/resume.pdf", "website/cover_letter.pdf"])
+
+    assert_includes output, "website/resume.pdf"
+    assert_includes output, "website/cover_letter.pdf"
+  end
+
   # .generated_dialog
 
   def test_generated_dialog_renders_dialog_for_already_generated_item
-    output = Jojo::Commands::Interactive::Dialogs.generated_dialog("Cover Letter", "1 hour ago", paid: true)
+    output = Jojo::Commands::Interactive::Dialogs.generated_dialog("Cover Letter", "1 hour ago", output_files: ["cover_letter.md"], paid: true)
 
     assert_includes output, "cover_letter.md already exists"
     assert_includes output, "1 hour ago"
     assert_includes output, "[r] Regenerate"
     assert_includes output, "$"
     assert_includes output, "[v] View"
+  end
+
+  def test_generated_dialog_shows_all_output_files_for_multi_file_commands
+    output = Jojo::Commands::Interactive::Dialogs.generated_dialog("PDF", "3 hours ago", output_files: ["website/resume.pdf", "website/cover_letter.pdf"])
+
+    assert_includes output, "website/resume.pdf already exists"
+    assert_includes output, "website/cover_letter.pdf"
   end
 
   # .error_dialog

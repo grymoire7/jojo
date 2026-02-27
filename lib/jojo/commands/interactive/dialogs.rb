@@ -26,7 +26,7 @@ module Jojo
           )
         end
 
-        def self.ready_dialog(label, inputs, output_file, paid: false)
+        def self.ready_dialog(label, inputs, output_files, paid: false)
           paid_str = paid ? " $" : ""
 
           lines = []
@@ -39,7 +39,7 @@ module Jojo
           end
           lines << ""
           lines << "  Output:"
-          lines << "    • #{output_file}"
+          output_files.each { |f| lines << "    • #{f}" }
           lines << ""
           lines << "  [Enter] Generate    [Esc] Back"
 
@@ -51,12 +51,17 @@ module Jojo
           )
         end
 
-        def self.generated_dialog(label, age, paid: false)
+        def self.generated_dialog(label, age, output_files:, paid: false)
           paid_str = paid ? " $" : ""
-          output_file = label.downcase.tr(" ", "_") + ".md"
 
           lines = []
-          lines << "  #{output_file} already exists (generated #{age})"
+          output_files.each_with_index do |f, i|
+            lines << if i == 0
+              "  #{f} already exists (generated #{age})"
+            else
+              "  #{f}"
+            end
+          end
           lines << ""
           lines << "  [r] Regenerate#{paid_str}    [v] View    [Esc] Back"
 

@@ -175,11 +175,11 @@ module Jojo
             dep_step = Workflow::STEPS.find { |s| s[:key] == dep_key }
             path = Workflow.file_path(dep_key, application)
             age = File.exist?(path) ? TimeFormatter.time_ago(File.mtime(path)) : nil
-            {name: dep_step[:output_file], age: age}
+            {name: dep_step[:output_files].first, age: age}
           end
 
           clear_screen
-          puts Dialogs.ready_dialog(step[:label], inputs, step[:output_file], paid: step[:paid])
+          puts Dialogs.ready_dialog(step[:label], inputs, step[:output_files], paid: step[:paid])
 
           loop do
             key = @reader.read_keypress
@@ -200,7 +200,7 @@ module Jojo
           age = TimeFormatter.time_ago(File.mtime(path))
 
           clear_screen
-          puts Dialogs.generated_dialog(step[:label], age, paid: step[:paid])
+          puts Dialogs.generated_dialog(step[:label], age, output_files: step[:output_files], paid: step[:paid])
 
           loop do
             key = @reader.read_keypress

@@ -13,7 +13,7 @@ module Jojo
             dependencies: [],
             command: :job_description,
             paid: false,
-            output_file: "job_description.md"
+            output_files: ["job_description.md"]
           },
           {
             key: :research,
@@ -21,7 +21,7 @@ module Jojo
             dependencies: [:job_description],
             command: :research,
             paid: true,
-            output_file: "research.md"
+            output_files: ["research.md"]
           },
           {
             key: :resume,
@@ -29,7 +29,7 @@ module Jojo
             dependencies: [:job_description, :research],
             command: :resume,
             paid: true,
-            output_file: "resume.md"
+            output_files: ["resume.md"]
           },
           {
             key: :cover_letter,
@@ -37,7 +37,7 @@ module Jojo
             dependencies: [:resume],
             command: :cover_letter,
             paid: true,
-            output_file: "cover_letter.md"
+            output_files: ["cover_letter.md"]
           },
           {
             key: :annotations,
@@ -45,7 +45,7 @@ module Jojo
             dependencies: [:job_description],
             command: :annotate,
             paid: true,
-            output_file: "job_description_annotations.json"
+            output_files: ["job_description_annotations.json"]
           },
           {
             key: :faq,
@@ -53,7 +53,7 @@ module Jojo
             dependencies: [:job_description, :resume],
             command: :faq,
             paid: true,
-            output_file: "faq.json"
+            output_files: ["faq.json"]
           },
           {
             key: :branding,
@@ -61,7 +61,7 @@ module Jojo
             dependencies: [:job_description, :resume, :research],
             command: :branding,
             paid: true,
-            output_file: "branding.md"
+            output_files: ["branding.md"]
           },
           {
             key: :website,
@@ -69,7 +69,7 @@ module Jojo
             dependencies: [:resume, :annotations, :faq],
             command: :website,
             paid: false,
-            output_file: "website/index.html"
+            output_files: ["website/index.html"]
           },
           {
             key: :pdf,
@@ -77,7 +77,7 @@ module Jojo
             dependencies: [:resume, :cover_letter],
             command: :pdf,
             paid: false,
-            output_file: "website/resume.pdf"
+            output_files: ["website/resume.pdf", "website/cover_letter.pdf"]
           }
         ].freeze
 
@@ -85,7 +85,7 @@ module Jojo
           step = STEPS.find { |s| s[:key] == step_key }
           raise ArgumentError, "Unknown step: #{step_key}" unless step
 
-          File.join(application.base_path, step[:output_file])
+          File.join(application.base_path, step[:output_files].first)
         end
 
         def self.status(step_key, application)

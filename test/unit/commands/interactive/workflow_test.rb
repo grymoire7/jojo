@@ -23,8 +23,21 @@ class Jojo::Commands::Interactive::WorkflowTest < JojoTest
       assert_includes step, :dependencies
       assert_includes step, :command
       assert_includes step, :paid
-      assert_includes step, :output_file
+      assert_includes step, :output_files
     end
+  end
+
+  def test_output_files_is_an_array_for_each_step
+    Jojo::Commands::Interactive::Workflow::STEPS.each do |step|
+      assert_kind_of Array, step[:output_files], "#{step[:key]} output_files should be an Array"
+      refute_empty step[:output_files], "#{step[:key]} output_files should not be empty"
+    end
+  end
+
+  def test_pdf_step_lists_both_resume_and_cover_letter_pdfs
+    pdf_step = Jojo::Commands::Interactive::Workflow::STEPS.find { |s| s[:key] == :pdf }
+    assert_includes pdf_step[:output_files], "website/resume.pdf"
+    assert_includes pdf_step[:output_files], "website/cover_letter.pdf"
   end
 
   # .file_path
