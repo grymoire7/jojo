@@ -126,6 +126,28 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
     assert_equal ["Ruby"], data["skills"]
   end
 
+  def test_filter_field_handles_markdown_wrapped_json
+    data = {"skills" => ["Ruby", "Python", "Java"]}
+
+    @ai_client.expect(:generate_text, "```json\n[0, 2]\n```", [String])
+
+    @transformer.send(:filter_field, "skills", data)
+
+    assert_equal ["Ruby", "Java"], data["skills"]
+    @ai_client.verify
+  end
+
+  def test_filter_field_handles_prose_with_embedded_json_array
+    data = {"skills" => ["Ruby", "Python", "Java"]}
+
+    @ai_client.expect(:generate_text, "The most relevant items are [0, 2].", [String])
+
+    @transformer.send(:filter_field, "skills", data)
+
+    assert_equal ["Ruby", "Java"], data["skills"]
+    @ai_client.verify
+  end
+
   # -- reorder_field --
 
   def test_reorder_field_reorders_array_items_using_ai
@@ -184,6 +206,28 @@ class Jojo::Commands::Resume::TransformerTest < JojoTest
     end
 
     assert_includes error.message, "invalid indices"
+  end
+
+  def test_reorder_field_handles_markdown_wrapped_json
+    data = {"skills" => ["Ruby", "Python", "Java"]}
+
+    @ai_client.expect(:generate_text, "```json\n[2, 0, 1]\n```", [String])
+
+    @transformer.send(:reorder_field, "skills", data, can_remove: true)
+
+    assert_equal ["Java", "Ruby", "Python"], data["skills"]
+    @ai_client.verify
+  end
+
+  def test_reorder_field_handles_prose_with_embedded_json_array
+    data = {"skills" => ["Ruby", "Python", "Java"]}
+
+    @ai_client.expect(:generate_text, "The reordered indices are [2, 0, 1] based on relevance.", [String])
+
+    @transformer.send(:reorder_field, "skills", data, can_remove: true)
+
+    assert_equal ["Java", "Ruby", "Python"], data["skills"]
+    @ai_client.verify
   end
 
   def test_reorder_field_allows_removal_when_can_remove_is_true

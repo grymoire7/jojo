@@ -140,7 +140,7 @@ module Jojo
           PROMPT
 
           response = @ai_client.generate_text(prompt)
-          indices = JSON.parse(response)
+          indices = parse_json_indices(response)
           indices.map { |i| items[i] }
         end
 
@@ -163,7 +163,7 @@ module Jojo
           PROMPT
 
           response = @ai_client.generate_text(prompt)
-          indices = JSON.parse(response)
+          indices = parse_json_indices(response)
 
           unless can_remove
             if indices.length != original_count
@@ -202,6 +202,16 @@ module Jojo
               parent[key] = call_rewrite_ai(original)
             end
           end
+        end
+
+        def parse_json_indices(response)
+          cleaned = response.strip.gsub(/\A```(?:json)?\s*\n?/, "").gsub(/\n?```\s*\z/, "").strip
+          JSON.parse(cleaned)
+        rescue JSON::ParserError
+          match = cleaned.match(/\[[\d\s,]+\]/)
+          raise unless match
+
+          JSON.parse(match[0])
         end
 
         def call_rewrite_ai(original)
