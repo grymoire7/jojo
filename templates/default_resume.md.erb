@@ -21,11 +21,14 @@
 **Technologies:** <%= exp["technologies"].join(", ") %>
 <% end %>
 
+<% if education && !education.empty? %>
 ## Education
 
 <% education.each do |edu| %>
-### <%= edu["degree"] %> - <%= edu["institution"] %> (<%= edu["year"] %>)
+### <%= edu["degree"] %> - <%= edu["institution"] %>
 <%= edu["description"] if edu["description"] %>
+<% end %>
+
 <% end %>
 
 <% if recommendations && !recommendations.empty? %>
@@ -48,15 +51,4 @@
 
 <% end %>
 <% end %>
-
-<% if education && !education.empty? %>
-## Projects & Achievements
-
-<% education.each do |edu| %>
-### <%= edu["degree"] %>, <%= edu["institution"] %>
-<%= edu["description"] %>
-
-<% end %>
-<% end %>
-
 
