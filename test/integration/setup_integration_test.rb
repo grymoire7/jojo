@@ -52,18 +52,18 @@ class SetupIntegrationTest < JojoTest
     cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Setting up your profile templates...", :green]
-    2.times { cli.expect :say, nil, [String, :green] }
+    cli.expect :say, nil, [String, :green]
 
     # show_summary
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Configuration complete!", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Created:"]
-    4.times { cli.expect :say, nil, [String] } # 4 created files
+    3.times { cli.expect :say, nil, [String] } # 3 created files
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Next steps:", :cyan]
     cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
-    cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
+    cli.expect :say, nil, ["  2. Copy templates/resume.md.erb to inputs/templates/ to customize resume layout"]
     cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
@@ -137,18 +137,18 @@ class SetupIntegrationTest < JojoTest
     cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Setting up your profile templates...", :green]
-    2.times { cli.expect :say, nil, [String, :green] }
+    cli.expect :say, nil, [String, :green]
 
     # show_summary
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Configuration complete!", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Created:"]
-    4.times { cli.expect :say, nil, [String] } # 4 created files
+    3.times { cli.expect :say, nil, [String] } # 3 created files
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Next steps:", :cyan]
     cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
-    cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
+    cli.expect :say, nil, ["  2. Copy templates/resume.md.erb to inputs/templates/ to customize resume layout"]
     cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
@@ -209,18 +209,18 @@ class SetupIntegrationTest < JojoTest
     cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Setting up your profile templates...", :green]
-    2.times { cli.expect :say, nil, [String, :green] }
+    cli.expect :say, nil, [String, :green]
 
     # show_summary
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Configuration complete!", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Created:"]
-    4.times { cli.expect :say, nil, [String] } # 4 created files
+    3.times { cli.expect :say, nil, [String] } # 3 created files
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Next steps:", :cyan]
     cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
-    cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
+    cli.expect :say, nil, ["  2. Copy templates/resume.md.erb to inputs/templates/ to customize resume layout"]
     cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
@@ -255,6 +255,6 @@ class SetupIntegrationTest < JojoTest
     FileUtils.cp(File.join(templates_dir, ".env.erb"), "templates/.env.erb")
     FileUtils.cp(File.join(templates_dir, "config.yml.erb"), "templates/config.yml.erb")
     FileUtils.cp(File.join(templates_dir, "resume_data.yml"), "templates/resume_data.yml")
-    FileUtils.cp(File.join(templates_dir, "default_resume.md.erb"), "templates/default_resume.md.erb")
+    FileUtils.cp(File.join(templates_dir, "resume.md.erb"), "templates/resume.md.erb")
   end
 end

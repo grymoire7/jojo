@@ -266,26 +266,6 @@ module Jojo
             @cli.say "✓ Created inputs/#{filename} #{description}", :green
             @created_files << "inputs/#{filename}"
           end
-
-          # Copy resume template to inputs/templates/
-          template_file = "default_resume.md.erb"
-          target_template_path = File.join("inputs", "templates", template_file)
-          source_template_path = File.join("templates", template_file)
-
-          if File.exist?(target_template_path) && !@overwrite
-            @cli.say "✓ inputs/templates/#{template_file} already exists (skipped)", :green
-            @skipped_files << "inputs/templates/#{template_file}"
-          else
-            unless File.exist?(source_template_path)
-              @cli.say "✗ Template file #{source_template_path} not found", :red
-              @cli.say "  This may indicate a corrupted installation.", :yellow
-              exit 1
-            end
-
-            FileUtils.cp(source_template_path, target_template_path)
-            @cli.say "✓ Created inputs/templates/#{template_file} (resume ERB template)", :green
-            @created_files << "inputs/templates/#{template_file}"
-          end
         end
 
         def show_summary
@@ -298,8 +278,7 @@ module Jojo
             file_descriptions = {
               ".env" => "API configuration",
               "config.yml" => "Personal preferences and permissions",
-              "inputs/resume_data.yml" => "Structured resume data (recommended)",
-              "inputs/templates/default_resume.md.erb" => "Resume rendering template"
+              "inputs/resume_data.yml" => "Structured resume data (recommended)"
             }
 
             @created_files.each do |file|
@@ -311,7 +290,7 @@ module Jojo
 
           @cli.say "Next steps:", :cyan
           @cli.say "  1. Customize inputs/resume_data.yml with your experience (structured format)"
-          @cli.say "  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"
+          @cli.say "  2. Copy templates/resume.md.erb to inputs/templates/ to customize resume layout"
           @cli.say "  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"
           @cli.say ""
           @cli.say "💡 Tip: The config.yml file contains resume_data.permissions to control curation."

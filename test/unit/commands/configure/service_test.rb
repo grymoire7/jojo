@@ -282,13 +282,12 @@ class Jojo::Commands::Configure::ServiceTest < JojoTest
   def test_setup_input_files_creates_inputs_directory_if_missing
     FileUtils.mkdir_p("templates")
     File.write("templates/resume_data.yml", "# JOJO_TEMPLATE_PLACEHOLDER")
-    File.write("templates/default_resume.md.erb", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->")
 
     cli = Minitest::Mock.new
     cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Setting up your profile templates...", :green]
-    2.times { cli.expect :say, nil, [String, :green] }
+    cli.expect :say, nil, [String, :green]
 
     service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.send(:setup_input_files)
@@ -301,14 +300,12 @@ class Jojo::Commands::Configure::ServiceTest < JojoTest
   def test_setup_input_files_copies_template_files_to_inputs
     FileUtils.mkdir_p("templates")
     File.write("templates/resume_data.yml", "# JOJO_TEMPLATE_PLACEHOLDER\nname: Test")
-    File.write("templates/default_resume.md.erb", "<!-- JOJO_TEMPLATE_PLACEHOLDER -->\n<%= name %>")
 
     cli = Minitest::Mock.new
     cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Setting up your profile templates...", :green]
     cli.expect :say, nil, ["✓ Created inputs/resume_data.yml (customize with your experience)", :green]
-    cli.expect :say, nil, ["✓ Created inputs/templates/default_resume.md.erb (resume ERB template)", :green]
 
     service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.send(:setup_input_files)
@@ -316,8 +313,6 @@ class Jojo::Commands::Configure::ServiceTest < JojoTest
     cli.verify
     assert_equal true, File.exist?("inputs/resume_data.yml")
     assert_includes File.read("inputs/resume_data.yml"), "JOJO_TEMPLATE_PLACEHOLDER"
-    assert_equal true, File.exist?("inputs/templates/default_resume.md.erb")
-    assert_includes File.read("inputs/templates/default_resume.md.erb"), "JOJO_TEMPLATE_PLACEHOLDER"
   end
 
   def test_setup_input_files_skips_existing_files_unless_overwrite_mode
@@ -326,14 +321,12 @@ class Jojo::Commands::Configure::ServiceTest < JojoTest
     FileUtils.mkdir_p("templates")
     File.write("inputs/resume_data.yml", "Existing data")
     File.write("templates/resume_data.yml", "Template data")
-    File.write("templates/default_resume.md.erb", "Template ERB")
 
     cli = Minitest::Mock.new
     cli.expect :say, nil, ["✓ inputs/ directory ready", :green]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Setting up your profile templates...", :green]
     cli.expect :say, nil, ["✓ inputs/resume_data.yml already exists (skipped)", :green]
-    cli.expect :say, nil, ["✓ Created inputs/templates/default_resume.md.erb (resume ERB template)", :green]
 
     service = Jojo::Commands::Configure::Service.new(cli_instance: cli, overwrite: false)
     service.send(:setup_input_files)
@@ -357,7 +350,7 @@ class Jojo::Commands::Configure::ServiceTest < JojoTest
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Next steps:", :cyan]
     cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
-    cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
+    cli.expect :say, nil, ["  2. Copy templates/resume.md.erb to inputs/templates/ to customize resume layout"]
     cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
@@ -378,7 +371,7 @@ class Jojo::Commands::Configure::ServiceTest < JojoTest
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["Next steps:", :cyan]
     cli.expect :say, nil, ["  1. Customize inputs/resume_data.yml with your experience (structured format)"]
-    cli.expect :say, nil, ["  2. Edit inputs/templates/default_resume.md.erb to customize resume layout"]
+    cli.expect :say, nil, ["  2. Copy templates/resume.md.erb to inputs/templates/ to customize resume layout"]
     cli.expect :say, nil, ["  3. Run 'jojo new -s <slug> -j <job-file>' to start your first application"]
     cli.expect :say, nil, [""]
     cli.expect :say, nil, ["💡 Tip: The config.yml file contains resume_data.permissions to control curation."]
