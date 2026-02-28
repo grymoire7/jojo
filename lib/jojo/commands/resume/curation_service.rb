@@ -18,7 +18,7 @@ module Jojo
           @overwrite = overwrite
         end
 
-        def generate(job_context)
+        def generate(job_context, template_vars: {})
           # Load base resume data
           loader = ResumeDataLoader.new(@resume_data_path)
           data = loader.load
@@ -41,7 +41,7 @@ module Jojo
 
           # Render using ERB template
           renderer = ErbRenderer.new(@template_path)
-          renderer.render(data)
+          renderer.render(data.merge(template_vars))
         end
 
         private

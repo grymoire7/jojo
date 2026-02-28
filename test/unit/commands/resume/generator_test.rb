@@ -68,6 +68,7 @@ class Jojo::Commands::Resume::GeneratorTest < JojoTest
     )
 
     @config.expect(:resume_template, nil)
+    @config.expect(:base_url, "https://example.com")
 
     error = assert_raises(Jojo::ResumeDataLoader::LoadError) do
       generator_no_data.generate

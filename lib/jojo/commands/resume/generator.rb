@@ -31,6 +31,11 @@ module Jojo
             job_description: File.read(application.job_description_path)
           }
 
+          template_vars = {
+            "company_name" => application.company_name,
+            "landing_page_url" => "#{config.base_url}/resume/#{application.slug}"
+          }
+
           log "Using transformation pipeline..."
           service = CurationService.new(
             ai_client: ai_client,
@@ -41,22 +46,16 @@ module Jojo
             overwrite: overwrite_flag || false
           )
 
-          resume = service.generate(job_context)
-          resume_with_link = add_landing_page_link(resume)
+          resume = service.generate(job_context, template_vars: template_vars)
 
           log "Saving resume to #{application.resume_path}..."
-          save_resume(resume_with_link)
+          save_resume(resume)
 
           log "Resume generation complete!"
-          resume_with_link
+          resume
         end
 
         private
-
-        def add_landing_page_link(resume_content)
-          link = "**Specifically for #{application.company_name}**: #{config.base_url}/resume/#{application.slug}"
-          "#{link}\n\n#{resume_content}"
-        end
 
         def save_resume(content)
           if cli_instance
