@@ -76,4 +76,30 @@ class Jojo::Commands::Resume::GeneratorTest < JojoTest
 
     assert_includes error.message, "not found"
   end
+
+  def test_resolve_template_path_returns_inputs_override_when_present
+    generator = Jojo::Commands::Resume::Generator.new(
+      @application, @ai_client,
+      config: @config, verbose: false,
+      inputs_path: "."
+    )
+    FileUtils.mkdir_p("templates")
+    File.write(File.join("templates", "resume.md.erb"), "override")
+
+    result = generator.send(:resolve_template_path, "resume.md.erb")
+
+    assert_equal File.join(".", "templates", "resume.md.erb"), result
+  end
+
+  def test_resolve_template_path_falls_back_to_templates_dir
+    generator = Jojo::Commands::Resume::Generator.new(
+      @application, @ai_client,
+      config: @config, verbose: false,
+      inputs_path: "nonexistent_inputs"
+    )
+
+    result = generator.send(:resolve_template_path, "resume.md.erb")
+
+    assert_equal File.join("templates", "resume.md.erb"), result
+  end
 end

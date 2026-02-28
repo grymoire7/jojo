@@ -22,8 +22,7 @@ module Jojo
           log "Generating config-based resume..."
 
           resume_data_path = File.join(inputs_path, "resume_data.yml")
-          template_path = config.resume_template ||
-            File.join(inputs_path, "templates", "default_resume.md.erb")
+          template_path = config.resume_template || resolve_template_path("resume.md.erb")
 
           cache_path = File.join(application.base_path, "resume_data_curated.yml")
 
@@ -56,6 +55,12 @@ module Jojo
         end
 
         private
+
+        def resolve_template_path(filename)
+          user_path = File.join(inputs_path, "templates", filename)
+          return user_path if File.exist?(user_path)
+          File.join("templates", filename)
+        end
 
         def save_resume(content)
           if cli_instance
