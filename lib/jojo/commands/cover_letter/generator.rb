@@ -9,8 +9,6 @@ module Jojo
   module Commands
     module CoverLetter
       class Generator
-        TEMPLATE_PATH = File.expand_path("cover_letter.md.erb", __dir__)
-
         attr_reader :application, :ai_client, :config, :verbose, :inputs_path, :overwrite_flag, :cli_instance
 
         def initialize(application, ai_client, config:, verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
@@ -127,7 +125,7 @@ module Jojo
 
         def render_template(body, inputs)
           resume_data = inputs[:resume_data]
-          renderer = ErbRenderer.new(TEMPLATE_PATH)
+          renderer = ErbRenderer.new(resolve_template_path("cover_letter.md.erb"))
           renderer.render(
             "name" => resume_data["name"],
             "email" => resume_data["email"],
@@ -137,6 +135,12 @@ module Jojo
             "company_name" => inputs[:company_name],
             "landing_page_url" => "#{config.base_url}/#{inputs[:company_slug]}"
           )
+        end
+
+        def resolve_template_path(filename)
+          user_path = File.join(inputs_path, "templates", filename)
+          return user_path if File.exist?(user_path)
+          File.join("templates", filename)
         end
 
         def save_cover_letter(content)

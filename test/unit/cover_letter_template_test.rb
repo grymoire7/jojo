@@ -5,6 +5,7 @@ require_relative "../../lib/jojo/application"
 class CoverLetterTemplateTest < JojoTest
   def setup
     super
+    copy_templates
     @application = Jojo::Application.new("acme-corp")
     @application.create_directory!
 
@@ -87,5 +88,26 @@ class CoverLetterTemplateTest < JojoTest
     assert_includes result, expected_date
     mock_ai.verify
     @config.verify
+  end
+
+  def test_uses_inputs_template_override_when_present
+    FileUtils.mkdir_p("inputs/templates")
+    FileUtils.cp(fixture_path("resume_data.yml"), "inputs/resume_data.yml")
+    File.write("inputs/templates/cover_letter.md.erb", "OVERRIDE: <%= body %>")
+
+    mock_ai = Minitest::Mock.new
+    mock_ai.expect(:generate_text, "letter body", [String])
+    @config.expect(:voice_and_tone, "professional and friendly")
+    @config.expect(:base_url, "https://example.com")
+
+    generator = Jojo::Commands::CoverLetter::Generator.new(
+      @application, mock_ai,
+      config: @config,
+      inputs_path: "inputs"
+    )
+    result = generator.generate
+
+    assert_includes result, "OVERRIDE: letter body"
+    mock_ai.verify
   end
 end
