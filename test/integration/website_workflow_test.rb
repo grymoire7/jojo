@@ -47,7 +47,7 @@ class WebsiteWorkflowTest < JojoTest
       @employer,
       @ai_client,
       config: @config,
-      template: "default",
+      template: "index",
       verbose: false
     )
     enable_tailwind_build(generator)

@@ -11,7 +11,7 @@ module Jojo
       class Generator
         attr_reader :application, :ai_client, :config, :verbose, :template_name, :inputs_path, :overwrite_flag, :cli_instance
 
-        def initialize(application, ai_client, config:, template: "default", verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
+        def initialize(application, ai_client, config:, template: "index", verbose: false, inputs_path: "inputs", overwrite_flag: nil, cli_instance: nil)
           @application = application
           @ai_client = ai_client
           @config = config
@@ -158,10 +158,10 @@ module Jojo
         end
 
         def render_template(vars)
-          template_path = File.join("templates", "website", "#{template_name}.html.erb")
+          template_path = resolve_template_path("website/#{template_name}.html.erb")
 
           unless File.exist?(template_path)
-            raise "Template not found: #{template_path}. Available templates: #{available_templates.join(", ")}"
+            raise "Template not found: #{template_name}. Available templates: #{available_templates.join(", ")}"
           end
 
           template_content = File.read(template_path)
@@ -226,25 +226,16 @@ module Jojo
         end
 
         def copy_template_assets
-          # Ensure website directory exists
           FileUtils.mkdir_p(application.website_path)
-
-          # Build Tailwind CSS
           build_tailwind_css
-
-          # Copy static assets (CSS is now built by Tailwind, not copied)
-          template_dir = File.join("templates", "website")
-          assets = ["script.js", "icons.svg"]
-
-          assets.each do |asset|
-            source = File.join(template_dir, asset)
+          ["script.js", "icons.svg"].each do |asset|
+            source = resolve_template_path("website/#{asset}")
             dest = File.join(application.website_path, asset)
-
             if File.exist?(source)
               FileUtils.cp(source, dest)
               log "Copied #{asset} to #{application.website_path}"
             else
-              log "Warning: Asset not found: #{source}"
+              log "Warning: Asset not found: #{asset}"
             end
           end
         end
@@ -302,6 +293,12 @@ module Jojo
           else
             File.write(application.index_html_path, html)
           end
+        end
+
+        def resolve_template_path(relative)
+          user_path = File.join(inputs_path, "templates", relative)
+          return user_path if File.exist?(user_path)
+          File.join("templates", relative)
         end
 
         def available_templates

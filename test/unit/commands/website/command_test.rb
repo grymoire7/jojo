@@ -60,7 +60,7 @@ class Jojo::Commands::Website::CommandTest < JojoTest
 
     mock_generator.expect(:generate, nil)
     mock_ai_client.expect(:total_tokens_used, 100)
-    mock_status_logger.expect(:log, nil, [], step: :website, tokens: 100, status: "complete", metadata: {template: "default"})
+    mock_status_logger.expect(:log, nil, [], step: :website, tokens: 100, status: "complete", metadata: {template: "index"})
 
     @mock_cli.expect(:say, nil, ["Generating website for Acme Corp...", :green])
     @mock_cli.expect(:say, nil, ["Warning: Research not found. Website will be less targeted.", :yellow])
@@ -95,7 +95,7 @@ class Jojo::Commands::Website::CommandTest < JojoTest
 
     mock_generator.expect(:generate, nil)
     mock_ai_client.expect(:total_tokens_used, 200)
-    mock_status_logger.expect(:log, nil, [], step: :website, tokens: 200, status: "complete", metadata: {template: "default"})
+    mock_status_logger.expect(:log, nil, [], step: :website, tokens: 200, status: "complete", metadata: {template: "index"})
 
     @mock_cli.expect(:say, nil, ["Generating website for Acme Corp...", :green])
     @mock_cli.expect(:say, nil, ["Website generated and saved to applications/acme-corp/index.html", :green])
@@ -133,7 +133,7 @@ class Jojo::Commands::Website::CommandTest < JojoTest
     @mock_cli.expect(:say, nil, [String, :green])
 
     mock_ai_client.expect(:total_tokens_used, 350)
-    mock_status_logger.expect(:log, nil, [], step: :website, tokens: 350, status: "complete", metadata: {template: "default"})
+    mock_status_logger.expect(:log, nil, [], step: :website, tokens: 350, status: "complete", metadata: {template: "index"})
 
     command = Jojo::Commands::Website::Command.new(
       @mock_cli,

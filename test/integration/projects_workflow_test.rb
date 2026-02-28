@@ -76,7 +76,7 @@ class ProjectsIntegrationWorkflowTest < JojoTest
 
     mock_ai = Minitest::Mock.new
 
-    generator = Jojo::Commands::Website::Generator.new(@employer, mock_ai, config: config, template: "default", inputs_path: @test_fixtures_dir)
+    generator = Jojo::Commands::Website::Generator.new(@employer, mock_ai, config: config, template: "index", inputs_path: @test_fixtures_dir)
     generator.generate
 
     html = File.read(@employer.index_html_path)

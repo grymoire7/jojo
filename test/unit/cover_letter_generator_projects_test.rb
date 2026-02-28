@@ -6,6 +6,7 @@ require_relative "../../lib/jojo/config"
 class CoverLetterGeneratorProjectsTest < JojoTest
   def setup
     super
+    copy_templates
     @application = Jojo::Application.new("test-corp")
     @application.create_directory!
     @config = Jojo::Config.new(fixture_path("valid_config.yml"))

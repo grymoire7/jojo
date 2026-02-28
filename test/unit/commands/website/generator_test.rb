@@ -306,4 +306,35 @@ class Jojo::Commands::Website::GeneratorTest < JojoTest
 
     assert_includes error.message, "branding.md not found"
   end
+
+  def test_uses_inputs_template_override_when_present
+    FileUtils.mkdir_p("override_inputs/templates/website")
+    File.write("override_inputs/templates/website/index.html.erb", "<html>OVERRIDE: <%= seeker_name %></html>")
+
+    generator = Jojo::Commands::Website::Generator.new(
+      @application, @ai_client,
+      config: @config,
+      verbose: false,
+      inputs_path: "override_inputs"
+    )
+    result = generator.generate
+
+    assert_includes result, "OVERRIDE: Jane Doe"
+  end
+
+  def test_uses_inputs_asset_override_when_present
+    FileUtils.mkdir_p("override_inputs/templates/website")
+    File.write("override_inputs/templates/website/index.html.erb", "<html>website</html>")
+    File.write("override_inputs/templates/website/script.js", "// CUSTOM JS")
+
+    generator = Jojo::Commands::Website::Generator.new(
+      @application, @ai_client,
+      config: @config,
+      verbose: false,
+      inputs_path: "override_inputs"
+    )
+    generator.generate
+
+    assert_includes File.read(File.join(@application.website_path, "script.js")), "// CUSTOM JS"
+  end
 end

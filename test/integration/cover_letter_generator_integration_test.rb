@@ -6,6 +6,7 @@ require_relative "../../lib/jojo/commands/cover_letter/generator"
 class CoverLetterGeneratorIntegrationTest < JojoTest
   def setup
     super
+    copy_templates
     @application = Jojo::Application.new("acme-corp")
     @ai_client = Minitest::Mock.new
     @config = Minitest::Mock.new

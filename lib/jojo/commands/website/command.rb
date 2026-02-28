@@ -57,7 +57,7 @@ module Jojo
         end
 
         def template_name
-          options[:template] || "default"
+          options[:template] || "index"
         end
       end
     end

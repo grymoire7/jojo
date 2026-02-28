@@ -19,7 +19,7 @@ module Jojo
     class_option :verbose, type: :boolean, aliases: "-v", desc: "Run verbosely"
     class_option :quiet, type: :boolean, aliases: "-q", desc: "Suppress output, rely on exit code"
     class_option :slug, type: :string, aliases: "-s", desc: "Application slug (unique identifier)"
-    class_option :template, type: :string, aliases: "-t", desc: "Website template name (default: default)", default: "default"
+    class_option :template, type: :string, aliases: "-t", desc: "Website template name (default: index)", default: "index"
     class_option :overwrite, type: :boolean, banner: "Overwrite existing files without prompting"
 
     def self.exit_on_failure?
