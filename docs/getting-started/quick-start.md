@@ -31,7 +31,7 @@ Replace the example content with your actual experience, skills, projects, and a
 Optionally customize the resume template and recommendations:
 
 ```bash
-nvim inputs/templates/default_resume.md.erb
+nvim inputs/templates/resume.md.erb
 nvim inputs/recommendations.md  # or delete if not needed
 ```
 

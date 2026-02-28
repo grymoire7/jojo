@@ -29,7 +29,7 @@ has_children: true
 
 | Command | Inputs | Outputs |
 |---------|--------|---------|
-| [`jojo configure`](configure) | None (interactive) | `.env`, `config.yml`, `inputs/resume_data.yml`, `inputs/templates/default_resume.md.erb` |
+| [`jojo configure`](configure) | None (interactive) | `.env`, `config.yml`, `inputs/resume_data.yml` |
 | [`jojo new`](new) | `inputs/resume_data.yml` | `applications/<slug>/` (workspace directory) |
 | [`jojo job_description`](job-description) | Job source (file or URL via `-j`) | `applications/<slug>/job_description_raw.md`, `job_description.md`, `job_details.yml`, `website/` |
 | [`jojo research`](research) | `applications/<slug>/job_description.md`, `job_details.yml` | `applications/<slug>/research.md`, `status_log.md` |
@@ -46,7 +46,7 @@ has_children: true
 | Option | Description |
 |--------|-------------|
 | `-s, --slug SLUG` | Application slug (unique identifier for the job application) |
-| `-t, --template TEMPLATE` | Website template name (default: `"default"`) |
+| `-t, --template TEMPLATE` | Website template name (default: `"index"`) |
 | `-v, --verbose` | Run verbosely with detailed output |
 | `-q, --quiet` | Suppress output, rely on exit code only |
 | `--overwrite` | Overwrite existing files without prompting |

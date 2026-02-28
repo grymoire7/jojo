@@ -95,9 +95,26 @@ Structured resume data in YAML format containing your complete work history, ski
 
 Delete the first comment line after customizing — Jojo warns you if templates are unchanged.
 
-### `inputs/templates/default_resume.md.erb`
+### Customizing templates
 
-ERB template used to render `resume_data.yml` into markdown. Customize to change how your resume is formatted.
+Output templates live in `templates/` — `resume.md.erb`, `cover_letter.md.erb`, and `website/index.html.erb`. Jojo uses these defaults automatically.
+
+To customize any template, copy it to `inputs/templates/` and edit it there. Jojo checks `inputs/templates/` first and falls back to `templates/` if no override exists:
+
+```bash
+# Customize the resume template
+cp templates/resume.md.erb inputs/templates/resume.md.erb
+nvim inputs/templates/resume.md.erb
+
+# Customize the cover letter template
+cp templates/cover_letter.md.erb inputs/templates/cover_letter.md.erb
+
+# Customize the website template and its assets
+cp templates/website/index.html.erb inputs/templates/website/index.html.erb
+cp templates/website/script.js inputs/templates/website/script.js
+```
+
+The `inputs/` directory is gitignored, so your customizations stay private.
 
 ### `inputs/recommendations.md` (optional)
 

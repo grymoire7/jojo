@@ -27,7 +27,6 @@ Interactive configuration wizard for API keys and preferences.
 | `.env` | API key for your chosen provider |
 | `config.yml` | User configuration (models, permissions, website settings) |
 | `inputs/resume_data.yml` | Structured resume data template |
-| `inputs/templates/default_resume.md.erb` | Resume rendering template |
 
 ## Example
 

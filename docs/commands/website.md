@@ -20,7 +20,7 @@ Generate a professional landing page that showcases you as the ideal candidate.
 | Option | Description |
 |--------|-------------|
 | `-s, --slug SLUG` | Application slug (or set `JOJO_APPLICATION_SLUG`) |
-| `-t, --template TEMPLATE` | Template name (default: `"default"`) |
+| `-t, --template TEMPLATE` | Template name (default: `"index"`) |
 | `--overwrite` | Overwrite existing website without prompting |
 
 ## Inputs
@@ -34,7 +34,7 @@ Generate a professional landing page that showcases you as the ideal candidate.
 | `applications/<slug>/faq.json` | FAQ content |
 | `applications/<slug>/job_description_annotations.json` | Job annotations |
 | `applications/<slug>/branding_statement.json` | Branding statement |
-| `inputs/templates/*` | Website templates |
+| `inputs/templates/website/` | Optional template and asset overrides |
 
 ## Outputs
 

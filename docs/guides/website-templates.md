@@ -38,7 +38,7 @@ Templates are ERB files located in `templates/website/`.
 1. Copy the default template:
 
    ```bash
-   cp templates/website/default.html.erb templates/website/modern.html.erb
+   cp templates/website/index.html.erb templates/website/modern.html.erb
    ```
 
 2. Edit with your custom HTML and CSS:
@@ -52,6 +52,23 @@ Templates are ERB files located in `templates/website/`.
    ```bash
    ./bin/jojo website -s acme-corp-senior-dev -t modern
    ```
+
+## Overriding the default template
+
+To customize the default website template without creating a named variant, copy it to `inputs/templates/website/`:
+
+```bash
+mkdir -p inputs/templates/website
+cp templates/website/index.html.erb inputs/templates/website/index.html.erb
+nvim inputs/templates/website/index.html.erb
+```
+
+Jojo will use your override automatically — no `-t` flag needed. You can also override static assets the same way:
+
+```bash
+cp templates/website/script.js inputs/templates/website/script.js
+cp templates/website/icons.svg inputs/templates/website/icons.svg
+```
 
 ## Template variables
 
@@ -95,6 +112,6 @@ ERB (Embedded Ruby) lets you embed Ruby code in HTML:
 
 ## Design guidelines
 
-- **Self-contained** — Templates should be single HTML files with inline CSS. External stylesheets and JavaScript files are not currently supported.
+- **Self-contained** — The default template uses Tailwind CSS and DaisyUI (built automatically). Custom named templates (e.g., `-t modern`) can use inline CSS or link to assets you copy alongside them.
 - **Responsive** — Consider mobile viewing since employers may open your link on any device.
 - **Professional** — Match the tone to your `voice_and_tone` setting in `config.yml`.
