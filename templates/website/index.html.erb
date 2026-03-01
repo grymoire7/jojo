@@ -232,8 +232,14 @@
               <% if project[:blog_post_url] %>
               <a href="<%= project[:blog_post_url] %>" class="btn btn-primary btn-sm">Technical Deep Dive</a>
               <% end %>
+              <% if project[:newsletter] %>
+              <a href="<%= project[:newsletter] %>" class="btn btn-primary btn-sm">Newsletter</a>
+              <% end %>
               <% if project[:live_url] %>
               <a href="<%= project[:live_url] %>" class="btn btn-accent btn-sm">Live Demo</a>
+              <% end %>
+              <% if project[:link] %>
+              <a href="<%= project[:link] %>" class="btn btn-accent btn-sm">Link</a>
               <% end %>
               <% if project[:url] %>
               <a href="<%= project[:url] %>" class="btn btn-outline btn-sm">Source Code</a>
