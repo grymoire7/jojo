@@ -1,6 +1,7 @@
 # lib/jojo/commands/annotate/generator.rb
 require "json"
 require_relative "prompt"
+require_relative "../../json_extractor"
 
 module Jojo
   module Commands
@@ -78,11 +79,7 @@ module Jojo
         end
 
         def parse_annotations(json_string)
-          # Strip markdown code fences if present (defensive programming)
-          # AI models sometimes wrap JSON in ```json ... ``` despite instructions
-          cleaned_json = json_string.strip.gsub(/\A```(?:json)?\n?/, "").gsub(/\n?```\z/, "")
-
-          JSON.parse(cleaned_json, symbolize_names: true)
+          JsonExtractor.call(json_string, symbolize_names: true)
         rescue JSON::ParserError => e
           log("Error: Failed to parse AI response as JSON: #{e.message}", status: "failed")
           raise "AI returned invalid JSON: #{e.message}"

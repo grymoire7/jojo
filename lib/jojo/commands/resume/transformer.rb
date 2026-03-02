@@ -1,6 +1,7 @@
 # lib/jojo/commands/resume/transformer.rb
 require "json"
 require_relative "../../errors"
+require_relative "../../json_extractor"
 
 module Jojo
   module Commands
@@ -140,7 +141,7 @@ module Jojo
           PROMPT
 
           response = @ai_client.generate_text(prompt)
-          indices = parse_json_indices(response)
+          indices = JsonExtractor.call(response)
           indices.map { |i| items[i] }
         end
 
@@ -163,7 +164,7 @@ module Jojo
           PROMPT
 
           response = @ai_client.generate_text(prompt)
-          indices = parse_json_indices(response)
+          indices = JsonExtractor.call(response)
 
           unless can_remove
             if indices.length != original_count
@@ -202,16 +203,6 @@ module Jojo
               parent[key] = call_rewrite_ai(original)
             end
           end
-        end
-
-        def parse_json_indices(response)
-          cleaned = response.strip.gsub(/\A```(?:json)?\s*\n?/, "").gsub(/\n?```\s*\z/, "").strip
-          JSON.parse(cleaned)
-        rescue JSON::ParserError
-          match = cleaned.match(/\[[\d\s,]+\]/)
-          raise unless match
-
-          JSON.parse(match[0])
         end
 
         def call_rewrite_ai(original)
