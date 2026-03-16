@@ -6,7 +6,11 @@ gem "thor", "~> 1.3"
 gem "ruby_llm", "~> 1.13"
 gem "deepsearch-rb", "~> 0.1"
 gem "dotenv", "~> 3.1"
-gem "html-to-markdown", "~> 2.16"
+# Pinned to < 2.26: versions 2.26+ introduced a workspace Cargo.toml at the gem
+# root that conflicts with Cargo 1.94.0, which requires Cargo.lock to be at the
+# workspace root. 2.25.x places the workspace root at native/, where Cargo.lock
+# correctly lives, pinning the html-to-markdown-rs Rust crate to a compatible version.
+gem "html-to-markdown", "~> 2.25.1"
 gem "reline"
 gem "tty-prompt", "~> 0.23"
 gem "tty-box", "~> 0.7"          # Box drawing for TUI

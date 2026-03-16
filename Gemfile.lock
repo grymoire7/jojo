@@ -46,7 +46,7 @@ GEM
     fiber-local (1.1.0)
       fiber-storage
     fiber-storage (1.0.1)
-    html-to-markdown (2.16.1)
+    html-to-markdown (2.25.1)
       rb_sys (>= 0.9, < 1.0)
     io-console (0.8.1)
     io-event (1.14.2)
@@ -82,9 +82,9 @@ GEM
       rack (>= 3)
     rainbow (3.1.1)
     rake (13.3.1)
-    rake-compiler-dock (1.10.0)
-    rb_sys (0.9.123)
-      rake-compiler-dock (= 1.10.0)
+    rake-compiler-dock (1.11.0)
+    rb_sys (0.9.124)
+      rake-compiler-dock (= 1.11.0)
     regexp_parser (2.11.3)
     reline (0.6.2)
       io-console (~> 0.5)
@@ -171,7 +171,7 @@ PLATFORMS
 DEPENDENCIES
   deepsearch-rb (~> 0.1)
   dotenv (~> 3.1)
-  html-to-markdown (~> 2.16)
+  html-to-markdown (~> 2.25.1)
   minitest (~> 5.25)
   minitest-reporters (~> 1.7)
   mock_openai!
