@@ -2,7 +2,7 @@ require_relative "../test_helper"
 require_relative "../../lib/jojo/application"
 require_relative "../../lib/jojo/commands/job_description/processor"
 
-class JobDescriptionProcessorVcrTest < JojoTest
+class JobDescriptionProcessorTest < JojoTest
   def setup
     super
     @application = Jojo::Application.new("test-company")
