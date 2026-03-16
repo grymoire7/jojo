@@ -41,27 +41,16 @@ require "minitest/reporters"
 # standard per-test timing format ("TestFoo#test_bar = 0.01 s = .").
 Minitest::Reporters.use! unless ENV["A"]&.include?("-v")
 
-require "vcr"
-require "webmock"
-
-# Ensure API keys are set so RubyLLM passes config validation
-# before making HTTP requests that VCR can intercept
-ENV["ANTHROPIC_API_KEY"] ||= "test-key-for-vcr"
-ENV["OPENAI_API_KEY"] ||= "test-key-for-vcr"
-
-VCR.configure do |config|
-  config.cassette_library_dir = File.expand_path("cassettes", __dir__)
-  config.hook_into :webmock
-  config.default_cassette_options = {
-    record: :once,
-    match_requests_on: [:method, :uri, :body]
-  }
-  config.filter_sensitive_data("<ANTHROPIC_API_KEY>") { ENV["ANTHROPIC_API_KEY"] }
-  config.filter_sensitive_data("<OPENAI_API_KEY>") { ENV["OPENAI_API_KEY"] }
-  config.ignore_localhost = true
-end
-
 require_relative "../lib/jojo"
+
+require "mock_openai/minitest"
+
+MockOpenAI.start_test_server!
+
+RubyLLM.configure do |config|
+  config.anthropic_api_key = ENV.fetch("ANTHROPIC_API_KEY", "test-key")
+  config.anthropic_api_base = MockOpenAI.server_url
+end
 
 # Stub Tailwind CSS builds by default in all tests to avoid the ~150ms CLI
 # invocation in tests that don't need to verify CSS output. Call
@@ -73,6 +62,8 @@ class Jojo::Commands::Website::Generator
 end
 
 class JojoTest < Minitest::Test
+  include MockOpenAI::Minitest
+
   def setup
     @original_dir = Dir.pwd
     @tmpdir = Dir.mktmpdir
@@ -118,10 +109,6 @@ class JojoTest < Minitest::Test
 
   def enable_tailwind_build(generator)
     generator.define_singleton_method(:build_tailwind_css) { build_tailwind_css_real }
-  end
-
-  def with_vcr(cassette_name, &block)
-    VCR.use_cassette(cassette_name, &block)
   end
 
   def write_test_config(overrides = {})
