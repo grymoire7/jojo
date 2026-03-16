@@ -1,5 +1,6 @@
-PATH
-  remote: ../mockopenai
+GIT
+  remote: https://github.com/grymoire7/mockopenai.git
+  revision: 32b9a5db18616ed31dcfaaf2a34cc7572069b498
   specs:
     mock_openai (0.1.0)
       logger (~> 1.0)

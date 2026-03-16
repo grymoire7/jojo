@@ -24,5 +24,5 @@ end
 group :test do
   gem "simplecov", require: false
   gem "simplecov_json_formatter", require: false
-  gem "mock_openai", path: "../mockopenai"
+  gem "mock_openai", git: "https://github.com/grymoire7/mockopenai.git"
 end
